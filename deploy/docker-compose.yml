@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: smart-park-postgres
+    environment:
+      POSTGRES_DB: parking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: smart-park-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.9
+    container_name: smart-park-etcd
+    environment:
+      ETCD_NAME: etcd
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+    ports:
+      - "2379:2379"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    container_name: smart-park-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+
+  gateway:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.gateway
+    container_name: smart-park-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - etcd
+    environment:
+      - KRATOS_CONF=../../configs/gateway.yaml
+
+  vehicle:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.vehicle
+    container_name: smart-park-vehicle
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - KRATOS_CONF=../../configs/vehicle.yaml
+
+  billing:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.billing
+    container_name: smart-park-billing
+    ports:
+      - "8002:8002"
+    depends_on:
+      - postgres
+    environment:
+      - KRATOS_CONF=../../configs/billing.yaml
+
+  payment:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.payment
+    container_name: smart-park-payment
+    ports:
+      - "8003:8003"
+    depends_on:
+      - postgres
+    environment:
+      - KRATOS_CONF=../../configs/payment.yaml
+
+  admin:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.admin
+    container_name: smart-park-admin
+    ports:
+      - "8004:8004"
+    depends_on:
+      - postgres
+    environment:
+      - KRATOS_CONF=../../configs/admin.yaml
+
+volumes:
+  postgres_data:
+  redis_data:

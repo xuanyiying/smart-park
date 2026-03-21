@@ -1,0 +1,17 @@
+server:
+  port: 8000
+  timeout: 60
+
+log:
+  level: info
+  format: json
+
+routes:
+  - path: /api/v1/device
+    target: vehicle-svc:8001
+  - path: /api/v1/billing
+    target: billing-svc:8002
+  - path: /api/v1/pay
+    target: payment-svc:8003
+  - path: /api/v1/admin
+    target: admin-svc:8004

@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+package api.admin.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/admin/v1;v1";
+
+import "google/api/annotations.proto";
+
+service AdminService {
+  rpc CreateParkingLot (CreateParkingLotRequest) returns (CreateParkingLotResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/lots"
+      body: "*"
+    };
+  }
+
+  rpc GetParkingLot (GetParkingLotRequest) returns (GetParkingLotResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/lots/{id}"
+    };
+  }
+
+  rpc UpdateParkingLot (UpdateParkingLotRequest) returns (UpdateParkingLotResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/lots/{id}"
+      body: "*"
+    };
+  }
+
+  rpc ListParkingLots (ListParkingLotsRequest) returns (ListParkingLotsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/lots"
+    };
+  }
+
+  rpc ListParkingRecords (ListParkingRecordsRequest) returns (ListParkingRecordsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/records"
+    };
+  }
+
+  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/orders"
+    };
+  }
+
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/orders/{id}"
+    };
+  }
+
+  rpc CreateVehicle (CreateVehicleRequest) returns (CreateVehicleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/vehicles"
+      body: "*"
+    };
+  }
+
+  rpc ListVehicles (ListVehiclesRequest) returns (ListVehiclesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/vehicles"
+    };
+  }
+
+  rpc GetDailyReport (GetDailyReportRequest) returns (GetDailyReportResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/reports/daily"
+    };
+  }
+
+  rpc GetMonthlyReport (GetMonthlyReportRequest) returns (GetMonthlyReportResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/reports/monthly"
+    };
+  }
+}
+
+message CreateParkingLotRequest {
+  string name = 1;
+  string address = 2;
+  int32 lanes = 3;
+}
+
+message CreateParkingLotResponse {
+  int32 code = 1;
+  string message = 2;
+  ParkingLot data = 3;
+}
+
+message GetParkingLotRequest {
+  string id = 1;
+}
+
+message GetParkingLotResponse {
+  int32 code = 1;
+  string message = 2;
+  ParkingLot data = 3;
+}
+
+message UpdateParkingLotRequest {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  int32 lanes = 4;
+  string status = 5;
+}
+
+message UpdateParkingLotResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message ListParkingLotsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListParkingLotsResponse {
+  int32 code = 1;
+  string message = 2;
+  ListData data = 3;
+}
+
+message ParkingLot {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  int32 lanes = 4;
+  string status = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message ListParkingRecordsRequest {
+  string lot_id = 1;
+  string start_time = 2;
+  string end_time = 3;
+  string plate_number = 4;
+  int32 page = 5;
+  int32 page_size = 6;
+}
+
+message ListParkingRecordsResponse {
+  int32 code = 1;
+  string message = 2;
+  ListData data = 3;
+}
+
+message ParkingRecord {
+  string id = 1;
+  string lot_id = 2;
+  string plate_number = 3;
+  int64 entry_time = 4;
+  int64 exit_time = 5;
+  int32 parking_duration = 6;
+  string status = 7;
+}
+
+message ListOrdersRequest {
+  string lot_id = 1;
+  string status = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message ListOrdersResponse {
+  int32 code = 1;
+  string message = 2;
+  ListData data = 3;
+}
+
+message GetOrderRequest {
+  string id = 1;
+}
+
+message GetOrderResponse {
+  int32 code = 1;
+  string message = 2;
+  Order data = 3;
+}
+
+message Order {
+  string id = 1;
+  string record_id = 2;
+  string lot_id = 3;
+  string plate_number = 4;
+  double amount = 5;
+  double discount_amount = 6;
+  double final_amount = 7;
+  string status = 8;
+  string pay_time = 9;
+  string pay_method = 10;
+}
+
+message CreateVehicleRequest {
+  string plate_number = 1;
+  string vehicle_type = 2;
+  string owner_name = 3;
+  string owner_phone = 4;
+  string monthly_valid_until = 5;
+}
+
+message CreateVehicleResponse {
+  int32 code = 1;
+  string message = 2;
+  Vehicle data = 3;
+}
+
+message ListVehiclesRequest {
+  string vehicle_type = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListVehiclesResponse {
+  int32 code = 1;
+  string message = 2;
+  ListData data = 3;
+}
+
+message Vehicle {
+  string id = 1;
+  string plate_number = 2;
+  string vehicle_type = 3;
+  string owner_name = 4;
+  string owner_phone = 5;
+  string monthly_valid_until = 6;
+  string created_at = 7;
+}
+
+message GetDailyReportRequest {
+  string lot_id = 1;
+  string date = 2;
+}
+
+message GetDailyReportResponse {
+  int32 code = 1;
+  string message = 2;
+  DailyReport data = 3;
+}
+
+message DailyReport {
+  string lot_id = 1;
+  string date = 2;
+  int32 total_entries = 3;
+  int32 total_exits = 4;
+  int32 total_vehicles = 5;
+  double total_amount = 6;
+  double total_discount = 7;
+  double net_amount = 8;
+}
+
+message GetMonthlyReportRequest {
+  string lot_id = 1;
+  int32 year = 2;
+  int32 month = 3;
+}
+
+message GetMonthlyReportResponse {
+  int32 code = 1;
+  string message = 2;
+  MonthlyReport data = 3;
+}
+
+message MonthlyReport {
+  string lot_id = 1;
+  int32 year = 2;
+  int32 month = 3;
+  int32 total_entries = 4;
+  int32 total_exits = 5;
+  int32 total_vehicles = 6;
+  double total_amount = 7;
+  double total_discount = 8;
+  double net_amount = 9;
+  repeated DailyReport daily_reports = 10;
+}
+
+message ListData {
+  repeated google.protobuf.Empty list = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}

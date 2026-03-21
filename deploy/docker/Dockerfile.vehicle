@@ -1,0 +1,37 @@
+# Build stage
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies
+RUN apk add --no-cache git make protobuf
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build vehicle service
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/vehicle-svc ./cmd/vehicle-svc
+
+# Final stage
+FROM alpine:latest
+
+WORKDIR /app
+
+# Install ca-certificates for HTTPS
+RUN apk --no-cache add ca-certificates tzdata
+
+# Copy binary from builder
+COPY --from=builder /app/vehicle-svc .
+
+# Copy configuration
+COPY configs/vehicle.yaml /app/configs/vehicle.yaml
+
+# Expose port
+EXPOSE 8001
+
+# Run the binary
+CMD ["./vehicle-svc"]

@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package api.payment.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/payment/v1;v1";
+
+import "google/api/annotations.proto";
+
+service PaymentService {
+  rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/create"
+      body: "*"
+    };
+  }
+
+  rpc GetPaymentStatus (GetPaymentStatusRequest) returns (GetPaymentStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/pay/{order_id}/status"
+    };
+  }
+
+  rpc WechatCallback (WechatCallbackRequest) returns (WechatCallbackResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/callback/wechat"
+      body: "*"
+    };
+  }
+
+  rpc AlipayCallback (AlipayCallbackRequest) returns (AlipayCallbackResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/callback/alipay"
+      body: "*"
+    };
+  }
+
+  rpc Refund (RefundRequest) returns (RefundResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/{order_id}/refund"
+      body: "*"
+    };
+  }
+}
+
+message CreatePaymentRequest {
+  string record_id = 1;
+  double amount = 2;
+  string pay_method = 3;
+  string open_id = 4;
+  string notify_url = 5;
+}
+
+message CreatePaymentResponse {
+  int32 code = 1;
+  string message = 2;
+  PaymentData data = 3;
+}
+
+message PaymentData {
+  string order_id = 1;
+  double amount = 2;
+  string pay_url = 3;
+  string qr_code = 4;
+  string expire_time = 5;
+}
+
+message GetPaymentStatusRequest {
+  string order_id = 1;
+}
+
+message GetPaymentStatusResponse {
+  int32 code = 1;
+  string message = 2;
+  PaymentStatusData data = 3;
+}
+
+message PaymentStatusData {
+  string order_id = 1;
+  string status = 2;
+  string pay_time = 3;
+  string pay_method = 4;
+}
+
+message WechatCallbackRequest {
+  string return_code = 1;
+  string return_msg = 2;
+  string result_code = 3;
+  string transaction_id = 4;
+  string out_trade_no = 5;
+  string total_fee = 6;
+  string time_end = 7;
+  string sign = 8;
+}
+
+message WechatCallbackResponse {
+  string return_code = 1;
+  string return_msg = 2;
+}
+
+message AlipayCallbackRequest {
+  string trade_status = 1;
+  string trade_no = 2;
+  string out_trade_no = 3;
+  string total_amount = 4;
+  string gmt_payment = 5;
+  string sign = 6;
+}
+
+message AlipayCallbackResponse {
+  string code = 1;
+  string msg = 2;
+}
+
+message RefundRequest {
+  string order_id = 1;
+  string reason = 2;
+}
+
+message RefundResponse {
+  int32 code = 1;
+  string message = 2;
+  RefundData data = 3;
+}
+
+message RefundData {
+  string refund_id = 1;
+  string status = 2;
+}

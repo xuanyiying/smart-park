@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package api.billing.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/billing/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service BillingService {
+  rpc CalculateFee (CalculateFeeRequest) returns (CalculateFeeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/billing/calculate"
+      body: "*"
+    };
+  }
+
+  rpc CreateBillingRule (CreateBillingRuleRequest) returns (CreateBillingRuleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/billing/rules"
+      body: "*"
+    };
+  }
+
+  rpc UpdateBillingRule (UpdateBillingRuleRequest) returns (UpdateBillingRuleResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/billing/rules/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteBillingRule (DeleteBillingRuleRequest) returns (DeleteBillingRuleResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/admin/billing/rules/{id}"
+    };
+  }
+
+  rpc GetBillingRules (GetBillingRulesRequest) returns (GetBillingRulesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/billing/rules"
+    };
+  }
+}
+
+message CalculateFeeRequest {
+  string record_id = 1;
+  string lot_id = 2;
+  string plate_number = 3;
+  int64 entry_time = 4;
+  int64 exit_time = 5;
+  string vehicle_type = 6;
+}
+
+message CalculateFeeResponse {
+  int32 code = 1;
+  string message = 2;
+  BillData data = 3;
+}
+
+message BillData {
+  string record_id = 1;
+  double base_amount = 2;
+  double discount_amount = 3;
+  double final_amount = 4;
+  repeated AppliedRule applied_rules = 5;
+}
+
+message AppliedRule {
+  string rule_id = 1;
+  string rule_name = 2;
+  double amount = 3;
+}
+
+message CreateBillingRuleRequest {
+  string lot_id = 1;
+  string rule_name = 2;
+  string rule_type = 3;
+  string conditions_json = 4;
+  string actions_json = 5;
+  int32 priority = 6;
+  bool is_active = 7;
+}
+
+message CreateBillingRuleResponse {
+  int32 code = 1;
+  string message = 2;
+  BillingRule data = 3;
+}
+
+message UpdateBillingRuleRequest {
+  string id = 1;
+  string rule_name = 2;
+  string rule_type = 3;
+  string conditions_json = 4;
+  string actions_json = 5;
+  int32 priority = 6;
+  bool is_active = 7;
+}
+
+message UpdateBillingRuleResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message DeleteBillingRuleRequest {
+  string id = 1;
+}
+
+message DeleteBillingRuleResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message GetBillingRulesRequest {
+  string lot_id = 1;
+}
+
+message GetBillingRulesResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated BillingRule data = 3;
+}
+
+message BillingRule {
+  string id = 1;
+  string lot_id = 2;
+  string rule_name = 3;
+  string rule_type = 4;
+  string conditions_json = 5;
+  string actions_json = 6;
+  int32 priority = 7;
+  bool is_active = 8;
+  string created_at = 9;
+}

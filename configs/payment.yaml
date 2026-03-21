@@ -1,0 +1,36 @@
+server:
+  port: 8003
+  timeout: 60
+
+database:
+  driver: postgres
+  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+mq:
+  type: "redis"
+  redis:
+    addr: "localhost:6379"
+    password: ""
+    db: 0
+    stream: "parking"
+
+log:
+  level: info
+  format: json
+
+wechat:
+  appid: ""
+  mchid: ""
+  key: ""
+  notifyUrl: ""
+
+alipay:
+  appid: ""
+  privateKey: ""
+  publicKey: ""
+  notifyUrl: ""

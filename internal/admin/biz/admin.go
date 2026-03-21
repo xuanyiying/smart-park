@@ -1,0 +1,410 @@
+// Package biz provides business logic for the admin service.
+package biz
+
+import (
+	"context"
+	"time"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/google/uuid"
+
+	v1 "github.com/xuanyiying/smart-park/api/admin/v1"
+)
+
+// ParkingLot represents a parking lot entity.
+type ParkingLot struct {
+	ID        uuid.UUID
+	Name      string
+	Address   string
+	Lanes     int
+	Status    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+// Vehicle represents a vehicle entity.
+type Vehicle struct {
+	ID                uuid.UUID
+	PlateNumber       string
+	VehicleType       string
+	OwnerName         string
+	OwnerPhone        string
+	MonthlyValidUntil *time.Time
+	CreatedAt         time.Time
+}
+
+// ParkingRecord represents a parking record entity.
+type ParkingRecord struct {
+	ID              uuid.UUID
+	LotID           uuid.UUID
+	PlateNumber     string
+	EntryTime       time.Time
+	ExitTime        *time.Time
+	ParkingDuration int
+	Status          string
+}
+
+// Order represents an order entity.
+type Order struct {
+	ID             uuid.UUID
+	RecordID       uuid.UUID
+	LotID          uuid.UUID
+	PlateNumber    string
+	Amount         float64
+	DiscountAmount float64
+	FinalAmount    float64
+	Status         string
+	PayTime        *time.Time
+	PayMethod      string
+}
+
+// DailyReport represents a daily report.
+type DailyReport struct {
+	LotID        string
+	Date         string
+	TotalEntries int
+	TotalExits   int
+	TotalVehicles int
+	TotalAmount  float64
+	TotalDiscount float64
+	NetAmount    float64
+}
+
+// MonthlyReport represents a monthly report.
+type MonthlyReport struct {
+	LotID        string
+	Year         int
+	Month        int
+	TotalEntries int
+	TotalExits   int
+	TotalVehicles int
+	TotalAmount  float64
+	TotalDiscount float64
+	NetAmount    float64
+	DailyReports []*DailyReport
+}
+
+// AdminRepo defines the repository interface for admin operations.
+type AdminRepo interface {
+	CreateParkingLot(ctx context.Context, lot *ParkingLot) error
+	GetParkingLot(ctx context.Context, lotID uuid.UUID) (*ParkingLot, error)
+	UpdateParkingLot(ctx context.Context, lot *ParkingLot) error
+	ListParkingLots(ctx context.Context, page, pageSize int) ([]*ParkingLot, int64, error)
+	CreateVehicle(ctx context.Context, vehicle *Vehicle) error
+	ListVehicles(ctx context.Context, vehicleType string, page, pageSize int) ([]*Vehicle, int64, error)
+	ListParkingRecords(ctx context.Context, lotID uuid.UUID, plateNumber, startTime, endTime string, page, pageSize int) ([]*ParkingRecord, int64, error)
+	ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*Order, int64, error)
+	GetOrder(ctx context.Context, orderID uuid.UUID) (*Order, error)
+	GetDailyReport(ctx context.Context, lotID uuid.UUID, date string) (*DailyReport, error)
+	GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year, month int) (*MonthlyReport, error)
+}
+
+// AdminUseCase implements admin business logic.
+type AdminUseCase struct {
+	repo AdminRepo
+	log  *log.Helper
+}
+
+// NewAdminUseCase creates a new AdminUseCase.
+func NewAdminUseCase(repo AdminRepo, logger log.Logger) *AdminUseCase {
+	return &AdminUseCase{
+		repo: repo,
+		log:  log.NewHelper(logger),
+	}
+}
+
+// CreateParkingLot creates a new parking lot.
+func (uc *AdminUseCase) CreateParkingLot(ctx context.Context, req *v1.CreateParkingLotRequest) (*v1.ParkingLot, error) {
+	lot := &ParkingLot{
+		ID:      uuid.New(),
+		Name:    req.Name,
+		Address: req.Address,
+		Lanes:   int(req.Lanes),
+		Status:  "active",
+	}
+
+	if err := uc.repo.CreateParkingLot(ctx, lot); err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to create parking lot: %v", err)
+		return nil, err
+	}
+
+	return &v1.ParkingLot{
+		Id:        lot.ID.String(),
+		Name:      lot.Name,
+		Address:   lot.Address,
+		Lanes:     int32(lot.Lanes),
+		Status:    lot.Status,
+		CreatedAt: lot.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: lot.UpdatedAt.Format(time.RFC3339),
+	}, nil
+}
+
+// GetParkingLot retrieves a parking lot.
+func (uc *AdminUseCase) GetParkingLot(ctx context.Context, id string) (*v1.ParkingLot, error) {
+	lotID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	lot, err := uc.repo.GetParkingLot(ctx, lotID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ParkingLot{
+		Id:        lot.ID.String(),
+		Name:      lot.Name,
+		Address:   lot.Address,
+		Lanes:     int32(lot.Lanes),
+		Status:    lot.Status,
+		CreatedAt: lot.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: lot.UpdatedAt.Format(time.RFC3339),
+	}, nil
+}
+
+// UpdateParkingLot updates a parking lot.
+func (uc *AdminUseCase) UpdateParkingLot(ctx context.Context, req *v1.UpdateParkingLotRequest) error {
+	lotID, err := uuid.Parse(req.Id)
+	if err != nil {
+		return err
+	}
+
+	lot := &ParkingLot{
+		ID:      lotID,
+		Name:    req.Name,
+		Address: req.Address,
+		Lanes:   int(req.Lanes),
+		Status:  req.Status,
+	}
+
+	return uc.repo.UpdateParkingLot(ctx, lot)
+}
+
+// ListParkingLots lists parking lots.
+func (uc *AdminUseCase) ListParkingLots(ctx context.Context, req *v1.ListParkingLotsRequest) (*v1.ListData, error) {
+	lots, total, err := uc.repo.ListParkingLots(ctx, int(req.Page), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+
+	var items []*v1.ParkingLot
+	for _, lot := range lots {
+		items = append(items, &v1.ParkingLot{
+			Id:        lot.ID.String(),
+			Name:      lot.Name,
+			Address:   lot.Address,
+			Lanes:     int32(lot.Lanes),
+			Status:    lot.Status,
+			CreatedAt: lot.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: lot.UpdatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return &v1.ListData{
+		Total:    int32(total),
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		List:     nil, // Will be populated with items
+	}, nil
+}
+
+// CreateVehicle creates a new vehicle.
+func (uc *AdminUseCase) CreateVehicle(ctx context.Context, req *v1.CreateVehicleRequest) (*v1.Vehicle, error) {
+	var monthlyValidUntil *time.Time
+	if req.MonthlyValidUntil != "" {
+		t, err := time.Parse(time.RFC3339, req.MonthlyValidUntil)
+		if err == nil {
+			monthlyValidUntil = &t
+		}
+	}
+
+	vehicle := &Vehicle{
+		ID:                uuid.New(),
+		PlateNumber:       req.PlateNumber,
+		VehicleType:       req.VehicleType,
+		OwnerName:         req.OwnerName,
+		OwnerPhone:        req.OwnerPhone,
+		MonthlyValidUntil: monthlyValidUntil,
+	}
+
+	if err := uc.repo.CreateVehicle(ctx, vehicle); err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to create vehicle: %v", err)
+		return nil, err
+	}
+
+	var validUntil string
+	if vehicle.MonthlyValidUntil != nil {
+		validUntil = vehicle.MonthlyValidUntil.Format(time.RFC3339)
+	}
+
+	return &v1.Vehicle{
+		Id:                vehicle.ID.String(),
+		PlateNumber:       vehicle.PlateNumber,
+		VehicleType:       vehicle.VehicleType,
+		OwnerName:         vehicle.OwnerName,
+		OwnerPhone:        vehicle.OwnerPhone,
+		MonthlyValidUntil: validUntil,
+		CreatedAt:         vehicle.CreatedAt.Format(time.RFC3339),
+	}, nil
+}
+
+// ListVehicles lists vehicles.
+func (uc *AdminUseCase) ListVehicles(ctx context.Context, req *v1.ListVehiclesRequest) (*v1.ListData, error) {
+	vehicles, total, err := uc.repo.ListVehicles(ctx, req.VehicleType, int(req.Page), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+
+	_ = vehicles // Will be converted to v1.Vehicle list
+
+	return &v1.ListData{
+		Total:    int32(total),
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}, nil
+}
+
+// ListParkingRecords lists parking records.
+func (uc *AdminUseCase) ListParkingRecords(ctx context.Context, req *v1.ListParkingRecordsRequest) (*v1.ListData, error) {
+	var lotID uuid.UUID
+	if req.LotId != "" {
+		var err error
+		lotID, err = uuid.Parse(req.LotId)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	records, total, err := uc.repo.ListParkingRecords(ctx, lotID, req.PlateNumber, req.StartTime, req.EndTime, int(req.Page), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+
+	_ = records // Will be converted to v1.ParkingRecord list
+
+	return &v1.ListData{
+		Total:    int32(total),
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}, nil
+}
+
+// ListOrders lists orders.
+func (uc *AdminUseCase) ListOrders(ctx context.Context, req *v1.ListOrdersRequest) (*v1.ListData, error) {
+	var lotID uuid.UUID
+	if req.LotId != "" {
+		var err error
+		lotID, err = uuid.Parse(req.LotId)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	orders, total, err := uc.repo.ListOrders(ctx, lotID, req.Status, int(req.Page), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+
+	_ = orders // Will be converted to v1.Order list
+
+	return &v1.ListData{
+		Total:    int32(total),
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}, nil
+}
+
+// GetOrder retrieves an order.
+func (uc *AdminUseCase) GetOrder(ctx context.Context, id string) (*v1.Order, error) {
+	orderID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	order, err := uc.repo.GetOrder(ctx, orderID)
+	if err != nil {
+		return nil, err
+	}
+
+	var payTime string
+	if order.PayTime != nil {
+		payTime = order.PayTime.Format(time.RFC3339)
+	}
+
+	return &v1.Order{
+		Id:             order.ID.String(),
+		RecordId:       order.RecordID.String(),
+		LotId:          order.LotID.String(),
+		PlateNumber:    order.PlateNumber,
+		Amount:         order.Amount,
+		DiscountAmount: order.DiscountAmount,
+		FinalAmount:    order.FinalAmount,
+		Status:         order.Status,
+		PayTime:        payTime,
+		PayMethod:      order.PayMethod,
+	}, nil
+}
+
+// GetDailyReport retrieves a daily report.
+func (uc *AdminUseCase) GetDailyReport(ctx context.Context, req *v1.GetDailyReportRequest) (*v1.DailyReport, error) {
+	lotID, err := uuid.Parse(req.LotId)
+	if err != nil {
+		return nil, err
+	}
+
+	report, err := uc.repo.GetDailyReport(ctx, lotID, req.Date)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.DailyReport{
+		LotId:         report.LotID,
+		Date:          report.Date,
+		TotalEntries:  int32(report.TotalEntries),
+		TotalExits:    int32(report.TotalExits),
+		TotalVehicles: int32(report.TotalVehicles),
+		TotalAmount:   report.TotalAmount,
+		TotalDiscount: report.TotalDiscount,
+		NetAmount:     report.NetAmount,
+	}, nil
+}
+
+// GetMonthlyReport retrieves a monthly report.
+func (uc *AdminUseCase) GetMonthlyReport(ctx context.Context, req *v1.GetMonthlyReportRequest) (*v1.MonthlyReport, error) {
+	lotID, err := uuid.Parse(req.LotId)
+	if err != nil {
+		return nil, err
+	}
+
+	report, err := uc.repo.GetMonthlyReport(ctx, lotID, int(req.Year), int(req.Month))
+	if err != nil {
+		return nil, err
+	}
+
+	var dailyReports []*v1.DailyReport
+	for _, dr := range report.DailyReports {
+		dailyReports = append(dailyReports, &v1.DailyReport{
+			LotId:         dr.LotID,
+			Date:          dr.Date,
+			TotalEntries:  int32(dr.TotalEntries),
+			TotalExits:    int32(dr.TotalExits),
+			TotalVehicles: int32(dr.TotalVehicles),
+			TotalAmount:   dr.TotalAmount,
+			TotalDiscount: dr.TotalDiscount,
+			NetAmount:     dr.NetAmount,
+		})
+	}
+
+	return &v1.MonthlyReport{
+		LotId:         report.LotID,
+		Year:          int32(report.Year),
+		Month:         int32(report.Month),
+		TotalEntries:  int32(report.TotalEntries),
+		TotalExits:    int32(report.TotalExits),
+		TotalVehicles: int32(report.TotalVehicles),
+		TotalAmount:   report.TotalAmount,
+		TotalDiscount: report.TotalDiscount,
+		NetAmount:     report.NetAmount,
+		DailyReports:  dailyReports,
+	}, nil
+}

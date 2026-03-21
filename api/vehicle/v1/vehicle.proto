@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package api.vehicle.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/vehicle/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service VehicleService {
+  rpc Entry (EntryRequest) returns (EntryResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/entry"
+      body: "*"
+    };
+  }
+
+  rpc Exit (ExitRequest) returns (ExitResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/exit"
+      body: "*"
+    };
+  }
+
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/heartbeat"
+      body: "*"
+    };
+  }
+
+  rpc GetDeviceStatus (GetDeviceStatusRequest) returns (GetDeviceStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{device_id}/status"
+    };
+  }
+
+  rpc SendCommand (SendCommandRequest) returns (SendCommandResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/{device_id}/command"
+      body: "*"
+    };
+  }
+
+  rpc GetVehicleInfo (GetVehicleInfoRequest) returns (GetVehicleInfoResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/vehicle/{plate_number}"
+    };
+  }
+}
+
+message EntryRequest {
+  string device_id = 1;
+  string plate_number = 2;
+  string plate_image_url = 3;
+  double confidence = 4;
+  string vehicle_type = 5;
+  string timestamp = 6;
+}
+
+message EntryResponse {
+  int32 code = 1;
+  string message = 2;
+  EntryData data = 3;
+}
+
+message EntryData {
+  string record_id = 1;
+  string plate_number = 2;
+  bool allowed = 3;
+  bool gate_open = 4;
+  string display_message = 5;
+}
+
+message ExitRequest {
+  string device_id = 1;
+  string plate_number = 2;
+  string plate_image_url = 3;
+  double confidence = 4;
+  string timestamp = 5;
+}
+
+message ExitResponse {
+  int32 code = 1;
+  string message = 2;
+  ExitData data = 3;
+}
+
+message ExitData {
+  string record_id = 1;
+  string plate_number = 2;
+  int32 parking_duration = 3;
+  double amount = 4;
+  double discount_amount = 5;
+  double final_amount = 6;
+  bool allowed = 7;
+  bool gate_open = 8;
+  string display_message = 9;
+}
+
+message HeartbeatRequest {
+  string device_id = 1;
+  string status = 2;
+  string timestamp = 3;
+}
+
+message HeartbeatResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message GetDeviceStatusRequest {
+  string device_id = 1;
+}
+
+message GetDeviceStatusResponse {
+  int32 code = 1;
+  string message = 2;
+  DeviceStatus data = 3;
+}
+
+message DeviceStatus {
+  string device_id = 1;
+  bool online = 2;
+  string status = 3;
+  string last_heartbeat = 4;
+}
+
+message SendCommandRequest {
+  string device_id = 1;
+  string command = 2;
+  map<string, string> params = 3;
+}
+
+message SendCommandResponse {
+  int32 code = 1;
+  string message = 2;
+  CommandData data = 3;
+}
+
+message CommandData {
+  string command_id = 1;
+  string status = 2;
+}
+
+message GetVehicleInfoRequest {
+  string plate_number = 1;
+}
+
+message GetVehicleInfoResponse {
+  int32 code = 1;
+  string message = 2;
+  VehicleInfo data = 3;
+}
+
+message VehicleInfo {
+  string plate_number = 1;
+  string vehicle_type = 2;
+  string owner_name = 3;
+  string owner_phone = 4;
+  string monthly_valid_until = 5;
+}
