@@ -11,6 +11,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/biz"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
 )
@@ -362,4 +363,78 @@ func (r *vehicleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) e
 	}
 
 	return tx.Commit()
+}
+
+// CreateOfflineSyncRecord creates an offline sync record.
+func (r *vehicleRepo) CreateOfflineSyncRecord(ctx context.Context, record *biz.OfflineSyncRecord) error {
+	_, err := r.data.db.OfflineSyncRecord.Create().
+		SetOfflineID(record.OfflineID).
+		SetRecordID(record.RecordID).
+		SetLotID(record.LotID).
+		SetDeviceID(record.DeviceID).
+		SetGateID(record.GateID).
+		SetOpenTime(record.OpenTime).
+		SetSyncAmount(record.SyncAmount).
+		SetSyncStatus(offlinesyncrecord.SyncStatusPendingSync).
+		SetRetryCount(0).
+		Save(ctx)
+
+	return err
+}
+
+// GetPendingSyncRecords retrieves pending sync records.
+func (r *vehicleRepo) GetPendingSyncRecords(ctx context.Context, limit int) ([]*biz.OfflineSyncRecord, error) {
+	records, err := r.data.db.OfflineSyncRecord.Query().
+		Where(offlinesyncrecord.SyncStatusEQ(offlinesyncrecord.SyncStatusPendingSync)).
+		Where(offlinesyncrecord.RetryCountLT(5)).
+		Limit(limit).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*biz.OfflineSyncRecord, len(records))
+	for i, rec := range records {
+		result[i] = toBizOfflineSyncRecord(rec)
+	}
+	return result, nil
+}
+
+// UpdateOfflineSyncRecord updates an offline sync record.
+func (r *vehicleRepo) UpdateOfflineSyncRecord(ctx context.Context, record *biz.OfflineSyncRecord) error {
+	update := r.data.db.OfflineSyncRecord.Update().
+		Where(offlinesyncrecord.OfflineID(record.OfflineID)).
+		SetSyncStatus(offlinesyncrecord.SyncStatus(record.SyncStatus)).
+		SetSyncError(record.SyncError).
+		SetRetryCount(record.RetryCount)
+
+	if record.SyncedAt != nil {
+		update.SetSyncedAt(*record.SyncedAt)
+	}
+
+	_, err := update.Save(ctx)
+	return err
+}
+
+func toBizOfflineSyncRecord(record *ent.OfflineSyncRecord) *biz.OfflineSyncRecord {
+	bizRecord := &biz.OfflineSyncRecord{
+		ID:         record.ID,
+		OfflineID:  record.OfflineID,
+		DeviceID:   record.DeviceID,
+		GateID:     record.GateID,
+		OpenTime:   record.OpenTime,
+		SyncAmount: record.SyncAmount,
+		SyncStatus: string(record.SyncStatus),
+		SyncError:  record.SyncError,
+		RetryCount: record.RetryCount,
+		SyncedAt:   record.SyncedAt,
+		CreatedAt:  record.CreatedAt,
+	}
+	if record.RecordID != nil {
+		bizRecord.RecordID = *record.RecordID
+	}
+	if record.LotID != nil {
+		bizRecord.LotID = *record.LotID
+	}
+	return bizRecord
 }
