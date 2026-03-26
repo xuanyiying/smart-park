@@ -145,16 +145,21 @@ func (s *UserService) GetParkingRecord(ctx context.Context, req *v1.GetParkingRe
 }
 
 func (s *UserService) ScanPay(ctx context.Context, req *v1.ScanPayRequest) (*v1.ScanPayResponse, error) {
-	// TODO: 在 Task 1.3 中实现扫码支付
+	// TODO: 从 JWT context 中获取 userID
+	userID := "" // 需要从 JWT context 中获取
+
+	data, err := s.uc.ScanPay(ctx, userID, req)
+	if err != nil {
+		return &v1.ScanPayResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
+
 	return &v1.ScanPayResponse{
 		Code:    200,
 		Message: "success",
-		Data: &v1.ScanPayData{
-			OrderId: "",
-			Amount:  0,
-			PayUrl:  "",
-			QrCode:  "",
-		},
+		Data:    data,
 	}, nil
 }
 

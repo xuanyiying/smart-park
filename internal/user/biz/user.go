@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	v1 "github.com/xuanyiying/smart-park/api/user/v1"
+	"github.com/xuanyiying/smart-park/internal/user/client/payment"
 	"github.com/xuanyiying/smart-park/internal/user/client/vehicle"
 	"github.com/xuanyiying/smart-park/internal/user/wechat"
 	"github.com/xuanyiying/smart-park/pkg/auth"
@@ -43,17 +44,19 @@ type UserRepo interface {
 }
 
 type UserUseCase struct {
-	userRepo      UserRepo
-	vehicleClient vehicle.Client
-	jwtManager    *auth.JWTManager
-	wechatClient  *wechat.Client
-	log           *log.Helper
+	userRepo       UserRepo
+	vehicleClient  vehicle.Client
+	paymentClient  payment.Client
+	jwtManager     *auth.JWTManager
+	wechatClient   *wechat.Client
+	log            *log.Helper
 }
 
-func NewUserUseCase(userRepo UserRepo, vehicleClient vehicle.Client, jwtManager *auth.JWTManager, wechatClient *wechat.Client, logger log.Logger) *UserUseCase {
+func NewUserUseCase(userRepo UserRepo, vehicleClient vehicle.Client, paymentClient payment.Client, jwtManager *auth.JWTManager, wechatClient *wechat.Client, logger log.Logger) *UserUseCase {
 	return &UserUseCase{
 		userRepo:      userRepo,
 		vehicleClient: vehicleClient,
+		paymentClient: paymentClient,
 		jwtManager:    jwtManager,
 		wechatClient:  wechatClient,
 		log:           log.NewHelper(logger),
@@ -258,5 +261,46 @@ func (uc *UserUseCase) GetParkingRecord(ctx context.Context, userID, recordID st
 		Duration:    record.ParkingDuration,
 		Amount:      amount,
 		Status:      record.RecordStatus,
+	}, nil
+}
+
+func (uc *UserUseCase) ScanPay(ctx context.Context, userID string, req *v1.ScanPayRequest) (*v1.ScanPayData, error) {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 1. 验证停车记录属于该用户
+	vehicles, _, err := uc.userRepo.ListUserVehicles(ctx, uid, 1, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	plateMap := make(map[string]bool)
+	for _, v := range vehicles {
+		plateMap[v.PlateNumber] = true
+	}
+
+	// 2. 获取停车记录信息
+	record, err := uc.vehicleClient.GetParkingRecord(ctx, req.RecordId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get parking record: %w", err)
+	}
+
+	if !plateMap[record.PlateNumber] {
+		return nil, fmt.Errorf("record not found or access denied")
+	}
+
+	// 3. 调用 payment service 创建支付
+	payData, err := uc.paymentClient.CreatePayment(ctx, req.RecordId, 0, req.PayMethod, req.OpenId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ScanPayData{
+		OrderId: payData.OrderId,
+		Amount:  payData.Amount,
+		PayUrl:  payData.PayUrl,
+		QrCode:  payData.QrCode,
 	}, nil
 }

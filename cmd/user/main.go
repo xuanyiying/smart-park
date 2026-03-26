@@ -12,9 +12,11 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
+	paymentv1 "github.com/xuanyiying/smart-park/api/payment/v1"
 	v1 "github.com/xuanyiying/smart-park/api/user/v1"
 	vehiclev1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
 	"github.com/xuanyiying/smart-park/internal/user/biz"
+	"github.com/xuanyiying/smart-park/internal/user/client/payment"
 	"github.com/xuanyiying/smart-park/internal/user/client/vehicle"
 	"github.com/xuanyiying/smart-park/internal/user/data"
 	"github.com/xuanyiying/smart-park/internal/user/data/ent"
@@ -36,6 +38,27 @@ func (m *mockVehicleClient) ListParkingRecords(ctx context.Context, plateNumbers
 
 func (m *mockVehicleClient) GetParkingRecord(ctx context.Context, recordID string) (*vehiclev1.ParkingRecordInfo, error) {
 	return nil, fmt.Errorf("not implemented")
+}
+
+// mockPaymentClient is a mock implementation of payment.Client for testing.
+type mockPaymentClient struct{}
+
+func (m *mockPaymentClient) CreatePayment(ctx context.Context, recordID string, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error) {
+	return &paymentv1.PaymentData{
+		OrderId: "mock_order_" + recordID,
+		Amount:  10.0,
+		PayUrl:  "https://payment.example.com/mock",
+		QrCode:  "",
+	}, nil
+}
+
+func (m *mockPaymentClient) GetPaymentStatus(ctx context.Context, orderID string) (*paymentv1.PaymentStatusData, error) {
+	return &paymentv1.PaymentStatusData{
+		OrderId:   orderID,
+		Status:    "pending",
+		PayTime:   "",
+		PayMethod: "",
+	}, nil
 }
 
 var (
@@ -114,13 +137,28 @@ func main() {
 		vehicleClient = &mockVehicleClient{}
 	}
 
+	// Initialize payment service client
+	var paymentClient payment.Client
+	if cfg.Payment != nil && cfg.Payment.Endpoint != "" {
+		conn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(cfg.Payment.Endpoint))
+		if err != nil {
+			logHelper.Errorf("failed to connect to payment service: %v", err)
+		} else {
+			paymentClient = payment.NewClient(paymentv1.NewPaymentServiceClient(conn))
+			logHelper.Info("payment client initialized successfully")
+		}
+	} else {
+		logHelper.Warn("payment endpoint not configured")
+		paymentClient = &mockPaymentClient{}
+	}
+
 	jwtConfig := &auth.JWTConfig{
 		SecretKey:     cfg.JWT.Secret,
 		TokenDuration: time.Duration(cfg.JWT.Expiry) * time.Hour,
 	}
 	jwtManager := auth.NewJWTManager(jwtConfig)
 
-	userUseCase := biz.NewUserUseCase(userRepo, vehicleClient, jwtManager, wechatClient, logger)
+	userUseCase := biz.NewUserUseCase(userRepo, vehicleClient, paymentClient, jwtManager, wechatClient, logger)
 
 	userSvc := service.NewUserService(userUseCase)
 
