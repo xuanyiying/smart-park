@@ -11,11 +11,11 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	v1 "github.com/xuanyiying/smart-park/api/billing/v1"
-	"github.com/xuanyiying/smart-park/ent"
 	"github.com/xuanyiying/smart-park/internal/billing/biz"
 	"github.com/xuanyiying/smart-park/internal/billing/data"
+	"github.com/xuanyiying/smart-park/internal/billing/data/ent"
 	"github.com/xuanyiying/smart-park/internal/billing/service"
-	"github.com/xuanyiying/smart-park/internal/conf"
+	"github.com/xuanyiying/smart-park/pkg/config"
 )
 
 var (
@@ -41,14 +41,14 @@ func main() {
 	logHelper := log.NewHelper(logger)
 
 	// Load configuration
-	cfg, err := conf.LoadConfig(flagconf)
+	cfg, err := config.Load(flagconf)
 	if err != nil {
 		logHelper.Errorf("failed to load config: %v", err)
 		os.Exit(1)
 	}
 
 	// Connect to database
-	dbClient, err := ent.Open("postgres", cfg.Database.Source, logger)
+	dbClient, err := ent.Open("postgres", cfg.Database.Source)
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
@@ -80,17 +80,16 @@ func main() {
 
 	// Create gRPC server
 	gs := grpc.NewServer(
-		grpc.Addr(":9002"),
+		grpc.Address(":9002"),
 	)
 
 	// Create HTTP server
 	hs := http.NewServer(
-		http.Addr(":8002"),
+		http.Address(":8002"),
 	)
 
 	// Register services
 	v1.RegisterBillingServiceServer(gs, billingSvc)
-	v1.RegisterBillingServiceHTTPServer(hs, billingSvc)
 
 	// Start application
 	app := newApp(logger, gs, hs)

@@ -2666,6 +2666,205 @@ A: 1. 双摄像头抓拍（前后牌照）
 
 ## 附录 I：v1.1 → v1.2 修复记录
 
+---
+
+## 附录 L：功能实现状态对照表（v1.4）
+
+### L.1 服务组件状态
+
+| 服务 | 组件 | Proto定义 | 实现状态 | 完成度 | 说明 |
+|------|------|----------|----------|--------|------|
+| **Gateway** | HTTP路由 | ✅ | ✅ 基本完成 | 80% | 支持路径前缀匹配，静态服务发现 |
+| | 健康检查 | ✅ | ✅ 已完成 | 100% | 就绪/存活探针 |
+| | WebSocket代理 | ✅ | 🔲 待实现 | 0% | StreamProxy 占位 |
+| | 限流熔断 | ❌ | 🔲 待规划 | - | - |
+| **Vehicle** | 入场处理 | ✅ | ✅ 基本完成 | 90% | 包含防重复入场逻辑 |
+| | 出场处理 | ✅ | ✅ 基本完成 | 85% | 简化的计费逻辑 |
+| | 设备心跳 | ✅ | ✅ 已完成 | 100% | - |
+| | 设备状态 | ✅ | ✅ 已完成 | 100% | 在线状态检测 |
+| | 设备控制 | ✅ | 🔲 占位实现 | 30% | 仅记录日志 |
+| | 车辆信息 | ✅ | ✅ 已完成 | 100% | - |
+| **Billing** | 费用计算 | ✅ | ✅ 基本完成 | 70% | 支持time/vip/monthly规则 |
+| | 规则CRUD | ✅ | ✅ 已完成 | 100% | - |
+| | 规则引擎 | ✅ | 🔲 简化实现 | 50% | 需完善Conditions/Actions解析 |
+| | 优惠叠加 | ❌ | 🔲 待规划 | - | - |
+| **Payment** | 创建订单 | ✅ | ✅ 基本完成 | 80% | 支付URL生成 |
+| | 支付状态 | ✅ | ✅ 已完成 | 100% | - |
+| | 微信回调 | ✅ | ✅ 基本完成 | 60% | 验签待实现 |
+| | 支付宝回调 | ✅ | ✅ 基本完成 | 60% | 验签待实现 |
+| | 退款处理 | ✅ | ✅ 基本完成 | 60% | 原路返回逻辑 |
+| **Admin** | 停车场CRUD | ✅ | ✅ 已完成 | 100% | - |
+| | 车辆管理 | ✅ | ✅ 已完成 | 100% | - |
+| | 记录查询 | ✅ | ✅ 基本完成 | 80% | 返回值转换待完善 |
+| | 订单管理 | ✅ | ✅ 基本完成 | 80% | - |
+| | 日报/月报 | ✅ | ✅ 基本完成 | 80% | - |
+| | 退款审批 | ✅ | 🔲 待实现 | 0% | 仅退款服务占位 |
+| **Notification** | 短信通知 | ❌ | 🔲 占位服务 | 0% | main.go仅入口 |
+| | 推送通知 | ❌ | 🔲 待规划 | - | - |
+
+### L.2 API端点实现对照
+
+#### 设备端 API (/api/v1/device/*)
+
+| 端点 | Proto | Service | Repository | 说明 |
+|------|-------|---------|------------|------|
+| POST /api/v1/device/entry | ✅ | ✅ | 🔲 | 入场处理，repo需实现 |
+| POST /api/v1/device/exit | ✅ | ✅ | 🔲 | 出场处理，repo需实现 |
+| POST /api/v1/device/heartbeat | ✅ | ✅ | 🔲 | 设备心跳 |
+| GET /api/v1/device/{id}/status | ✅ | ✅ | 🔲 | 设备状态 |
+| POST /api/v1/device/{id}/command | ✅ | ✅ | 🔲 | 指令下发（占位） |
+| GET /api/v1/vehicle/{plate} | ✅ | ✅ | 🔲 | 车辆信息查询 |
+
+#### 计费 API (/api/v1/billing/*)
+
+| 端点 | Proto | Service | Repository | 说明 |
+|------|-------|---------|------------|------|
+| POST /api/v1/billing/calculate | ✅ | ✅ | 🔲 | 费用计算 |
+| POST /api/v1/admin/billing/rules | ✅ | ✅ | 🔲 | 创建规则 |
+| PUT /api/v1/admin/billing/rules/{id} | ✅ | ✅ | 🔲 | 更新规则 |
+| DELETE /api/v1/admin/billing/rules/{id} | ✅ | ✅ | 🔲 | 删除规则 |
+| GET /api/v1/admin/billing/rules | ✅ | ✅ | 🔲 | 查询规则 |
+
+#### 支付 API (/api/v1/pay/*)
+
+| 端点 | Proto | Service | Repository | 说明 |
+|------|-------|---------|------------|------|
+| POST /api/v1/pay/create | ✅ | ✅ | 🔲 | 创建订单 |
+| GET /api/v1/pay/{id}/status | ✅ | ✅ | 🔲 | 订单状态 |
+| POST /api/v1/pay/callback/wechat | ✅ | ✅ | 🔲 | 微信回调 |
+| POST /api/v1/pay/callback/alipay | ✅ | ✅ | 🔲 | 支付宝回调 |
+| POST /api/v1/pay/{id}/refund | ✅ | ✅ | 🔲 | 退款请求 |
+
+#### 管理端 API (/api/v1/admin/*)
+
+| 端点 | Proto | Service | Repository | 说明 |
+|------|-------|---------|------------|------|
+| POST /api/v1/admin/lots | ✅ | ✅ | 🔲 | 创建停车场 |
+| GET /api/v1/admin/lots/{id} | ✅ | ✅ | 🔲 | 停车场详情 |
+| PUT /api/v1/admin/lots/{id} | ✅ | ✅ | 🔲 | 更新停车场 |
+| GET /api/v1/admin/lots | ✅ | ✅ | 🔲 | 停车场列表 |
+| GET /api/v1/admin/records | ✅ | ✅ | 🔲 | 入出场记录 |
+| GET /api/v1/admin/orders | ✅ | ✅ | 🔲 | 订单列表 |
+| GET /api/v1/admin/orders/{id} | ✅ | ✅ | 🔲 | 订单详情 |
+| POST /api/v1/admin/vehicles | ✅ | ✅ | 🔲 | 录入车辆 |
+| GET /api/v1/admin/vehicles | ✅ | ✅ | 🔲 | 车辆列表 |
+| GET /api/v1/admin/reports/daily | ✅ | ✅ | 🔲 | 日报 |
+| GET /api/v1/admin/reports/monthly | ✅ | ✅ | 🔲 | 月报 |
+
+#### 车主端 API (/api/v1/user/*) ⚠️ 待实现
+
+| 端点 | Proto | Service | 说明 |
+|------|-------|---------|------|
+| GET /api/v1/user/records | ❌ | 🔲 | 查询停车记录 |
+| GET /api/v1/user/records/{id} | ❌ | 🔲 | 停车详情 |
+| POST /api/v1/user/plates | ❌ | 🔲 | 绑定车牌 |
+| GET /api/v1/user/plates | ❌ | 🔲 | 我的车牌 |
+| DELETE /api/v1/user/plates/{id} | ❌ | 🔲 | 解绑车牌 |
+| POST /api/v1/user/pay/create | ❌ | 🔲 | 扫码缴费 |
+| GET /api/v1/user/orders | ❌ | 🔲 | 我的订单 |
+| GET /api/v1/user/orders/{id} | ❌ | 🔲 | 订单详情 |
+| POST /api/v1/user/orders/{id}/refund | ❌ | 🔲 | 退款申请 |
+| GET /api/v1/user/monthly-card | ❌ | 🔲 | 月卡信息 |
+| POST /api/v1/user/monthly-card/purchase | ❌ | 🔲 | 月卡购买 |
+
+### L.3 数据库实体状态
+
+| 实体 | 所在服务 | Schema | Repository | 说明 |
+|------|----------|--------|------------|------|
+| parking_lots | admin | ✅ | 🔲 | 停车场表 |
+| lanes | vehicle | ✅ | 🔲 | 车道表 |
+| vehicles | admin | ✅ | 🔲 | 车辆表 |
+| parking_records | vehicle | ✅ | 🔲 | 入场记录表 |
+| billing_rules | billing | ✅ | 🔲 | 计费规则表 |
+| orders | payment | ✅ | 🔲 | 订单表 |
+| refund_approvals | payment | ✅ | 🔲 | 退款审批表 |
+| device_registry | vehicle | ✅ | 🔲 | 设备注册表 |
+| offline_sync_records | vehicle | ✅ | 🔲 | 离线同步记录 |
+| distributed_locks | vehicle | ✅ | 🔲 | 分布式锁表 |
+
+### L.4 关键技术实现
+
+| 技术点 | 状态 | 说明 |
+|--------|------|------|
+| **gRPC/HTTP双协议** | ✅ 已支持 | Proto定义含google.api.http注解 |
+| **服务注册发现** | 🔲 简化实现 | 静态配置，服务发现接口已定义 |
+| **分布式锁** | ✅ Schema就绪 | distributed_locks表已定义 |
+| **离线同步** | ✅ Schema就绪 | offline_sync_records表已定义 |
+| **消息队列** | ❌ 待实现 | 架构设计有Redis Streams方案 |
+| **JWT认证** | ❌ 待实现 | 架构设计有RS256方案 |
+| **HMAC设备认证** | ❌ 待实现 | 架构设计有device_secret方案 |
+| **支付回调验签** | 🔲 占位实现 | 代码有注释，待集成SDK |
+
+### L.5 待完善功能清单
+
+#### 高优先级 (MVP必需)
+
+1. **Repository层实现**
+   - 所有服务的 data 层 repository 实现
+   - Ent 代码生成与迁移
+
+2. **车主端 API**
+   - 用户认证（JWT）
+   - 车牌绑定
+   - 扫码支付流程
+   - 月卡管理
+
+3. **支付集成**
+   - 微信支付 SDK 集成
+   - 支付宝 SDK 集成
+   - 回调验签实现
+
+4. **设备控制**
+   - MQTT/WebSocket 设备通信
+   - 开闸/关闸指令下发
+   - 离线模式本地控制
+
+#### 中优先级 (完整功能)
+
+5. **计费引擎完善**
+   - Conditions/Actions JSON 解析
+   - 优惠叠加逻辑
+   - 夜间优惠时段
+
+6. **退款审批流**
+   - 审批记录表集成
+   - LOT_ADMIN 权限控制
+   - 审计日志
+
+7. **通知服务**
+   - 短信通知
+   - 微信/支付宝消息推送
+
+#### 低优先级 (增强功能)
+
+8. **高级特性**
+   - Redis 缓存层
+   - 消息队列异步处理
+   - 多级监控告警
+   - 灰度发布
+
+### L.6 配置文件状态
+
+| 配置文件 | 状态 | 说明 |
+|----------|------|------|
+| configs/gateway.yaml | ✅ 已完成 | 路由配置：8000端口，4条路由 |
+| configs/vehicle.yaml | ✅ 占位 | 需配置数据库、Redis等 |
+| configs/billing.yaml | ✅ 占位 | 需配置数据库 |
+| configs/payment.yaml | ✅ 占位 | 需配置微信/支付宝密钥 |
+| configs/admin.yaml | ✅ 占位 | 需配置数据库 |
+| deploy/docker-compose.yml | ✅ 已完成 | 基础设施：postgres, redis, etcd, jaeger |
+
+### L.7 路由配置（Gateway）
+
+```
+/api/v1/device/*  → vehicle-svc:8001
+/api/v1/billing/* → billing-svc:8002
+/api/v1/pay/*     → payment-svc:8003
+/api/v1/admin/*    → admin-svc:8004
+```
+
+⚠️ 注意：车主端 API (/api/v1/user/*) 尚未配置路由，需后续添加。
+
 | # | 问题 | 修复方案 |
 |---|------|----------|
 | 1 | 支付回调未校验金额 | 增加 `paidAmount` 与 `order.finalAmount` 比对，误差 > 0.01 拒绝 |

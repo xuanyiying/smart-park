@@ -92,16 +92,20 @@ func (d *StaticDiscovery) Close() error {
 // RouterUseCase 路由用例
 type RouterUseCase struct {
 	discovery ServiceDiscovery
-	routes    []*RouteConfig
-	log       *log.Helper
+	etcdReg  *EtcdRegistry
+	routes   []*RouteConfig
+	log      *log.Helper
+	useEtcd  bool
 }
 
 // NewRouterUseCase 创建路由用例
-func NewRouterUseCase(discovery ServiceDiscovery, routes []*RouteConfig, logger log.Logger) *RouterUseCase {
+func NewRouterUseCase(discovery ServiceDiscovery, etcdReg *EtcdRegistry, routes []*RouteConfig, useEtcd bool, logger log.Logger) *RouterUseCase {
 	return &RouterUseCase{
 		discovery: discovery,
-		routes:    routes,
-		log:       log.NewHelper(logger),
+		etcdReg:  etcdReg,
+		routes:   routes,
+		useEtcd:  useEtcd,
+		log:      log.NewHelper(logger),
 	}
 }
 
@@ -121,6 +125,15 @@ func (uc *RouterUseCase) GetServiceTarget(ctx context.Context, path string) (str
 	if route == nil {
 		return "", ErrRouteNotFound
 	}
+
+	if uc.useEtcd && uc.etcdReg != nil {
+		serviceName := strings.Split(route.Target, ":")[0]
+		instances, err := uc.etcdReg.GetService(ctx, serviceName)
+		if err == nil && len(instances) > 0 {
+			return instances[0].Endpoints[0], nil
+		}
+	}
+
 	return route.Target, nil
 }
 

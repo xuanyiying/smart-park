@@ -11,11 +11,13 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
-	"github.com/xuanyiying/smart-park/ent"
-	"github.com/xuanyiying/smart-park/internal/conf"
+	"github.com/xuanyiying/smart-park/internal/payment/alipay"
 	"github.com/xuanyiying/smart-park/internal/payment/biz"
 	"github.com/xuanyiying/smart-park/internal/payment/data"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent"
 	"github.com/xuanyiying/smart-park/internal/payment/service"
+	"github.com/xuanyiying/smart-park/internal/payment/wechat"
+	"github.com/xuanyiying/smart-park/pkg/config"
 )
 
 var (
@@ -41,14 +43,14 @@ func main() {
 	logHelper := log.NewHelper(logger)
 
 	// Load configuration
-	cfg, err := conf.LoadConfig(flagconf)
+	cfg, err := config.Load(flagconf)
 	if err != nil {
 		logHelper.Errorf("failed to load config: %v", err)
 		os.Exit(1)
 	}
 
 	// Connect to database
-	dbClient, err := ent.Open("postgres", cfg.Database.Source, logger)
+	dbClient, err := ent.Open("postgres", cfg.Database.Source)
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
@@ -72,25 +74,73 @@ func main() {
 	// Initialize repositories
 	orderRepo := data.NewOrderRepo(dataLayer)
 
+	// Initialize payment clients
+	var wechatClient *wechat.Client
+	var alipayClient *alipay.Client
+
+	if cfg.Wechat.AppID != "" && cfg.Wechat.MchID != "" {
+		wechatCfg := &wechat.Config{
+			AppID:          cfg.Wechat.AppID,
+			MchID:          cfg.Wechat.MchID,
+			APIKey:         cfg.Wechat.APIKey,
+			CertSerialNo:   cfg.Wechat.CertSerialNo,
+			PrivateKeyPath: cfg.Wechat.PrivateKeyPath,
+			NotifyURL:      cfg.Wechat.NotifyURL,
+		}
+		var err error
+		wechatClient, err = wechat.NewClient(wechatCfg)
+		if err != nil {
+			logHelper.Errorf("failed to create wechat client: %v", err)
+		} else {
+			logHelper.Info("wechat payment client initialized successfully")
+		}
+	} else {
+		logHelper.Warn("wechat payment config not provided, using mock")
+	}
+
+	if cfg.Alipay.AppID != "" && cfg.Alipay.PrivateKey != "" {
+		alipayCfg := &alipay.Config{
+			AppID:           cfg.Alipay.AppID,
+			PrivateKey:      cfg.Alipay.PrivateKey,
+			AlipayPublicKey: cfg.Alipay.PublicKey,
+			IsProduction:    cfg.Alipay.IsProduction,
+		}
+		var err error
+		alipayClient, err = alipay.NewClient(alipayCfg)
+		if err != nil {
+			logHelper.Errorf("failed to create alipay client: %v", err)
+		} else {
+			logHelper.Info("alipay payment client initialized successfully")
+		}
+	} else {
+		logHelper.Warn("alipay payment config not provided, using mock")
+	}
+
+	// Initialize payment config
+	paymentConfig := &biz.PaymentConfig{
+		WechatMchID:     cfg.Wechat.MchID,
+		WechatKey:       cfg.Wechat.APIKey,
+		AlipayPublicKey: cfg.Alipay.PublicKey,
+	}
+
 	// Initialize business logic
-	paymentUseCase := biz.NewPaymentUseCase(orderRepo, logger)
+	paymentUseCase := biz.NewPaymentUseCase(orderRepo, paymentConfig, wechatClient, alipayClient, logger)
 
 	// Initialize gRPC service
 	paymentSvc := service.NewPaymentService(paymentUseCase, logger)
 
 	// Create gRPC server
 	gs := grpc.NewServer(
-		grpc.Addr(":9003"),
+		grpc.Address(":9003"),
 	)
 
 	// Create HTTP server
 	hs := http.NewServer(
-		http.Addr(":8003"),
+		http.Address(":8003"),
 	)
 
 	// Register services
 	v1.RegisterPaymentServiceServer(gs, paymentSvc)
-	v1.RegisterPaymentServiceHTTPServer(hs, paymentSvc)
 
 	// Start application
 	app := newApp(logger, gs, hs)

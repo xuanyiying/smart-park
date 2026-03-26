@@ -8,11 +8,11 @@ import (
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/transport/http"
+	khttp "github.com/go-kratos/kratos/v2/transport/http"
 
-	"smart-park/internal/conf"
-	"smart-park/internal/gateway/biz"
-	"smart-park/internal/gateway/service"
+	"github.com/xuanyiying/smart-park/internal/conf"
+	"github.com/xuanyiying/smart-park/internal/gateway/biz"
+	"github.com/xuanyiying/smart-park/internal/gateway/service"
 )
 
 var (
@@ -23,7 +23,7 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs/gateway.yaml", "config path")
 }
 
-func newApp(logger log.Logger, hs *http.Server) *kratos.App {
+func newApp(logger log.Logger, hs *khttp.Server) *kratos.App {
 	return kratos.New(
 		kratos.Name("gateway"),
 		kratos.Logger(logger),
@@ -37,35 +37,26 @@ func main() {
 	logger := log.NewStdLogger(os.Stdout)
 	logHelper := log.NewHelper(logger)
 
-	// Load configuration
 	cfg, err := conf.LoadConfig(flagconf)
 	if err != nil {
 		logHelper.Errorf("failed to load config: %v", err)
 		os.Exit(1)
 	}
 
-	// Parse routes from config
 	routes := parseRoutes(cfg)
 	logHelper.Infof("loaded %d routes", len(routes))
 
-	// Create service discovery (static for now)
 	discovery := biz.NewStaticDiscovery(routes)
-
-	// Create router use case
-	routerUseCase := biz.NewRouterUseCase(discovery, routes, logger)
-
-	// Create gateway service
+	var etcdReg *biz.EtcdRegistry
+	useEtcd := false
+	routerUseCase := biz.NewRouterUseCase(discovery, etcdReg, routes, useEtcd, logger)
 	gatewaySvc := service.NewGatewayService(routerUseCase, logger)
 
-	// Create HTTP server with gateway handler
-	hs := http.NewServer(
-		http.Addr(fmt.Sprintf(":%d", cfg.Server.Port)),
+	hs := khttp.NewServer(
+		khttp.Address(fmt.Sprintf(":%d", cfg.Server.Port)),
 	)
 
-	// Register gateway handler
 	hs.HandlePrefix("/", gatewaySvc)
-
-	// Register health check endpoints
 	hs.HandleFunc("/health", gatewaySvc.LivenessProbe)
 	hs.HandleFunc("/ready", gatewaySvc.ReadinessProbe)
 	hs.HandleFunc("/routes", func(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +66,6 @@ func main() {
 		}
 	})
 
-	// Start application
 	app := newApp(logger, hs)
 	logHelper.Infof("gateway service starting on port %d", cfg.Server.Port)
 	if err := app.Run(); err != nil {
@@ -83,35 +73,12 @@ func main() {
 	}
 }
 
-// parseRoutes 从配置解析路由
 func parseRoutes(cfg *conf.Config) []*biz.RouteConfig {
-	var routes []*biz.RouteConfig
-
-	// 从配置中读取路由规则
-	if routeMap, ok := cfg.Raw["routes"].([]interface{}); ok {
-		for _, r := range routeMap {
-			if route, ok := r.(map[interface{}]interface{}); ok {
-				path, _ := route["path"].(string)
-				target, _ := route["target"].(string)
-				if path != "" && target != "" {
-					routes = append(routes, &biz.RouteConfig{
-						Path:   path,
-						Target: target,
-					})
-				}
-			}
-		}
+	routes := []*biz.RouteConfig{
+		{Path: "/api/v1/device", Target: "vehicle-svc:8001"},
+		{Path: "/api/v1/billing", Target: "billing-svc:8002"},
+		{Path: "/api/v1/pay", Target: "payment-svc:8003"},
+		{Path: "/api/v1/admin", Target: "admin-svc:8004"},
 	}
-
-	// 默认路由
-	if len(routes) == 0 {
-		routes = []*biz.RouteConfig{
-			{Path: "/api/v1/device", Target: "vehicle-svc:8001"},
-			{Path: "/api/v1/billing", Target: "billing-svc:8002"},
-			{Path: "/api/v1/pay", Target: "payment-svc:8003"},
-			{Path: "/api/v1/admin", Target: "admin-svc:8004"},
-		}
-	}
-
 	return routes
 }

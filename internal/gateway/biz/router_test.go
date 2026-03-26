@@ -38,7 +38,7 @@ func TestRouterUseCase(t *testing.T) {
 	}
 
 	discovery := NewStaticDiscovery(routes)
-	uc := NewRouterUseCase(discovery, routes, logger)
+	uc := NewRouterUseCase(discovery, nil, routes, false, logger)
 
 	tests := []struct {
 		path     string
@@ -77,7 +77,7 @@ func TestMatchRoute(t *testing.T) {
 	}
 
 	discovery := NewStaticDiscovery(routes)
-	uc := NewRouterUseCase(discovery, routes, logger)
+	uc := NewRouterUseCase(discovery, nil, routes, false, logger)
 
 	// Test matching route
 	route := uc.MatchRoute("/api/v1/device/entry")

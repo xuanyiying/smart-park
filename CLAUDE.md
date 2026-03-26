@@ -110,3 +110,36 @@ Defined in proto files under `api/*/v1/*.proto`:
 - Services run database migrations on startup via `ent.Migrate()`
 - Configuration is loaded from YAML files specified via `-conf` flag
 - Proto files define both gRPC and HTTP endpoints using `google.api.http` annotations
+
+## Implementation Status
+
+See [TODO.md](./TODO.md) for detailed implementation status.
+
+### Current State (v0.2)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Proto Definitions | ✅ Complete | All API endpoints defined |
+| Business Logic | ✅ Complete | UseCase layer implemented |
+| Service Layer | ✅ Complete | gRPC services implemented |
+| Repository Layer | 🔲 Todo | Data layer needs implementation |
+| Gateway | ✅ Complete | Basic routing working |
+| Payment Integration | 🔲 Partial | SDK integration pending |
+| User APIs | 🔲 Todo | Not implemented yet |
+| Notification | 🔲 Todo | Placeholder only |
+
+### Gateway Routes
+
+```
+/api/v1/device/*  → vehicle-svc:8001
+/api/v1/billing/* → billing-svc:8002
+/api/v1/pay/*     → payment-svc:8003
+/api/v1/admin/*    → admin-svc:8004
+```
+
+### Next Steps
+
+1. **Implement Repository Layer** - Complete data access layer for all services
+2. **Integrate Payment SDKs** - WeChat Pay and Alipay
+3. **Implement User APIs** - User authentication, plate binding, QR payment
+4. **Device Control** - MQTT/WebSocket for gate control

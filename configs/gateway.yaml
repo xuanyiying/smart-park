@@ -2,10 +2,6 @@ server:
   port: 8000
   timeout: 60
 
-log:
-  level: info
-  format: json
-
 routes:
   - path: /api/v1/device
     target: vehicle-svc:8001
@@ -15,3 +11,18 @@ routes:
     target: payment-svc:8003
   - path: /api/v1/admin
     target: admin-svc:8004
+  - path: /api/v1/user
+    target: user-svc:8005
+
+etcd:
+  endpoints:
+    - "${ETCD_ENDPOINT:localhost:2379}"
+  timeout: 5s
+
+log:
+  level: info
+  format: json
+
+otel:
+  endpoint: "${OTEL_ENDPOINT}"
+  serviceName: "gateway-svc"

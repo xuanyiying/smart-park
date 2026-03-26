@@ -8,21 +8,14 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	"github.com/xuanyiying/smart-park/ent"
-	"github.com/xuanyiying/smart-park/ent/order"
-	"github.com/xuanyiying/smart-park/ent/parkinglot"
-	"github.com/xuanyiying/smart-park/ent/parkingrecord"
-	"github.com/xuanyiying/smart-park/ent/vehicle"
 	"github.com/xuanyiying/smart-park/internal/admin/biz"
+	ent "github.com/xuanyiying/smart-park/internal/admin/data/ent"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/order"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/vehicle"
 )
 
-// Data holds the data layer dependencies.
-type Data struct {
-	db  *ent.Client
-	log *log.Helper
-}
-
-// NewData creates a new Data instance.
 func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
 	d := &Data{
 		db:  db,
@@ -112,7 +105,7 @@ func (r *adminRepo) ListParkingLots(ctx context.Context, page, pageSize int) ([]
 
 	offset := (page - 1) * pageSize
 	lots, err := query.
-		Order(parkinglot.Desc(parkinglot.FieldCreatedAt)).
+		Order(ent.Desc("created_at")).
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)
@@ -168,11 +161,11 @@ func (r *adminRepo) ListVehicles(ctx context.Context, vehicleType string, page, 
 	if vehicleType != "" {
 		switch vehicleType {
 		case "temporary":
-			query = query.Where(vehicle.VehicleType(vehicle.VehicleTypeTemporary))
+			query = query.Where(vehicle.VehicleTypeEQ(vehicle.VehicleTypeTemporary))
 		case "monthly":
-			query = query.Where(vehicle.VehicleType(vehicle.VehicleTypeMonthly))
+			query = query.Where(vehicle.VehicleTypeEQ(vehicle.VehicleTypeMonthly))
 		case "vip":
-			query = query.Where(vehicle.VehicleType(vehicle.VehicleTypeVip))
+			query = query.Where(vehicle.VehicleTypeEQ(vehicle.VehicleTypeVip))
 		}
 	}
 
@@ -183,7 +176,7 @@ func (r *adminRepo) ListVehicles(ctx context.Context, vehicleType string, page, 
 
 	offset := (page - 1) * pageSize
 	vehicles, err := query.
-		Order(vehicle.Desc(vehicle.FieldCreatedAt)).
+		Order(ent.Desc("created_at")).
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)
@@ -235,7 +228,7 @@ func (r *adminRepo) ListParkingRecords(ctx context.Context, lotID uuid.UUID, pla
 
 	offset := (page - 1) * pageSize
 	records, err := query.
-		Order(parkingrecord.Desc(parkingrecord.FieldEntryTime)).
+		Order(ent.Desc("entry_time")).
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)
@@ -269,15 +262,15 @@ func (r *adminRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 	if status != "" {
 		switch status {
 		case "pending":
-			query = query.Where(order.Status(order.StatusPending))
+			query = query.Where(order.StatusEQ(order.StatusPending))
 		case "paid":
-			query = query.Where(order.Status(order.StatusPaid))
+			query = query.Where(order.StatusEQ(order.StatusPaid))
 		case "refunding":
-			query = query.Where(order.Status(order.StatusRefunding))
+			query = query.Where(order.StatusEQ(order.StatusRefunding))
 		case "refunded":
-			query = query.Where(order.Status(order.StatusRefunded))
+			query = query.Where(order.StatusEQ(order.StatusRefunded))
 		case "failed":
-			query = query.Where(order.Status(order.StatusFailed))
+			query = query.Where(order.StatusEQ(order.StatusFailed))
 		}
 	}
 
@@ -288,7 +281,7 @@ func (r *adminRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 
 	offset := (page - 1) * pageSize
 	orders, err := query.
-		Order(order.Desc(order.FieldCreatedAt)).
+		Order(ent.Desc("created_at")).
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)
@@ -298,10 +291,6 @@ func (r *adminRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 
 	var result []*biz.Order
 	for _, o := range orders {
-		var payMethod string
-		if o.PayMethod != nil {
-			payMethod = string(*o.PayMethod)
-		}
 		result = append(result, &biz.Order{
 			ID:             o.ID,
 			RecordID:       o.RecordID,
@@ -312,7 +301,7 @@ func (r *adminRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 			FinalAmount:    o.FinalAmount,
 			Status:         string(o.Status),
 			PayTime:        o.PayTime,
-			PayMethod:      payMethod,
+			PayMethod:      string(o.PayMethod),
 		})
 	}
 
@@ -329,11 +318,6 @@ func (r *adminRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order
 		return nil, err
 	}
 
-	var payMethod string
-	if o.PayMethod != nil {
-		payMethod = string(*o.PayMethod)
-	}
-
 	return &biz.Order{
 		ID:             o.ID,
 		RecordID:       o.RecordID,
@@ -344,7 +328,7 @@ func (r *adminRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order
 		FinalAmount:    o.FinalAmount,
 		Status:         string(o.Status),
 		PayTime:        o.PayTime,
-		PayMethod:      payMethod,
+		PayMethod:      string(o.PayMethod),
 	}, nil
 }
 
@@ -382,7 +366,7 @@ func (r *adminRepo) GetDailyReport(ctx context.Context, lotID uuid.UUID, date st
 	orders, _ := r.data.db.Order.Query().
 		Where(
 			order.LotID(lotID),
-			order.Status(order.StatusPaid),
+			order.StatusEQ(order.StatusPaid),
 			order.PayTimeNotNil(),
 			order.PayTimeGTE(startOfDay),
 			order.PayTimeLT(endOfDay),
@@ -435,7 +419,7 @@ func (r *adminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year,
 	orders, _ := r.data.db.Order.Query().
 		Where(
 			order.LotID(lotID),
-			order.Status(order.StatusPaid),
+			order.StatusEQ(order.StatusPaid),
 			order.PayTimeNotNil(),
 			order.PayTimeGTE(startOfMonth),
 			order.PayTimeLT(endOfMonth),

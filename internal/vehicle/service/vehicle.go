@@ -14,23 +14,36 @@ import (
 type VehicleService struct {
 	v1.UnimplementedVehicleServiceServer
 
-	vehicleUseCase *biz.VehicleUseCase
-	billingUseCase *biz.BillingUseCase
-	log            *log.Helper
+	entryExitUseCase *biz.EntryExitUseCase
+	deviceUseCase    *biz.DeviceUseCase
+	vehicleUseCase   *biz.VehicleQueryUseCase
+	commandUseCase   *biz.CommandUseCase
+	recordUseCase    *biz.RecordQueryUseCase
+	log              *log.Helper
 }
 
 // NewVehicleService creates a new VehicleService.
-func NewVehicleService(vehicleUseCase *biz.VehicleUseCase, billingUseCase *biz.BillingUseCase, logger log.Logger) *VehicleService {
+func NewVehicleService(
+	entryExitUseCase *biz.EntryExitUseCase,
+	deviceUseCase *biz.DeviceUseCase,
+	vehicleUseCase *biz.VehicleQueryUseCase,
+	commandUseCase *biz.CommandUseCase,
+	recordUseCase *biz.RecordQueryUseCase,
+	logger log.Logger,
+) *VehicleService {
 	return &VehicleService{
-		vehicleUseCase: vehicleUseCase,
-		billingUseCase: billingUseCase,
-		log:            log.NewHelper(logger),
+		entryExitUseCase: entryExitUseCase,
+		deviceUseCase:    deviceUseCase,
+		vehicleUseCase:   vehicleUseCase,
+		commandUseCase:   commandUseCase,
+		recordUseCase:    recordUseCase,
+		log:              log.NewHelper(logger),
 	}
 }
 
 // Entry handles vehicle entry request.
 func (s *VehicleService) Entry(ctx context.Context, req *v1.EntryRequest) (*v1.EntryResponse, error) {
-	data, err := s.vehicleUseCase.Entry(ctx, req)
+	data, err := s.entryExitUseCase.Entry(ctx, req)
 	if err != nil {
 		s.log.WithContext(ctx).Errorf("Entry failed: %v", err)
 		return &v1.EntryResponse{
@@ -48,7 +61,7 @@ func (s *VehicleService) Entry(ctx context.Context, req *v1.EntryRequest) (*v1.E
 
 // Exit handles vehicle exit request.
 func (s *VehicleService) Exit(ctx context.Context, req *v1.ExitRequest) (*v1.ExitResponse, error) {
-	data, err := s.vehicleUseCase.Exit(ctx, req)
+	data, err := s.entryExitUseCase.Exit(ctx, req)
 	if err != nil {
 		s.log.WithContext(ctx).Errorf("Exit failed: %v", err)
 		return &v1.ExitResponse{
@@ -66,7 +79,7 @@ func (s *VehicleService) Exit(ctx context.Context, req *v1.ExitRequest) (*v1.Exi
 
 // Heartbeat handles device heartbeat request.
 func (s *VehicleService) Heartbeat(ctx context.Context, req *v1.HeartbeatRequest) (*v1.HeartbeatResponse, error) {
-	if err := s.vehicleUseCase.Heartbeat(ctx, req); err != nil {
+	if err := s.deviceUseCase.Heartbeat(ctx, req); err != nil {
 		s.log.WithContext(ctx).Errorf("Heartbeat failed: %v", err)
 		return &v1.HeartbeatResponse{
 			Code:    500,
@@ -82,7 +95,7 @@ func (s *VehicleService) Heartbeat(ctx context.Context, req *v1.HeartbeatRequest
 
 // GetDeviceStatus handles get device status request.
 func (s *VehicleService) GetDeviceStatus(ctx context.Context, req *v1.GetDeviceStatusRequest) (*v1.GetDeviceStatusResponse, error) {
-	status, err := s.vehicleUseCase.GetDeviceStatus(ctx, req.DeviceId)
+	status, err := s.deviceUseCase.GetDeviceStatus(ctx, req.DeviceId)
 	if err != nil {
 		s.log.WithContext(ctx).Errorf("GetDeviceStatus failed: %v", err)
 		return &v1.GetDeviceStatusResponse{
@@ -100,7 +113,7 @@ func (s *VehicleService) GetDeviceStatus(ctx context.Context, req *v1.GetDeviceS
 
 // SendCommand handles send command request.
 func (s *VehicleService) SendCommand(ctx context.Context, req *v1.SendCommandRequest) (*v1.SendCommandResponse, error) {
-	data, err := s.vehicleUseCase.SendCommand(ctx, req.DeviceId, req.Command, req.Params)
+	data, err := s.commandUseCase.SendCommand(ctx, req.DeviceId, req.Command, req.Params)
 	if err != nil {
 		s.log.WithContext(ctx).Errorf("SendCommand failed: %v", err)
 		return &v1.SendCommandResponse{
@@ -128,6 +141,51 @@ func (s *VehicleService) GetVehicleInfo(ctx context.Context, req *v1.GetVehicleI
 	}
 
 	return &v1.GetVehicleInfoResponse{
+		Code:    0,
+		Message: "success",
+		Data:    info,
+	}, nil
+}
+
+// ListParkingRecords handles list parking records request.
+func (s *VehicleService) ListParkingRecords(ctx context.Context, req *v1.ListParkingRecordsRequest) (*v1.ListParkingRecordsResponse, error) {
+	page := int(req.Page)
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	data, err := s.recordUseCase.ListParkingRecordsByPlates(ctx, req.PlateNumbers, page, pageSize)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListParkingRecords failed: %v", err)
+		return &v1.ListParkingRecordsResponse{
+			Code:    500,
+			Message: "获取停车记录失败",
+		}, nil
+	}
+
+	return &v1.ListParkingRecordsResponse{
+		Code:    0,
+		Message: "success",
+		Data:    data,
+	}, nil
+}
+
+// GetParkingRecord handles get parking record request.
+func (s *VehicleService) GetParkingRecord(ctx context.Context, req *v1.GetParkingRecordRequest) (*v1.GetParkingRecordResponse, error) {
+	info, err := s.recordUseCase.GetParkingRecord(ctx, req.RecordId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetParkingRecord failed: %v", err)
+		return &v1.GetParkingRecordResponse{
+			Code:    500,
+			Message: "获取停车记录失败",
+		}, nil
+	}
+
+	return &v1.GetParkingRecordResponse{
 		Code:    0,
 		Message: "success",
 		Data:    info,

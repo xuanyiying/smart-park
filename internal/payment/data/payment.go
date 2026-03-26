@@ -3,49 +3,23 @@ package data
 
 import (
 	"context"
-	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	"github.com/xuanyiying/smart-park/ent"
-	"github.com/xuanyiying/smart-park/ent/order"
 	"github.com/xuanyiying/smart-park/internal/payment/biz"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/predicate"
 )
 
-// Data holds the data layer dependencies.
-type Data struct {
-	db  *ent.Client
-	log *log.Helper
-}
-
-// NewData creates a new Data instance.
-func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
-	d := &Data{
-		db:  db,
-		log: log.NewHelper(logger),
-	}
-
-	cleanup := func() {
-		if err := d.db.Close(); err != nil {
-			d.log.Errorf("failed to close database: %v", err)
-		}
-	}
-
-	return d, cleanup, nil
-}
-
-// orderRepo implements biz.OrderRepo.
 type orderRepo struct {
 	data *Data
 }
 
-// NewOrderRepo creates a new OrderRepo.
 func NewOrderRepo(data *Data) biz.OrderRepo {
 	return &orderRepo{data: data}
 }
 
-// GetOrder retrieves an order by ID.
 func (r *orderRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order, error) {
 	o, err := r.data.db.Order.Get(ctx, orderID)
 	if err != nil {
@@ -54,11 +28,9 @@ func (r *orderRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order
 		}
 		return nil, err
 	}
-
 	return toBizOrder(o), nil
 }
 
-// GetOrderByRecordID retrieves an order by record ID.
 func (r *orderRepo) GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) (*biz.Order, error) {
 	o, err := r.data.db.Order.Query().
 		Where(order.RecordID(recordID)).
@@ -69,11 +41,9 @@ func (r *orderRepo) GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) 
 		}
 		return nil, err
 	}
-
 	return toBizOrder(o), nil
 }
 
-// GetOrderByTransactionID retrieves an order by transaction ID.
 func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID string) (*biz.Order, error) {
 	o, err := r.data.db.Order.Query().
 		Where(order.TransactionID(transactionID)).
@@ -84,13 +54,11 @@ func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID s
 		}
 		return nil, err
 	}
-
 	return toBizOrder(o), nil
 }
 
-// CreateOrder creates a new order.
 func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
-	create := r.data.db.Order.Create().
+	_, err := r.data.db.Order.Create().
 		SetID(o.ID).
 		SetRecordID(o.RecordID).
 		SetLotID(o.LotID).
@@ -98,17 +66,11 @@ func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
 		SetAmount(o.Amount).
 		SetDiscountAmount(o.DiscountAmount).
 		SetFinalAmount(o.FinalAmount).
-		SetStatus(order.StatusPending)
-
-	if o.VehicleID != nil {
-		create.SetVehicleID(*o.VehicleID)
-	}
-
-	_, err := create.Save(ctx)
+		SetStatus(order.StatusPending).
+		Save(ctx)
 	return err
 }
 
-// UpdateOrder updates an order.
 func (r *orderRepo) UpdateOrder(ctx context.Context, o *biz.Order) error {
 	update := r.data.db.Order.UpdateOneID(o.ID)
 
@@ -129,14 +91,7 @@ func (r *orderRepo) UpdateOrder(ctx context.Context, o *biz.Order) error {
 		update.SetPayTime(*o.PayTime)
 	}
 	if o.PayMethod != "" {
-		switch o.PayMethod {
-		case "wechat":
-			update.SetPayMethod(order.PayMethodWechat)
-		case "alipay":
-			update.SetPayMethod(order.PayMethodAlipay)
-		case "cash":
-			update.SetPayMethod(order.PayMethodCash)
-		}
+		update.SetPayMethod(order.PayMethod(o.PayMethod))
 	}
 	if o.TransactionID != "" {
 		update.SetTransactionID(o.TransactionID)
@@ -155,24 +110,29 @@ func (r *orderRepo) UpdateOrder(ctx context.Context, o *biz.Order) error {
 	return err
 }
 
-// ListOrders lists orders with pagination.
 func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*biz.Order, int64, error) {
-	query := r.data.db.Order.Query().Where(order.LotID(lotID))
-
+	predicates := []predicate.Order{}
+	if lotID != uuid.Nil {
+		predicates = append(predicates, order.LotID(lotID))
+	}
 	if status != "" {
+		var orderStatus order.Status
 		switch status {
 		case "pending":
-			query = query.Where(order.Status(order.StatusPending))
+			orderStatus = order.StatusPending
 		case "paid":
-			query = query.Where(order.Status(order.StatusPaid))
+			orderStatus = order.StatusPaid
 		case "refunding":
-			query = query.Where(order.Status(order.StatusRefunding))
+			orderStatus = order.StatusRefunding
 		case "refunded":
-			query = query.Where(order.Status(order.StatusRefunded))
+			orderStatus = order.StatusRefunded
 		case "failed":
-			query = query.Where(order.Status(order.StatusFailed))
+			orderStatus = order.StatusFailed
 		}
+		predicates = append(predicates, order.StatusEQ(orderStatus))
 	}
+
+	query := r.data.db.Order.Query().Where(predicates...)
 
 	total, err := query.Count(ctx)
 	if err != nil {
@@ -181,7 +141,6 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 
 	offset := (page - 1) * pageSize
 	orders, err := query.
-		Order(order.Desc(order.FieldCreatedAt)).
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)
@@ -197,13 +156,7 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 	return result, int64(total), nil
 }
 
-// Helper function to convert ent Order to biz Order.
 func toBizOrder(o *ent.Order) *biz.Order {
-	var payMethod string
-	if o.PayMethod != nil {
-		payMethod = string(*o.PayMethod)
-	}
-
 	return &biz.Order{
 		ID:                  o.ID,
 		RecordID:            o.RecordID,
@@ -215,7 +168,7 @@ func toBizOrder(o *ent.Order) *biz.Order {
 		FinalAmount:         o.FinalAmount,
 		Status:              string(o.Status),
 		PayTime:             o.PayTime,
-		PayMethod:           payMethod,
+		PayMethod:           string(o.PayMethod),
 		TransactionID:       o.TransactionID,
 		PaidAmount:          o.PaidAmount,
 		RefundedAt:          o.RefundedAt,

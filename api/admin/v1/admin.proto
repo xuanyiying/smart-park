@@ -120,7 +120,14 @@ message ListParkingLotsRequest {
 message ListParkingLotsResponse {
   int32 code = 1;
   string message = 2;
-  ListData data = 3;
+  ParkingLotListData data = 3;
+}
+
+message ParkingLotListData {
+  repeated ParkingLot list = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
 }
 
 message ParkingLot {
@@ -145,7 +152,14 @@ message ListParkingRecordsRequest {
 message ListParkingRecordsResponse {
   int32 code = 1;
   string message = 2;
-  ListData data = 3;
+  ParkingRecordListData data = 3;
+}
+
+message ParkingRecordListData {
+  repeated ParkingRecord list = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
 }
 
 message ParkingRecord {
@@ -168,7 +182,14 @@ message ListOrdersRequest {
 message ListOrdersResponse {
   int32 code = 1;
   string message = 2;
-  ListData data = 3;
+  OrderListData data = 3;
+}
+
+message OrderListData {
+  repeated Order list = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
 }
 
 message GetOrderRequest {
@@ -217,7 +238,14 @@ message ListVehiclesRequest {
 message ListVehiclesResponse {
   int32 code = 1;
   string message = 2;
-  ListData data = 3;
+  VehicleListData data = 3;
+}
+
+message VehicleListData {
+  repeated Vehicle list = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
 }
 
 message Vehicle {
@@ -275,11 +303,4 @@ message MonthlyReport {
   double total_discount = 8;
   double net_amount = 9;
   repeated DailyReport daily_reports = 10;
-}
-
-message ListData {
-  repeated google.protobuf.Empty list = 1;
-  int32 total = 2;
-  int32 page = 3;
-  int32 page_size = 4;
 }

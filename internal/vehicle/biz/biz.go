@@ -8,8 +8,11 @@ import (
 
 // ProviderSet is the provider set for biz layer.
 var ProviderSet = wire.NewSet(
-	NewVehicleUseCase,
-	NewBillingUseCase,
+	NewEntryExitUseCase,
+	NewDeviceUseCase,
+	NewVehicleQueryUseCase,
+	NewCommandUseCase,
+	NewRecordQueryUseCase,
 	NewLogger,
 )
 

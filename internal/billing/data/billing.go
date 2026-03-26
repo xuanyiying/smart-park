@@ -4,36 +4,12 @@ package data
 import (
 	"context"
 
-	"entgo.io/ent/dialect/sql"
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	"github.com/xuanyiying/smart-park/ent"
-	"github.com/xuanyiying/smart-park/ent/billingrule"
 	"github.com/xuanyiying/smart-park/internal/billing/biz"
+	"github.com/xuanyiying/smart-park/internal/billing/data/ent"
+	"github.com/xuanyiying/smart-park/internal/billing/data/ent/billingrule"
 )
-
-// Data holds the data layer dependencies.
-type Data struct {
-	db  *ent.Client
-	log *log.Helper
-}
-
-// NewData creates a new Data instance.
-func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
-	d := &Data{
-		db:  db,
-		log: log.NewHelper(logger),
-	}
-
-	cleanup := func() {
-		if err := d.db.Close(); err != nil {
-			d.log.Errorf("failed to close database: %v", err)
-		}
-	}
-
-	return d, cleanup, nil
-}
 
 // billingRuleRepo implements biz.BillingRuleRepo.
 type billingRuleRepo struct {
@@ -49,7 +25,7 @@ func NewBillingRuleRepo(data *Data) biz.BillingRuleRepo {
 func (r *billingRuleRepo) GetRulesByLotID(ctx context.Context, lotID uuid.UUID) ([]*biz.BillingRule, error) {
 	rules, err := r.data.db.BillingRule.Query().
 		Where(billingrule.LotID(lotID)).
-		Order(billingrule.Desc(billingrule.FieldPriority)).
+		Order(ent.Desc(billingrule.FieldPriority)).
 		All(ctx)
 	if err != nil {
 		return nil, err
@@ -147,7 +123,7 @@ func (r *billingRuleRepo) ListBillingRules(ctx context.Context, lotID uuid.UUID,
 
 	offset := (page - 1) * pageSize
 	rules, err := query.
-		Order(billingrule.Desc(billingrule.FieldPriority)).
+		Order(ent.Desc(billingrule.FieldPriority)).
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)

@@ -4,33 +4,33 @@ server:
 
 database:
   driver: postgres
-  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  source: "host=${DB_HOST} user=${DB_USER} password=${DB_PASSWORD} dbname=parking port=${DB_PORT} sslmode=disable"
 
 redis:
-  addr: "localhost:6379"
-  password: ""
+  addr: "${REDIS_ADDR}"
+  password: "${REDIS_PASSWORD}"
   db: 0
 
-mq:
-  type: "redis"
-  redis:
-    addr: "localhost:6379"
-    password: ""
-    db: 0
-    stream: "parking"
+wechat:
+  app_id: ${WECHAT_APP_ID}
+  mch_id: ${WECHAT_MCH_ID}
+  api_key: ${WECHAT_API_KEY}
+  cert_serial_no: ${WECHAT_CERT_SERIAL_NO}
+  private_key_path: ${WECHAT_PRIVATE_KEY_PATH}
+  public_key_path: ${WECHAT_PUBLIC_KEY_PATH}
+  notify_url: ${WECHAT_NOTIFY_URL}
+
+alipay:
+  app_id: ${ALIPAY_APP_ID}
+  private_key: ${ALIPAY_PRIVATE_KEY}
+  public_key: ${ALIPAY_PUBLIC_KEY}
+  notify_url: ${ALIPAY_NOTIFY_URL}
+  is_production: ${ALIPAY_IS_PRODUCTION:false}
 
 log:
   level: info
   format: json
 
-wechat:
-  appid: ""
-  mchid: ""
-  key: ""
-  notifyUrl: ""
-
-alipay:
-  appid: ""
-  privateKey: ""
-  publicKey: ""
-  notifyUrl: ""
+otel:
+  endpoint: "${OTEL_ENDPOINT}"
+  serviceName: "payment-svc"

@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -65,10 +66,11 @@ func (m *MockOrderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status 
 }
 
 func TestPaymentUseCase_CreatePayment(t *testing.T) {
-	logger := log.NewStdLogger(nil)
+	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
 
-	uc := NewPaymentUseCase(mockRepo, logger)
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
@@ -96,9 +98,48 @@ func TestPaymentUseCase_CreatePayment(t *testing.T) {
 	}
 }
 
-func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
-	logger := log.NewStdLogger(nil)
+func TestPaymentUseCase_CreatePayment_InvalidAmount(t *testing.T) {
+	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
+
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+
+	req := &v1.CreatePaymentRequest{
+		RecordId:  uuid.New().String(),
+		Amount:    -10.50,
+		PayMethod: "wechat",
+	}
+
+	_, err := uc.CreatePayment(context.Background(), req)
+	if err == nil {
+		t.Error("Expected error for negative amount")
+	}
+}
+
+func TestPaymentUseCase_CreatePayment_InvalidMethod(t *testing.T) {
+	logger := log.NewStdLogger(os.Stdout)
+	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
+
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+
+	req := &v1.CreatePaymentRequest{
+		RecordId:  uuid.New().String(),
+		Amount:    10.50,
+		PayMethod: "invalid",
+	}
+
+	_, err := uc.CreatePayment(context.Background(), req)
+	if err == nil {
+		t.Error("Expected error for invalid payment method")
+	}
+}
+
+func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
+	logger := log.NewStdLogger(os.Stdout)
+	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
 
 	orderID := uuid.New()
 	payTime := time.Now()
@@ -106,12 +147,12 @@ func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
 		ID:        orderID,
 		RecordID:  uuid.New(),
 		LotID:     uuid.New(),
-		Status:    "paid",
+		Status:    string(StatusPaid),
 		PayTime:   &payTime,
-		PayMethod: "wechat",
+		PayMethod: string(MethodWechat),
 	}
 
-	uc := NewPaymentUseCase(mockRepo, logger)
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
 
 	data, err := uc.GetPaymentStatus(context.Background(), orderID.String())
 	if err != nil {
@@ -122,25 +163,27 @@ func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
 		t.Fatal("Expected non-nil response")
 	}
 
-	if data.Status != "paid" {
+	if data.Status != string(StatusPaid) {
 		t.Errorf("Expected status 'paid', got %s", data.Status)
 	}
 }
 
 func TestPaymentUseCase_Refund(t *testing.T) {
-	logger := log.NewStdLogger(nil)
+	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
 
 	orderID := uuid.New()
 	mockRepo.Orders[orderID] = &Order{
 		ID:          orderID,
 		RecordID:    uuid.New(),
 		LotID:       uuid.New(),
-		Status:      "paid",
+		Status:      string(StatusPaid),
 		FinalAmount: 10.00,
+		PayMethod:   string(MethodWechat),
 	}
 
-	uc := NewPaymentUseCase(mockRepo, logger)
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
 
 	data, err := uc.Refund(context.Background(), orderID.String(), "Test refund")
 	if err != nil {
@@ -156,14 +199,41 @@ func TestPaymentUseCase_Refund(t *testing.T) {
 	}
 
 	// Verify order status was updated
-	if mockRepo.Orders[orderID].Status != "refunded" {
-		t.Error("Expected order status to be 'refunded'")
+	if mockRepo.Orders[orderID].Status != string(StatusRefunded) {
+		t.Errorf("Expected order status to be 'refunded', got %s", mockRepo.Orders[orderID].Status)
+	}
+}
+
+func TestPaymentUseCase_Refund_NotPaid(t *testing.T) {
+	logger := log.NewStdLogger(os.Stdout)
+	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
+
+	orderID := uuid.New()
+	mockRepo.Orders[orderID] = &Order{
+		ID:          orderID,
+		RecordID:    uuid.New(),
+		LotID:       uuid.New(),
+		Status:      string(StatusPending),
+		FinalAmount: 10.00,
+	}
+
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+
+	data, err := uc.Refund(context.Background(), orderID.String(), "Test refund")
+	if err != nil {
+		t.Fatalf("Refund failed: %v", err)
+	}
+
+	if data.Status != "failed" {
+		t.Errorf("Expected status 'failed', got %s", data.Status)
 	}
 }
 
 func TestPaymentUseCase_HandleWechatCallback(t *testing.T) {
-	logger := log.NewStdLogger(nil)
+	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
 
 	transactionID := "wx-transaction-123"
 	orderID := uuid.New()
@@ -171,11 +241,11 @@ func TestPaymentUseCase_HandleWechatCallback(t *testing.T) {
 		ID:            orderID,
 		RecordID:      uuid.New(),
 		LotID:         uuid.New(),
-		Status:        "pending",
+		Status:        string(StatusPending),
 		TransactionID: transactionID,
 	}
 
-	uc := NewPaymentUseCase(mockRepo, logger)
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
 
 	req := &v1.WechatCallbackRequest{
 		ReturnCode:    "SUCCESS",
@@ -195,7 +265,46 @@ func TestPaymentUseCase_HandleWechatCallback(t *testing.T) {
 	}
 
 	// Verify order status was updated
-	if mockRepo.Orders[orderID].Status != "paid" {
-		t.Error("Expected order status to be 'paid'")
+	if mockRepo.Orders[orderID].Status != string(StatusPaid) {
+		t.Errorf("Expected order status to be 'paid', got %s", mockRepo.Orders[orderID].Status)
+	}
+}
+
+func TestPaymentUseCase_HandleAlipayCallback(t *testing.T) {
+	logger := log.NewStdLogger(os.Stdout)
+	mockRepo := NewMockOrderRepo()
+	config := &PaymentConfig{}
+
+	transactionID := "alipay-transaction-123"
+	orderID := uuid.New()
+	mockRepo.Orders[orderID] = &Order{
+		ID:            orderID,
+		RecordID:      uuid.New(),
+		LotID:         uuid.New(),
+		Status:        string(StatusPending),
+		TransactionID: transactionID,
+	}
+
+	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+
+	req := &v1.AlipayCallbackRequest{
+		TradeStatus:  "TRADE_SUCCESS",
+		TradeNo:      transactionID,
+		OutTradeNo:   orderID.String(),
+		TotalAmount:  "10.00",
+	}
+
+	resp, err := uc.HandleAlipayCallback(context.Background(), req)
+	if err != nil {
+		t.Fatalf("HandleAlipayCallback failed: %v", err)
+	}
+
+	if resp.Code != "success" {
+		t.Errorf("Expected code 'success', got %s", resp.Code)
+	}
+
+	// Verify order status was updated
+	if mockRepo.Orders[orderID].Status != string(StatusPaid) {
+		t.Errorf("Expected order status to be 'paid', got %s", mockRepo.Orders[orderID].Status)
 	}
 }

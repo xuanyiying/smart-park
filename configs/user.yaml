@@ -1,0 +1,28 @@
+server:
+  port: 8005
+  timeout: 60
+
+database:
+  driver: postgres
+  source: "host=${DB_HOST} user=${DB_USER} password=${DB_PASSWORD} dbname=parking port=${DB_PORT} sslmode=disable"
+
+redis:
+  addr: "${REDIS_ADDR}"
+  password: "${REDIS_PASSWORD}"
+  db: 0
+
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  token_duration: 24h
+
+wechat:
+  app_id: ${WECHAT_MINI_APP_ID}
+  app_secret: ${WECHAT_MINI_APP_SECRET}
+
+log:
+  level: info
+  format: json
+
+otel:
+  endpoint: "${OTEL_ENDPOINT}"
+  serviceName: "user-svc"

@@ -181,7 +181,7 @@ func (uc *AdminUseCase) UpdateParkingLot(ctx context.Context, req *v1.UpdatePark
 }
 
 // ListParkingLots lists parking lots.
-func (uc *AdminUseCase) ListParkingLots(ctx context.Context, req *v1.ListParkingLotsRequest) (*v1.ListData, error) {
+func (uc *AdminUseCase) ListParkingLots(ctx context.Context, req *v1.ListParkingLotsRequest) (*v1.ParkingLotListData, error) {
 	lots, total, err := uc.repo.ListParkingLots(ctx, int(req.Page), int(req.PageSize))
 	if err != nil {
 		return nil, err
@@ -200,11 +200,11 @@ func (uc *AdminUseCase) ListParkingLots(ctx context.Context, req *v1.ListParking
 		})
 	}
 
-	return &v1.ListData{
+	return &v1.ParkingLotListData{
+		List:     items,
 		Total:    int32(total),
 		Page:     req.Page,
 		PageSize: req.PageSize,
-		List:     nil, // Will be populated with items
 	}, nil
 }
 
@@ -249,15 +249,31 @@ func (uc *AdminUseCase) CreateVehicle(ctx context.Context, req *v1.CreateVehicle
 }
 
 // ListVehicles lists vehicles.
-func (uc *AdminUseCase) ListVehicles(ctx context.Context, req *v1.ListVehiclesRequest) (*v1.ListData, error) {
+func (uc *AdminUseCase) ListVehicles(ctx context.Context, req *v1.ListVehiclesRequest) (*v1.VehicleListData, error) {
 	vehicles, total, err := uc.repo.ListVehicles(ctx, req.VehicleType, int(req.Page), int(req.PageSize))
 	if err != nil {
 		return nil, err
 	}
 
-	_ = vehicles // Will be converted to v1.Vehicle list
+	var items []*v1.Vehicle
+	for _, v := range vehicles {
+		var validUntil string
+		if v.MonthlyValidUntil != nil {
+			validUntil = v.MonthlyValidUntil.Format(time.RFC3339)
+		}
+		items = append(items, &v1.Vehicle{
+			Id:                v.ID.String(),
+			PlateNumber:       v.PlateNumber,
+			VehicleType:       v.VehicleType,
+			OwnerName:         v.OwnerName,
+			OwnerPhone:        v.OwnerPhone,
+			MonthlyValidUntil: validUntil,
+			CreatedAt:         v.CreatedAt.Format(time.RFC3339),
+		})
+	}
 
-	return &v1.ListData{
+	return &v1.VehicleListData{
+		List:     items,
 		Total:    int32(total),
 		Page:     req.Page,
 		PageSize: req.PageSize,
@@ -265,7 +281,7 @@ func (uc *AdminUseCase) ListVehicles(ctx context.Context, req *v1.ListVehiclesRe
 }
 
 // ListParkingRecords lists parking records.
-func (uc *AdminUseCase) ListParkingRecords(ctx context.Context, req *v1.ListParkingRecordsRequest) (*v1.ListData, error) {
+func (uc *AdminUseCase) ListParkingRecords(ctx context.Context, req *v1.ListParkingRecordsRequest) (*v1.ParkingRecordListData, error) {
 	var lotID uuid.UUID
 	if req.LotId != "" {
 		var err error
@@ -280,9 +296,20 @@ func (uc *AdminUseCase) ListParkingRecords(ctx context.Context, req *v1.ListPark
 		return nil, err
 	}
 
-	_ = records // Will be converted to v1.ParkingRecord list
+	var items []*v1.ParkingRecord
+	for _, rec := range records {
+		items = append(items, &v1.ParkingRecord{
+			Id:               rec.ID.String(),
+			LotId:            rec.LotID.String(),
+			PlateNumber:      rec.PlateNumber,
+			EntryTime:        rec.EntryTime.Unix(),
+			ParkingDuration:  int32(rec.ParkingDuration),
+			Status:           rec.Status,
+		})
+	}
 
-	return &v1.ListData{
+	return &v1.ParkingRecordListData{
+		List:     items,
 		Total:    int32(total),
 		Page:     req.Page,
 		PageSize: req.PageSize,
@@ -290,7 +317,7 @@ func (uc *AdminUseCase) ListParkingRecords(ctx context.Context, req *v1.ListPark
 }
 
 // ListOrders lists orders.
-func (uc *AdminUseCase) ListOrders(ctx context.Context, req *v1.ListOrdersRequest) (*v1.ListData, error) {
+func (uc *AdminUseCase) ListOrders(ctx context.Context, req *v1.ListOrdersRequest) (*v1.OrderListData, error) {
 	var lotID uuid.UUID
 	if req.LotId != "" {
 		var err error
@@ -305,9 +332,28 @@ func (uc *AdminUseCase) ListOrders(ctx context.Context, req *v1.ListOrdersReques
 		return nil, err
 	}
 
-	_ = orders // Will be converted to v1.Order list
+	var items []*v1.Order
+	for _, o := range orders {
+		var payTime string
+		if o.PayTime != nil {
+			payTime = o.PayTime.Format(time.RFC3339)
+		}
+		items = append(items, &v1.Order{
+			Id:             o.ID.String(),
+			RecordId:       o.RecordID.String(),
+			LotId:          o.LotID.String(),
+			PlateNumber:    o.PlateNumber,
+			Amount:         o.Amount,
+			DiscountAmount: o.DiscountAmount,
+			FinalAmount:    o.FinalAmount,
+			Status:         o.Status,
+			PayTime:        payTime,
+			PayMethod:      o.PayMethod,
+		})
+	}
 
-	return &v1.ListData{
+	return &v1.OrderListData{
+		List:     items,
 		Total:    int32(total),
 		Page:     req.Page,
 		PageSize: req.PageSize,

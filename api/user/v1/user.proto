@@ -1,0 +1,246 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/user/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service UserService {
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/login"
+      body: "*"
+    };
+  }
+  
+  rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/info"
+    };
+  }
+  
+  rpc BindPlate (BindPlateRequest) returns (BindPlateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/plates"
+      body: "*"
+    };
+  }
+  
+  rpc UnbindPlate (UnbindPlateRequest) returns (UnbindPlateResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/user/plates/{plate_number}"
+    };
+  }
+  
+  rpc ListPlates (ListPlatesRequest) returns (ListPlatesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/plates"
+    };
+  }
+  
+  rpc ListParkingRecords (ListParkingRecordsRequest) returns (ListParkingRecordsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/parking-records"
+    };
+  }
+  
+  rpc GetParkingRecord (GetParkingRecordRequest) returns (GetParkingRecordResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/parking-records/{record_id}"
+    };
+  }
+  
+  rpc ScanPay (ScanPayRequest) returns (ScanPayResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/scan-pay"
+      body: "*"
+    };
+  }
+  
+  rpc GetMonthlyCard (GetMonthlyCardRequest) returns (GetMonthlyCardResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/monthly-card/{plate_number}"
+    };
+  }
+  
+  rpc PurchaseMonthlyCard (PurchaseMonthlyCardRequest) returns (PurchaseMonthlyCardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/monthly-card"
+      body: "*"
+    };
+  }
+}
+
+message LoginRequest {
+  string code = 1;
+}
+
+message LoginResponse {
+  int32 code = 1;
+  string message = 2;
+  LoginData data = 3;
+}
+
+message LoginData {
+  string token = 1;
+  string open_id = 2;
+  int64 expires_at = 3;
+}
+
+message GetUserInfoRequest {}
+
+message GetUserInfoResponse {
+  int32 code = 1;
+  string message = 2;
+  UserInfo data = 3;
+}
+
+message UserInfo {
+  string user_id = 1;
+  string open_id = 2;
+  string nickname = 3;
+  string avatar = 4;
+  string phone = 5;
+  int64 created_at = 6;
+}
+
+message BindPlateRequest {
+  string plate_number = 1;
+  string owner_name = 2;
+  string owner_phone = 3;
+}
+
+message BindPlateResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message UnbindPlateRequest {
+  string plate_number = 1;
+}
+
+message UnbindPlateResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message ListPlatesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListPlatesResponse {
+  int32 code = 1;
+  string message = 2;
+  ListPlatesData data = 3;
+}
+
+message ListPlatesData {
+  repeated PlateInfo plates = 1;
+  int32 total = 2;
+}
+
+message PlateInfo {
+  string plate_number = 1;
+  string vehicle_type = 2;
+  string owner_name = 3;
+  string owner_phone = 4;
+  string monthly_valid_until = 5;
+}
+
+message ListParkingRecordsRequest {
+  string plate_number = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListParkingRecordsResponse {
+  int32 code = 1;
+  string message = 2;
+  ListParkingRecordsData data = 3;
+}
+
+message ListParkingRecordsData {
+  repeated ParkingRecordInfo records = 1;
+  int32 total = 2;
+}
+
+message ParkingRecordInfo {
+  string record_id = 1;
+  string plate_number = 2;
+  string lot_name = 3;
+  string entry_time = 4;
+  string exit_time = 5;
+  int32 duration = 6;
+  double amount = 7;
+  string status = 8;
+}
+
+message GetParkingRecordRequest {
+  string record_id = 1;
+}
+
+message GetParkingRecordResponse {
+  int32 code = 1;
+  string message = 2;
+  ParkingRecordInfo data = 3;
+}
+
+message ScanPayRequest {
+  string record_id = 1;
+  string pay_method = 2;
+  string open_id = 3;
+}
+
+message ScanPayResponse {
+  int32 code = 1;
+  string message = 2;
+  ScanPayData data = 3;
+}
+
+message ScanPayData {
+  string order_id = 1;
+  double amount = 2;
+  string pay_url = 3;
+  string qr_code = 4;
+  string expire_time = 5;
+}
+
+message GetMonthlyCardRequest {
+  string plate_number = 1;
+}
+
+message GetMonthlyCardResponse {
+  int32 code = 1;
+  string message = 2;
+  MonthlyCardInfo data = 3;
+}
+
+message MonthlyCardInfo {
+  string plate_number = 1;
+  string valid_until = 2;
+  int32 days_remaining = 3;
+  bool is_valid = 4;
+}
+
+message PurchaseMonthlyCardRequest {
+  string plate_number = 1;
+  int32 months = 2;
+  string pay_method = 3;
+  string open_id = 4;
+}
+
+message PurchaseMonthlyCardResponse {
+  int32 code = 1;
+  string message = 2;
+  PurchaseMonthlyCardData data = 3;
+}
+
+message PurchaseMonthlyCardData {
+  string order_id = 1;
+  double amount = 2;
+  string pay_url = 3;
+  string qr_code = 4;
+}

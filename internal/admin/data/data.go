@@ -1,12 +1,18 @@
-// Package data provides data access layer for the admin service.
 package data
 
 import (
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent"
 )
 
-// ProviderSet is the provider set for data layer.
 var ProviderSet = wire.NewSet(
 	NewData,
 	NewAdminRepo,
 )
+
+type Data struct {
+	db  *ent.Client
+	log *log.Helper
+}

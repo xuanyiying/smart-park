@@ -23,6 +23,8 @@ log:
   level: info
   format: json
 
-otel:
+telemetry:
+  enabled: true
   endpoint: "localhost:4317"
   serviceName: "vehicle-svc"
+  sampleRate: 1.0

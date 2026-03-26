@@ -1,20 +1,18 @@
-// Package data provides data access layer for the vehicle service.
 package data
 
 import (
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 
-	"github.com/xuanyiying/smart-park/ent"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
 )
 
-// ProviderSet is the provider set for data layer.
 var ProviderSet = wire.NewSet(
 	NewData,
 	NewVehicleRepo,
-	NewBillingRuleRepo,
 )
 
-// Data holds shared data layer dependencies.
 type Data struct {
-	DB *ent.Client
+	db  *ent.Client
+	log *log.Helper
 }

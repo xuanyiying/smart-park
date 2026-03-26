@@ -12,7 +12,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"smart-park/internal/gateway/biz"
+	"github.com/xuanyiying/smart-park/internal/gateway/biz"
 )
 
 // GatewayService 网关服务

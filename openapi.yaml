@@ -1,0 +1,487 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: VehicleService API
+    version: 0.0.1
+paths:
+    /api/v1/device/entry:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_Entry
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/EntryRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EntryResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/exit:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_Exit
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ExitRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ExitResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/heartbeat:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_Heartbeat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/HeartbeatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HeartbeatResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/command:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_SendCommand
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SendCommandRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SendCommandResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/status:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDeviceStatus
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceStatusResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/records:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListParkingRecords
+            parameters:
+                - name: plateNumbers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListParkingRecordsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/records/{recordId}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetParkingRecord
+            parameters:
+                - name: recordId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetParkingRecordResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/{plateNumber}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetVehicleInfo
+            parameters:
+                - name: plateNumber
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetVehicleInfoResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        CommandData:
+            type: object
+            properties:
+                commandId:
+                    type: string
+                status:
+                    type: string
+        DeviceStatus:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                online:
+                    type: boolean
+                status:
+                    type: string
+                lastHeartbeat:
+                    type: string
+        EntryData:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                plateNumber:
+                    type: string
+                allowed:
+                    type: boolean
+                gateOpen:
+                    type: boolean
+                displayMessage:
+                    type: string
+        EntryRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                plateNumber:
+                    type: string
+                plateImageUrl:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                vehicleType:
+                    type: string
+                timestamp:
+                    type: string
+        EntryResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/EntryData'
+        ExitData:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                plateNumber:
+                    type: string
+                parkingDuration:
+                    type: integer
+                    format: int32
+                amount:
+                    type: number
+                    format: double
+                discountAmount:
+                    type: number
+                    format: double
+                finalAmount:
+                    type: number
+                    format: double
+                allowed:
+                    type: boolean
+                gateOpen:
+                    type: boolean
+                displayMessage:
+                    type: string
+        ExitRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                plateNumber:
+                    type: string
+                plateImageUrl:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                timestamp:
+                    type: string
+        ExitResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ExitData'
+        GetDeviceStatusResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DeviceStatus'
+        GetParkingRecordResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ParkingRecordInfo'
+        GetVehicleInfoResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/VehicleInfo'
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        HeartbeatRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                status:
+                    type: string
+                timestamp:
+                    type: string
+        HeartbeatResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        ListParkingRecordsData:
+            type: object
+            properties:
+                records:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ParkingRecordInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListParkingRecordsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ListParkingRecordsData'
+        ParkingRecordInfo:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                lotId:
+                    type: string
+                vehicleId:
+                    type: string
+                plateNumber:
+                    type: string
+                entryLaneId:
+                    type: string
+                entryTime:
+                    type: string
+                entryImageUrl:
+                    type: string
+                recordStatus:
+                    type: string
+                exitTime:
+                    type: string
+                exitImageUrl:
+                    type: string
+                exitLaneId:
+                    type: string
+                exitDeviceId:
+                    type: string
+                parkingDuration:
+                    type: integer
+                    format: int32
+                exitStatus:
+                    type: string
+                paymentLock:
+                    type: integer
+                    format: int32
+        SendCommandRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                command:
+                    type: string
+                params:
+                    type: object
+                    additionalProperties:
+                        type: string
+        SendCommandResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/CommandData'
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        VehicleInfo:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                vehicleType:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+                monthlyValidUntil:
+                    type: string
+tags:
+    - name: VehicleService

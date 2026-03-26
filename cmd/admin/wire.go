@@ -10,9 +10,9 @@ import (
 	"github.com/google/wire"
 
 	v1 "github.com/xuanyiying/smart-park/api/admin/v1"
-	"github.com/xuanyiying/smart-park/ent"
 	"github.com/xuanyiying/smart-park/internal/admin/biz"
 	"github.com/xuanyiying/smart-park/internal/admin/data"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent"
 	"github.com/xuanyiying/smart-park/internal/admin/service"
 )
 
@@ -21,20 +21,20 @@ func initApp(entClient *ent.Client, logger log.Logger) (*app, func(), error) {
 	wire.Build(
 		// Data layer
 		data.ProviderSet,
-		
+
 		// Business layer
 		biz.ProviderSet,
-		
+
 		// Service layer
 		service.ProviderSet,
-		
+
 		// gRPC and HTTP servers
 		grpc.NewServer,
 		http.NewServer,
-		
+
 		// Service registration
 		wire.Bind(new(v1.AdminServiceServer), new(*service.AdminService)),
-		
+
 		// App
 		newApp,
 	)

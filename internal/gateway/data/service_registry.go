@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	etcdreg "github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/registry"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -31,8 +31,9 @@ func NewServiceRegistry(etcdEndpoints []string, logger log.Logger) (*ServiceRegi
 }
 
 // GetRegistry 获取 Kratos registry
-func (r *ServiceRegistry) GetRegistry() registry.Registry {
-	return registry.NewEtcd(r.client)
+func (r *ServiceRegistry) GetRegistry() *etcdreg.Registry {
+	reg := etcdreg.New(r.client)
+	return reg
 }
 
 // Close 关闭连接

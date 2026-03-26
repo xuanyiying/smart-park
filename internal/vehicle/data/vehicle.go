@@ -5,23 +5,15 @@ import (
 	"context"
 	"time"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	"github.com/xuanyiying/smart-park/ent"
-	"github.com/xuanyiying/smart-park/ent/device"
-	"github.com/xuanyiying/smart-park/ent/lane"
-	"github.com/xuanyiying/smart-park/ent/parkingrecord"
-	"github.com/xuanyiying/smart-park/ent/vehicle"
 	"github.com/xuanyiying/smart-park/internal/vehicle/biz"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
 )
-
-// Data holds the data layer dependencies.
-type Data struct {
-	db  *ent.Client
-	log *log.Helper
-}
 
 // NewData creates a new Data instance.
 func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
@@ -219,6 +211,42 @@ func (r *vehicleRepo) GetParkingRecord(ctx context.Context, recordID uuid.UUID) 
 	return toBizParkingRecord(record), nil
 }
 
+// ListParkingRecordsByPlates retrieves parking records by plate numbers with pagination.
+func (r *vehicleRepo) ListParkingRecordsByPlates(ctx context.Context, plateNumbers []string, page, pageSize int) ([]*biz.ParkingRecord, int, error) {
+	if len(plateNumbers) == 0 {
+		return []*biz.ParkingRecord{}, 0, nil
+	}
+
+	// Build query
+	query := r.data.db.ParkingRecord.Query().
+		Where(parkingrecord.PlateNumberIn(plateNumbers...))
+
+	// Get total count
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Apply pagination
+	offset := (page - 1) * pageSize
+	records, err := query.
+		Order(ent.Desc(parkingrecord.FieldEntryTime)).
+		Offset(offset).
+		Limit(pageSize).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Convert to biz entities
+	result := make([]*biz.ParkingRecord, len(records))
+	for i, record := range records {
+		result[i] = toBizParkingRecord(record)
+	}
+
+	return result, total, nil
+}
+
 // GetDeviceByCode retrieves a device by device code.
 func (r *vehicleRepo) GetDeviceByCode(ctx context.Context, deviceCode string) (*biz.Device, error) {
 	d, err := r.data.db.Device.Query().
@@ -287,68 +315,51 @@ func (r *vehicleRepo) GetLaneByDeviceCode(ctx context.Context, deviceCode string
 	}, nil
 }
 
-// billingRuleRepo implements biz.BillingRepo.
-type billingRuleRepo struct {
-	data *Data
-}
-
-// NewBillingRuleRepo creates a new BillingRuleRepo.
-func NewBillingRuleRepo(data *Data) biz.BillingRepo {
-	return &billingRuleRepo{data: data}
-}
-
-// GetRulesByLotID retrieves billing rules by lot ID.
-func (r *billingRuleRepo) GetRulesByLotID(ctx context.Context, lotID uuid.UUID) ([]*biz.BillingRule, error) {
-	rules, err := r.data.db.BillingRule.Query().
-		Where(
-			func(s *sql.Selector) {
-				s.Where(sql.EQ("lot_id", lotID))
-			},
-		).
-		All(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var result []*biz.BillingRule
-	for _, rule := range rules {
-		result = append(result, &biz.BillingRule{
-			ID:         rule.ID,
-			LotID:      rule.LotID,
-			RuleName:   rule.RuleName,
-			RuleType:   string(rule.RuleType),
-			Conditions: rule.ConditionsJSON,
-			Actions:    rule.ActionsJSON,
-			RuleConfig: rule.RuleConfig,
-			Priority:   rule.Priority,
-			IsActive:   rule.IsActive,
-		})
-	}
-
-	return result, nil
-}
-
 // Helper function to convert ent ParkingRecord to biz ParkingRecord.
 func toBizParkingRecord(record *ent.ParkingRecord) *biz.ParkingRecord {
 	return &biz.ParkingRecord{
-		ID:              record.ID,
-		LotID:           record.LotID,
-		EntryLaneID:     record.EntryLaneID,
-		VehicleID:       record.VehicleID,
-		PlateNumber:     record.PlateNumber,
+		ID:                record.ID,
+		LotID:             record.LotID,
+		EntryLaneID:       record.EntryLaneID,
+		VehicleID:         record.VehicleID,
+		PlateNumber:       record.PlateNumber,
 		PlateNumberSource: string(record.PlateNumberSource),
-		EntryTime:       record.EntryTime,
-		EntryImageURL:   record.EntryImageURL,
-		RecordStatus:    string(record.RecordStatus),
-		ExitTime:        record.ExitTime,
-		ExitImageURL:    record.ExitImageURL,
-		ExitLaneID:      record.ExitLaneID,
-		ExitDeviceID:    record.ExitDeviceID,
-		ParkingDuration: record.ParkingDuration,
-		ExitStatus:      string(record.ExitStatus),
-		PaymentLock:     record.PaymentLock,
-		Metadata:        record.RecordMetadata,
-		CreatedAt:       record.CreatedAt,
-		UpdatedAt:       record.UpdatedAt,
+		EntryTime:         record.EntryTime,
+		EntryImageURL:     record.EntryImageURL,
+		RecordStatus:      string(record.RecordStatus),
+		ExitTime:          record.ExitTime,
+		ExitImageURL:      record.ExitImageURL,
+		ExitLaneID:        record.ExitLaneID,
+		ExitDeviceID:      record.ExitDeviceID,
+		ParkingDuration:   record.ParkingDuration,
+		ExitStatus:        string(record.ExitStatus),
+		PaymentLock:       record.PaymentLock,
+		Metadata:          record.RecordMetadata,
+		CreatedAt:         record.CreatedAt,
+		UpdatedAt:         record.UpdatedAt,
 	}
+}
+
+// WithTx executes a function within a transaction.
+func (r *vehicleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	tx, err := r.data.db.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if v := recover(); v != nil {
+			_ = tx.Rollback()
+			panic(v)
+		}
+	}()
+
+	if err := fn(ctx); err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			return rerr
+		}
+		return err
+	}
+
+	return tx.Commit()
 }

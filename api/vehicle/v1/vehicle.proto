@@ -47,6 +47,18 @@ service VehicleService {
       get: "/api/v1/vehicle/{plate_number}"
     };
   }
+
+  rpc ListParkingRecords (ListParkingRecordsRequest) returns (ListParkingRecordsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/vehicle/records"
+    };
+  }
+
+  rpc GetParkingRecord (GetParkingRecordRequest) returns (GetParkingRecordResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/vehicle/records/{record_id}"
+    };
+  }
 }
 
 message EntryRequest {
@@ -159,4 +171,49 @@ message VehicleInfo {
   string owner_name = 3;
   string owner_phone = 4;
   string monthly_valid_until = 5;
+}
+
+message ListParkingRecordsRequest {
+  repeated string plate_numbers = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListParkingRecordsResponse {
+  int32 code = 1;
+  string message = 2;
+  ListParkingRecordsData data = 3;
+}
+
+message ListParkingRecordsData {
+  repeated ParkingRecordInfo records = 1;
+  int32 total = 2;
+}
+
+message GetParkingRecordRequest {
+  string record_id = 1;
+}
+
+message GetParkingRecordResponse {
+  int32 code = 1;
+  string message = 2;
+  ParkingRecordInfo data = 3;
+}
+
+message ParkingRecordInfo {
+  string record_id = 1;
+  string lot_id = 2;
+  string vehicle_id = 3;
+  string plate_number = 4;
+  string entry_lane_id = 5;
+  string entry_time = 6;
+  string entry_image_url = 7;
+  string record_status = 8;
+  string exit_time = 9;
+  string exit_image_url = 10;
+  string exit_lane_id = 11;
+  string exit_device_id = 12;
+  int32 parking_duration = 13;
+  string exit_status = 14;
+  int32 payment_lock = 15;
 }

@@ -3,6 +3,8 @@ package biz
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -10,6 +12,125 @@ import (
 
 	v1 "github.com/xuanyiying/smart-park/api/billing/v1"
 )
+
+// Condition represents a parsed billing condition.
+type Condition struct {
+	Type      string                 `json:"type"`
+	Field     string                 `json:"field,omitempty"`
+	Operator  string                 `json:"operator,omitempty"`
+	Value     interface{}            `json:"value,omitempty"`
+	And       []*Condition           `json:"and,omitempty"`
+	Or        []*Condition           `json:"or,omitempty"`
+	Conditions []*Condition          `json:"conditions,omitempty"`
+}
+
+// Action represents a parsed billing action.
+type Action struct {
+	Type   string                 `json:"type"`
+	Amount float64                `json:"amount,omitempty"`
+	Percent float64               `json:"percent,omitempty"`
+	Unit   string                 `json:"unit,omitempty"`
+	Ceil   float64                `json:"ceil,omitempty"`
+	Cap    float64                `json:"cap,omitempty"`
+}
+
+// ParseConditions parses JSON conditions string into Condition struct.
+func ParseConditions(jsonStr string) (*Condition, error) {
+	if jsonStr == "" {
+		return nil, nil
+	}
+	var cond Condition
+	if err := json.Unmarshal([]byte(jsonStr), &cond); err != nil {
+		return nil, fmt.Errorf("failed to parse conditions: %w", err)
+	}
+	return &cond, nil
+}
+
+// ParseActions parses JSON actions string into Action slice.
+func ParseActions(jsonStr string) ([]*Action, error) {
+	if jsonStr == "" {
+		return nil, nil
+	}
+	var actions []*Action
+	if err := json.Unmarshal([]byte(jsonStr), &actions); err != nil {
+		return nil, fmt.Errorf("failed to parse actions: %w", err)
+	}
+	return actions, nil
+}
+
+// EvaluateCondition evaluates if a condition is met given the context.
+func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
+	if cond == nil {
+		return true
+	}
+
+	switch cond.Type {
+	case "and":
+		for _, c := range cond.Conditions {
+			if !EvaluateCondition(c, ctx) {
+				return false
+			}
+		}
+		return true
+
+	case "or":
+		for _, c := range cond.Conditions {
+			if EvaluateCondition(c, ctx) {
+				return true
+			}
+		}
+		return false
+
+	case "vehicle_type":
+		return ctx.VehicleType == cond.Value
+
+	case "duration_min":
+		minutes := ctx.Duration.Minutes()
+		switch cond.Operator {
+		case "gte":
+			return minutes >= cond.Value.(float64)
+		case "lte":
+			return minutes <= cond.Value.(float64)
+		case "gt":
+			return minutes > cond.Value.(float64)
+		case "lt":
+			return minutes < cond.Value.(float64)
+		case "eq":
+			return minutes == cond.Value.(float64)
+		}
+		return false
+
+	case "time_range":
+		hour := float64(ctx.ExitTime.Hour()) + float64(ctx.ExitTime.Minute())/60.0
+		start := cond.Value.(map[string]interface{})["start"].(float64)
+		end := cond.Value.(map[string]interface{})["end"].(float64)
+		return hour >= start && hour <= end
+
+	case "day_of_week":
+		weekday := int(ctx.ExitTime.Weekday())
+		for _, day := range cond.Value.([]interface{}) {
+			if int(day.(float64)) == weekday {
+				return true
+			}
+		}
+		return false
+
+	case "holiday":
+		return ctx.IsHoliday
+
+	default:
+		return false
+	}
+}
+
+// BillingContext contains context for billing rule evaluation.
+type BillingContext struct {
+	VehicleType string
+	Duration    time.Duration
+	EntryTime   time.Time
+	ExitTime    time.Time
+	IsHoliday   bool
+}
 
 // BillingRule represents a billing rule entity.
 type BillingRule struct {
@@ -57,7 +178,6 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 		return nil, err
 	}
 
-	// Get billing rules
 	rules, err := uc.repo.GetRulesByLotID(ctx, lotID)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to get billing rules: %v", err)
@@ -68,11 +188,15 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 	exitTime := time.Unix(req.ExitTime, 0)
 	duration := exitTime.Sub(entryTime)
 
-	// Calculate base amount (default: 2 yuan per hour)
-	hours := duration.Hours()
-	baseAmount := hours * 2
+	billingCtx := &BillingContext{
+		VehicleType: req.VehicleType,
+		Duration:    duration,
+		EntryTime:   entryTime,
+		ExitTime:    exitTime,
+		IsHoliday:   false,
+	}
 
-	// Apply rules
+	var baseAmount float64
 	var discountAmount float64
 	var appliedRules []*v1.AppliedRule
 
@@ -81,39 +205,48 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 			continue
 		}
 
-		// Apply rule logic based on type
+		cond, err := ParseConditions(rule.Conditions)
+		if err != nil {
+			uc.log.WithContext(ctx).Warnf("failed to parse condition for rule %s: %v", rule.RuleName, err)
+			continue
+		}
+
+		if !EvaluateCondition(cond, billingCtx) {
+			continue
+		}
+
+		actions, err := ParseActions(rule.Actions)
+		if err != nil {
+			uc.log.WithContext(ctx).Warnf("failed to parse actions for rule %s: %v", rule.RuleName, err)
+			continue
+		}
+
+		ruleAmount := applyActions(actions, duration)
+		if ruleAmount != 0 {
+			appliedRules = append(appliedRules, &v1.AppliedRule{
+				RuleId:   rule.ID.String(),
+				RuleName: rule.RuleName,
+				Amount:   ruleAmount,
+			})
+		}
+
 		switch rule.RuleType {
-		case "time":
-			// Time-based pricing
-			amount := applyTimeRule(rule, hours)
-			if amount > 0 {
-				appliedRules = append(appliedRules, &v1.AppliedRule{
-					RuleId:   rule.ID.String(),
-					RuleName: rule.RuleName,
-					Amount:   amount,
-				})
-				baseAmount = amount
+		case "base", "time":
+			if baseAmount == 0 || ruleAmount < baseAmount {
+				baseAmount = ruleAmount
 			}
-		case "vip":
-			if req.VehicleType == "vip" {
-				discount := baseAmount * 0.5
-				discountAmount += discount
-				appliedRules = append(appliedRules, &v1.AppliedRule{
-					RuleId:   rule.ID.String(),
-					RuleName: rule.RuleName,
-					Amount:   -discount,
-				})
-			}
+		case "discount", "exemption":
+			discountAmount += ruleAmount
 		case "monthly":
 			if req.VehicleType == "monthly" {
 				discountAmount = baseAmount
-				appliedRules = append(appliedRules, &v1.AppliedRule{
-					RuleId:   rule.ID.String(),
-					RuleName: rule.RuleName,
-					Amount:   -discountAmount,
-				})
 			}
 		}
+	}
+
+	if baseAmount == 0 {
+		hours := duration.Hours()
+		baseAmount = calculateDefaultFee(hours)
 	}
 
 	finalAmount := baseAmount - discountAmount
@@ -130,14 +263,49 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 	}, nil
 }
 
-// applyTimeRule applies a time-based billing rule.
-func applyTimeRule(rule *BillingRule, hours float64) float64 {
-	// Simplified time rule calculation
-	// In production, parse Conditions and Actions JSON
+// applyActions applies billing actions and returns the calculated amount.
+func applyActions(actions []*Action, duration time.Duration) float64 {
+	var amount float64
+	hours := duration.Hours()
+	minutes := duration.Minutes()
+
+	for _, a := range actions {
+		switch a.Type {
+		case "fixed":
+			amount += a.Amount
+		case "per_hour":
+			amount += hours * a.Amount
+		case "per_minute":
+			amount += minutes * a.Amount
+		case "percentage":
+			amount -= amount * (a.Percent / 100)
+		case "cap":
+			if amount > a.Cap {
+				amount = a.Cap
+			}
+		case "ceil":
+			amount = ceilToDecimal(amount, 2)
+		}
+	}
+
+	return amount
+}
+
+// calculateDefaultFee calculates default fee when no rules match.
+func calculateDefaultFee(hours float64) float64 {
 	if hours < 1 {
-		return 5 // Minimum charge
+		return 5
 	}
 	return hours * 2
+}
+
+// ceilToDecimal rounds amount up to specified decimal places.
+func ceilToDecimal(amount float64, decimals int) float64 {
+	m := 1
+	for i := 0; i < decimals; i++ {
+		m *= 10
+	}
+	return float64(int(amount*float64(m)+0.999999)) / float64(m)
 }
 
 // CreateBillingRule creates a new billing rule.
