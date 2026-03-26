@@ -21,6 +21,7 @@ type Config struct {
 	Alipay    AlipayConfig    `mapstructure:"alipay"`
 	MQTT      MQTTConfig      `mapstructure:"mqtt"`
 	Billing   *BillingConfig  `mapstructure:"billing"`
+	Vehicle   *VehicleConfig  `mapstructure:"vehicle"`
 	JWT       JWTConfig       `mapstructure:"jwt"`
 }
 
@@ -118,6 +119,11 @@ type MQTTConfig struct {
 }
 
 type BillingConfig struct {
+	Endpoint string `mapstructure:"endpoint"`
+	Timeout  int    `mapstructure:"timeout"`
+}
+
+type VehicleConfig struct {
 	Endpoint string `mapstructure:"endpoint"`
 	Timeout  int    `mapstructure:"timeout"`
 }

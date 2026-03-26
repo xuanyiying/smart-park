@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"time"
 
@@ -12,14 +13,30 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	v1 "github.com/xuanyiying/smart-park/api/user/v1"
+	vehiclev1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
 	"github.com/xuanyiying/smart-park/internal/user/biz"
+	"github.com/xuanyiying/smart-park/internal/user/client/vehicle"
 	"github.com/xuanyiying/smart-park/internal/user/data"
 	"github.com/xuanyiying/smart-park/internal/user/data/ent"
 	"github.com/xuanyiying/smart-park/internal/user/service"
-	"github.com/xuanyiying/smart-park/internal/user/wechat"
+	userwechat "github.com/xuanyiying/smart-park/internal/user/wechat"
 	"github.com/xuanyiying/smart-park/pkg/auth"
 	"github.com/xuanyiying/smart-park/pkg/config"
 )
+
+// mockVehicleClient is a mock implementation of vehicle.Client for testing.
+type mockVehicleClient struct{}
+
+func (m *mockVehicleClient) ListParkingRecords(ctx context.Context, plateNumbers []string, page, pageSize int32) (*vehiclev1.ListParkingRecordsData, error) {
+	return &vehiclev1.ListParkingRecordsData{
+		Records: []*vehiclev1.ParkingRecordInfo{},
+		Total:   0,
+	}, nil
+}
+
+func (m *mockVehicleClient) GetParkingRecord(ctx context.Context, recordID string) (*vehiclev1.ParkingRecordInfo, error) {
+	return nil, fmt.Errorf("not implemented")
+}
 
 var (
 	flagconf string
@@ -70,16 +87,31 @@ func main() {
 
 	userRepo := data.NewUserRepo(dataLayer)
 
-	var wechatClient *wechat.Client
+	var wechatClient *userwechat.Client
 	if cfg.Wechat.AppID != "" {
-		wechatCfg := &wechat.Config{
+		wechatCfg := &userwechat.Config{
 			AppID:     cfg.Wechat.AppID,
 			AppSecret: cfg.Wechat.APIKey,
 		}
-		wechatClient = wechat.NewClient(wechatCfg)
+		wechatClient = userwechat.NewClient(wechatCfg)
 		logHelper.Info("wechat client initialized successfully")
 	} else {
 		logHelper.Warn("wechat config not provided, using mock openid")
+	}
+
+	// Initialize vehicle service client
+	var vehicleClient vehicle.Client
+	if cfg.Vehicle != nil && cfg.Vehicle.Endpoint != "" {
+		conn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(cfg.Vehicle.Endpoint))
+		if err != nil {
+			logHelper.Errorf("failed to connect to vehicle service: %v", err)
+		} else {
+			vehicleClient = vehicle.NewClient(vehiclev1.NewVehicleServiceClient(conn))
+			logHelper.Info("vehicle client initialized successfully")
+		}
+	} else {
+		logHelper.Warn("vehicle endpoint not configured")
+		vehicleClient = &mockVehicleClient{}
 	}
 
 	jwtConfig := &auth.JWTConfig{
@@ -88,7 +120,7 @@ func main() {
 	}
 	jwtManager := auth.NewJWTManager(jwtConfig)
 
-	userUseCase := biz.NewUserUseCase(userRepo, jwtManager, wechatClient, logger)
+	userUseCase := biz.NewUserUseCase(userRepo, vehicleClient, jwtManager, wechatClient, logger)
 
 	userSvc := service.NewUserService(userUseCase)
 

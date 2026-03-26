@@ -2,12 +2,14 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
 	v1 "github.com/xuanyiying/smart-park/api/user/v1"
+	"github.com/xuanyiying/smart-park/internal/user/client/vehicle"
 	"github.com/xuanyiying/smart-park/internal/user/wechat"
 	"github.com/xuanyiying/smart-park/pkg/auth"
 )
@@ -41,18 +43,20 @@ type UserRepo interface {
 }
 
 type UserUseCase struct {
-	userRepo     UserRepo
-	jwtManager   *auth.JWTManager
-	wechatClient *wechat.Client
-	log          *log.Helper
+	userRepo      UserRepo
+	vehicleClient vehicle.Client
+	jwtManager    *auth.JWTManager
+	wechatClient  *wechat.Client
+	log           *log.Helper
 }
 
-func NewUserUseCase(userRepo UserRepo, jwtManager *auth.JWTManager, wechatClient *wechat.Client, logger log.Logger) *UserUseCase {
+func NewUserUseCase(userRepo UserRepo, vehicleClient vehicle.Client, jwtManager *auth.JWTManager, wechatClient *wechat.Client, logger log.Logger) *UserUseCase {
 	return &UserUseCase{
-		userRepo:     userRepo,
-		jwtManager:   jwtManager,
-		wechatClient: wechatClient,
-		log:          log.NewHelper(logger),
+		userRepo:      userRepo,
+		vehicleClient: vehicleClient,
+		jwtManager:    jwtManager,
+		wechatClient:  wechatClient,
+		log:           log.NewHelper(logger),
 	}
 }
 
@@ -148,5 +152,111 @@ func (uc *UserUseCase) ListPlates(ctx context.Context, userID string, page, page
 	return &v1.ListPlatesData{
 		Plates: plates,
 		Total:  int32(total),
+	}, nil
+}
+
+func (uc *UserUseCase) ListParkingRecords(ctx context.Context, userID string, page, pageSize int32) (*v1.ListParkingRecordsData, error) {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 1. 获取用户绑定的车牌
+	vehicles, _, err := uc.userRepo.ListUserVehicles(ctx, uid, 1, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(vehicles) == 0 {
+		return &v1.ListParkingRecordsData{
+			Records: []*v1.ParkingRecordInfo{},
+			Total:   0,
+		}, nil
+	}
+
+	// 2. 提取车牌号
+	var plateNumbers []string
+	for _, v := range vehicles {
+		plateNumbers = append(plateNumbers, v.PlateNumber)
+	}
+
+	// 3. 调用 vehicle service 查询停车记录
+	vehicleData, err := uc.vehicleClient.ListParkingRecords(ctx, plateNumbers, page, pageSize)
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to list parking records from vehicle service: %v", err)
+		return nil, err
+	}
+
+	// 4. 转换为 user service 的响应格式
+	var records []*v1.ParkingRecordInfo
+	for _, r := range vehicleData.Records {
+		// 计算金额（这里简化处理，实际应该从订单获取）
+		var amount float64
+		if r.ExitStatus == "paid" {
+			amount = 0 // 已支付，显示0或实际金额
+		}
+
+		records = append(records, &v1.ParkingRecordInfo{
+			RecordId:   r.RecordId,
+			PlateNumber: r.PlateNumber,
+			LotName:    "", // 需要从lot_id查询名称
+			EntryTime:  r.EntryTime,
+			ExitTime:   r.ExitTime,
+			Duration:   r.ParkingDuration,
+			Amount:     amount,
+			Status:     r.RecordStatus,
+		})
+	}
+
+	return &v1.ListParkingRecordsData{
+		Records: records,
+		Total:   vehicleData.Total,
+	}, nil
+}
+
+func (uc *UserUseCase) GetParkingRecord(ctx context.Context, userID, recordID string) (*v1.ParkingRecordInfo, error) {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 1. 获取用户绑定的车牌
+	vehicles, _, err := uc.userRepo.ListUserVehicles(ctx, uid, 1, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. 调用 vehicle service 查询记录
+	record, err := uc.vehicleClient.GetParkingRecord(ctx, recordID)
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to get parking record from vehicle service: %v", err)
+		return nil, err
+	}
+
+	// 3. 验证记录是否属于该用户的车牌
+	userPlateMap := make(map[string]bool)
+	for _, v := range vehicles {
+		userPlateMap[v.PlateNumber] = true
+	}
+
+	if !userPlateMap[record.PlateNumber] {
+		return nil, fmt.Errorf("record not found or access denied")
+	}
+
+	// 计算金额（这里简化处理，实际应该从订单获取）
+	var amount float64
+	if record.ExitStatus == "paid" {
+		amount = 0 // 已支付，显示0或实际金额
+	}
+
+	return &v1.ParkingRecordInfo{
+		RecordId:    record.RecordId,
+		PlateNumber: record.PlateNumber,
+		LotName:     "", // 需要从lot_id查询名称
+		EntryTime:   record.EntryTime,
+		ExitTime:    record.ExitTime,
+		Duration:    record.ParkingDuration,
+		Amount:      amount,
+		Status:      record.RecordStatus,
 	}, nil
 }

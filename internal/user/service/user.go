@@ -98,23 +98,49 @@ func (s *UserService) ListPlates(ctx context.Context, req *v1.ListPlatesRequest)
 }
 
 func (s *UserService) ListParkingRecords(ctx context.Context, req *v1.ListParkingRecordsRequest) (*v1.ListParkingRecordsResponse, error) {
-	// TODO: 在 Task 1.2 中实现跨服务调用
+	// TODO: 从 JWT context 中获取 userID
+	userID := "" // 需要从 JWT context 中获取
+
+	page := req.Page
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := req.PageSize
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	data, err := s.uc.ListParkingRecords(ctx, userID, page, pageSize)
+	if err != nil {
+		return &v1.ListParkingRecordsResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
+
 	return &v1.ListParkingRecordsResponse{
 		Code:    200,
 		Message: "success",
-		Data: &v1.ListParkingRecordsData{
-			Records: []*v1.ParkingRecordInfo{},
-			Total:   0,
-		},
+		Data:    data,
 	}, nil
 }
 
 func (s *UserService) GetParkingRecord(ctx context.Context, req *v1.GetParkingRecordRequest) (*v1.GetParkingRecordResponse, error) {
-	// TODO: 在 Task 1.2 中实现
+	// TODO: 从 JWT context 中获取 userID
+	userID := "" // 需要从 JWT context 中获取
+
+	data, err := s.uc.GetParkingRecord(ctx, userID, req.RecordId)
+	if err != nil {
+		return &v1.GetParkingRecordResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
+
 	return &v1.GetParkingRecordResponse{
 		Code:    200,
 		Message: "success",
-		Data:    nil,
+		Data:    data,
 	}, nil
 }
 
