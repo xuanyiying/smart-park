@@ -32,6 +32,7 @@ type Action struct {
 	Unit   string                 `json:"unit,omitempty"`
 	Ceil   float64                `json:"ceil,omitempty"`
 	Cap    float64                `json:"cap,omitempty"`
+	Value  float64                `json:"value,omitempty"`
 }
 
 // ParseConditions parses JSON conditions string into Condition struct.
@@ -221,7 +222,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 			continue
 		}
 
-		ruleAmount := applyActions(actions, duration)
+		ruleAmount := applyActions(actions, duration, exitTime)
 		if ruleAmount != 0 {
 			appliedRules = append(appliedRules, &v1.AppliedRule{
 				RuleId:   rule.ID.String(),
@@ -264,7 +265,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 }
 
 // applyActions applies billing actions and returns the calculated amount.
-func applyActions(actions []*Action, duration time.Duration) float64 {
+func applyActions(actions []*Action, duration time.Duration, exitTime time.Time) float64 {
 	var amount float64
 	hours := duration.Hours()
 	minutes := duration.Minutes()
@@ -285,6 +286,33 @@ func applyActions(actions []*Action, duration time.Duration) float64 {
 			}
 		case "ceil":
 			amount = ceilToDecimal(amount, 2)
+		case "max_daily":
+			days := int(hours/24) + 1
+			if days < 1 {
+				days = 1
+			}
+			maxAmount := a.Amount * float64(days)
+			if amount > maxAmount {
+				amount = maxAmount
+			}
+		case "min_charge":
+			if amount < a.Amount {
+				amount = a.Amount
+			}
+		case "free_duration":
+			freeMinutes := a.Value / 60
+			if duration.Minutes() <= float64(freeMinutes) {
+				amount = 0
+			}
+		case "night_discount":
+			hour := exitTime.Hour()
+			if hour >= 22 || hour < 8 {
+				amount = amount * (1 - a.Amount/100)
+			}
+		case "first_hour_free":
+			if hours <= 1 {
+				amount = 0
+			}
 		}
 	}
 
