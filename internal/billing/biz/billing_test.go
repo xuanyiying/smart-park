@@ -279,60 +279,69 @@ func TestEvaluateCondition(t *testing.T) {
 
 func TestApplyActions(t *testing.T) {
 	duration := 120 * time.Minute // 2 hours
+	exitTime := time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC)
 
 	tests := []struct {
 		name     string
 		actions  []*Action
 		duration time.Duration
+		exitTime time.Time
 		expected float64
 	}{
 		{
 			name:     "fixed amount",
 			actions:  []*Action{{Type: "fixed", Amount: 10.0}},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 10.0,
 		},
 		{
 			name:     "per_hour",
 			actions:  []*Action{{Type: "per_hour", Amount: 5.0}},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 10.0, // 2 hours * 5 = 10
 		},
 		{
 			name:     "per_minute",
 			actions:  []*Action{{Type: "per_minute", Amount: 0.1}},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 12.0, // 120 minutes * 0.1 = 12
 		},
 		{
 			name:     "percentage discount",
 			actions:  []*Action{{Type: "fixed", Amount: 100.0}, {Type: "percentage", Percent: 20.0}},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 80.0, // 100 - 20%
 		},
 		{
 			name:     "cap applied",
 			actions:  []*Action{{Type: "per_hour", Amount: 50.0}, {Type: "cap", Cap: 80.0}},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 80.0, // 2 * 50 = 100, capped to 80
 		},
 		{
 			name:     "multiple actions chain",
 			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "percentage", Percent: 10.0}, {Type: "cap", Cap: 50.0}},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 18.0, // 2*10=20, 20-10%=18, within cap
 		},
 		{
 			name:     "empty actions",
 			actions:  []*Action{},
 			duration: duration,
+			exitTime: exitTime,
 			expected: 0.0,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration)
+			got := applyActions(tt.actions, tt.duration, tt.exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}

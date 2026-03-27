@@ -1,0 +1,441 @@
+syntax = "proto3";
+
+package api.charging.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/charging/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service ChargingService {
+  // Station management
+  rpc CreateStation (CreateStationRequest) returns (CreateStationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/charging/stations"
+      body: "*"
+    };
+  }
+
+  rpc GetStation (GetStationRequest) returns (GetStationResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/stations/{station_id}"
+    };
+  }
+
+  rpc UpdateStation (UpdateStationRequest) returns (UpdateStationResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/charging/stations/{station_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteStation (DeleteStationRequest) returns (DeleteStationResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/charging/stations/{station_id}"
+    };
+  }
+
+  rpc ListStations (ListStationsRequest) returns (ListStationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/stations"
+    };
+  }
+
+  rpc GetAvailableStations (GetAvailableStationsRequest) returns (GetAvailableStationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/stations/available"
+    };
+  }
+
+  // Connector management
+  rpc CreateConnector (CreateConnectorRequest) returns (CreateConnectorResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/charging/connectors"
+      body: "*"
+    };
+  }
+
+  rpc GetConnector (GetConnectorRequest) returns (GetConnectorResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/connectors/{connector_id}"
+    };
+  }
+
+  rpc ListConnectors (ListConnectorsRequest) returns (ListConnectorsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/stations/{station_id}/connectors"
+    };
+  }
+
+  // Charging session
+  rpc StartCharging (StartChargingRequest) returns (StartChargingResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/charging/sessions/start"
+      body: "*"
+    };
+  }
+
+  rpc StopCharging (StopChargingRequest) returns (StopChargingResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/charging/sessions/{session_id}/stop"
+      body: "*"
+    };
+  }
+
+  rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/sessions/{session_id}"
+    };
+  }
+
+  rpc ListUserSessions (ListUserSessionsRequest) returns (ListUserSessionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/sessions"
+    };
+  }
+
+  rpc GetChargingSummary (GetChargingSummaryRequest) returns (GetChargingSummaryResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/sessions/{session_id}/summary"
+    };
+  }
+
+  // Price management
+  rpc CreatePrice (CreatePriceRequest) returns (CreatePriceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/charging/prices"
+      body: "*"
+    };
+  }
+
+  rpc GetCurrentPrice (GetCurrentPriceRequest) returns (GetCurrentPriceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/stations/{station_id}/price"
+    };
+  }
+
+  rpc ListPrices (ListPricesRequest) returns (ListPricesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/charging/stations/{station_id}/prices"
+    };
+  }
+
+  // Payment
+  rpc ConfirmPayment (ConfirmPaymentRequest) returns (ConfirmPaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/charging/sessions/{session_id}/payment/confirm"
+      body: "*"
+    };
+  }
+}
+
+// Station messages
+message CreateStationRequest {
+  string lot_id = 1;
+  string name = 2;
+  string station_type = 3; // ac, dc, fast_dc
+  string connector_type = 4;
+  double max_power = 5;
+  double voltage = 6;
+  int32 total_connectors = 7;
+  string location = 8;
+  string floor = 9;
+}
+
+message CreateStationResponse {
+  int32 code = 1;
+  string message = 2;
+  Station data = 3;
+}
+
+message GetStationRequest {
+  string station_id = 1;
+}
+
+message GetStationResponse {
+  int32 code = 1;
+  string message = 2;
+  Station data = 3;
+}
+
+message UpdateStationRequest {
+  string station_id = 1;
+  string name = 2;
+  string status = 3; // available, offline, maintenance
+  double max_power = 4;
+  int32 total_connectors = 5;
+  string location = 6;
+  string floor = 7;
+}
+
+message UpdateStationResponse {
+  int32 code = 1;
+  string message = 2;
+  Station data = 3;
+}
+
+message DeleteStationRequest {
+  string station_id = 1;
+}
+
+message DeleteStationResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message ListStationsRequest {
+  string lot_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListStationsResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Station data = 3;
+  int64 total = 4;
+}
+
+message GetAvailableStationsRequest {
+  string lot_id = 1;
+}
+
+message GetAvailableStationsResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Station data = 3;
+}
+
+message Station {
+  string id = 1;
+  string lot_id = 2;
+  string name = 3;
+  string station_type = 4;
+  string status = 5;
+  string connector_type = 6;
+  double max_power = 7;
+  double voltage = 8;
+  int32 total_connectors = 9;
+  int32 available_connectors = 10;
+  string location = 11;
+  string floor = 12;
+  string created_at = 13;
+  string updated_at = 14;
+}
+
+// Connector messages
+message CreateConnectorRequest {
+  string station_id = 1;
+  int32 number = 2;
+  string type = 3; // ac, dc, fast_dc
+  double max_power = 4;
+  double voltage = 5;
+}
+
+message CreateConnectorResponse {
+  int32 code = 1;
+  string message = 2;
+  Connector data = 3;
+}
+
+message GetConnectorRequest {
+  string connector_id = 1;
+}
+
+message GetConnectorResponse {
+  int32 code = 1;
+  string message = 2;
+  Connector data = 3;
+}
+
+message ListConnectorsRequest {
+  string station_id = 1;
+}
+
+message ListConnectorsResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Connector data = 3;
+}
+
+message Connector {
+  string id = 1;
+  string station_id = 2;
+  int32 number = 3;
+  string type = 4;
+  string status = 5; // available, charging, faulted, offline
+  double max_power = 6;
+  double voltage = 7;
+  double current = 8;
+  string fault_code = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+// Session messages
+message StartChargingRequest {
+  string station_id = 1;
+  string connector_id = 2;
+  string user_id = 3;
+  string vehicle_plate = 4;
+}
+
+message StartChargingResponse {
+  int32 code = 1;
+  string message = 2;
+  Session data = 3;
+}
+
+message StopChargingRequest {
+  string session_id = 1;
+  string user_id = 2;
+}
+
+message StopChargingResponse {
+  int32 code = 1;
+  string message = 2;
+  Session data = 3;
+}
+
+message GetSessionRequest {
+  string session_id = 1;
+}
+
+message GetSessionResponse {
+  int32 code = 1;
+  string message = 2;
+  Session data = 3;
+}
+
+message ListUserSessionsRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListUserSessionsResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Session data = 3;
+  int64 total = 4;
+}
+
+message GetChargingSummaryRequest {
+  string session_id = 1;
+}
+
+message GetChargingSummaryResponse {
+  int32 code = 1;
+  string message = 2;
+  ChargingSummary data = 3;
+}
+
+message Session {
+  string id = 1;
+  string station_id = 2;
+  string connector_id = 3;
+  string user_id = 4;
+  string vehicle_plate = 5;
+  string start_time = 6;
+  string end_time = 7;
+  double start_energy = 8;
+  double end_energy = 9;
+  double charged_energy = 10;
+  double cost = 11;
+  double service_fee = 12;
+  double total_amount = 13;
+  string status = 14; // pending, charging, completed, cancelled, expired
+  string payment_status = 15; // pending, paid, refunded, failed
+  string pay_time = 16;
+  string payment_method = 17;
+  string transaction_id = 18;
+  string created_at = 19;
+  string updated_at = 20;
+}
+
+message ChargingSummary {
+  string session_id = 1;
+  string station_name = 2;
+  int32 connector_num = 3;
+  string vehicle_plate = 4;
+  string start_time = 5;
+  string end_time = 6;
+  double duration = 7; // hours
+  double charged_energy = 8;
+  double cost = 9;
+  double service_fee = 10;
+  double total_amount = 11;
+  string payment_status = 12;
+}
+
+// Price messages
+message CreatePriceRequest {
+  string station_id = 1;
+  string name = 2;
+  int32 start_hour = 3;
+  int32 end_hour = 4;
+  double price_per_kwh = 5;
+  double service_fee = 6;
+  double peak_load = 7;
+  double off_peak_load = 8;
+  bool is_peak_hours = 9;
+  string effective_at = 10;
+  string expires_at = 11;
+}
+
+message CreatePriceResponse {
+  int32 code = 1;
+  string message = 2;
+  Price data = 3;
+}
+
+message GetCurrentPriceRequest {
+  string station_id = 1;
+}
+
+message GetCurrentPriceResponse {
+  int32 code = 1;
+  string message = 2;
+  Price data = 3;
+}
+
+message ListPricesRequest {
+  string station_id = 1;
+}
+
+message ListPricesResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Price data = 3;
+}
+
+message Price {
+  string id = 1;
+  string station_id = 2;
+  string name = 3;
+  int32 start_hour = 4;
+  int32 end_hour = 5;
+  double price_per_kwh = 6;
+  double service_fee = 7;
+  double peak_load = 8;
+  double off_peak_load = 9;
+  bool is_peak_hours = 10;
+  string effective_at = 11;
+  string expires_at = 12;
+  string created_at = 13;
+  string updated_at = 14;
+}
+
+// Payment messages
+message ConfirmPaymentRequest {
+  string session_id = 1;
+  string transaction_id = 2;
+  string payment_method = 3;
+  double paid_amount = 4;
+}
+
+message ConfirmPaymentResponse {
+  int32 code = 1;
+  string message = 2;
+  Session data = 3;
+}

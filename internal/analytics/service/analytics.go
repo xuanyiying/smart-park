@@ -1,3 +1,4 @@
+// Package service provides gRPC service implementation for the analytics service.
 package service
 
 import (
@@ -5,33 +6,33 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	biz "github.com/xuanyiying/smart-park/internal/analytics/biz"
+	"github.com/xuanyiying/smart-park/internal/analytics/biz"
 	v1 "github.com/xuanyiying/smart-park/api/analytics/v1"
 )
 
-// AnalyticsService implements the analytics service interface
+// AnalyticsService implements the AnalyticsService gRPC service.
 type AnalyticsService struct {
 	v1.UnimplementedAnalyticsServiceServer
 
-	uc     *biz.AnalyticsUseCase
-	logger *log.Helper
+	uc  *biz.AnalyticsUseCase
+	log *log.Helper
 }
 
-// NewAnalyticsService creates a new analytics service
+// NewAnalyticsService creates a new AnalyticsService.
 func NewAnalyticsService(uc *biz.AnalyticsUseCase, logger log.Logger) *AnalyticsService {
 	return &AnalyticsService{
-		uc:     uc,
-		logger: log.NewHelper(logger),
+		uc:  uc,
+		log: log.NewHelper(logger),
 	}
 }
 
-// GetLotAnalytics retrieves analytics data for a specific parking lot
+// GetLotAnalytics retrieves analytics data for a specific parking lot.
 func (s *AnalyticsService) GetLotAnalytics(ctx context.Context, req *v1.GetLotAnalyticsRequest) (*v1.GetLotAnalyticsResponse, error) {
-	s.logger.WithContext(ctx).Infof("GetLotAnalytics called for lot: %s", req.LotId)
+	s.log.WithContext(ctx).Infof("GetLotAnalytics called for lot: %s", req.LotId)
 
 	data, err := s.uc.GetLotAnalytics(ctx, req)
 	if err != nil {
-		s.logger.WithContext(ctx).Errorf("GetLotAnalytics failed: %v", err)
+		s.log.WithContext(ctx).Errorf("GetLotAnalytics failed: %v", err)
 		return nil, err
 	}
 
@@ -40,13 +41,13 @@ func (s *AnalyticsService) GetLotAnalytics(ctx context.Context, req *v1.GetLotAn
 	}, nil
 }
 
-// GetRevenueTrend retrieves revenue trend data
+// GetRevenueTrend retrieves revenue trend data.
 func (s *AnalyticsService) GetRevenueTrend(ctx context.Context, req *v1.GetRevenueTrendRequest) (*v1.GetRevenueTrendResponse, error) {
-	s.logger.WithContext(ctx).Infof("GetRevenueTrend called for lot: %s, period: %s", req.LotId, req.Period)
+	s.log.WithContext(ctx).Infof("GetRevenueTrend called for lot: %s, period: %s", req.LotId, req.Period)
 
 	data, err := s.uc.GetRevenueTrend(ctx, req)
 	if err != nil {
-		s.logger.WithContext(ctx).Errorf("GetRevenueTrend failed: %v", err)
+		s.log.WithContext(ctx).Errorf("GetRevenueTrend failed: %v", err)
 		return nil, err
 	}
 
@@ -55,13 +56,13 @@ func (s *AnalyticsService) GetRevenueTrend(ctx context.Context, req *v1.GetReven
 	}, nil
 }
 
-// PredictPeakHours predicts peak hours based on historical data
+// PredictPeakHours predicts peak hours based on historical data.
 func (s *AnalyticsService) PredictPeakHours(ctx context.Context, req *v1.PredictPeakHoursRequest) (*v1.PredictPeakHoursResponse, error) {
-	s.logger.WithContext(ctx).Infof("PredictPeakHours called for lot: %s, date: %s", req.LotId, req.Date)
+	s.log.WithContext(ctx).Infof("PredictPeakHours called for lot: %s, date: %s", req.LotId, req.Date)
 
 	data, err := s.uc.PredictPeakHours(ctx, req)
 	if err != nil {
-		s.logger.WithContext(ctx).Errorf("PredictPeakHours failed: %v", err)
+		s.log.WithContext(ctx).Errorf("PredictPeakHours failed: %v", err)
 		return nil, err
 	}
 
@@ -70,13 +71,13 @@ func (s *AnalyticsService) PredictPeakHours(ctx context.Context, req *v1.Predict
 	}, nil
 }
 
-// GetOccupancyRate retrieves occupancy rate data
+// GetOccupancyRate retrieves occupancy rate data.
 func (s *AnalyticsService) GetOccupancyRate(ctx context.Context, req *v1.GetOccupancyRateRequest) (*v1.GetOccupancyRateResponse, error) {
-	s.logger.WithContext(ctx).Infof("GetOccupancyRate called for lot: %s", req.LotId)
+	s.log.WithContext(ctx).Infof("GetOccupancyRate called for lot: %s", req.LotId)
 
 	data, err := s.uc.GetOccupancyRate(ctx, req)
 	if err != nil {
-		s.logger.WithContext(ctx).Errorf("GetOccupancyRate failed: %v", err)
+		s.log.WithContext(ctx).Errorf("GetOccupancyRate failed: %v", err)
 		return nil, err
 	}
 
@@ -85,13 +86,13 @@ func (s *AnalyticsService) GetOccupancyRate(ctx context.Context, req *v1.GetOccu
 	}, nil
 }
 
-// GetVehicleFlow retrieves vehicle flow data
+// GetVehicleFlow retrieves vehicle flow data.
 func (s *AnalyticsService) GetVehicleFlow(ctx context.Context, req *v1.GetVehicleFlowRequest) (*v1.GetVehicleFlowResponse, error) {
-	s.logger.WithContext(ctx).Infof("GetVehicleFlow called for lot: %s, date: %s", req.LotId, req.Date)
+	s.log.WithContext(ctx).Infof("GetVehicleFlow called for lot: %s, date: %s", req.LotId, req.Date)
 
 	data, err := s.uc.GetVehicleFlow(ctx, req)
 	if err != nil {
-		s.logger.WithContext(ctx).Errorf("GetVehicleFlow failed: %v", err)
+		s.log.WithContext(ctx).Errorf("GetVehicleFlow failed: %v", err)
 		return nil, err
 	}
 

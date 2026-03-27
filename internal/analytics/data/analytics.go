@@ -1,3 +1,4 @@
+// Package data provides data access layer for the analytics service.
 package data
 
 import (
@@ -5,40 +6,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	biz "github.com/xuanyiying/smart-park/internal/analytics/biz"
+	"github.com/xuanyiying/smart-park/internal/analytics/biz"
 )
 
-// AnalyticsRepo implements biz.AnalyticsRepo interface
-type AnalyticsRepo struct {
-	data   *Data
-	logger *log.Helper
+// analyticsRepo implements biz.AnalyticsRepo.
+type analyticsRepo struct {
+	data *Data
 }
 
-// Data wraps database connection
-type Data struct {
-	// db *sql.DB or *gorm.DB
+// NewAnalyticsRepo creates a new AnalyticsRepo.
+func NewAnalyticsRepo(data *Data) biz.AnalyticsRepo {
+	return &analyticsRepo{data: data}
 }
 
-// NewAnalyticsRepo creates a new analytics repository
-func NewAnalyticsRepo(data *Data, logger log.Logger) *AnalyticsRepo {
-	return &AnalyticsRepo{
-		data:   data,
-		logger: log.NewHelper(logger),
-	}
-}
-
-// NewData creates a new Data instance
-func NewData() *Data {
-	return &Data{}
-}
-
-// GetLotStats retrieves parking lot statistics for a date range
-func (r *AnalyticsRepo) GetLotStats(ctx context.Context, lotID uuid.UUID, startDate, endDate time.Time) (*biz.LotStats, error) {
-	r.logger.WithContext(ctx).Infof("Getting lot stats for %s from %s to %s", lotID, startDate, endDate)
-
+// GetLotStats retrieves parking lot statistics for a date range.
+func (r *analyticsRepo) GetLotStats(ctx context.Context, lotID uuid.UUID, startDate, endDate time.Time) (*biz.LotStats, error) {
 	// TODO: Implement actual database query
 	// This is a placeholder implementation
 	stats := &biz.LotStats{
@@ -54,10 +38,8 @@ func (r *AnalyticsRepo) GetLotStats(ctx context.Context, lotID uuid.UUID, startD
 	return stats, nil
 }
 
-// GetRevenueData retrieves revenue data for trend analysis
-func (r *AnalyticsRepo) GetRevenueData(ctx context.Context, lotID uuid.UUID, period string, limit int) ([]*biz.RevenuePoint, error) {
-	r.logger.WithContext(ctx).Infof("Getting revenue data for %s, period: %s, limit: %d", lotID, period, limit)
-
+// GetRevenueData retrieves revenue data for trend analysis.
+func (r *analyticsRepo) GetRevenueData(ctx context.Context, lotID uuid.UUID, period string, limit int) ([]*biz.RevenuePoint, error) {
 	// TODO: Implement actual database query
 	points := make([]*biz.RevenuePoint, 0, limit)
 	now := time.Now()
@@ -74,10 +56,8 @@ func (r *AnalyticsRepo) GetRevenueData(ctx context.Context, lotID uuid.UUID, per
 	return points, nil
 }
 
-// GetOccupancyData retrieves occupancy data for a date range
-func (r *AnalyticsRepo) GetOccupancyData(ctx context.Context, lotID uuid.UUID, startDate, endDate time.Time) ([]*biz.OccupancyPoint, error) {
-	r.logger.WithContext(ctx).Infof("Getting occupancy data for %s from %s to %s", lotID, startDate, endDate)
-
+// GetOccupancyData retrieves occupancy data for a date range.
+func (r *analyticsRepo) GetOccupancyData(ctx context.Context, lotID uuid.UUID, startDate, endDate time.Time) ([]*biz.OccupancyPoint, error) {
 	// TODO: Implement actual database query
 	points := make([]*biz.OccupancyPoint, 0)
 	current := startDate
@@ -95,10 +75,8 @@ func (r *AnalyticsRepo) GetOccupancyData(ctx context.Context, lotID uuid.UUID, s
 	return points, nil
 }
 
-// GetVehicleFlowData retrieves vehicle flow data for a specific date
-func (r *AnalyticsRepo) GetVehicleFlowData(ctx context.Context, lotID uuid.UUID, date time.Time) ([]*biz.FlowPoint, error) {
-	r.logger.WithContext(ctx).Infof("Getting vehicle flow data for %s on %s", lotID, date.Format("2006-01-02"))
-
+// GetVehicleFlowData retrieves vehicle flow data for a specific date.
+func (r *analyticsRepo) GetVehicleFlowData(ctx context.Context, lotID uuid.UUID, date time.Time) ([]*biz.FlowPoint, error) {
 	// TODO: Implement actual database query
 	points := make([]*biz.FlowPoint, 0, 24)
 
@@ -118,10 +96,8 @@ func (r *AnalyticsRepo) GetVehicleFlowData(ctx context.Context, lotID uuid.UUID,
 	return points, nil
 }
 
-// GetHistoricalPeakHours retrieves historical peak hours data
-func (r *AnalyticsRepo) GetHistoricalPeakHours(ctx context.Context, lotID uuid.UUID, days int) (map[int]int, error) {
-	r.logger.WithContext(ctx).Infof("Getting historical peak hours for %s, days: %d", lotID, days)
-
+// GetHistoricalPeakHours retrieves historical peak hours data.
+func (r *analyticsRepo) GetHistoricalPeakHours(ctx context.Context, lotID uuid.UUID, days int) (map[int]int, error) {
 	// TODO: Implement actual database query
 	// Return simulated data: hour -> vehicle count
 	peakHours := map[int]int{

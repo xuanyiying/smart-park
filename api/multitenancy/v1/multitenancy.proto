@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+package api.multitenancy.v1;
+
+option go_package = "github.com/xuanyiying/smart-park/api/multitenancy/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service TenantService {
+  rpc CreateTenant (CreateTenantRequest) returns (CreateTenantResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/tenants"
+      body: "*"
+    };
+  }
+
+  rpc GetTenant (GetTenantRequest) returns (GetTenantResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/tenants/{tenant_id}"
+    };
+  }
+
+  rpc GetTenantByCode (GetTenantByCodeRequest) returns (GetTenantByCodeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/tenants/code/{code}"
+    };
+  }
+
+  rpc UpdateTenant (UpdateTenantRequest) returns (UpdateTenantResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/tenants/{tenant_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteTenant (DeleteTenantRequest) returns (DeleteTenantResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/admin/tenants/{tenant_id}"
+    };
+  }
+
+  rpc ListTenants (ListTenantsRequest) returns (ListTenantsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/tenants"
+    };
+  }
+
+  rpc EnableTenant (EnableTenantRequest) returns (EnableTenantResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/tenants/{tenant_id}/enable"
+    };
+  }
+
+  rpc DisableTenant (DisableTenantRequest) returns (DisableTenantResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/tenants/{tenant_id}/disable"
+    };
+  }
+
+  rpc CheckFeature (CheckFeatureRequest) returns (CheckFeatureResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/tenants/{tenant_id}/features/{feature}"
+    };
+  }
+
+  rpc CheckQuota (CheckQuotaRequest) returns (CheckQuotaResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/tenants/{tenant_id}/quota"
+    };
+  }
+}
+
+message CreateTenantRequest {
+  string name = 1;
+  string code = 2;
+  TenantConfig config = 3;
+}
+
+message CreateTenantResponse {
+  int32 code = 1;
+  string message = 2;
+  Tenant data = 3;
+}
+
+message GetTenantRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantResponse {
+  int32 code = 1;
+  string message = 2;
+  Tenant data = 3;
+}
+
+message GetTenantByCodeRequest {
+  string code = 1;
+}
+
+message GetTenantByCodeResponse {
+  int32 code = 1;
+  string message = 2;
+  Tenant data = 3;
+}
+
+message UpdateTenantRequest {
+  string tenant_id = 1;
+  string name = 2;
+  TenantConfig config = 3;
+}
+
+message UpdateTenantResponse {
+  int32 code = 1;
+  string message = 2;
+  Tenant data = 3;
+}
+
+message DeleteTenantRequest {
+  string tenant_id = 1;
+}
+
+message DeleteTenantResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message ListTenantsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListTenantsResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Tenant data = 3;
+  int64 total = 4;
+}
+
+message EnableTenantRequest {
+  string tenant_id = 1;
+}
+
+message EnableTenantResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message DisableTenantRequest {
+  string tenant_id = 1;
+}
+
+message DisableTenantResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message CheckFeatureRequest {
+  string tenant_id = 1;
+  string feature = 2;
+}
+
+message CheckFeatureResponse {
+  int32 code = 1;
+  string message = 2;
+  bool has_feature = 3;
+}
+
+message CheckQuotaRequest {
+  string tenant_id = 1;
+  string resource_type = 2; // parking_lots, devices, users
+  int32 current_count = 3;
+}
+
+message CheckQuotaResponse {
+  int32 code = 1;
+  string message = 2;
+  bool allowed = 3;
+  int32 limit = 4;
+  int32 remaining = 5;
+}
+
+message Tenant {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+  string status = 4; // active, disabled, expired
+  TenantConfig config = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  string expired_at = 8;
+}
+
+message TenantConfig {
+  int32 max_parking_lots = 1;
+  int32 max_devices = 2;
+  int32 max_users = 3;
+  int64 storage_quota = 4;
+  repeated string features = 5;
+  string custom_domain = 6;
+  string timezone = 7;
+  string currency = 8;
+  string language = 9;
+}

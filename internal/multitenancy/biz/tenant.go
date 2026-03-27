@@ -1,3 +1,4 @@
+// Package biz provides business logic for the multitenancy service.
 package biz
 
 import (
@@ -8,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Tenant represents a tenant in the system
+// Tenant represents a tenant in the system.
 type Tenant struct {
 	ID        uuid.UUID
 	Name      string
@@ -20,7 +21,7 @@ type Tenant struct {
 	ExpiredAt *time.Time
 }
 
-// TenantConfig holds tenant-specific configuration
+// TenantConfig holds tenant-specific configuration.
 type TenantConfig struct {
 	MaxParkingLots int
 	MaxDevices     int
@@ -33,7 +34,7 @@ type TenantConfig struct {
 	Language       string
 }
 
-// TenantInfo is a lightweight version of Tenant for context
+// TenantInfo is a lightweight version of Tenant for context.
 type TenantInfo struct {
 	ID     uuid.UUID
 	Code   string
@@ -41,7 +42,7 @@ type TenantInfo struct {
 	Config TenantConfig
 }
 
-// IsValid checks if tenant is valid and active
+// IsValid checks if tenant is valid and active.
 func (t *Tenant) IsValid() bool {
 	if t == nil {
 		return false
@@ -55,7 +56,7 @@ func (t *Tenant) IsValid() bool {
 	return true
 }
 
-// HasFeature checks if tenant has a specific feature enabled
+// HasFeature checks if tenant has a specific feature enabled.
 func (t *Tenant) HasFeature(feature string) bool {
 	if t == nil || t.Config.Features == nil {
 		return false
@@ -68,7 +69,7 @@ func (t *Tenant) HasFeature(feature string) bool {
 	return false
 }
 
-// ToInfo converts Tenant to TenantInfo
+// ToInfo converts Tenant to TenantInfo.
 func (t *Tenant) ToInfo() *TenantInfo {
 	if t == nil {
 		return nil
@@ -81,7 +82,7 @@ func (t *Tenant) ToInfo() *TenantInfo {
 	}
 }
 
-// TenantRepo interface for tenant data access
+// TenantRepo defines the repository interface for tenant operations.
 type TenantRepo interface {
 	Create(ctx context.Context, tenant *Tenant) error
 	Update(ctx context.Context, tenant *Tenant) error
@@ -92,23 +93,23 @@ type TenantRepo interface {
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 }
 
-// TenantUseCase handles tenant business logic
+// TenantUseCase handles tenant business logic.
 type TenantUseCase struct {
-	repo   TenantRepo
-	logger *log.Helper
+	repo TenantRepo
+	log  *log.Helper
 }
 
-// NewTenantUseCase creates a new tenant use case
+// NewTenantUseCase creates a new TenantUseCase.
 func NewTenantUseCase(repo TenantRepo, logger log.Logger) *TenantUseCase {
 	return &TenantUseCase{
-		repo:   repo,
-		logger: log.NewHelper(logger),
+		repo: repo,
+		log:  log.NewHelper(logger),
 	}
 }
 
-// CreateTenant creates a new tenant
+// CreateTenant creates a new tenant.
 func (uc *TenantUseCase) CreateTenant(ctx context.Context, name, code string, config *TenantConfig) (*Tenant, error) {
-	uc.logger.WithContext(ctx).Infof("Creating tenant: %s, code: %s", name, code)
+	uc.log.WithContext(ctx).Infof("Creating tenant: %s, code: %s", name, code)
 
 	// Check if code already exists
 	existing, _ := uc.repo.GetByCode(ctx, code)
@@ -132,26 +133,26 @@ func (uc *TenantUseCase) CreateTenant(ctx context.Context, name, code string, co
 	}
 
 	if err := uc.repo.Create(ctx, tenant); err != nil {
-		uc.logger.WithContext(ctx).Errorf("Failed to create tenant: %v", err)
+		uc.log.WithContext(ctx).Errorf("Failed to create tenant: %v", err)
 		return nil, err
 	}
 
 	return tenant, nil
 }
 
-// GetTenant retrieves a tenant by ID
+// GetTenant retrieves a tenant by ID.
 func (uc *TenantUseCase) GetTenant(ctx context.Context, id uuid.UUID) (*Tenant, error) {
 	return uc.repo.GetByID(ctx, id)
 }
 
-// GetTenantByCode retrieves a tenant by code
+// GetTenantByCode retrieves a tenant by code.
 func (uc *TenantUseCase) GetTenantByCode(ctx context.Context, code string) (*Tenant, error) {
 	return uc.repo.GetByCode(ctx, code)
 }
 
-// UpdateTenant updates tenant information
+// UpdateTenant updates tenant information.
 func (uc *TenantUseCase) UpdateTenant(ctx context.Context, id uuid.UUID, name string, config *TenantConfig) (*Tenant, error) {
-	uc.logger.WithContext(ctx).Infof("Updating tenant: %s", id)
+	uc.log.WithContext(ctx).Infof("Updating tenant: %s", id)
 
 	tenant, err := uc.repo.GetByID(ctx, id)
 	if err != nil {
@@ -167,37 +168,37 @@ func (uc *TenantUseCase) UpdateTenant(ctx context.Context, id uuid.UUID, name st
 	tenant.UpdatedAt = time.Now()
 
 	if err := uc.repo.Update(ctx, tenant); err != nil {
-		uc.logger.WithContext(ctx).Errorf("Failed to update tenant: %v", err)
+		uc.log.WithContext(ctx).Errorf("Failed to update tenant: %v", err)
 		return nil, err
 	}
 
 	return tenant, nil
 }
 
-// DisableTenant disables a tenant
+// DisableTenant disables a tenant.
 func (uc *TenantUseCase) DisableTenant(ctx context.Context, id uuid.UUID) error {
-	uc.logger.WithContext(ctx).Infof("Disabling tenant: %s", id)
+	uc.log.WithContext(ctx).Infof("Disabling tenant: %s", id)
 	return uc.repo.UpdateStatus(ctx, id, "disabled")
 }
 
-// EnableTenant enables a tenant
+// EnableTenant enables a tenant.
 func (uc *TenantUseCase) EnableTenant(ctx context.Context, id uuid.UUID) error {
-	uc.logger.WithContext(ctx).Infof("Enabling tenant: %s", id)
+	uc.log.WithContext(ctx).Infof("Enabling tenant: %s", id)
 	return uc.repo.UpdateStatus(ctx, id, "active")
 }
 
-// DeleteTenant deletes a tenant
+// DeleteTenant deletes a tenant.
 func (uc *TenantUseCase) DeleteTenant(ctx context.Context, id uuid.UUID) error {
-	uc.logger.WithContext(ctx).Infof("Deleting tenant: %s", id)
+	uc.log.WithContext(ctx).Infof("Deleting tenant: %s", id)
 	return uc.repo.Delete(ctx, id)
 }
 
-// ListTenants lists all tenants with pagination
+// ListTenants lists all tenants with pagination.
 func (uc *TenantUseCase) ListTenants(ctx context.Context, page, pageSize int) ([]*Tenant, int64, error) {
 	return uc.repo.List(ctx, page, pageSize)
 }
 
-// CheckFeature checks if a tenant has access to a feature
+// CheckFeature checks if a tenant has access to a feature.
 func (uc *TenantUseCase) CheckFeature(ctx context.Context, tenantID uuid.UUID, feature string) error {
 	tenant, err := uc.repo.GetByID(ctx, tenantID)
 	if err != nil {
@@ -211,7 +212,7 @@ func (uc *TenantUseCase) CheckFeature(ctx context.Context, tenantID uuid.UUID, f
 	return nil
 }
 
-// CheckQuota checks if tenant has exceeded resource quota
+// CheckQuota checks if tenant has exceeded resource quota.
 func (uc *TenantUseCase) CheckQuota(ctx context.Context, tenantID uuid.UUID, resourceType string, currentCount int) error {
 	tenant, err := uc.repo.GetByID(ctx, tenantID)
 	if err != nil {
@@ -237,7 +238,7 @@ func (uc *TenantUseCase) CheckQuota(ctx context.Context, tenantID uuid.UUID, res
 	return nil
 }
 
-// DefaultTenantConfig returns default tenant configuration
+// DefaultTenantConfig returns default tenant configuration.
 func DefaultTenantConfig() TenantConfig {
 	return TenantConfig{
 		MaxParkingLots: 1,

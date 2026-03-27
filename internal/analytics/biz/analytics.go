@@ -1,4 +1,5 @@
-package analytics
+// Package biz provides business logic for the analytics service.
+package biz
 
 import (
 	"context"
@@ -10,6 +11,7 @@ import (
 	v1 "github.com/xuanyiying/smart-park/api/analytics/v1"
 )
 
+// AnalyticsRepo defines the repository interface for analytics operations.
 type AnalyticsRepo interface {
 	GetLotStats(ctx context.Context, lotID uuid.UUID, startDate, endDate time.Time) (*LotStats, error)
 	GetRevenueData(ctx context.Context, lotID uuid.UUID, period string, limit int) ([]*RevenuePoint, error)
@@ -18,6 +20,7 @@ type AnalyticsRepo interface {
 	GetHistoricalPeakHours(ctx context.Context, lotID uuid.UUID, days int) (map[int]int, error)
 }
 
+// LotStats represents parking lot statistics.
 type LotStats struct {
 	LotID         uuid.UUID
 	LotName       string
@@ -28,12 +31,14 @@ type LotStats struct {
 	PeakHour      int
 }
 
+// RevenuePoint represents a revenue data point.
 type RevenuePoint struct {
 	Date         time.Time
 	Revenue      float64
 	VehicleCount int
 }
 
+// OccupancyPoint represents an occupancy data point.
 type OccupancyPoint struct {
 	Timestamp      time.Time
 	Rate           float64
@@ -41,6 +46,7 @@ type OccupancyPoint struct {
 	TotalSpaces    int
 }
 
+// FlowPoint represents a vehicle flow data point.
 type FlowPoint struct {
 	Timestamp time.Time
 	Entries   int
@@ -48,11 +54,13 @@ type FlowPoint struct {
 	NetFlow   int
 }
 
+// AnalyticsUseCase implements analytics business logic.
 type AnalyticsUseCase struct {
 	repo AnalyticsRepo
 	log  *log.Helper
 }
 
+// NewAnalyticsUseCase creates a new AnalyticsUseCase.
 func NewAnalyticsUseCase(repo AnalyticsRepo, logger log.Logger) *AnalyticsUseCase {
 	return &AnalyticsUseCase{
 		repo: repo,
@@ -60,6 +68,7 @@ func NewAnalyticsUseCase(repo AnalyticsRepo, logger log.Logger) *AnalyticsUseCas
 	}
 }
 
+// GetLotAnalytics retrieves analytics data for a specific parking lot.
 func (uc *AnalyticsUseCase) GetLotAnalytics(ctx context.Context, req *v1.GetLotAnalyticsRequest) (*v1.LotAnalyticsData, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
@@ -92,6 +101,7 @@ func (uc *AnalyticsUseCase) GetLotAnalytics(ctx context.Context, req *v1.GetLotA
 	}, nil
 }
 
+// GetRevenueTrend retrieves revenue trend data.
 func (uc *AnalyticsUseCase) GetRevenueTrend(ctx context.Context, req *v1.GetRevenueTrendRequest) (*v1.RevenueTrendData, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
@@ -124,6 +134,7 @@ func (uc *AnalyticsUseCase) GetRevenueTrend(ctx context.Context, req *v1.GetReve
 	}, nil
 }
 
+// PredictPeakHours predicts peak hours based on historical data.
 func (uc *AnalyticsUseCase) PredictPeakHours(ctx context.Context, req *v1.PredictPeakHoursRequest) (*v1.PeakHoursPrediction, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
@@ -148,13 +159,14 @@ func (uc *AnalyticsUseCase) PredictPeakHours(ctx context.Context, req *v1.Predic
 	}
 
 	return &v1.PeakHoursPrediction{
-		LotId:     lotID.String(),
-		Date:      req.Date,
-		PeakHours: peakHours,
+		LotId:      lotID.String(),
+		Date:       req.Date,
+		PeakHours:  peakHours,
 		Confidence: 0.85,
 	}, nil
 }
 
+// GetOccupancyRate retrieves occupancy rate data.
 func (uc *AnalyticsUseCase) GetOccupancyRate(ctx context.Context, req *v1.GetOccupancyRateRequest) (*v1.OccupancyRateData, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
@@ -214,6 +226,7 @@ func (uc *AnalyticsUseCase) GetOccupancyRate(ctx context.Context, req *v1.GetOcc
 	}, nil
 }
 
+// GetVehicleFlow retrieves vehicle flow data.
 func (uc *AnalyticsUseCase) GetVehicleFlow(ctx context.Context, req *v1.GetVehicleFlowRequest) (*v1.VehicleFlowData, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
@@ -247,11 +260,11 @@ func (uc *AnalyticsUseCase) GetVehicleFlow(ctx context.Context, req *v1.GetVehic
 	}
 
 	return &v1.VehicleFlowData{
-		LotId:          lotID.String(),
-		Date:           req.Date,
-		TotalEntries:   int32(totalEntries),
-		TotalExits:     int32(totalExits),
+		LotId:           lotID.String(),
+		Date:            req.Date,
+		TotalEntries:    int32(totalEntries),
+		TotalExits:      int32(totalExits),
 		CurrentVehicles: int32(currentVehicles),
-		FlowPoints:     flowPoints,
+		FlowPoints:      flowPoints,
 	}, nil
 }

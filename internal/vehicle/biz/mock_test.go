@@ -105,6 +105,22 @@ func (m *MockVehicleRepo) GetLaneByDeviceCode(ctx context.Context, deviceCode st
 	return m.Lanes[deviceCode], nil
 }
 
+func (m *MockVehicleRepo) ListParkingRecordsByPlates(ctx context.Context, plateNumbers []string, page, pageSize int) ([]*ParkingRecord, int, error) {
+	return nil, 0, nil
+}
+
 func (m *MockVehicleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
 	return fn(ctx)
+}
+
+func (m *MockVehicleRepo) CreateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error {
+	return nil
+}
+
+func (m *MockVehicleRepo) GetPendingSyncRecords(ctx context.Context, limit int) ([]*OfflineSyncRecord, error) {
+	return nil, nil
+}
+
+func (m *MockVehicleRepo) UpdateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error {
+	return nil
 }

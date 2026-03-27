@@ -65,12 +65,38 @@ func (m *MockOrderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status 
 	return result, int64(len(result)), nil
 }
 
+type MockRecordRepo struct{}
+
+func NewMockRecordRepo() *MockRecordRepo {
+	return &MockRecordRepo{}
+}
+
+func (m *MockRecordRepo) GetRecord(ctx context.Context, recordID string) (*ParkingRecordInfo, error) {
+	return nil, nil
+}
+
+func (m *MockRecordRepo) UpdateRecordStatus(ctx context.Context, recordID string, status string) error {
+	return nil
+}
+
+type MockGateControlService struct{}
+
+func NewMockGateControlService() *MockGateControlService {
+	return &MockGateControlService{}
+}
+
+func (m *MockGateControlService) OpenGate(ctx context.Context, deviceID string, recordID string) error {
+	return nil
+}
+
 func TestPaymentUseCase_CreatePayment(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
@@ -101,9 +127,11 @@ func TestPaymentUseCase_CreatePayment(t *testing.T) {
 func TestPaymentUseCase_CreatePayment_InvalidAmount(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
@@ -120,9 +148,11 @@ func TestPaymentUseCase_CreatePayment_InvalidAmount(t *testing.T) {
 func TestPaymentUseCase_CreatePayment_InvalidMethod(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
@@ -139,6 +169,8 @@ func TestPaymentUseCase_CreatePayment_InvalidMethod(t *testing.T) {
 func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
 	orderID := uuid.New()
@@ -152,7 +184,7 @@ func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
 		PayMethod: string(MethodWechat),
 	}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	data, err := uc.GetPaymentStatus(context.Background(), orderID.String())
 	if err != nil {
@@ -171,6 +203,8 @@ func TestPaymentUseCase_GetPaymentStatus(t *testing.T) {
 func TestPaymentUseCase_Refund(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
 	orderID := uuid.New()
@@ -183,7 +217,7 @@ func TestPaymentUseCase_Refund(t *testing.T) {
 		PayMethod:   string(MethodWechat),
 	}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	data, err := uc.Refund(context.Background(), orderID.String(), "Test refund")
 	if err != nil {
@@ -207,6 +241,8 @@ func TestPaymentUseCase_Refund(t *testing.T) {
 func TestPaymentUseCase_Refund_NotPaid(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
 	orderID := uuid.New()
@@ -218,7 +254,7 @@ func TestPaymentUseCase_Refund_NotPaid(t *testing.T) {
 		FinalAmount: 10.00,
 	}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	data, err := uc.Refund(context.Background(), orderID.String(), "Test refund")
 	if err != nil {
@@ -233,6 +269,8 @@ func TestPaymentUseCase_Refund_NotPaid(t *testing.T) {
 func TestPaymentUseCase_HandleWechatCallback(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
 	transactionID := "wx-transaction-123"
@@ -245,7 +283,7 @@ func TestPaymentUseCase_HandleWechatCallback(t *testing.T) {
 		TransactionID: transactionID,
 	}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	req := &v1.WechatCallbackRequest{
 		ReturnCode:    "SUCCESS",
@@ -273,6 +311,8 @@ func TestPaymentUseCase_HandleWechatCallback(t *testing.T) {
 func TestPaymentUseCase_HandleAlipayCallback(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
 	mockRepo := NewMockOrderRepo()
+	mockRecordRepo := NewMockRecordRepo()
+	mockGateSvc := NewMockGateControlService()
 	config := &PaymentConfig{}
 
 	transactionID := "alipay-transaction-123"
@@ -285,13 +325,13 @@ func TestPaymentUseCase_HandleAlipayCallback(t *testing.T) {
 		TransactionID: transactionID,
 	}
 
-	uc := NewPaymentUseCase(mockRepo, config, nil, nil, logger)
+	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)
 
 	req := &v1.AlipayCallbackRequest{
-		TradeStatus:  "TRADE_SUCCESS",
-		TradeNo:      transactionID,
-		OutTradeNo:   orderID.String(),
-		TotalAmount:  "10.00",
+		TradeStatus: "TRADE_SUCCESS",
+		TradeNo:     transactionID,
+		OutTradeNo:  orderID.String(),
+		TotalAmount: "10.00",
 	}
 
 	resp, err := uc.HandleAlipayCallback(context.Background(), req)
