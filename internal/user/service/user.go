@@ -5,6 +5,7 @@ import (
 
 	v1 "github.com/xuanyiying/smart-park/api/user/v1"
 	"github.com/xuanyiying/smart-park/internal/user/biz"
+	"github.com/xuanyiying/smart-park/internal/user/middleware"
 )
 
 type UserService struct {
@@ -33,21 +34,21 @@ func (s *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Logi
 }
 
 func (s *UserService) GetUserInfo(ctx context.Context, req *v1.GetUserInfoRequest) (*v1.GetUserInfoResponse, error) {
-	// TODO: 从 context 中获取 userID
-	// 暂时返回空实现
+	userID := middleware.GetUserIDFromContext(ctx)
+	openID := middleware.GetOpenIDFromContext(ctx)
+
 	return &v1.GetUserInfoResponse{
 		Code:    200,
 		Message: "success",
 		Data: &v1.UserInfo{
-			UserId: "",
-			OpenId: "",
+			UserId: userID,
+			OpenId: openID,
 		},
 	}, nil
 }
 
 func (s *UserService) BindPlate(ctx context.Context, req *v1.BindPlateRequest) (*v1.BindPlateResponse, error) {
-	// TODO: 从 context 中获取 userID
-	userID := "" // 需要从 JWT context 中获取
+	userID := middleware.GetUserIDFromContext(ctx)
 	err := s.uc.BindPlate(ctx, userID, req)
 	if err != nil {
 		return &v1.BindPlateResponse{
@@ -63,8 +64,7 @@ func (s *UserService) BindPlate(ctx context.Context, req *v1.BindPlateRequest) (
 }
 
 func (s *UserService) UnbindPlate(ctx context.Context, req *v1.UnbindPlateRequest) (*v1.UnbindPlateResponse, error) {
-	// TODO: 从 context 中获取 userID
-	userID := "" // 需要从 JWT context 中获取
+	userID := middleware.GetUserIDFromContext(ctx)
 	err := s.uc.UnbindPlate(ctx, userID, req.PlateNumber)
 	if err != nil {
 		return &v1.UnbindPlateResponse{
@@ -80,8 +80,7 @@ func (s *UserService) UnbindPlate(ctx context.Context, req *v1.UnbindPlateReques
 }
 
 func (s *UserService) ListPlates(ctx context.Context, req *v1.ListPlatesRequest) (*v1.ListPlatesResponse, error) {
-	// TODO: 从 context 中获取 userID
-	userID := "" // 需要从 JWT context 中获取
+	userID := middleware.GetUserIDFromContext(ctx)
 	data, err := s.uc.ListPlates(ctx, userID, int(req.Page), int(req.PageSize))
 	if err != nil {
 		return &v1.ListPlatesResponse{
@@ -98,8 +97,7 @@ func (s *UserService) ListPlates(ctx context.Context, req *v1.ListPlatesRequest)
 }
 
 func (s *UserService) ListParkingRecords(ctx context.Context, req *v1.ListParkingRecordsRequest) (*v1.ListParkingRecordsResponse, error) {
-	// TODO: 从 JWT context 中获取 userID
-	userID := "" // 需要从 JWT context 中获取
+	userID := middleware.GetUserIDFromContext(ctx)
 
 	page := req.Page
 	if page <= 0 {
@@ -126,8 +124,7 @@ func (s *UserService) ListParkingRecords(ctx context.Context, req *v1.ListParkin
 }
 
 func (s *UserService) GetParkingRecord(ctx context.Context, req *v1.GetParkingRecordRequest) (*v1.GetParkingRecordResponse, error) {
-	// TODO: 从 JWT context 中获取 userID
-	userID := "" // 需要从 JWT context 中获取
+	userID := middleware.GetUserIDFromContext(ctx)
 
 	data, err := s.uc.GetParkingRecord(ctx, userID, req.RecordId)
 	if err != nil {
@@ -145,8 +142,7 @@ func (s *UserService) GetParkingRecord(ctx context.Context, req *v1.GetParkingRe
 }
 
 func (s *UserService) ScanPay(ctx context.Context, req *v1.ScanPayRequest) (*v1.ScanPayResponse, error) {
-	// TODO: 从 JWT context 中获取 userID
-	userID := "" // 需要从 JWT context 中获取
+	userID := middleware.GetUserIDFromContext(ctx)
 
 	data, err := s.uc.ScanPay(ctx, userID, req)
 	if err != nil {
@@ -164,19 +160,35 @@ func (s *UserService) ScanPay(ctx context.Context, req *v1.ScanPayRequest) (*v1.
 }
 
 func (s *UserService) GetMonthlyCard(ctx context.Context, req *v1.GetMonthlyCardRequest) (*v1.GetMonthlyCardResponse, error) {
-	// TODO: 后续实现
+	userID := middleware.GetUserIDFromContext(ctx)
+	data, err := s.uc.GetMonthlyCard(ctx, userID, req.PlateNumber)
+	if err != nil {
+		return &v1.GetMonthlyCardResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
+
 	return &v1.GetMonthlyCardResponse{
 		Code:    200,
 		Message: "success",
-		Data:    nil,
+		Data:    data,
 	}, nil
 }
 
 func (s *UserService) PurchaseMonthlyCard(ctx context.Context, req *v1.PurchaseMonthlyCardRequest) (*v1.PurchaseMonthlyCardResponse, error) {
-	// TODO: 后续实现
+	userID := middleware.GetUserIDFromContext(ctx)
+	data, err := s.uc.PurchaseMonthlyCard(ctx, userID, req)
+	if err != nil {
+		return &v1.PurchaseMonthlyCardResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
+
 	return &v1.PurchaseMonthlyCardResponse{
 		Code:    200,
 		Message: "success",
-		Data:    nil,
+		Data:    data,
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -135,8 +136,11 @@ type PaymentConfig struct {
 }
 
 type JWTConfig struct {
-	Secret string `mapstructure:"secret"`
-	Expiry int    `mapstructure:"expiry"`
+	Secret         string        `mapstructure:"secret"`
+	PublicKeyPath  string        `mapstructure:"public_key_path"`
+	PrivateKeyPath string        `mapstructure:"private_key_path"`
+	Expiry         int           `mapstructure:"expiry"`
+	TokenDuration  time.Duration `mapstructure:"token_duration"`
 }
 
 type ConfigLoader struct {

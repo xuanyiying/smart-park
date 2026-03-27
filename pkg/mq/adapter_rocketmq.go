@@ -1,7 +1,4 @@
-//go:build rocketmq
-// +build rocketmq
-
-package rocketmq
+package mq
 
 import (
 	"context"
@@ -15,88 +12,27 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/producer"
 )
 
-// Logger interface for logging
-type Logger interface {
-	Infow(msg string, keysAndValues ...interface{})
-	Errorw(msg string, keysAndValues ...interface{})
-	Debugw(msg string, keysAndValues ...interface{})
-	Warnw(msg string, keysAndValues ...interface{})
-}
-
-// NopLogger is a no-op logger
-type NopLogger struct{}
-
-func (NopLogger) Infow(msg string, keysAndValues ...interface{})  {}
-func (NopLogger) Errorw(msg string, keysAndValues ...interface{}) {}
-func (NopLogger) Debugw(msg string, keysAndValues ...interface{}) {}
-func (NopLogger) Warnw(msg string, keysAndValues ...interface{})  {}
-
-// Config holds RocketMQ configuration
-type Config struct {
-	NameServer string
-	Group      string
-	AccessKey  string
-	SecretKey  string
-	Namespace  string
-}
-
-// Message represents a message
-type Message struct {
-	ID        string
-	Topic     string
-	Key       string
-	Body      []byte
-	Headers   map[string]string
-	Timestamp time.Time
-}
-
-// Producer interface
-type Producer interface {
-	Publish(ctx context.Context, topic string, msg *Message) error
-	PublishAsync(ctx context.Context, topic string, msg *Message) error
-	Close() error
-}
-
-// Consumer interface
-type Consumer interface {
-	Subscribe(ctx context.Context, topic string, group string, handler func(msg *Message) error) error
-	SubscribeAsync(ctx context.Context, topic string, group string, handler func(msg *Message) error) error
-	Unsubscribe(ctx context.Context, topic string) error
-	Close() error
-}
-
-// Adapter interface
-type Adapter interface {
-	NewProducer() (Producer, error)
-	NewConsumer() (Consumer, error)
-	Name() string
-}
-
-// RocketMQAdapter implements Adapter for RocketMQ
 type RocketMQAdapter struct {
-	config Config
+	config RocketMQConfig
 	logger Logger
+	mu     sync.RWMutex
 }
 
-// NewRocketMQAdapter creates a new RocketMQ adapter
-func NewRocketMQAdapter(cfg Config) *RocketMQAdapter {
+func NewRocketMQAdapter(cfg RocketMQConfig) *RocketMQAdapter {
 	return &RocketMQAdapter{
 		config: cfg,
 		logger: NopLogger{},
 	}
 }
 
-// SetLogger sets the logger
-func (a *RocketMQAdapter) SetLogger(logger Logger) {
-	a.logger = logger
-}
-
-// Name returns adapter name
 func (a *RocketMQAdapter) Name() string {
 	return "rocketmq"
 }
 
-// getCredentials returns credentials if configured
+func (a *RocketMQAdapter) SetLogger(logger Logger) {
+	a.logger = logger
+}
+
 func (a *RocketMQAdapter) getCredentials() primitive.Credentials {
 	if a.config.AccessKey != "" && a.config.SecretKey != "" {
 		return primitive.Credentials{
@@ -107,11 +43,12 @@ func (a *RocketMQAdapter) getCredentials() primitive.Credentials {
 	return primitive.Credentials{}
 }
 
-// NewProducer creates a new producer
 func (a *RocketMQAdapter) NewProducer() (Producer, error) {
 	opts := []producer.Option{
 		producer.WithNameServer([]string{a.config.NameServer}),
 		producer.WithGroupName(a.config.Group + "-producer"),
+		producer.WithRetry(3),
+		producer.WithSendMsgTimeout(10 * time.Second),
 	}
 
 	creds := a.getCredentials()
@@ -125,25 +62,28 @@ func (a *RocketMQAdapter) NewProducer() (Producer, error) {
 
 	p, err := rocketmq.NewProducer(opts...)
 	if err != nil {
+		a.logger.Errorw("failed to create producer", "error", err)
 		return nil, fmt.Errorf("failed to create producer: %w", err)
 	}
 
 	if err := p.Start(); err != nil {
+		a.logger.Errorw("failed to start producer", "error", err)
 		return nil, fmt.Errorf("failed to start producer: %w", err)
 	}
 
+	a.logger.Infow("rocketmq producer started", "nameServer", a.config.NameServer, "group", a.config.Group)
 	return &RocketMQProducer{
 		producer: p,
 		logger:   a.logger,
 	}, nil
 }
 
-// NewConsumer creates a new consumer
 func (a *RocketMQAdapter) NewConsumer() (Consumer, error) {
 	opts := []consumer.Option{
 		consumer.WithNameServer([]string{a.config.NameServer}),
 		consumer.WithGroupName(a.config.Group),
 		consumer.WithConsumerModel(consumer.Clustering),
+		consumer.WithConsumeFromWhere(consumer.ConsumeFromLastOffset),
 	}
 
 	creds := a.getCredentials()
@@ -157,36 +97,34 @@ func (a *RocketMQAdapter) NewConsumer() (Consumer, error) {
 
 	c, err := rocketmq.NewPushConsumer(opts...)
 	if err != nil {
+		a.logger.Errorw("failed to create consumer", "error", err)
 		return nil, fmt.Errorf("failed to create consumer: %w", err)
 	}
 
+	a.logger.Infow("rocketmq consumer created", "nameServer", a.config.NameServer, "group", a.config.Group)
 	return &RocketMQConsumer{
-		consumer:  c,
-		logger:    a.logger,
-		handlers:  make(map[string]func(msg *Message) error),
-		stopCh:    make(chan struct{}),
+		consumer: c,
+		logger:   a.logger,
+		handlers: make(map[string]func(msg *Message) error),
+		stopCh:   make(chan struct{}),
 	}, nil
 }
 
-// RocketMQProducer implements Producer for RocketMQ
 type RocketMQProducer struct {
 	producer rocketmq.Producer
 	logger   Logger
 }
 
-// Publish publishes a message
 func (p *RocketMQProducer) Publish(ctx context.Context, topic string, msg *Message) error {
 	rmqMsg := &primitive.Message{
 		Topic: topic,
 		Body:  msg.Body,
 	}
 
-	// Set key if provided
 	if msg.Key != "" {
 		rmqMsg.WithKeys([]string{msg.Key})
 	}
 
-	// Add properties
 	if msg.ID != "" {
 		rmqMsg.WithProperty("id", msg.ID)
 	}
@@ -203,14 +141,13 @@ func (p *RocketMQProducer) Publish(ctx context.Context, topic string, msg *Messa
 
 	if result.Status != primitive.SendOK {
 		p.logger.Errorw("message send failed", "status", result.Status, "topic", topic)
-		return fmt.Errorf("send failed with status: %s", result.Status)
+		return fmt.Errorf("send failed with status: %v", result.Status)
 	}
 
 	p.logger.Infow("message published", "topic", topic, "key", msg.Key, "msgID", result.MsgID)
 	return nil
 }
 
-// PublishAsync publishes a message asynchronously
 func (p *RocketMQProducer) PublishAsync(ctx context.Context, topic string, msg *Message) error {
 	rmqMsg := &primitive.Message{
 		Topic: topic,
@@ -242,12 +179,13 @@ func (p *RocketMQProducer) PublishAsync(ctx context.Context, topic string, msg *
 	return nil
 }
 
-// Close closes the producer
 func (p *RocketMQProducer) Close() error {
-	return p.producer.Shutdown()
+	if p.producer != nil {
+		return p.producer.Shutdown()
+	}
+	return nil
 }
 
-// RocketMQConsumer implements Consumer for RocketMQ
 type RocketMQConsumer struct {
 	consumer  rocketmq.PushConsumer
 	logger    Logger
@@ -257,7 +195,6 @@ type RocketMQConsumer struct {
 	isRunning bool
 }
 
-// Subscribe subscribes to a topic
 func (c *RocketMQConsumer) Subscribe(ctx context.Context, topic string, group string, handler func(msg *Message) error) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -281,18 +218,20 @@ func (c *RocketMQConsumer) Subscribe(ctx context.Context, topic string, group st
 
 	if err != nil {
 		c.logger.Errorw("failed to subscribe", "error", err, "topic", topic)
-		return err
+		return fmt.Errorf("failed to subscribe: %w", err)
 	}
 
 	c.handlers[topic] = handler
 
 	if !c.isRunning {
 		if err := c.consumer.Start(); err != nil {
+			c.logger.Errorw("failed to start consumer", "error", err)
 			return fmt.Errorf("failed to start consumer: %w", err)
 		}
 		c.isRunning = true
 	}
 
+	c.logger.Infow("subscribed to topic", "topic", topic, "group", group)
 	return nil
 }
 
@@ -305,56 +244,67 @@ func (c *RocketMQConsumer) parseMessage(msg *primitive.MessageExt, topic string)
 		Timestamp: time.Unix(msg.BornTimestamp/1000, 0),
 	}
 
-	// Get key from properties
-	if keys, ok := msg.GetProperty("KEYS"); ok {
+	if keys := msg.GetProperty("KEYS"); keys != "" {
 		m.Key = keys
 	}
 
-	// Get custom ID if set
-	if id, ok := msg.GetProperty("id"); ok {
+	if id := msg.GetProperty("id"); id != "" {
 		m.ID = id
 	}
 
-	// Parse timestamp
-	if ts, ok := msg.GetProperty("timestamp"); ok {
+	if ts := msg.GetProperty("timestamp"); ts != "" {
 		if t, err := time.Parse(time.RFC3339, ts); err == nil {
 			m.Timestamp = t
 		}
 	}
 
-	// Copy all properties as headers
 	for k, v := range msg.GetProperties() {
 		if k != "KEYS" && k != "id" && k != "timestamp" {
 			m.Headers[k] = v
 		}
 	}
 
+	if m.ID == "" {
+		m.ID = GenerateID()
+	}
+
 	return m
 }
 
-// SubscribeAsync subscribes to a topic asynchronously
 func (c *RocketMQConsumer) SubscribeAsync(ctx context.Context, topic string, group string, handler func(msg *Message) error) error {
 	return c.Subscribe(ctx, topic, group, handler)
 }
 
-// Unsubscribe unsubscribes from a topic
 func (c *RocketMQConsumer) Unsubscribe(ctx context.Context, topic string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if err := c.consumer.Unsubscribe(topic); err != nil {
+		c.logger.Errorw("failed to unsubscribe", "error", err, "topic", topic)
+		return err
+	}
+
 	delete(c.handlers, topic)
+	c.logger.Infow("unsubscribed from topic", "topic", topic)
 	return nil
 }
 
-// Close closes the consumer
 func (c *RocketMQConsumer) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.isRunning {
+	if c.isRunning && c.stopCh != nil {
 		close(c.stopCh)
 		c.isRunning = false
 	}
 
-	return c.consumer.Shutdown()
+	if c.consumer != nil {
+		if err := c.consumer.Shutdown(); err != nil {
+			c.logger.Errorw("failed to shutdown consumer", "error", err)
+			return err
+		}
+	}
+
+	c.logger.Infow("rocketmq consumer closed")
+	return nil
 }

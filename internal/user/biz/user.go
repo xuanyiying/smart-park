@@ -270,7 +270,6 @@ func (uc *UserUseCase) ScanPay(ctx context.Context, userID string, req *v1.ScanP
 		return nil, err
 	}
 
-	// 1. 验证停车记录属于该用户
 	vehicles, _, err := uc.userRepo.ListUserVehicles(ctx, uid, 1, 100)
 	if err != nil {
 		return nil, err
@@ -281,7 +280,6 @@ func (uc *UserUseCase) ScanPay(ctx context.Context, userID string, req *v1.ScanP
 		plateMap[v.PlateNumber] = true
 	}
 
-	// 2. 获取停车记录信息
 	record, err := uc.vehicleClient.GetParkingRecord(ctx, req.RecordId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get parking record: %w", err)
@@ -291,13 +289,102 @@ func (uc *UserUseCase) ScanPay(ctx context.Context, userID string, req *v1.ScanP
 		return nil, fmt.Errorf("record not found or access denied")
 	}
 
-	// 3. 调用 payment service 创建支付
 	payData, err := uc.paymentClient.CreatePayment(ctx, req.RecordId, 0, req.PayMethod, req.OpenId)
 	if err != nil {
 		return nil, err
 	}
 
 	return &v1.ScanPayData{
+		OrderId: payData.OrderId,
+		Amount:  payData.Amount,
+		PayUrl:  payData.PayUrl,
+		QrCode:  payData.QrCode,
+	}, nil
+}
+
+func (uc *UserUseCase) GetMonthlyCard(ctx context.Context, userID, plateNumber string) (*v1.MonthlyCardInfo, error) {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	vehicles, _, err := uc.userRepo.ListUserVehicles(ctx, uid, 1, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	plateMap := make(map[string]bool)
+	for _, v := range vehicles {
+		plateMap[v.PlateNumber] = true
+	}
+
+	if !plateMap[plateNumber] {
+		return nil, fmt.Errorf("plate number not bound to user")
+	}
+
+	vehicleInfo, err := uc.vehicleClient.GetVehicleInfo(ctx, plateNumber)
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to get vehicle info: %v", err)
+		return &v1.MonthlyCardInfo{
+			PlateNumber:  plateNumber,
+			IsValid:      false,
+			DaysRemaining: 0,
+		}, nil
+	}
+
+	var isValid bool
+	var daysRemaining int32
+	var validUntil string
+
+	if vehicleInfo.MonthlyValidUntil != "" {
+		validUntilTime, err := time.Parse("2006-01-02", vehicleInfo.MonthlyValidUntil)
+		if err == nil {
+			validUntil = vehicleInfo.MonthlyValidUntil
+			now := time.Now()
+			if validUntilTime.After(now) {
+				isValid = true
+				daysRemaining = int32(validUntilTime.Sub(now).Hours() / 24)
+			}
+		}
+	}
+
+	return &v1.MonthlyCardInfo{
+		PlateNumber:   plateNumber,
+		ValidUntil:    validUntil,
+		DaysRemaining: daysRemaining,
+		IsValid:       isValid,
+	}, nil
+}
+
+func (uc *UserUseCase) PurchaseMonthlyCard(ctx context.Context, userID string, req *v1.PurchaseMonthlyCardRequest) (*v1.PurchaseMonthlyCardData, error) {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	vehicles, _, err := uc.userRepo.ListUserVehicles(ctx, uid, 1, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	plateMap := make(map[string]bool)
+	for _, v := range vehicles {
+		plateMap[v.PlateNumber] = true
+	}
+
+	if !plateMap[req.PlateNumber] {
+		return nil, fmt.Errorf("plate number not bound to user")
+	}
+
+	monthlyPrice := 300.0
+	amount := monthlyPrice * float64(req.Months)
+
+	payData, err := uc.paymentClient.CreateMonthlyCardPayment(ctx, req.PlateNumber, req.Months, amount, req.PayMethod, req.OpenId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.PurchaseMonthlyCardData{
 		OrderId: payData.OrderId,
 		Amount:  payData.Amount,
 		PayUrl:  payData.PayUrl,

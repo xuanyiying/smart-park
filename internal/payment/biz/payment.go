@@ -17,6 +17,8 @@ import (
 // PaymentUseCase implements payment business logic.
 type PaymentUseCase struct {
 	orderRepo    OrderRepo
+	recordRepo   RecordRepo
+	gateClient   GateControlService
 	log          *log.Helper
 	config       *PaymentConfig
 	bizConfig    *Config
@@ -25,9 +27,11 @@ type PaymentUseCase struct {
 }
 
 // NewPaymentUseCase creates a new PaymentUseCase.
-func NewPaymentUseCase(orderRepo OrderRepo, config *PaymentConfig, wechatClient *wechat.Client, alipayClient *alipay.Client, logger log.Logger) *PaymentUseCase {
+func NewPaymentUseCase(orderRepo OrderRepo, recordRepo RecordRepo, gateClient GateControlService, config *PaymentConfig, wechatClient *wechat.Client, alipayClient *alipay.Client, logger log.Logger) *PaymentUseCase {
 	return &PaymentUseCase{
 		orderRepo:    orderRepo,
+		recordRepo:   recordRepo,
+		gateClient:   gateClient,
 		log:          log.NewHelper(logger),
 		config:       config,
 		bizConfig:    DefaultConfig(),

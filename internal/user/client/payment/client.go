@@ -10,6 +10,7 @@ import (
 type Client interface {
 	CreatePayment(ctx context.Context, recordID string, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error)
 	GetPaymentStatus(ctx context.Context, orderID string) (*paymentv1.PaymentStatusData, error)
+	CreateMonthlyCardPayment(ctx context.Context, plateNumber string, months int32, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error)
 }
 
 type client struct {
@@ -45,6 +46,22 @@ func (c *client) GetPaymentStatus(ctx context.Context, orderID string) (*payment
 	}
 	if resp.Code != 0 && resp.Code != 200 {
 		return nil, fmt.Errorf("get payment status failed: %s", resp.Message)
+	}
+	return resp.Data, nil
+}
+
+func (c *client) CreateMonthlyCardPayment(ctx context.Context, plateNumber string, months int32, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error) {
+	resp, err := c.paymentClient.CreatePayment(ctx, &paymentv1.CreatePaymentRequest{
+		RecordId:  fmt.Sprintf("monthly_%s_%d", plateNumber, months),
+		Amount:    amount,
+		PayMethod: payMethod,
+		OpenId:    openID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create monthly card payment: %w", err)
+	}
+	if resp.Code != 0 && resp.Code != 200 {
+		return nil, fmt.Errorf("create monthly card payment failed: %s", resp.Message)
 	}
 	return resp.Data, nil
 }

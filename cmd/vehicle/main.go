@@ -144,7 +144,7 @@ func main() {
 	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, logger)
 	deviceUseCase := biz.NewDeviceUseCase(vehicleRepo, logger)
 	vehicleQueryUseCase := biz.NewVehicleQueryUseCase(vehicleRepo, logger)
-	commandUseCase := biz.NewCommandUseCase(mqttClient, logger)
+	commandUseCase := biz.NewCommandUseCase(vehicleRepo, mqttClient, logger)
 	recordQueryUseCase := biz.NewRecordQueryUseCase(vehicleRepo)
 
 	// Initialize gRPC service

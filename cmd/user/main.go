@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
@@ -40,6 +39,13 @@ func (m *mockVehicleClient) GetParkingRecord(ctx context.Context, recordID strin
 	return nil, fmt.Errorf("not implemented")
 }
 
+func (m *mockVehicleClient) GetVehicleInfo(ctx context.Context, plateNumber string) (*vehiclev1.VehicleInfo, error) {
+	return &vehiclev1.VehicleInfo{
+		PlateNumber: plateNumber,
+		VehicleType: "temporary",
+	}, nil
+}
+
 // mockPaymentClient is a mock implementation of payment.Client for testing.
 type mockPaymentClient struct{}
 
@@ -58,6 +64,15 @@ func (m *mockPaymentClient) GetPaymentStatus(ctx context.Context, orderID string
 		Status:    "pending",
 		PayTime:   "",
 		PayMethod: "",
+	}, nil
+}
+
+func (m *mockPaymentClient) CreateMonthlyCardPayment(ctx context.Context, plateNumber string, months int32, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error) {
+	return &paymentv1.PaymentData{
+		OrderId: "mock_monthly_" + plateNumber,
+		Amount:  amount,
+		PayUrl:  "https://payment.example.com/mock",
+		QrCode:  "",
 	}, nil
 }
 
@@ -153,10 +168,15 @@ func main() {
 	}
 
 	jwtConfig := &auth.JWTConfig{
-		SecretKey:     cfg.JWT.Secret,
-		TokenDuration: time.Duration(cfg.JWT.Expiry) * time.Hour,
+		PublicKeyPath:  cfg.JWT.PublicKeyPath,
+		PrivateKeyPath: cfg.JWT.PrivateKeyPath,
+		TokenDuration:  cfg.JWT.TokenDuration,
 	}
-	jwtManager := auth.NewJWTManager(jwtConfig)
+	jwtManager, err := auth.NewJWTManager(jwtConfig)
+	if err != nil {
+		logHelper.Errorf("failed to create JWT manager: %v", err)
+		os.Exit(1)
+	}
 
 	userUseCase := biz.NewUserUseCase(userRepo, vehicleClient, paymentClient, jwtManager, wechatClient, logger)
 

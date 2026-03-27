@@ -245,7 +245,6 @@ func (uc *EntryExitUseCase) getVehicleInfo(ctx context.Context, plateNumber stri
 }
 
 func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *ParkingRecord, lane *Lane, exitTime time.Time, vehicle *Vehicle, vehicleType string) (float64, float64, float64) {
-	// 通过 Billing 服务计算费用
 	feeResult, err := uc.billingClient.CalculateFee(ctx, record.ID.String(), lane.LotID.String(),
 		record.EntryTime.Unix(), exitTime.Unix(), vehicleType)
 	if err != nil {
@@ -255,10 +254,22 @@ func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *Parkin
 
 	finalAmount := feeResult.FinalAmount
 
-	// 月卡车辆免费
-	if vehicle != nil && vehicle.VehicleType == VehicleTypeMonthly &&
-		vehicle.MonthlyValidUntil != nil && vehicle.MonthlyValidUntil.After(time.Now()) {
-		finalAmount = 0
+	if vehicle != nil && vehicle.VehicleType == VehicleTypeMonthly {
+		if vehicle.MonthlyValidUntil != nil && vehicle.MonthlyValidUntil.After(time.Now()) {
+			finalAmount = 0
+			uc.log.WithContext(ctx).Infof("[EXIT] Monthly vehicle with valid card - PlateNumber: %s, ValidUntil: %s",
+				record.PlateNumber, vehicle.MonthlyValidUntil.Format(time.RFC3339))
+		} else {
+			if record.Metadata == nil {
+				record.Metadata = make(map[string]interface{})
+			}
+			record.Metadata["chargeAs"] = VehicleTypeTemporary
+			record.Metadata["monthlyExpired"] = true
+			if vehicle.MonthlyValidUntil != nil {
+				record.Metadata["expiredAt"] = vehicle.MonthlyValidUntil.Format(time.RFC3339)
+			}
+			uc.log.WithContext(ctx).Warnf("[EXIT] Monthly card expired, charging as temporary - PlateNumber: %s", record.PlateNumber)
+		}
 	}
 
 	return feeResult.BaseAmount, feeResult.DiscountAmount, finalAmount

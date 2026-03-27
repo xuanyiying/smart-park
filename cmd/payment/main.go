@@ -11,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
+	vehiclev1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
 	"github.com/xuanyiying/smart-park/internal/payment/alipay"
 	"github.com/xuanyiying/smart-park/internal/payment/biz"
 	"github.com/xuanyiying/smart-park/internal/payment/data"
@@ -123,8 +124,22 @@ func main() {
 		AlipayPublicKey: cfg.Alipay.PublicKey,
 	}
 
+	// Initialize vehicle service client for gate control
+	vehicleConn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint("vehicle-svc:9001"))
+	if err != nil {
+		logHelper.Warnf("failed to connect vehicle service: %v, gate control disabled", err)
+	}
+	
+	var recordRepo biz.RecordRepo
+	var gateClient biz.GateControlService
+	if vehicleConn != nil {
+		vehicleClient := vehiclev1.NewVehicleServiceClient(vehicleConn)
+		recordRepo = biz.NewVehicleRecordRepoAdapter(vehicleClient)
+		gateClient = biz.NewGateControlAdapter(vehicleClient)
+	}
+
 	// Initialize business logic
-	paymentUseCase := biz.NewPaymentUseCase(orderRepo, paymentConfig, wechatClient, alipayClient, logger)
+	paymentUseCase := biz.NewPaymentUseCase(orderRepo, recordRepo, gateClient, paymentConfig, wechatClient, alipayClient, logger)
 
 	// Initialize gRPC service
 	paymentSvc := service.NewPaymentService(paymentUseCase, logger)

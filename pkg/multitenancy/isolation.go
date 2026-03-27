@@ -84,7 +84,7 @@ func (db *TenantAwareDB) WithTenantScope(ctx context.Context, tenantID uuid.UUID
 	})
 }
 
-// IsolationLevel returns the current isolation level
-func (db *TenantAwareDB) IsolationLevel() IsolationLevel {
+// GetIsolationLevel returns the current isolation level
+func (db *TenantAwareDB) GetIsolationLevel() IsolationLevel {
 	return db.isolation.level
 }

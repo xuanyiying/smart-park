@@ -19,6 +19,16 @@ mq:
     db: 0
     stream: "parking"
 
+mqtt:
+  broker: "${MQTT_BROKER:tcp://localhost:1883}"
+  client_id: "vehicle-service"
+  username: "${MQTT_USERNAME:}"
+  password: "${MQTT_PASSWORD:}"
+  topics:
+    command: "parking/device/{device_id}/command"
+    status: "parking/device/{device_id}/status"
+    heartbeat: "parking/device/{device_id}/heartbeat"
+
 log:
   level: info
   format: json

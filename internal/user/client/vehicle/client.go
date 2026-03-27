@@ -11,6 +11,7 @@ import (
 type Client interface {
 	ListParkingRecords(ctx context.Context, plateNumbers []string, page, pageSize int32) (*vehiclev1.ListParkingRecordsData, error)
 	GetParkingRecord(ctx context.Context, recordID string) (*vehiclev1.ParkingRecordInfo, error)
+	GetVehicleInfo(ctx context.Context, plateNumber string) (*vehiclev1.VehicleInfo, error)
 }
 
 // client implements Client interface.
@@ -54,6 +55,22 @@ func (c *client) GetParkingRecord(ctx context.Context, recordID string) (*vehicl
 
 	if resp.Code != 0 && resp.Code != 200 {
 		return nil, fmt.Errorf("get parking record failed: %s", resp.Message)
+	}
+
+	return resp.Data, nil
+}
+
+// GetVehicleInfo retrieves vehicle information by plate number.
+func (c *client) GetVehicleInfo(ctx context.Context, plateNumber string) (*vehiclev1.VehicleInfo, error) {
+	resp, err := c.vehicleClient.GetVehicleInfo(ctx, &vehiclev1.GetVehicleInfoRequest{
+		PlateNumber: plateNumber,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get vehicle info: %w", err)
+	}
+
+	if resp.Code != 0 && resp.Code != 200 {
+		return nil, fmt.Errorf("get vehicle info failed: %s", resp.Message)
 	}
 
 	return resp.Data, nil
