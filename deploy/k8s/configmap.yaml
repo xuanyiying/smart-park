@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smart-park-config
+  namespace: smart-park
+data:
+  gateway.yaml: |
+    server:
+      http:
+        addr: 0.0.0.0:8000
+        timeout: 1s
+      grpc:
+        addr: 0.0.0.0:9000
+        timeout: 1s
+    data:
+      database:
+        driver: postgres
+        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      redis:
+        addr: redis:6379
+        password: ""
+        db: 0
+        read_timeout: 0.2s
+        write_timeout: 0.2s
+    trace:
+      endpoint: http://jaeger:14268/api/traces
+
+  vehicle.yaml: |
+    server:
+      http:
+        addr: 0.0.0.0:8001
+      grpc:
+        addr: 0.0.0.0:9001
+    data:
+      database:
+        driver: postgres
+        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      redis:
+        addr: redis:6379
+    lock:
+      ttl: 30s
+
+  billing.yaml: |
+    server:
+      http:
+        addr: 0.0.0.0:8002
+      grpc:
+        addr: 0.0.0.0:9002
+    data:
+      database:
+        driver: postgres
+        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      redis:
+        addr: redis:6379
+
+  payment.yaml: |
+    server:
+      http:
+        addr: 0.0.0.0:8003
+      grpc:
+        addr: 0.0.0.0:9003
+    data:
+      database:
+        driver: postgres
+        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      redis:
+        addr: redis:6379
+    payment:
+      orderExpiration: 30m
+      refundWindow: 30m
+
+  admin.yaml: |
+    server:
+      http:
+        addr: 0.0.0.0:8004
+      grpc:
+        addr: 0.0.0.0:9004
+    data:
+      database:
+        driver: postgres
+        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      redis:
+        addr: redis:6379
+    admin:
+      defaultPageSize: 20
+      maxPageSize: 100
+      reportCacheTTL: 5m

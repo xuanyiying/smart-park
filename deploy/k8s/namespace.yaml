@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smart-park
+  labels:
+    name: smart-park
+    app.kubernetes.io/name: smart-park
+    app.kubernetes.io/version: "1.0.0"
