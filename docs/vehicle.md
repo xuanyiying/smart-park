@@ -213,9 +213,169 @@ type Lane struct {
 ### 挑战一：高并发入场/出场
 
 **问题描述**：
-早晚高峰时段，单车道可能达到 300-500 车次/小时，系统需要处理高并发请求。
+早晚高峰时段，单车道可能达到 300-500 车次/小时，系统需要处理高并发请求，同时保证同一车辆不会重复入场或重复计费。
 
-**解决方案**：
+**解决方案对比**：
+
+| 方案 | 并发能力 | 复杂度 | 一致性 | 适用场景 |
+|------|---------|--------|--------|----------|
+| 分布式锁 | 高 | 中 | 强 | 通用场景 |
+| 乐观锁 | 中 | 低 | 强 | 读多写少 |
+| 唯一约束+幂等 | 高 | 低 | 强 | 简单场景 |
+| 消息队列 | 很高 | 高 | 最终一致 | 超高并发 |
+| 令牌桶+本地锁 | 很高 | 高 | 强 | 极端并发 |
+
+#### 方案一：分布式锁（当前采用）
+
+基于 Redis 的分布式锁，确保并发场景下数据一致性：
+
+```go
+// 锁 Key 设计
+lockKey := fmt.Sprintf("parking:v1:lock:%s:%s", lockType, identifier)
+
+// 获取锁
+acquired, err := uc.lockRepo.AcquireLock(ctx, lockKey, owner, ttl)
+if !acquired {
+    return fmt.Errorf("operation in progress")
+}
+defer uc.lockRepo.ReleaseLock(ctx, lockKey, owner)
+```
+
+**优点**：实现简单，强一致性，支持分布式部署
+**缺点**：依赖 Redis，存在网络开销
+
+#### 方案二：数据库乐观锁
+
+使用版本号控制并发，无需额外依赖：
+
+```go
+type ParkingRecord struct {
+    ID          uuid.UUID
+    PlateNumber string
+    RecordStatus string
+    Version     int  // 版本号
+}
+
+// 出场时更新（乐观锁）
+result := db.Model(&ParkingRecord{}).
+    Where("id = ? AND record_status = ? AND version = ?", 
+        recordID, "entry", currentVersion).
+    Updates(map[string]interface{}{
+        "record_status": "exited",
+        "version":       currentVersion + 1,
+    })
+
+if result.RowsAffected == 0 {
+    return fmt.Errorf("record updated by another transaction")
+}
+```
+
+**优点**：无需 Redis，不会产生死锁，适合读多写少
+**缺点**：并发冲突时需要重试
+
+#### 方案三：数据库唯一约束 + 应用层幂等
+
+利用数据库唯一索引防止重复入场：
+
+```sql
+-- 数据库层面防止重复入场
+CREATE UNIQUE INDEX idx_unique_active_plate 
+ON parking_records(plate_number) 
+WHERE record_status IN ('entry', 'exiting');
+```
+
+```go
+func (uc *UseCase) ProcessEntry(ctx context.Context, req *EntryRequest) (*EntryResponse, error) {
+    // 生成幂等性键
+    idempotencyKey := generateIdempotencyKey(req.DeviceID, req.PlateNumber, time.Now())
+    
+    // 先检查是否已处理过
+    if cached := uc.cache.Get(ctx, idempotencyKey); cached != nil {
+        return cached.(*EntryResponse), nil
+    }
+    
+    // 尝试插入记录（依赖数据库唯一约束）
+    record, err := uc.repo.CreateEntry(ctx, req)
+    if err != nil {
+        // 唯一约束冲突，说明已入场
+        if isUniqueViolation(err) {
+            existing, _ := uc.repo.GetActiveRecordByPlate(ctx, req.PlateNumber)
+            return &EntryResponse{IsDuplicate: true, RecordID: existing.ID}, nil
+        }
+        return nil, err
+    }
+    
+    // 缓存结果
+    uc.cache.Set(ctx, idempotencyKey, record, 5*time.Minute)
+    return &EntryResponse{RecordID: record.ID}, nil
+}
+```
+
+**优点**：实现简单，数据库保证最终一致性
+**缺点**：唯一约束冲突异常处理成本较高
+
+#### 方案四：消息队列异步处理
+
+入场请求先入队列，异步顺序处理：
+
+```go
+func (uc *UseCase) AsyncProcessEntry(ctx context.Context, req *EntryRequest) (string, error) {
+    requestID := uuid.New().String()
+    
+    msg := &EntryMessage{
+        RequestID:   requestID,
+        PlateNumber: req.PlateNumber,
+        DeviceID:    req.DeviceID,
+    }
+    
+    // 按车牌号分区，保证同一车牌顺序处理
+    partitionKey := hash(req.PlateNumber) % numPartitions
+    err := uc.kafkaProducer.Send(ctx, "entry-topic", partitionKey, msg)
+    
+    return requestID, err
+}
+```
+
+**优点**：削峰填谷，吞吐量高，天然保证顺序性
+**缺点**：延迟相对较高，系统复杂度增加
+
+#### 方案五：组合方案（推荐）
+
+对于 Smart Park 场景，推荐采用多层防护的组合方案：
+
+```go
+func (uc *UseCase) ProcessEntry(ctx context.Context, req *EntryRequest) (*EntryResponse, error) {
+    // 第一层：限流保护
+    if !uc.rateLimiter.Allow() {
+        return nil, fmt.Errorf("system busy")
+    }
+    
+    // 第二层：布隆过滤器快速判断
+    if uc.bloomFilter.MayContain(req.PlateNumber) {
+        // 可能已存在，查询数据库确认
+        existing, _ := uc.repo.GetActiveRecordByPlate(ctx, req.PlateNumber)
+        if existing != nil {
+            return &EntryResponse{IsDuplicate: true, RecordID: existing.ID}, nil
+        }
+    }
+    
+    // 第三层：数据库唯一约束（最终防线）
+    record, err := uc.repo.CreateEntry(ctx, req)
+    if err != nil {
+        if isUniqueViolation(err) {
+            return &EntryResponse{IsDuplicate: true}, nil
+        }
+        return nil, err
+    }
+    
+    // 添加到布隆过滤器
+    uc.bloomFilter.Add(req.PlateNumber)
+    
+    return &EntryResponse{RecordID: record.ID}, nil
+}
+```
+
+**优化措施**：
 
 1. **数据库优化**
    ```sql

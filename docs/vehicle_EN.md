@@ -214,9 +214,169 @@ type Lane struct {
 ### Challenge 1: High Concurrency Entry/Exit Processing
 
 **Problem Description**:
-During morning and evening rush hours, a single lane may reach 300-500 vehicles/hour, requiring the system to handle high concurrency requests.
+During morning and evening rush hours, a single lane may reach 300-500 vehicles/hour, requiring the system to handle high concurrency requests while ensuring the same vehicle does not enter or get billed multiple times.
 
-**Solution**:
+**Solution Comparison**:
+
+| Solution | Concurrency | Complexity | Consistency | Applicable Scenario |
+|----------|-------------|------------|-------------|---------------------|
+| Distributed Lock | High | Medium | Strong | General scenarios |
+| Optimistic Lock | Medium | Low | Strong | Read-heavy scenarios |
+| Unique Constraint + Idempotency | High | Low | Strong | Simple scenarios |
+| Message Queue | Very High | High | Eventual | Ultra-high concurrency |
+| Token Bucket + Local Lock | Very High | High | Strong | Extreme concurrency |
+
+#### Solution 1: Distributed Lock (Currently Used)
+
+Redis-based distributed lock to ensure data consistency in concurrent scenarios:
+
+```go
+// Lock key design
+lockKey := fmt.Sprintf("parking:v1:lock:%s:%s", lockType, identifier)
+
+// Acquire lock
+acquired, err := uc.lockRepo.AcquireLock(ctx, lockKey, owner, ttl)
+if !acquired {
+    return fmt.Errorf("operation in progress")
+}
+defer uc.lockRepo.ReleaseLock(ctx, lockKey, owner)
+```
+
+**Pros**: Simple implementation, strong consistency, supports distributed deployment
+**Cons**: Depends on Redis, has network overhead
+
+#### Solution 2: Database Optimistic Lock
+
+Use version number to control concurrency without additional dependencies:
+
+```go
+type ParkingRecord struct {
+    ID          uuid.UUID
+    PlateNumber string
+    RecordStatus string
+    Version     int  // Version number
+}
+
+// Update on exit (optimistic lock)
+result := db.Model(&ParkingRecord{}).
+    Where("id = ? AND record_status = ? AND version = ?", 
+        recordID, "entry", currentVersion).
+    Updates(map[string]interface{}{
+        "record_status": "exited",
+        "version":       currentVersion + 1,
+    })
+
+if result.RowsAffected == 0 {
+    return fmt.Errorf("record updated by another transaction")
+}
+```
+
+**Pros**: No Redis needed, no deadlocks, suitable for read-heavy scenarios
+**Cons**: Requires retry on concurrent conflicts
+
+#### Solution 3: Database Unique Constraint + Application Idempotency
+
+Use database unique index to prevent duplicate entry:
+
+```sql
+-- Database-level duplicate entry prevention
+CREATE UNIQUE INDEX idx_unique_active_plate 
+ON parking_records(plate_number) 
+WHERE record_status IN ('entry', 'exiting');
+```
+
+```go
+func (uc *UseCase) ProcessEntry(ctx context.Context, req *EntryRequest) (*EntryResponse, error) {
+    // Generate idempotency key
+    idempotencyKey := generateIdempotencyKey(req.DeviceID, req.PlateNumber, time.Now())
+    
+    // Check if already processed
+    if cached := uc.cache.Get(ctx, idempotencyKey); cached != nil {
+        return cached.(*EntryResponse), nil
+    }
+    
+    // Try to insert record (rely on database unique constraint)
+    record, err := uc.repo.CreateEntry(ctx, req)
+    if err != nil {
+        // Unique constraint conflict means already entered
+        if isUniqueViolation(err) {
+            existing, _ := uc.repo.GetActiveRecordByPlate(ctx, req.PlateNumber)
+            return &EntryResponse{IsDuplicate: true, RecordID: existing.ID}, nil
+        }
+        return nil, err
+    }
+    
+    // Cache result
+    uc.cache.Set(ctx, idempotencyKey, record, 5*time.Minute)
+    return &EntryResponse{RecordID: record.ID}, nil
+}
+```
+
+**Pros**: Simple implementation, database guarantees eventual consistency
+**Cons**: Unique constraint conflict exception handling cost is higher
+
+#### Solution 4: Message Queue Async Processing
+
+Entry requests first go into queue, processed asynchronously in sequence:
+
+```go
+func (uc *UseCase) AsyncProcessEntry(ctx context.Context, req *EntryRequest) (string, error) {
+    requestID := uuid.New().String()
+    
+    msg := &EntryMessage{
+        RequestID:   requestID,
+        PlateNumber: req.PlateNumber,
+        DeviceID:    req.DeviceID,
+    }
+    
+    // Partition by plate number to ensure sequential processing for same plate
+    partitionKey := hash(req.PlateNumber) % numPartitions
+    err := uc.kafkaProducer.Send(ctx, "entry-topic", partitionKey, msg)
+    
+    return requestID, err
+}
+```
+
+**Pros**: Peak shaving, high throughput, naturally guarantees ordering
+**Cons**: Higher latency, increased system complexity
+
+#### Solution 5: Combined Solution (Recommended)
+
+For Smart Park scenarios, a multi-layer defense combined solution is recommended:
+
+```go
+func (uc *UseCase) ProcessEntry(ctx context.Context, req *EntryRequest) (*EntryResponse, error) {
+    // Layer 1: Rate limiting protection
+    if !uc.rateLimiter.Allow() {
+        return nil, fmt.Errorf("system busy")
+    }
+    
+    // Layer 2: Bloom filter quick check
+    if uc.bloomFilter.MayContain(req.PlateNumber) {
+        // May already exist, query database to confirm
+        existing, _ := uc.repo.GetActiveRecordByPlate(ctx, req.PlateNumber)
+        if existing != nil {
+            return &EntryResponse{IsDuplicate: true, RecordID: existing.ID}, nil
+        }
+    }
+    
+    // Layer 3: Database unique constraint (final defense)
+    record, err := uc.repo.CreateEntry(ctx, req)
+    if err != nil {
+        if isUniqueViolation(err) {
+            return &EntryResponse{IsDuplicate: true}, nil
+        }
+        return nil, err
+    }
+    
+    // Add to bloom filter
+    uc.bloomFilter.Add(req.PlateNumber)
+    
+    return &EntryResponse{RecordID: record.ID}, nil
+}
+```
+
+**Optimization Measures**:
 
 1. **Database Optimization**
    ```sql
