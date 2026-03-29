@@ -4,37 +4,37 @@ server:
 
 database:
   driver: postgres
-  source: "host=${DB_HOST:localhost} user=${DB_USER:postgres} password=${DB_PASSWORD:} dbname=${DB_NAME:parking} port=${DB_PORT:5432} sslmode=${DB_SSL_MODE:disable}"
+  source: "host=localhost user=postgres password=secure_postgres_2025 dbname=parking port=5432 sslmode=disable"
 
 redis:
-  addr: "${REDIS_ADDR:localhost:6379}"
-  password: "${REDIS_PASSWORD:}"
-  db: ${REDIS_DB:0}
+  addr: "localhost:6379"
+  password: ""
+  db: 0
 
 mq:
   type: "redis"
   redis:
-    addr: "${REDIS_ADDR:localhost:6379}"
-    password: "${REDIS_PASSWORD:}"
-    db: ${REDIS_DB:0}
+    addr: "localhost:6379"
+    password: ""
+    db: 0
     stream: "parking"
 
 mqtt:
-  broker: "${MQTT_BROKER:tcp://localhost:1883}"
+  broker: ""
   client_id: "vehicle-service"
-  username: "${MQTT_USERNAME:}"
-  password: "${MQTT_PASSWORD:}"
+  username: ""
+  password: ""
   topics:
     command: "parking/device/{device_id}/command"
     status: "parking/device/{device_id}/status"
     heartbeat: "parking/device/{device_id}/heartbeat"
 
 log:
-  level: ${LOG_LEVEL:info}
-  format: ${LOG_FORMAT:json}
+  level: info
+  format: json
 
 telemetry:
-  enabled: ${TELEMETRY_ENABLED:true}
-  endpoint: "${OTEL_ENDPOINT:localhost:4317}"
+  enabled: true
+  endpoint: "localhost:4317"
   serviceName: "vehicle-svc"
-  sampleRate: ${TRACE_SAMPLE_RATE:1.0}
+  sampleRate: 1.0

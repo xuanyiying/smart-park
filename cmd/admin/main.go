@@ -9,6 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	_ "github.com/lib/pq"
 
 	v1 "github.com/xuanyiying/smart-park/api/admin/v1"
 	"github.com/xuanyiying/smart-park/internal/admin/biz"
@@ -90,6 +91,7 @@ func main() {
 
 	// Register services
 	v1.RegisterAdminServiceServer(gs, adminSvc)
+	v1.RegisterAdminServiceHTTPServer(hs, adminSvc)
 
 	// Start application
 	app := newApp(logger, gs, hs)

@@ -25,6 +25,9 @@ type Config struct {
 	Vehicle   *VehicleConfig  `mapstructure:"vehicle"`
 	Payment   *PaymentConfig  `mapstructure:"payment"`
 	JWT       JWTConfig       `mapstructure:"jwt"`
+	Routes    []RouteConfig   `mapstructure:"routes"`
+	Etcd      EtcdConfig      `mapstructure:"etcd"`
+	Otel      OtelConfig      `mapstructure:"otel"`
 }
 
 type ServerConfig struct {
@@ -141,6 +144,21 @@ type JWTConfig struct {
 	PrivateKeyPath string        `mapstructure:"private_key_path"`
 	Expiry         int           `mapstructure:"expiry"`
 	TokenDuration  time.Duration `mapstructure:"token_duration"`
+}
+
+type RouteConfig struct {
+	Path   string `mapstructure:"path"`
+	Target string `mapstructure:"target"`
+}
+
+type EtcdConfig struct {
+	Endpoints []string `mapstructure:"endpoints"`
+	Timeout   string   `mapstructure:"timeout"`
+}
+
+type OtelConfig struct {
+	Endpoint    string `mapstructure:"endpoint"`
+	ServiceName string `mapstructure:"serviceName"`
 }
 
 type ConfigLoader struct {

@@ -74,11 +74,12 @@ func main() {
 }
 
 func parseRoutes(cfg *conf.Config) []*biz.RouteConfig {
-	routes := []*biz.RouteConfig{
-		{Path: "/api/v1/device", Target: "vehicle-svc:8001"},
-		{Path: "/api/v1/billing", Target: "billing-svc:8002"},
-		{Path: "/api/v1/pay", Target: "payment-svc:8003"},
-		{Path: "/api/v1/admin", Target: "admin-svc:8004"},
+	routes := make([]*biz.RouteConfig, 0, len(cfg.Routes))
+	for _, r := range cfg.Routes {
+		routes = append(routes, &biz.RouteConfig{
+			Path:   r.Path,
+			Target: r.Target,
+		})
 	}
 	return routes
 }

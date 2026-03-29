@@ -10,6 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/go-redis/redis/v8"
+	_ "github.com/lib/pq"
 
 	billingv1 "github.com/xuanyiying/smart-park/api/billing/v1"
 	v1 "github.com/xuanyiying/smart-park/api/vehicle/v1"

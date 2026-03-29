@@ -9,6 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	_ "github.com/lib/pq"
 
 	v1 "github.com/xuanyiying/smart-park/api/billing/v1"
 	"github.com/xuanyiying/smart-park/internal/billing/biz"
@@ -90,6 +91,7 @@ func main() {
 
 	// Register services
 	v1.RegisterBillingServiceServer(gs, billingSvc)
+	v1.RegisterBillingServiceHTTPServer(hs, billingSvc)
 
 	// Start application
 	app := newApp(logger, gs, hs)
