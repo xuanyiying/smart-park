@@ -7,6 +7,46 @@ option go_package = "github.com/xuanyiying/smart-park/api/admin/v1;v1";
 import "google/api/annotations.proto";
 
 service AdminService {
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/login"
+      body: "*"
+    };
+  }
+
+  rpc GetCurrentUser (GetCurrentUserRequest) returns (GetCurrentUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/user"
+    };
+  }
+
+  // User Management
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/users"
+    };
+  }
+
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/users"
+      body: "*"
+    };
+  }
+
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/users/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/admin/users/{id}"
+    };
+  }
+
   rpc CreateParkingLot (CreateParkingLotRequest) returns (CreateParkingLotResponse) {
     option (google.api.http) = {
       post: "/api/v1/admin/lots"
@@ -303,4 +343,96 @@ message MonthlyReport {
   double total_discount = 8;
   double net_amount = 9;
   repeated DailyReport daily_reports = 10;
+}
+
+// Login messages
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  int32 code = 1;
+  string message = 2;
+  LoginData data = 3;
+}
+
+message LoginData {
+  string token = 1;
+  User user = 2;
+  int64 expires_at = 3;
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string name = 3;
+  string role = 4;
+  string avatar = 5;
+}
+
+message GetCurrentUserRequest {}
+
+message GetCurrentUserResponse {
+  int32 code = 1;
+  string message = 2;
+  User data = 3;
+}
+
+// User Management
+message ListUsersRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListUsersResponse {
+  int32 code = 1;
+  string message = 2;
+  UserListData data = 3;
+}
+
+message UserListData {
+  repeated User list = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string name = 3;
+  string role = 4;
+  string email = 5;
+  string status = 6;
+}
+
+message CreateUserResponse {
+  int32 code = 1;
+  string message = 2;
+  User data = 3;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string username = 2;
+  string name = 3;
+  string role = 4;
+  string email = 5;
+  string status = 6;
+}
+
+message UpdateUserResponse {
+  int32 code = 1;
+  string message = 2;
+  User data = 3;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {
+  int32 code = 1;
+  string message = 2;
 }

@@ -27,29 +27,45 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-stop_all_in_one() {
-    log_info "Stopping all-in-one service..."
+stop_service() {
+    local service=$1
+    local port=$2
     
-    pid_file="/tmp/smart-park-all-in-one.pid"
+    log_info "Stopping $service service..."
+    
+    pid_file="/tmp/smart-park-$service.pid"
     if [ -f "$pid_file" ]; then
         pid=$(cat "$pid_file")
         if kill -0 "$pid" 2>/dev/null; then
-            log_info "Stopping all-in-one service (PID: $pid)..."
-            kill "$pid" 2>/dev/null || log_warning "Failed to stop all-in-one service"
+            log_info "Stopping $service service (PID: $pid)..."
+            kill "$pid" 2>/dev/null || log_warning "Failed to stop $service service"
         else
-            log_warning "All-in-one service is not running"
+            log_warning "$service service is not running"
         fi
         rm -f "$pid_file"
     else
-        log_warning "No PID file found for all-in-one service"
+        log_warning "No PID file found for $service service"
     fi
     
-    if lsof -ti:8000 >/dev/null 2>&1; then
-        log_info "Killing process on port 8000..."
-        lsof -ti:8000 | xargs kill -9 2>/dev/null || log_warning "Failed to kill process on port 8000"
+    if lsof -ti:$port >/dev/null 2>&1; then
+        log_info "Killing process on port $port..."
+        lsof -ti:$port | xargs kill -9 2>/dev/null || log_warning "Failed to kill process on port $port"
     fi
     
-    log_success "All-in-one service stopped"
+    log_success "$service service stopped"
+}
+
+stop_microservices() {
+    log_info "Stopping microservices..."
+    
+    local services=("gateway:8000" "vehicle:8001" "billing:8002" "payment:8003" "admin:8004")
+    
+    for svc in "${services[@]}"; do
+        IFS=':' read -r name port <<< "$svc"
+        stop_service "$name" "$port"
+    done
+    
+    log_success "All microservices stopped"
 }
 
 stop_frontend() {
@@ -100,43 +116,35 @@ show_status() {
     log_info "Checking services status..."
     echo ""
     
-    log_info "All-in-One Service:"
-    if lsof -ti:8000 >/dev/null 2>&1; then
-        log_error "Port 8000 is still active"
-    else
-        log_success "Port 8000 is stopped"
-    fi
+    log_info "Microservices:"
+    local services=("gateway:8000" "vehicle:8001" "billing:8002" "payment:8003" "admin:8004")
+    for svc in "${services[@]}"; do
+        IFS=':' read -r name port <<< "$svc"
+        if lsof -ti:$port >/dev/null 2>&1; then
+            log_warning "$name service still running on port $port"
+        else
+            log_success "$name service stopped"
+        fi
+    done
     
     echo ""
     log_info "Frontend:"
     if lsof -ti:3000 >/dev/null 2>&1; then
-        log_error "Port 3000 is still active"
+        log_warning "Frontend still running on port 3000"
     else
-        log_success "Port 3000 is stopped"
+        log_success "Frontend stopped"
     fi
     
     echo ""
-    log_info "Infrastructure:"
-    docker ps | grep -E "postgres|redis|etcd|jaeger" | awk '{print "  - " $1 ": " $NF}' || log_success "No infrastructure services running"
-    
-    echo ""
-    log_success "========================================="
-    log_success "  Development Environment Stopped!"
-    log_success "========================================="
-    echo ""
+    log_success "All services stopped"
 }
 
 main() {
     log_info "Stopping development environment..."
     
-    stop_all_in_one
+    stop_microservices
     stop_frontend
-    
-    if [ "$1" = "--all" ]; then
-        stop_infrastructure
-    else
-        log_info "Infrastructure services are still running (use --all to stop them)"
-    fi
+    stop_infrastructure
     
     show_status
 }

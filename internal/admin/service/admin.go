@@ -221,3 +221,153 @@ func (s *AdminService) GetMonthlyReport(ctx context.Context, req *v1.GetMonthlyR
 		Data:    report,
 	}, nil
 }
+
+// Login handles admin login request.
+func (s *AdminService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.LoginResponse, error) {
+	user, token, expiresAt, err := s.uc.Login(ctx, req.Username, req.Password)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("Login failed: %v", err)
+		return &v1.LoginResponse{
+			Code:    401,
+			Message: "用户名或密码错误",
+		}, nil
+	}
+
+	return &v1.LoginResponse{
+		Code:    0,
+		Message: "success",
+		Data: &v1.LoginData{
+			Token:     token,
+			ExpiresAt: expiresAt,
+			User: &v1.User{
+				Id:       user.ID.String(),
+				Username: user.Username,
+				Name:     user.Name,
+				Role:     user.Role,
+				Avatar:   user.Avatar,
+			},
+		},
+	}, nil
+}
+
+// GetCurrentUser handles get current user request.
+func (s *AdminService) GetCurrentUser(ctx context.Context, req *v1.GetCurrentUserRequest) (*v1.GetCurrentUserResponse, error) {
+	user, err := s.uc.GetCurrentUser(ctx)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetCurrentUser failed: %v", err)
+		return &v1.GetCurrentUserResponse{
+			Code:    401,
+			Message: "未登录或登录已过期",
+		}, nil
+	}
+
+	return &v1.GetCurrentUserResponse{
+		Code:    0,
+		Message: "success",
+		Data: &v1.User{
+			Id:       user.ID.String(),
+			Username: user.Username,
+			Name:     user.Name,
+			Role:     user.Role,
+			Avatar:   user.Avatar,
+		},
+	}, nil
+}
+
+// ListUsers handles list users request.
+func (s *AdminService) ListUsers(ctx context.Context, req *v1.ListUsersRequest) (*v1.ListUsersResponse, error) {
+	users, total, err := s.uc.ListUsers(ctx, int(req.Page), int(req.PageSize))
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListUsers failed: %v", err)
+		return &v1.ListUsersResponse{
+			Code:    500,
+			Message: "获取用户列表失败",
+		}, nil
+	}
+
+	var list []*v1.User
+	for _, u := range users {
+		list = append(list, &v1.User{
+			Id:       u.ID.String(),
+			Username: u.Username,
+			Name:     u.Name,
+			Role:     u.Role,
+			Avatar:   u.Avatar,
+		})
+	}
+
+	return &v1.ListUsersResponse{
+		Code:    0,
+		Message: "success",
+		Data: &v1.UserListData{
+			List:     list,
+			Total:    int32(total),
+			Page:     req.Page,
+			PageSize: req.PageSize,
+		},
+	}, nil
+}
+
+// CreateUser handles create user request.
+func (s *AdminService) CreateUser(ctx context.Context, req *v1.CreateUserRequest) (*v1.CreateUserResponse, error) {
+	user, err := s.uc.CreateUser(ctx, req.Username, req.Password, req.Name, req.Role, req.Email, req.Status)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CreateUser failed: %v", err)
+		return &v1.CreateUserResponse{
+			Code:    500,
+			Message: "创建用户失败",
+		}, nil
+	}
+
+	return &v1.CreateUserResponse{
+		Code:    0,
+		Message: "创建成功",
+		Data: &v1.User{
+			Id:       user.ID.String(),
+			Username: user.Username,
+			Name:     user.Name,
+			Role:     user.Role,
+			Avatar:   user.Avatar,
+		},
+	}, nil
+}
+
+// UpdateUser handles update user request.
+func (s *AdminService) UpdateUser(ctx context.Context, req *v1.UpdateUserRequest) (*v1.UpdateUserResponse, error) {
+	user, err := s.uc.UpdateUser(ctx, req.Id, req.Username, req.Name, req.Role, req.Email, req.Status)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateUser failed: %v", err)
+		return &v1.UpdateUserResponse{
+			Code:    500,
+			Message: "更新用户失败",
+		}, nil
+	}
+
+	return &v1.UpdateUserResponse{
+		Code:    0,
+		Message: "更新成功",
+		Data: &v1.User{
+			Id:       user.ID.String(),
+			Username: user.Username,
+			Name:     user.Name,
+			Role:     user.Role,
+			Avatar:   user.Avatar,
+		},
+	}, nil
+}
+
+// DeleteUser handles delete user request.
+func (s *AdminService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*v1.DeleteUserResponse, error) {
+	if err := s.uc.DeleteUser(ctx, req.Id); err != nil {
+		s.log.WithContext(ctx).Errorf("DeleteUser failed: %v", err)
+		return &v1.DeleteUserResponse{
+			Code:    500,
+			Message: "删除用户失败",
+		}, nil
+	}
+
+	return &v1.DeleteUserResponse{
+		Code:    0,
+		Message: "删除成功",
+	}, nil
+}

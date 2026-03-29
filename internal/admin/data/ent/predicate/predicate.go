@@ -15,5 +15,8 @@ type ParkingLot func(*sql.Selector)
 // ParkingRecord is the predicate function for parkingrecord builders.
 type ParkingRecord func(*sql.Selector)
 
+// User is the predicate function for user builders.
+type User func(*sql.Selector)
+
 // Vehicle is the predicate function for vehicle builders.
 type Vehicle func(*sql.Selector)

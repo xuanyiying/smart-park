@@ -61,6 +61,7 @@ func main() {
 		logHelper.Errorf("failed to migrate database: %v", err)
 		os.Exit(1)
 	}
+	logHelper.Info("database migrated successfully")
 
 	// Initialize data layer
 	dataLayer, cleanup, err := data.NewData(dbClient, logger)
@@ -72,6 +73,14 @@ func main() {
 
 	// Initialize repositories
 	adminRepo := data.NewAdminRepo(dataLayer)
+
+	// Seed initial data
+	if err := adminRepo.SeedData(context.Background()); err != nil {
+		logHelper.Errorf("failed to seed data: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("seed data created successfully")
+	}
 
 	// Initialize business logic
 	adminUseCase := biz.NewAdminUseCase(adminRepo, logger)

@@ -17,6 +17,7 @@ type MockAdminRepo struct {
 	Vehicles     map[uuid.UUID]*Vehicle
 	Orders       map[uuid.UUID]*Order
 	DailyReports map[string]*DailyReport
+	Users        map[uuid.UUID]*User
 }
 
 func NewMockAdminRepo() *MockAdminRepo {
@@ -25,6 +26,7 @@ func NewMockAdminRepo() *MockAdminRepo {
 		Vehicles:     make(map[uuid.UUID]*Vehicle),
 		Orders:       make(map[uuid.UUID]*Order),
 		DailyReports: make(map[string]*DailyReport),
+		Users:        make(map[uuid.UUID]*User),
 	}
 }
 
@@ -94,6 +96,46 @@ func (m *MockAdminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, y
 		TotalEntries: 100,
 		TotalExits:   95,
 	}, nil
+}
+
+func (m *MockAdminRepo) GetUserByUsername(ctx context.Context, username string) (*User, error) {
+	for _, u := range m.Users {
+		if u.Username == username {
+			return u, nil
+		}
+	}
+	return nil, nil
+}
+
+func (m *MockAdminRepo) GetUserByID(ctx context.Context, userID uuid.UUID) (*User, error) {
+	return m.Users[userID], nil
+}
+
+func (m *MockAdminRepo) ListUsers(ctx context.Context, page, pageSize int) ([]*User, int64, error) {
+	var users []*User
+	for _, u := range m.Users {
+		users = append(users, u)
+	}
+	return users, int64(len(users)), nil
+}
+
+func (m *MockAdminRepo) CreateUser(ctx context.Context, user *User) error {
+	m.Users[user.ID] = user
+	return nil
+}
+
+func (m *MockAdminRepo) UpdateUser(ctx context.Context, user *User) error {
+	m.Users[user.ID] = user
+	return nil
+}
+
+func (m *MockAdminRepo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	delete(m.Users, userID)
+	return nil
+}
+
+func (m *MockAdminRepo) SeedData(ctx context.Context) error {
+	return nil
 }
 
 func TestAdminUseCase_CreateParkingLot(t *testing.T) {

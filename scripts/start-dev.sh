@@ -80,67 +80,91 @@ start_infrastructure() {
     log_success "Infrastructure services started"
 }
 
-build_all_in_one() {
-    log_info "Building all-in-one service..."
+build_services() {
+    log_info "Building microservices..."
     
     cd "$PROJECT_ROOT"
     
     mkdir -p bin
     
-    if [ -f "bin/all-in-one" ]; then
-        log_success "All-in-one binary already exists, skipping build"
-        log_info "Use --rebuild to force rebuild"
+    local services=("gateway" "vehicle" "billing" "payment" "admin")
+    
+    for service in "${services[@]}"; do
+        log_info "Building $service service..."
+        if [ -f "bin/$service-svc" ] && [ "$1" != "--rebuild" ]; then
+            log_success "$service service binary already exists, skipping build"
+            continue
+        fi
+        
+        if go build -o "bin/$service-svc" "./cmd/$service" 2>&1; then
+            log_success "$service service built successfully"
+        else
+            log_error "Failed to build $service service"
+            exit 1
+        fi
+        
+        # Add delay to avoid resource issues
+        sleep 2
+    done
+    
+    log_success "All microservices built successfully"
+}
+
+start_service() {
+    local service=$1
+    local port=$2
+    local grpc_port=$3
+    local config=$4
+    
+    log_info "Starting $service service..."
+    
+    cd "$PROJECT_ROOT"
+    
+    if lsof -ti:$port >/dev/null 2>&1; then
+        log_warning "Port $port is already in use, $service service may already be running"
         return
     fi
     
-    go build -o bin/all-in-one ./cmd/all-in-one
-    
-    log_success "All-in-one service built successfully"
-}
-
-rebuild_all_in_one() {
-    log_info "Rebuilding all-in-one service..."
-    
-    cd "$PROJECT_ROOT"
-    
-    rm -f bin/all-in-one
-    go build -o bin/all-in-one ./cmd/all-in-one
-    
-    log_success "All-in-one service rebuilt successfully"
-}
-
-start_all_in_one() {
-    log_info "Starting all-in-one service..."
-    
-    cd "$PROJECT_ROOT"
-    
     mkdir -p logs
     
-    if lsof -ti:8000 >/dev/null 2>&1; then
-        log_warning "Port 8000 is already in use"
-        read -p "Kill existing process and restart? (y/N): " kill_existing
-        if [[ $kill_existing =~ ^[Yy]$ ]]; then
-            lsof -ti:8000 | xargs kill -9 2>/dev/null
-            sleep 2
-        else
-            log_error "Cannot start all-in-one service, port 8000 is occupied"
-            exit 1
-        fi
-    fi
+    # Set environment variables for service discovery
+    export SERVICE_NAME=$service
+    export SERVICE_PORT=$port
+    export GRPC_PORT=$grpc_port
     
-    ./bin/all-in-one -conf ./configs/dev.yaml > logs/all-in-one.log 2>&1 &
-    echo $! > /tmp/smart-park-all-in-one.pid
+    ./bin/$service-svc -conf "$config" > "logs/$service.log" 2>&1 &
+    echo $! > "/tmp/smart-park-$service.pid"
     
     sleep 3
     
-    if lsof -ti:8000 >/dev/null 2>&1; then
-        log_success "All-in-one service started on port 8000"
+    if lsof -ti:$port >/dev/null 2>&1; then
+        log_success "$service service started on port $port"
     else
-        log_error "Failed to start all-in-one service"
-        log_info "Check logs at: logs/all-in-one.log"
-        tail -20 logs/all-in-one.log
-        exit 1
+        log_error "Failed to start $service service"
+        log_info "Check logs at: logs/$service.log"
+        tail -20 "logs/$service.log"
     fi
+}
+
+start_microservices() {
+    log_info "Starting microservices..."
+    
+    # Start services in order with delays to avoid resource issues
+    start_service "admin" "8004" "9004" "./configs"
+    sleep 2
+    
+    start_service "vehicle" "8001" "9001" "./configs"
+    sleep 2
+    
+    start_service "billing" "8002" "9002" "./configs"
+    sleep 2
+    
+    start_service "payment" "8003" "9003" "./configs"
+    sleep 2
+    
+    start_service "gateway" "8000" "9000" "./configs"
+    
+    log_success "All microservices started"
 }
 
 start_frontend() {
@@ -173,12 +197,16 @@ show_status() {
     docker ps | grep -E "postgres|redis|etcd|jaeger" | awk '{print "  - " $1 ": " $NF}' || log_warning "No infrastructure services found"
     
     echo ""
-    log_info "All-in-One Service:"
-    if lsof -ti:8000 >/dev/null 2>&1; then
-        log_success "Port 8000 is active (All-in-One Service)"
-    else
-        log_error "Port 8000 is not active"
-    fi
+    log_info "Microservices:"
+    local services=("gateway:8000" "vehicle:8001" "billing:8002" "payment:8003" "admin:8004")
+    for svc in "${services[@]}"; do
+        IFS=':' read -r name port <<< "$svc"
+        if lsof -ti:$port >/dev/null 2>&1; then
+            log_success "$name service on port $port"
+        else
+            log_error "$name service on port $port"
+        fi
+    done
     
     echo ""
     log_info "Frontend:"
@@ -195,7 +223,7 @@ show_status() {
     echo ""
     log_info "Service URLs:"
     echo "  - Frontend:    http://localhost:3000"
-    echo "  - API:         http://localhost:8000"
+    echo "  - Gateway:     http://localhost:8000"
     echo "  - Jaeger UI:   http://localhost:16686"
     echo ""
     log_info "API Endpoints:"
@@ -214,15 +242,9 @@ main() {
     log_info "Starting development environment..."
     
     check_dependencies
-    
-    if [ "$1" = "--rebuild" ]; then
-        rebuild_all_in_one
-    else
-        build_all_in_one
-    fi
-    
+    build_services "$@"
     start_infrastructure
-    start_all_in_one
+    start_microservices
     start_frontend
     
     show_status

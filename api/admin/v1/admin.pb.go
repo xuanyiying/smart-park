@@ -2230,6 +2230,916 @@ func (x *MonthlyReport) GetDailyReports() []*DailyReport {
 	return nil
 }
 
+// Login messages
+type LoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginRequest) Reset() {
+	*x = LoginRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginRequest) ProtoMessage() {}
+
+func (x *LoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
+func (*LoginRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *LoginRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *LoginRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *LoginData             `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginResponse) Reset() {
+	*x = LoginResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResponse) ProtoMessage() {}
+
+func (x *LoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
+func (*LoginResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *LoginResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *LoginResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetData() *LoginData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type LoginData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginData) Reset() {
+	*x = LoginData{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginData) ProtoMessage() {}
+
+func (x *LoginData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginData.ProtoReflect.Descriptor instead.
+func (*LoginData) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *LoginData) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *LoginData) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+func (x *LoginData) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+type User struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Role          string                 `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
+	Avatar        string                 `protobuf:"bytes,5,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *User) Reset() {
+	*x = User{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *User) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*User) ProtoMessage() {}
+
+func (x *User) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use User.ProtoReflect.Descriptor instead.
+func (*User) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *User) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *User) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *User) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *User) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *User) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+type GetCurrentUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCurrentUserRequest) Reset() {
+	*x = GetCurrentUserRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCurrentUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCurrentUserRequest) ProtoMessage() {}
+
+func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCurrentUserRequest.ProtoReflect.Descriptor instead.
+func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{36}
+}
+
+type GetCurrentUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *User                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCurrentUserResponse) Reset() {
+	*x = GetCurrentUserResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCurrentUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCurrentUserResponse) ProtoMessage() {}
+
+func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCurrentUserResponse.ProtoReflect.Descriptor instead.
+func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetCurrentUserResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetCurrentUserResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetCurrentUserResponse) GetData() *User {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// User Management
+type ListUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersRequest) Reset() {
+	*x = ListUsersRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersRequest) ProtoMessage() {}
+
+func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListUsersRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *ListUsersRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListUsersRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type ListUsersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *UserListData          `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersResponse) Reset() {
+	*x = ListUsersResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersResponse) ProtoMessage() {}
+
+func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
+func (*ListUsersResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *ListUsersResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListUsersResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListUsersResponse) GetData() *UserListData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type UserListData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*User                `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserListData) Reset() {
+	*x = UserListData{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserListData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserListData) ProtoMessage() {}
+
+func (x *UserListData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserListData.ProtoReflect.Descriptor instead.
+func (*UserListData) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *UserListData) GetList() []*User {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *UserListData) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *UserListData) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *UserListData) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type CreateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Role          string                 `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
+	Email         string                 `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserRequest) Reset() {
+	*x = CreateUserRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserRequest) ProtoMessage() {}
+
+func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
+func (*CreateUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *CreateUserRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type CreateUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *User                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserResponse) Reset() {
+	*x = CreateUserResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserResponse) ProtoMessage() {}
+
+func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
+func (*CreateUserResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *CreateUserResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *CreateUserResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CreateUserResponse) GetData() *User {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type UpdateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Role          string                 `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
+	Email         string                 `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *UpdateUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type UpdateUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *User                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserResponse) Reset() {
+	*x = UpdateUserResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserResponse) ProtoMessage() {}
+
+func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
+func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *UpdateUserResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateUserResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateUserResponse) GetData() *User {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DeleteUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *DeleteUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserResponse) Reset() {
+	*x = DeleteUserResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserResponse) ProtoMessage() {}
+
+func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
+func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *DeleteUserResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeleteUserResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_api_admin_v1_admin_proto protoreflect.FileDescriptor
 
 const file_api_admin_v1_admin_proto_rawDesc = "" +
@@ -2415,9 +3325,79 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\n" +
 	"net_amount\x18\t \x01(\x01R\tnetAmount\x12>\n" +
 	"\rdaily_reports\x18\n" +
-	" \x03(\v2\x19.api.admin.v1.DailyReportR\fdailyReports2\xf8\n" +
+	" \x03(\v2\x19.api.admin.v1.DailyReportR\fdailyReports\"F\n" +
+	"\fLoginRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"j\n" +
+	"\rLoginResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
+	"\x04data\x18\x03 \x01(\v2\x17.api.admin.v1.LoginDataR\x04data\"h\n" +
+	"\tLoginData\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12&\n" +
+	"\x04user\x18\x02 \x01(\v2\x12.api.admin.v1.UserR\x04user\x12\x1d\n" +
 	"\n" +
-	"\fAdminService\x12\x80\x01\n" +
+	"expires_at\x18\x03 \x01(\x03R\texpiresAt\"r\n" +
+	"\x04User\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x12\n" +
+	"\x04role\x18\x04 \x01(\tR\x04role\x12\x16\n" +
+	"\x06avatar\x18\x05 \x01(\tR\x06avatar\"\x17\n" +
+	"\x15GetCurrentUserRequest\"n\n" +
+	"\x16GetCurrentUserResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
+	"\x04data\x18\x03 \x01(\v2\x12.api.admin.v1.UserR\x04data\"C\n" +
+	"\x10ListUsersRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"q\n" +
+	"\x11ListUsersResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.admin.v1.UserListDataR\x04data\"}\n" +
+	"\fUserListData\x12&\n" +
+	"\x04list\x18\x01 \x03(\v2\x12.api.admin.v1.UserR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\xa1\x01\n" +
+	"\x11CreateUserRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x12\n" +
+	"\x04role\x18\x04 \x01(\tR\x04role\x12\x14\n" +
+	"\x05email\x18\x05 \x01(\tR\x05email\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"j\n" +
+	"\x12CreateUserResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
+	"\x04data\x18\x03 \x01(\v2\x12.api.admin.v1.UserR\x04data\"\x95\x01\n" +
+	"\x11UpdateUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x12\n" +
+	"\x04role\x18\x04 \x01(\tR\x04role\x12\x14\n" +
+	"\x05email\x18\x05 \x01(\tR\x05email\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"j\n" +
+	"\x12UpdateUserResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
+	"\x04data\x18\x03 \x01(\v2\x12.api.admin.v1.UserR\x04data\"#\n" +
+	"\x11DeleteUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"B\n" +
+	"\x12DeleteUserResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x98\x10\n" +
+	"\fAdminService\x12`\n" +
+	"\x05Login\x12\x1a.api.admin.v1.LoginRequest\x1a\x1b.api.admin.v1.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12w\n" +
+	"\x0eGetCurrentUser\x12#.api.admin.v1.GetCurrentUserRequest\x1a$.api.admin.v1.GetCurrentUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/admin/user\x12i\n" +
+	"\tListUsers\x12\x1e.api.admin.v1.ListUsersRequest\x1a\x1f.api.admin.v1.ListUsersResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/admin/users\x12o\n" +
+	"\n" +
+	"CreateUser\x12\x1f.api.admin.v1.CreateUserRequest\x1a .api.admin.v1.CreateUserResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/users\x12t\n" +
+	"\n" +
+	"UpdateUser\x12\x1f.api.admin.v1.UpdateUserRequest\x1a .api.admin.v1.UpdateUserResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\x1a\x18/api/v1/admin/users/{id}\x12q\n" +
+	"\n" +
+	"DeleteUser\x12\x1f.api.admin.v1.DeleteUserRequest\x1a .api.admin.v1.DeleteUserResponse\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/admin/users/{id}\x12\x80\x01\n" +
 	"\x10CreateParkingLot\x12%.api.admin.v1.CreateParkingLotRequest\x1a&.api.admin.v1.CreateParkingLotResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/admin/lots\x12y\n" +
 	"\rGetParkingLot\x12\".api.admin.v1.GetParkingLotRequest\x1a#.api.admin.v1.GetParkingLotResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/admin/lots/{id}\x12\x85\x01\n" +
 	"\x10UpdateParkingLot\x12%.api.admin.v1.UpdateParkingLotRequest\x1a&.api.admin.v1.UpdateParkingLotResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/admin/lots/{id}\x12z\n" +
@@ -2443,7 +3423,7 @@ func file_api_admin_v1_admin_proto_rawDescGZIP() []byte {
 	return file_api_admin_v1_admin_proto_rawDescData
 }
 
-var file_api_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
+var file_api_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_api_admin_v1_admin_proto_goTypes = []any{
 	(*CreateParkingLotRequest)(nil),    // 0: api.admin.v1.CreateParkingLotRequest
 	(*CreateParkingLotResponse)(nil),   // 1: api.admin.v1.CreateParkingLotResponse
@@ -2477,6 +3457,21 @@ var file_api_admin_v1_admin_proto_goTypes = []any{
 	(*GetMonthlyReportRequest)(nil),    // 29: api.admin.v1.GetMonthlyReportRequest
 	(*GetMonthlyReportResponse)(nil),   // 30: api.admin.v1.GetMonthlyReportResponse
 	(*MonthlyReport)(nil),              // 31: api.admin.v1.MonthlyReport
+	(*LoginRequest)(nil),               // 32: api.admin.v1.LoginRequest
+	(*LoginResponse)(nil),              // 33: api.admin.v1.LoginResponse
+	(*LoginData)(nil),                  // 34: api.admin.v1.LoginData
+	(*User)(nil),                       // 35: api.admin.v1.User
+	(*GetCurrentUserRequest)(nil),      // 36: api.admin.v1.GetCurrentUserRequest
+	(*GetCurrentUserResponse)(nil),     // 37: api.admin.v1.GetCurrentUserResponse
+	(*ListUsersRequest)(nil),           // 38: api.admin.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),          // 39: api.admin.v1.ListUsersResponse
+	(*UserListData)(nil),               // 40: api.admin.v1.UserListData
+	(*CreateUserRequest)(nil),          // 41: api.admin.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),         // 42: api.admin.v1.CreateUserResponse
+	(*UpdateUserRequest)(nil),          // 43: api.admin.v1.UpdateUserRequest
+	(*UpdateUserResponse)(nil),         // 44: api.admin.v1.UpdateUserResponse
+	(*DeleteUserRequest)(nil),          // 45: api.admin.v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),         // 46: api.admin.v1.DeleteUserResponse
 }
 var file_api_admin_v1_admin_proto_depIdxs = []int32{
 	9,  // 0: api.admin.v1.CreateParkingLotResponse.data:type_name -> api.admin.v1.ParkingLot
@@ -2494,33 +3489,52 @@ var file_api_admin_v1_admin_proto_depIdxs = []int32{
 	28, // 12: api.admin.v1.GetDailyReportResponse.data:type_name -> api.admin.v1.DailyReport
 	31, // 13: api.admin.v1.GetMonthlyReportResponse.data:type_name -> api.admin.v1.MonthlyReport
 	28, // 14: api.admin.v1.MonthlyReport.daily_reports:type_name -> api.admin.v1.DailyReport
-	0,  // 15: api.admin.v1.AdminService.CreateParkingLot:input_type -> api.admin.v1.CreateParkingLotRequest
-	2,  // 16: api.admin.v1.AdminService.GetParkingLot:input_type -> api.admin.v1.GetParkingLotRequest
-	4,  // 17: api.admin.v1.AdminService.UpdateParkingLot:input_type -> api.admin.v1.UpdateParkingLotRequest
-	6,  // 18: api.admin.v1.AdminService.ListParkingLots:input_type -> api.admin.v1.ListParkingLotsRequest
-	10, // 19: api.admin.v1.AdminService.ListParkingRecords:input_type -> api.admin.v1.ListParkingRecordsRequest
-	14, // 20: api.admin.v1.AdminService.ListOrders:input_type -> api.admin.v1.ListOrdersRequest
-	17, // 21: api.admin.v1.AdminService.GetOrder:input_type -> api.admin.v1.GetOrderRequest
-	20, // 22: api.admin.v1.AdminService.CreateVehicle:input_type -> api.admin.v1.CreateVehicleRequest
-	22, // 23: api.admin.v1.AdminService.ListVehicles:input_type -> api.admin.v1.ListVehiclesRequest
-	26, // 24: api.admin.v1.AdminService.GetDailyReport:input_type -> api.admin.v1.GetDailyReportRequest
-	29, // 25: api.admin.v1.AdminService.GetMonthlyReport:input_type -> api.admin.v1.GetMonthlyReportRequest
-	1,  // 26: api.admin.v1.AdminService.CreateParkingLot:output_type -> api.admin.v1.CreateParkingLotResponse
-	3,  // 27: api.admin.v1.AdminService.GetParkingLot:output_type -> api.admin.v1.GetParkingLotResponse
-	5,  // 28: api.admin.v1.AdminService.UpdateParkingLot:output_type -> api.admin.v1.UpdateParkingLotResponse
-	7,  // 29: api.admin.v1.AdminService.ListParkingLots:output_type -> api.admin.v1.ListParkingLotsResponse
-	11, // 30: api.admin.v1.AdminService.ListParkingRecords:output_type -> api.admin.v1.ListParkingRecordsResponse
-	15, // 31: api.admin.v1.AdminService.ListOrders:output_type -> api.admin.v1.ListOrdersResponse
-	18, // 32: api.admin.v1.AdminService.GetOrder:output_type -> api.admin.v1.GetOrderResponse
-	21, // 33: api.admin.v1.AdminService.CreateVehicle:output_type -> api.admin.v1.CreateVehicleResponse
-	23, // 34: api.admin.v1.AdminService.ListVehicles:output_type -> api.admin.v1.ListVehiclesResponse
-	27, // 35: api.admin.v1.AdminService.GetDailyReport:output_type -> api.admin.v1.GetDailyReportResponse
-	30, // 36: api.admin.v1.AdminService.GetMonthlyReport:output_type -> api.admin.v1.GetMonthlyReportResponse
-	26, // [26:37] is the sub-list for method output_type
-	15, // [15:26] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	34, // 15: api.admin.v1.LoginResponse.data:type_name -> api.admin.v1.LoginData
+	35, // 16: api.admin.v1.LoginData.user:type_name -> api.admin.v1.User
+	35, // 17: api.admin.v1.GetCurrentUserResponse.data:type_name -> api.admin.v1.User
+	40, // 18: api.admin.v1.ListUsersResponse.data:type_name -> api.admin.v1.UserListData
+	35, // 19: api.admin.v1.UserListData.list:type_name -> api.admin.v1.User
+	35, // 20: api.admin.v1.CreateUserResponse.data:type_name -> api.admin.v1.User
+	35, // 21: api.admin.v1.UpdateUserResponse.data:type_name -> api.admin.v1.User
+	32, // 22: api.admin.v1.AdminService.Login:input_type -> api.admin.v1.LoginRequest
+	36, // 23: api.admin.v1.AdminService.GetCurrentUser:input_type -> api.admin.v1.GetCurrentUserRequest
+	38, // 24: api.admin.v1.AdminService.ListUsers:input_type -> api.admin.v1.ListUsersRequest
+	41, // 25: api.admin.v1.AdminService.CreateUser:input_type -> api.admin.v1.CreateUserRequest
+	43, // 26: api.admin.v1.AdminService.UpdateUser:input_type -> api.admin.v1.UpdateUserRequest
+	45, // 27: api.admin.v1.AdminService.DeleteUser:input_type -> api.admin.v1.DeleteUserRequest
+	0,  // 28: api.admin.v1.AdminService.CreateParkingLot:input_type -> api.admin.v1.CreateParkingLotRequest
+	2,  // 29: api.admin.v1.AdminService.GetParkingLot:input_type -> api.admin.v1.GetParkingLotRequest
+	4,  // 30: api.admin.v1.AdminService.UpdateParkingLot:input_type -> api.admin.v1.UpdateParkingLotRequest
+	6,  // 31: api.admin.v1.AdminService.ListParkingLots:input_type -> api.admin.v1.ListParkingLotsRequest
+	10, // 32: api.admin.v1.AdminService.ListParkingRecords:input_type -> api.admin.v1.ListParkingRecordsRequest
+	14, // 33: api.admin.v1.AdminService.ListOrders:input_type -> api.admin.v1.ListOrdersRequest
+	17, // 34: api.admin.v1.AdminService.GetOrder:input_type -> api.admin.v1.GetOrderRequest
+	20, // 35: api.admin.v1.AdminService.CreateVehicle:input_type -> api.admin.v1.CreateVehicleRequest
+	22, // 36: api.admin.v1.AdminService.ListVehicles:input_type -> api.admin.v1.ListVehiclesRequest
+	26, // 37: api.admin.v1.AdminService.GetDailyReport:input_type -> api.admin.v1.GetDailyReportRequest
+	29, // 38: api.admin.v1.AdminService.GetMonthlyReport:input_type -> api.admin.v1.GetMonthlyReportRequest
+	33, // 39: api.admin.v1.AdminService.Login:output_type -> api.admin.v1.LoginResponse
+	37, // 40: api.admin.v1.AdminService.GetCurrentUser:output_type -> api.admin.v1.GetCurrentUserResponse
+	39, // 41: api.admin.v1.AdminService.ListUsers:output_type -> api.admin.v1.ListUsersResponse
+	42, // 42: api.admin.v1.AdminService.CreateUser:output_type -> api.admin.v1.CreateUserResponse
+	44, // 43: api.admin.v1.AdminService.UpdateUser:output_type -> api.admin.v1.UpdateUserResponse
+	46, // 44: api.admin.v1.AdminService.DeleteUser:output_type -> api.admin.v1.DeleteUserResponse
+	1,  // 45: api.admin.v1.AdminService.CreateParkingLot:output_type -> api.admin.v1.CreateParkingLotResponse
+	3,  // 46: api.admin.v1.AdminService.GetParkingLot:output_type -> api.admin.v1.GetParkingLotResponse
+	5,  // 47: api.admin.v1.AdminService.UpdateParkingLot:output_type -> api.admin.v1.UpdateParkingLotResponse
+	7,  // 48: api.admin.v1.AdminService.ListParkingLots:output_type -> api.admin.v1.ListParkingLotsResponse
+	11, // 49: api.admin.v1.AdminService.ListParkingRecords:output_type -> api.admin.v1.ListParkingRecordsResponse
+	15, // 50: api.admin.v1.AdminService.ListOrders:output_type -> api.admin.v1.ListOrdersResponse
+	18, // 51: api.admin.v1.AdminService.GetOrder:output_type -> api.admin.v1.GetOrderResponse
+	21, // 52: api.admin.v1.AdminService.CreateVehicle:output_type -> api.admin.v1.CreateVehicleResponse
+	23, // 53: api.admin.v1.AdminService.ListVehicles:output_type -> api.admin.v1.ListVehiclesResponse
+	27, // 54: api.admin.v1.AdminService.GetDailyReport:output_type -> api.admin.v1.GetDailyReportResponse
+	30, // 55: api.admin.v1.AdminService.GetMonthlyReport:output_type -> api.admin.v1.GetMonthlyReportResponse
+	39, // [39:56] is the sub-list for method output_type
+	22, // [22:39] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_api_admin_v1_admin_proto_init() }
@@ -2534,7 +3548,7 @@ func file_api_admin_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_admin_v1_admin_proto_rawDesc), len(file_api_admin_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   32,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

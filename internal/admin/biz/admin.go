@@ -3,6 +3,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -84,6 +85,18 @@ type MonthlyReport struct {
 	DailyReports  []*DailyReport
 }
 
+// User represents an admin user entity.
+type User struct {
+	ID        uuid.UUID
+	Username  string
+	Password  string
+	Name      string
+	Role      string
+	Avatar    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 // AdminRepo defines the repository interface for admin operations.
 type AdminRepo interface {
 	CreateParkingLot(ctx context.Context, lot *ParkingLot) error
@@ -97,6 +110,15 @@ type AdminRepo interface {
 	GetOrder(ctx context.Context, orderID uuid.UUID) (*Order, error)
 	GetDailyReport(ctx context.Context, lotID uuid.UUID, date string) (*DailyReport, error)
 	GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year, month int) (*MonthlyReport, error)
+	// User related methods
+	GetUserByUsername(ctx context.Context, username string) (*User, error)
+	GetUserByID(ctx context.Context, userID uuid.UUID) (*User, error)
+	ListUsers(ctx context.Context, page, pageSize int) ([]*User, int64, error)
+	CreateUser(ctx context.Context, user *User) error
+	UpdateUser(ctx context.Context, user *User) error
+	DeleteUser(ctx context.Context, userID uuid.UUID) error
+	// SeedData creates initial seed data for development
+	SeedData(ctx context.Context) error
 }
 
 // AdminUseCase implements admin business logic.
@@ -453,4 +475,105 @@ func (uc *AdminUseCase) GetMonthlyReport(ctx context.Context, req *v1.GetMonthly
 		NetAmount:     report.NetAmount,
 		DailyReports:  dailyReports,
 	}, nil
+}
+
+// contextKey is the key for context values.
+type contextKey string
+
+const userContextKey contextKey = "user"
+
+// Login validates user credentials and returns a token.
+func (uc *AdminUseCase) Login(ctx context.Context, username, password string) (*User, string, int64, error) {
+	user, err := uc.repo.GetUserByUsername(ctx, username)
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("user not found: %v", err)
+		return nil, "", 0, err
+	}
+
+	// In production, use bcrypt.CompareHashAndPassword
+	if user.Password != password {
+		uc.log.WithContext(ctx).Errorf("invalid password for user: %s", username)
+		return nil, "", 0, err
+	}
+
+	// Generate token (in production, use JWT)
+	token := uuid.New().String()
+	expiresAt := time.Now().Add(24 * time.Hour).Unix()
+
+	return user, token, expiresAt, nil
+}
+
+// GetCurrentUser retrieves the current user from context.
+func (uc *AdminUseCase) GetCurrentUser(ctx context.Context) (*User, error) {
+	user, ok := ctx.Value(userContextKey).(*User)
+	if !ok {
+		return nil, fmt.Errorf("user not found in context")
+	}
+	return user, nil
+}
+
+// SetUserInContext sets the user in the context.
+func SetUserInContext(ctx context.Context, user *User) context.Context {
+	return context.WithValue(ctx, userContextKey, user)
+}
+
+// ListUsers lists all users with pagination.
+func (uc *AdminUseCase) ListUsers(ctx context.Context, page, pageSize int) ([]*User, int64, error) {
+	return uc.repo.ListUsers(ctx, page, pageSize)
+}
+
+// CreateUser creates a new user.
+func (uc *AdminUseCase) CreateUser(ctx context.Context, username, password, name, role, email, status string) (*User, error) {
+	user := &User{
+		ID:        uuid.New(),
+		Username:  username,
+		Password:  password,
+		Name:      name,
+		Role:      role,
+		Avatar:    "",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	if err := uc.repo.CreateUser(ctx, user); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+// UpdateUser updates an existing user.
+func (uc *AdminUseCase) UpdateUser(ctx context.Context, id, username, name, role, email, status string) (*User, error) {
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := uc.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if username != "" {
+		user.Username = username
+	}
+	if name != "" {
+		user.Name = name
+	}
+	if role != "" {
+		user.Role = role
+	}
+	user.UpdatedAt = time.Now()
+
+	if err := uc.repo.UpdateUser(ctx, user); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+// DeleteUser deletes a user by ID.
+func (uc *AdminUseCase) DeleteUser(ctx context.Context, id string) error {
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return err
+	}
+	return uc.repo.DeleteUser(ctx, userID)
 }

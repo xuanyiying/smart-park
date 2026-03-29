@@ -15,6 +15,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/order"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/user"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/vehicle"
 )
 
@@ -79,6 +80,7 @@ func checkColumn(t, c string) error {
 			order.Table:         order.ValidColumn,
 			parkinglot.Table:    parkinglot.ValidColumn,
 			parkingrecord.Table: parkingrecord.ValidColumn,
+			user.Table:          user.ValidColumn,
 			vehicle.Table:       vehicle.ValidColumn,
 		})
 	})

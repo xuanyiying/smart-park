@@ -13,6 +13,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/order"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/user"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/vehicle"
 )
 
@@ -443,4 +444,108 @@ func (r *adminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year,
 		TotalDiscount: totalDiscount,
 		NetAmount:     totalAmount,
 	}, nil
+}
+
+// GetUserByUsername retrieves a user by username.
+func (r *adminRepo) GetUserByUsername(ctx context.Context, username string) (*biz.User, error) {
+	u, err := r.data.db.User.Query().Where(user.Username(username)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &biz.User{
+		ID:        u.ID,
+		Username:  u.Username,
+		Password:  u.Password,
+		Name:      u.Name,
+		Role:      u.Role,
+		Avatar:    u.Avatar,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+	}, nil
+}
+
+// GetUserByID retrieves a user by ID.
+func (r *adminRepo) GetUserByID(ctx context.Context, userID uuid.UUID) (*biz.User, error) {
+	u, err := r.data.db.User.Query().Where(user.ID(userID)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &biz.User{
+		ID:        u.ID,
+		Username:  u.Username,
+		Password:  u.Password,
+		Name:      u.Name,
+		Role:      u.Role,
+		Avatar:    u.Avatar,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+	}, nil
+}
+
+// ListUsers lists all users with pagination.
+func (r *adminRepo) ListUsers(ctx context.Context, page, pageSize int) ([]*biz.User, int64, error) {
+	total, err := r.data.db.User.Query().Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * pageSize
+	users, err := r.data.db.User.Query().
+		Order(ent.Desc("created_at")).
+		Offset(offset).
+		Limit(pageSize).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var result []*biz.User
+	for _, u := range users {
+		result = append(result, &biz.User{
+			ID:        u.ID,
+			Username:  u.Username,
+			Password:  u.Password,
+			Name:      u.Name,
+			Role:      u.Role,
+			Avatar:    u.Avatar,
+			CreatedAt: u.CreatedAt,
+			UpdatedAt: u.UpdatedAt,
+		})
+	}
+
+	return result, int64(total), nil
+}
+
+// CreateUser creates a new user.
+func (r *adminRepo) CreateUser(ctx context.Context, u *biz.User) error {
+	_, err := r.data.db.User.Create().
+		SetID(u.ID).
+		SetUsername(u.Username).
+		SetPassword(u.Password).
+		SetName(u.Name).
+		SetRole(u.Role).
+		SetAvatar(u.Avatar).
+		SetCreatedAt(u.CreatedAt).
+		SetUpdatedAt(u.UpdatedAt).
+		Save(ctx)
+	return err
+}
+
+// UpdateUser updates an existing user.
+func (r *adminRepo) UpdateUser(ctx context.Context, u *biz.User) error {
+	_, err := r.data.db.User.UpdateOneID(u.ID).
+		SetUsername(u.Username).
+		SetName(u.Name).
+		SetRole(u.Role).
+		SetAvatar(u.Avatar).
+		SetUpdatedAt(u.UpdatedAt).
+		Save(ctx)
+	return err
+}
+
+// DeleteUser deletes a user by ID.
+func (r *adminRepo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	return r.data.db.User.DeleteOneID(userID).Exec(ctx)
 }

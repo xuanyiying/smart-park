@@ -18,6 +18,8 @@ type Tx struct {
 	ParkingLot *ParkingLotClient
 	// ParkingRecord is the client for interacting with the ParkingRecord builders.
 	ParkingRecord *ParkingRecordClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 	// Vehicle is the client for interacting with the Vehicle builders.
 	Vehicle *VehicleClient
 
@@ -154,6 +156,7 @@ func (tx *Tx) init() {
 	tx.Order = NewOrderClient(tx.config)
 	tx.ParkingLot = NewParkingLotClient(tx.config)
 	tx.ParkingRecord = NewParkingRecordClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)
 }
 

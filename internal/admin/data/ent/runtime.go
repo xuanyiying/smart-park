@@ -10,6 +10,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/schema"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent/user"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/vehicle"
 )
 
@@ -161,6 +162,26 @@ func init() {
 	parkingrecordDescID := parkingrecordFields[0].Descriptor()
 	// parkingrecord.DefaultID holds the default value on creation for the id field.
 	parkingrecord.DefaultID = parkingrecordDescID.Default.(func() uuid.UUID)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescRole is the schema descriptor for role field.
+	userDescRole := userFields[4].Descriptor()
+	// user.DefaultRole holds the default value on creation for the role field.
+	user.DefaultRole = userDescRole.Default.(string)
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[6].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userFields[7].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userDescID is the schema descriptor for id field.
+	userDescID := userFields[0].Descriptor()
+	// user.DefaultID holds the default value on creation for the id field.
+	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 	vehicleFields := schema.Vehicle{}.Fields()
 	_ = vehicleFields
 	// vehicleDescPlateNumber is the schema descriptor for plate_number field.
