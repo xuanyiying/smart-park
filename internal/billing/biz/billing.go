@@ -15,24 +15,24 @@ import (
 
 // Condition represents a parsed billing condition.
 type Condition struct {
-	Type      string                 `json:"type"`
-	Field     string                 `json:"field,omitempty"`
-	Operator  string                 `json:"operator,omitempty"`
-	Value     interface{}            `json:"value,omitempty"`
-	And       []*Condition           `json:"and,omitempty"`
-	Or        []*Condition           `json:"or,omitempty"`
-	Conditions []*Condition          `json:"conditions,omitempty"`
+	Type       string       `json:"type"`
+	Field      string       `json:"field,omitempty"`
+	Operator   string       `json:"operator,omitempty"`
+	Value      interface{}  `json:"value,omitempty"`
+	And        []*Condition `json:"and,omitempty"`
+	Or         []*Condition `json:"or,omitempty"`
+	Conditions []*Condition `json:"conditions,omitempty"`
 }
 
 // Action represents a parsed billing action.
 type Action struct {
-	Type   string                 `json:"type"`
-	Amount float64                `json:"amount,omitempty"`
-	Percent float64               `json:"percent,omitempty"`
-	Unit   string                 `json:"unit,omitempty"`
-	Ceil   float64                `json:"ceil,omitempty"`
-	Cap    float64                `json:"cap,omitempty"`
-	Value  float64                `json:"value,omitempty"`
+	Type    string  `json:"type"`
+	Amount  float64 `json:"amount,omitempty"`
+	Percent float64 `json:"percent,omitempty"`
+	Unit    string  `json:"unit,omitempty"`
+	Ceil    float64 `json:"ceil,omitempty"`
+	Cap     float64 `json:"cap,omitempty"`
+	Value   float64 `json:"value,omitempty"`
 }
 
 // ParseConditions parses JSON conditions string into Condition struct.
@@ -360,10 +360,10 @@ func (uc *BillingUseCase) CreateBillingRule(ctx context.Context, req *v1.CreateB
 	}
 
 	return &v1.BillingRule{
-		Id:            rule.ID.String(),
-		LotId:         rule.LotID.String(),
-		RuleName:      rule.RuleName,
-		RuleType:      rule.RuleType,
+		Id:             rule.ID.String(),
+		LotId:          rule.LotID.String(),
+		RuleName:       rule.RuleName,
+		RuleType:       rule.RuleType,
 		ConditionsJson: rule.Conditions,
 		ActionsJson:    rule.Actions,
 		Priority:       int32(rule.Priority),
@@ -417,10 +417,10 @@ func (uc *BillingUseCase) GetBillingRules(ctx context.Context, req *v1.GetBillin
 	var result []*v1.BillingRule
 	for _, rule := range rules {
 		result = append(result, &v1.BillingRule{
-			Id:            rule.ID.String(),
-			LotId:         rule.LotID.String(),
-			RuleName:      rule.RuleName,
-			RuleType:      rule.RuleType,
+			Id:             rule.ID.String(),
+			LotId:          rule.LotID.String(),
+			RuleName:       rule.RuleName,
+			RuleType:       rule.RuleType,
 			ConditionsJson: rule.Conditions,
 			ActionsJson:    rule.Actions,
 			Priority:       int32(rule.Priority),

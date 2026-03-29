@@ -6,10 +6,10 @@ import "time"
 type PaymentStatus string
 
 const (
-	StatusPending   PaymentStatus = "pending"
-	StatusPaid      PaymentStatus = "paid"
-	StatusRefunded  PaymentStatus = "refunded"
-	StatusFailed    PaymentStatus = "failed"
+	StatusPending  PaymentStatus = "pending"
+	StatusPaid     PaymentStatus = "paid"
+	StatusRefunded PaymentStatus = "refunded"
+	StatusFailed   PaymentStatus = "failed"
 )
 
 // PayMethod represents the payment method.
@@ -40,10 +40,10 @@ const (
 type Config struct {
 	// Order expiration time
 	OrderExpiration time.Duration
-	
+
 	// Default currency (CNY)
 	Currency string
-	
+
 	// Default order description
 	DefaultDescription string
 }

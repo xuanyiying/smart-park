@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/xuanyiying/smart-park/internal/analytics/biz"
 	v1 "github.com/xuanyiying/smart-park/api/analytics/v1"
+	"github.com/xuanyiying/smart-park/internal/analytics/biz"
 )
 
 // AnalyticsService implements the AnalyticsService gRPC service.

@@ -25,7 +25,7 @@ func JWTAuth(jwtManager *auth.JWTManager) middleware.Middleware {
 					return nil, errors.Unauthorized("UNAUTHORIZED", "missing authorization header")
 				}
 
-				if after, ok0 :=strings.CutPrefix(token, "Bearer "); ok0  {
+				if after, ok0 := strings.CutPrefix(token, "Bearer "); ok0 {
 					token = after
 				}
 

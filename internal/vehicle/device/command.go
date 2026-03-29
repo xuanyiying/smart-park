@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/uuid"
 )
 
 type CommandType string
@@ -43,6 +44,7 @@ type MQTTClient interface {
 type CommandManager struct {
 	mqttClient MQTTClient
 	pending    map[string]chan *CommandResponse
+	mu         sync.RWMutex
 	timeout    time.Duration
 }
 
@@ -71,8 +73,15 @@ func (m *CommandManager) SendCommand(ctx context.Context, deviceID string, cmdTy
 	}
 
 	respChan := make(chan *CommandResponse, 1)
+	m.mu.Lock()
 	m.pending[cmd.ID] = respChan
-	defer delete(m.pending, cmd.ID)
+	m.mu.Unlock()
+
+	defer func() {
+		m.mu.Lock()
+		delete(m.pending, cmd.ID)
+		m.mu.Unlock()
+	}()
 
 	if err := m.mqttClient.Publish(ctx, topic, payload); err != nil {
 		return nil, err
@@ -89,14 +98,17 @@ func (m *CommandManager) SendCommand(ctx context.Context, deviceID string, cmdTy
 }
 
 func (m *CommandManager) HandleResponse(resp *CommandResponse) {
-	if ch, ok := m.pending[resp.ID]; ok {
+	m.mu.RLock()
+	ch, ok := m.pending[resp.ID]
+	m.mu.RUnlock()
+	if ok {
 		ch <- resp
 	}
 }
 
 func (m *CommandManager) SubscribeToResponses(ctx context.Context, deviceID string) error {
 	topic := fmt.Sprintf("device/%s/response", deviceID)
-	
+
 	handler := func(client mqtt.Client, msg mqtt.Message) {
 		var resp CommandResponse
 		if err := json.Unmarshal(msg.Payload(), &resp); err != nil {

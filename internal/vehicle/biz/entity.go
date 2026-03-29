@@ -17,28 +17,28 @@ const (
 	VehicleTypeMonthly   = "monthly"
 	VehicleTypeVIP       = "vip"
 
-	RecordStatusEntry   = "entry"
+	RecordStatusEntry = "entry"
 
-	SyncStatusPending  = "pending"
-	SyncStatusSynced   = "synced"
-	SyncStatusFailed   = "failed"
+	SyncStatusPending = "pending"
+	SyncStatusSynced  = "synced"
+	SyncStatusFailed  = "failed"
 )
 
 // OfflineSyncRecord represents an offline sync record for device operations.
 type OfflineSyncRecord struct {
-	ID          uuid.UUID
-	OfflineID   string
-	RecordID    uuid.UUID
-	LotID       uuid.UUID
-	DeviceID    string
-	GateID      string
-	OpenTime    time.Time
-	SyncAmount  float64
-	SyncStatus  string
-	SyncError   string
-	RetryCount  int
-	SyncedAt    *time.Time
-	CreatedAt   time.Time
+	ID         uuid.UUID
+	OfflineID  string
+	RecordID   uuid.UUID
+	LotID      uuid.UUID
+	DeviceID   string
+	GateID     string
+	OpenTime   time.Time
+	SyncAmount float64
+	SyncStatus string
+	SyncError  string
+	RetryCount int
+	SyncedAt   *time.Time
+	CreatedAt  time.Time
 }
 
 const (

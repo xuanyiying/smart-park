@@ -8,12 +8,12 @@ import (
 
 func TestCommandStruct(t *testing.T) {
 	cmd := &Command{
-		CommandID:  "test-123",
-		DeviceID:   "device-456",
-		Command:    CommandOpenGate,
-		Params:     map[string]string{"timeout": "5"},
-		Timestamp:  time.Now().Unix(),
-		Priority:   1,
+		CommandID: "test-123",
+		DeviceID:  "device-456",
+		Command:   CommandOpenGate,
+		Params:    map[string]string{"timeout": "5"},
+		Timestamp: time.Now().Unix(),
+		Priority:  1,
 	}
 
 	if cmd.CommandID != "test-123" {

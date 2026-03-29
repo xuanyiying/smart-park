@@ -25,7 +25,7 @@ func NewVehicleCache(cache Cache) *VehicleCache {
 
 func (c *VehicleCache) GetVehicle(ctx context.Context, plateNumber string) (*biz.Vehicle, error) {
 	key := fmt.Sprintf("%s%s", VehicleKeyPrefix, plateNumber)
-	
+
 	data, err := c.cache.Get(ctx, key)
 	if err != nil {
 		if err == ErrCacheMiss {

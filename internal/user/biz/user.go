@@ -44,12 +44,12 @@ type UserRepo interface {
 }
 
 type UserUseCase struct {
-	userRepo       UserRepo
-	vehicleClient  vehicle.Client
-	paymentClient  payment.Client
-	jwtManager     *auth.JWTManager
-	wechatClient   *wechat.Client
-	log            *log.Helper
+	userRepo      UserRepo
+	vehicleClient vehicle.Client
+	paymentClient payment.Client
+	jwtManager    *auth.JWTManager
+	wechatClient  *wechat.Client
+	log           *log.Helper
 }
 
 func NewUserUseCase(userRepo UserRepo, vehicleClient vehicle.Client, paymentClient payment.Client, jwtManager *auth.JWTManager, wechatClient *wechat.Client, logger log.Logger) *UserUseCase {
@@ -101,7 +101,7 @@ func (uc *UserUseCase) getOpenIDFromWechat(ctx context.Context, code string) (st
 		}
 		return openID, nil
 	}
-	
+
 	uc.log.WithContext(ctx).Warn("wechat client not configured, using mock openid")
 	return "mock_openid_" + code, nil
 }
@@ -200,14 +200,14 @@ func (uc *UserUseCase) ListParkingRecords(ctx context.Context, userID string, pa
 		}
 
 		records = append(records, &v1.ParkingRecordInfo{
-			RecordId:   r.RecordId,
+			RecordId:    r.RecordId,
 			PlateNumber: r.PlateNumber,
-			LotName:    "", // 需要从lot_id查询名称
-			EntryTime:  r.EntryTime,
-			ExitTime:   r.ExitTime,
-			Duration:   r.ParkingDuration,
-			Amount:     amount,
-			Status:     r.RecordStatus,
+			LotName:     "", // 需要从lot_id查询名称
+			EntryTime:   r.EntryTime,
+			ExitTime:    r.ExitTime,
+			Duration:    r.ParkingDuration,
+			Amount:      amount,
+			Status:      r.RecordStatus,
 		})
 	}
 
@@ -326,8 +326,8 @@ func (uc *UserUseCase) GetMonthlyCard(ctx context.Context, userID, plateNumber s
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to get vehicle info: %v", err)
 		return &v1.MonthlyCardInfo{
-			PlateNumber:  plateNumber,
-			IsValid:      false,
+			PlateNumber:   plateNumber,
+			IsValid:       false,
 			DaysRemaining: 0,
 		}, nil
 	}

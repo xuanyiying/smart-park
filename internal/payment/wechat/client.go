@@ -124,12 +124,12 @@ func generateNonceStr() string {
 
 func (c *Client) signJSAPI(timeStamp, nonceStr, packageStr string) (string, error) {
 	message := fmt.Sprintf("%s\n%s\n%s\n%s\n", c.config.AppID, timeStamp, nonceStr, packageStr)
-	
+
 	hashed := sha256.Sum256([]byte(message))
 	signature, err := rsa.SignPKCS1v15(rand.Reader, c.privateKey, crypto.SHA256, hashed[:])
 	if err != nil {
 		return "", err
 	}
-	
+
 	return base64.StdEncoding.EncodeToString(signature), nil
 }

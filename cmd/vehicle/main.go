@@ -108,7 +108,7 @@ func main() {
 		Addr:     cfg.Redis.Addr,
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.DB,
-})
+	})
 
 	// Test Redis connection
 	if err := redisClient.Ping(context.Background()).Err(); err != nil {

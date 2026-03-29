@@ -9,11 +9,11 @@ import (
 )
 
 type Config struct {
-	AppID        string
-	PrivateKey   string
+	AppID           string
+	PrivateKey      string
 	AlipayPublicKey string
-	NotifyURL    string
-	IsProduction bool
+	NotifyURL       string
+	IsProduction    bool
 }
 
 type Client struct {

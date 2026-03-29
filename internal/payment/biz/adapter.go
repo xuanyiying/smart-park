@@ -52,8 +52,8 @@ func (r *recordRepoAdapter) GetRecord(ctx context.Context, recordID string) (*Pa
 	}
 
 	info := &ParkingRecordInfo{
-		ID:          record.RecordId,
-		PlateNumber: record.PlateNumber,
+		ID:           record.RecordId,
+		PlateNumber:  record.PlateNumber,
 		ExitDeviceID: record.ExitDeviceId,
 		LotID:        record.LotId,
 	}

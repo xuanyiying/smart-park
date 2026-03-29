@@ -14,19 +14,19 @@ import (
 type CommandType string
 
 const (
-	CommandOpenGate    CommandType = "open_gate"
-	CommandCloseGate   CommandType = "close_gate"
-	CommandRestart     CommandType = "restart"
+	CommandOpenGate     CommandType = "open_gate"
+	CommandCloseGate    CommandType = "close_gate"
+	CommandRestart      CommandType = "restart"
 	CommandUpdateConfig CommandType = "update_config"
 )
 
 type Command struct {
-	CommandID   string            `json:"command_id"`
-	DeviceID    string            `json:"device_id"`
-	Command     CommandType       `json:"command"`
-	Params      map[string]string `json:"params,omitempty"`
-	Timestamp   int64             `json:"timestamp"`
-	Priority    int               `json:"priority"`
+	CommandID string            `json:"command_id"`
+	DeviceID  string            `json:"device_id"`
+	Command   CommandType       `json:"command"`
+	Params    map[string]string `json:"params,omitempty"`
+	Timestamp int64             `json:"timestamp"`
+	Priority  int               `json:"priority"`
 }
 
 type CommandResult struct {
@@ -72,7 +72,7 @@ func NewMQTTClient(cfg *Config) *MQTTClient {
 	}
 
 	broker := fmt.Sprintf("tcp://%s:%d", cfg.Broker, cfg.Port)
-	
+
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(broker)
 	opts.SetClientID(clientID)
@@ -84,9 +84,9 @@ func NewMQTTClient(cfg *Config) *MQTTClient {
 	client := mqtt.NewClient(opts)
 
 	return &MQTTClient{
-		client:    client,
-		config:    cfg,
-		results:   make(chan *CommandResult, 100),
+		client:          client,
+		config:          cfg,
+		results:         make(chan *CommandResult, 100),
 		commandHandlers: make(map[string]func(*Command)),
 	}
 }
@@ -98,7 +98,7 @@ func (c *MQTTClient) Connect() error {
 	if token := c.client.Connect(); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
-	
+
 	c.connected = true
 	return nil
 }

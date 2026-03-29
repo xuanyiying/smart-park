@@ -92,20 +92,20 @@ func (d *StaticDiscovery) Close() error {
 // RouterUseCase 路由用例
 type RouterUseCase struct {
 	discovery ServiceDiscovery
-	etcdReg  *EtcdRegistry
-	routes   []*RouteConfig
-	log      *log.Helper
-	useEtcd  bool
+	etcdReg   *EtcdRegistry
+	routes    []*RouteConfig
+	log       *log.Helper
+	useEtcd   bool
 }
 
 // NewRouterUseCase 创建路由用例
 func NewRouterUseCase(discovery ServiceDiscovery, etcdReg *EtcdRegistry, routes []*RouteConfig, useEtcd bool, logger log.Logger) *RouterUseCase {
 	return &RouterUseCase{
 		discovery: discovery,
-		etcdReg:  etcdReg,
-		routes:   routes,
-		useEtcd:  useEtcd,
-		log:      log.NewHelper(logger),
+		etcdReg:   etcdReg,
+		routes:    routes,
+		useEtcd:   useEtcd,
+		log:       log.NewHelper(logger),
 	}
 }
 

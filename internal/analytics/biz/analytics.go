@@ -217,12 +217,12 @@ func (uc *AnalyticsUseCase) GetOccupancyRate(ctx context.Context, req *v1.GetOcc
 	}
 
 	return &v1.OccupancyRateData{
-		LotId:        lotID.String(),
-		CurrentRate:  currentRate,
-		AvgRate:      avgRate,
-		MaxRate:      maxRate,
-		MinRate:      minRate,
-		Points:       occupancyPoints,
+		LotId:       lotID.String(),
+		CurrentRate: currentRate,
+		AvgRate:     avgRate,
+		MaxRate:     maxRate,
+		MinRate:     minRate,
+		Points:      occupancyPoints,
 	}, nil
 }
 

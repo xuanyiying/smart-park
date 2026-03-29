@@ -70,7 +70,7 @@ func (Connector) Edges() []ent.Edge {
 
 // Indexes of the Connector.
 func (Connector) Indexes() []ent.Index {
-	return []ent.Index {
+	return []ent.Index{
 		index.Fields("station_id"),
 		index.Fields("status"),
 		index.Fields("station_id", "number").Unique(),

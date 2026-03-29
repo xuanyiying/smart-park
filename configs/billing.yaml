@@ -4,21 +4,21 @@ server:
 
 database:
   driver: postgres
-  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  source: "host=${DB_HOST:localhost} user=${DB_USER:postgres} password=${DB_PASSWORD:} dbname=${DB_NAME:parking} port=${DB_PORT:5432} sslmode=${DB_SSL_MODE:disable}"
 
 redis:
-  addr: "localhost:6379"
-  password: ""
-  db: 0
+  addr: "${REDIS_ADDR:localhost:6379}"
+  password: "${REDIS_PASSWORD:}"
+  db: ${REDIS_DB:0}
 
 mq:
   type: "redis"
   redis:
-    addr: "localhost:6379"
-    password: ""
-    db: 0
+    addr: "${REDIS_ADDR:localhost:6379}"
+    password: "${REDIS_PASSWORD:}"
+    db: ${REDIS_DB:0}
     stream: "parking"
 
 log:
-  level: info
-  format: json
+  level: ${LOG_LEVEL:info}
+  format: ${LOG_FORMAT:json}

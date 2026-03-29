@@ -12,10 +12,10 @@ import (
 type RecommendationType string
 
 const (
-	RecommendationTypeDiscount     RecommendationType = "discount"
-	RecommendationTypeMonthlyCard  RecommendationType = "monthly_card"
-	RecommendationTypeCoupon       RecommendationType = "coupon"
-	RecommendationTypeLoyalty      RecommendationType = "loyalty"
+	RecommendationTypeDiscount    RecommendationType = "discount"
+	RecommendationTypeMonthlyCard RecommendationType = "monthly_card"
+	RecommendationTypeCoupon      RecommendationType = "coupon"
+	RecommendationTypeLoyalty     RecommendationType = "loyalty"
 )
 
 type Recommendation struct {
@@ -55,10 +55,10 @@ type UserRepo interface {
 }
 
 type LotInfo struct {
-	ID         uuid.UUID
-	Name       string
+	ID          uuid.UUID
+	Name        string
 	TotalSpaces int
-	HourlyRate float64
+	HourlyRate  float64
 	MonthlyRate float64
 }
 

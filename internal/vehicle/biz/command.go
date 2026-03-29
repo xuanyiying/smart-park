@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
-	"github.com/xuanyiying/smart-park/internal/vehicle/data/mqtt"
 	v1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/mqtt"
 )
 
 // CommandUseCase handles device command business logic.

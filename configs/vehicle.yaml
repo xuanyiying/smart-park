@@ -4,19 +4,19 @@ server:
 
 database:
   driver: postgres
-  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  source: "host=${DB_HOST:localhost} user=${DB_USER:postgres} password=${DB_PASSWORD:} dbname=${DB_NAME:parking} port=${DB_PORT:5432} sslmode=${DB_SSL_MODE:disable}"
 
 redis:
-  addr: "localhost:6379"
-  password: ""
-  db: 0
+  addr: "${REDIS_ADDR:localhost:6379}"
+  password: "${REDIS_PASSWORD:}"
+  db: ${REDIS_DB:0}
 
 mq:
   type: "redis"
   redis:
-    addr: "localhost:6379"
-    password: ""
-    db: 0
+    addr: "${REDIS_ADDR:localhost:6379}"
+    password: "${REDIS_PASSWORD:}"
+    db: ${REDIS_DB:0}
     stream: "parking"
 
 mqtt:
@@ -30,11 +30,11 @@ mqtt:
     heartbeat: "parking/device/{device_id}/heartbeat"
 
 log:
-  level: info
-  format: json
+  level: ${LOG_LEVEL:info}
+  format: ${LOG_FORMAT:json}
 
 telemetry:
-  enabled: true
-  endpoint: "localhost:4317"
+  enabled: ${TELEMETRY_ENABLED:true}
+  endpoint: "${OTEL_ENDPOINT:localhost:4317}"
   serviceName: "vehicle-svc"
-  sampleRate: 1.0
+  sampleRate: ${TRACE_SAMPLE_RATE:1.0}

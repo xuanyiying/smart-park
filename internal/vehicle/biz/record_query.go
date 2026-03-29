@@ -73,15 +73,15 @@ func (uc *RecordQueryUseCase) GetParkingRecord(ctx context.Context, recordID str
 // toParkingRecordInfo converts biz ParkingRecord to proto ParkingRecordInfo.
 func (uc *RecordQueryUseCase) toParkingRecordInfo(record *ParkingRecord) *v1.ParkingRecordInfo {
 	info := &v1.ParkingRecordInfo{
-		RecordId:          record.ID.String(),
-		LotId:             record.LotID.String(),
-		EntryLaneId:       record.EntryLaneID.String(),
-		EntryTime:         record.EntryTime.Format("2006-01-02T15:04:05Z07:00"),
-		EntryImageUrl:     record.EntryImageURL,
-		RecordStatus:      record.RecordStatus,
-		ParkingDuration:   int32(record.ParkingDuration),
-		ExitStatus:        record.ExitStatus,
-		PaymentLock:       int32(record.PaymentLock),
+		RecordId:        record.ID.String(),
+		LotId:           record.LotID.String(),
+		EntryLaneId:     record.EntryLaneID.String(),
+		EntryTime:       record.EntryTime.Format("2006-01-02T15:04:05Z07:00"),
+		EntryImageUrl:   record.EntryImageURL,
+		RecordStatus:    record.RecordStatus,
+		ParkingDuration: int32(record.ParkingDuration),
+		ExitStatus:      record.ExitStatus,
+		PaymentLock:     int32(record.PaymentLock),
 	}
 
 	if record.VehicleID != nil {

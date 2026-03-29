@@ -60,24 +60,24 @@ func (v *Validator) ValidateJWTSecret() error {
 func (v *Validator) ValidateWechatConfig() error {
 	appID := os.Getenv("WECHAT_APP_ID")
 	mchID := os.Getenv("WECHAT_MCH_ID")
-	
+
 	if appID == "" || strings.Contains(appID, "your_") {
 		return errors.New("invalid WeChat App ID")
 	}
-	
+
 	if mchID == "" || strings.Contains(mchID, "your_") {
 		return errors.New("invalid WeChat Merchant ID")
 	}
-	
+
 	return nil
 }
 
 func (v *Validator) ValidateAlipayConfig() error {
 	appID := os.Getenv("ALIPAY_APP_ID")
-	
+
 	if appID == "" || strings.Contains(appID, "your_") {
 		return errors.New("invalid Alipay App ID")
 	}
-	
+
 	return nil
 }

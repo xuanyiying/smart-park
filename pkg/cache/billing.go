@@ -24,7 +24,7 @@ func NewBillingCache(cache Cache) *BillingCache {
 
 func (c *BillingCache) GetBillingRule(ctx context.Context, lotID string, ruleType string) (*biz.BillingRule, error) {
 	key := fmt.Sprintf("%s%s:%s", BillingRuleKeyPrefix, lotID, ruleType)
-	
+
 	data, err := c.cache.Get(ctx, key)
 	if err != nil {
 		if err == ErrCacheMiss {

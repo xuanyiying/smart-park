@@ -2,6 +2,8 @@ package device_test
 
 import (
 	"context"
+	"encoding/json"
+	"sync"
 	"testing"
 	"time"
 
@@ -10,22 +12,38 @@ import (
 )
 
 type mockMQTTClient struct {
+	mu                sync.Mutex
 	publishedTopics   []string
 	publishedPayloads [][]byte
+	handler           mqtt.MessageHandler
 }
 
 func (m *mockMQTTClient) Publish(ctx context.Context, topic string, payload []byte) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	m.publishedTopics = append(m.publishedTopics, topic)
 	m.publishedPayloads = append(m.publishedPayloads, payload)
 	return nil
 }
 
 func (m *mockMQTTClient) Subscribe(ctx context.Context, topic string, handler mqtt.MessageHandler) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.handler = handler
 	return nil
 }
 
 func (m *mockMQTTClient) Unsubscribe(ctx context.Context, topic string) error {
 	return nil
+}
+
+func (m *mockMQTTClient) getPublishedPayload() ([]byte, bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if len(m.publishedPayloads) == 0 {
+		return nil, false
+	}
+	return m.publishedPayloads[0], true
 }
 
 func TestSendCommand(t *testing.T) {
@@ -39,8 +57,18 @@ func TestSendCommand(t *testing.T) {
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
+		payload, ok := mockClient.getPublishedPayload()
+		if !ok {
+			t.Error("no payload published")
+			return
+		}
+		var cmd device.Command
+		if err := json.Unmarshal(payload, &cmd); err != nil {
+			t.Errorf("failed to unmarshal command: %v", err)
+			return
+		}
 		manager.HandleResponse(&device.CommandResponse{
-			ID:        "test-command-id",
+			ID:        cmd.ID,
 			Success:   true,
 			Message:   "Command executed",
 			Timestamp: time.Now().Unix(),
@@ -52,9 +80,13 @@ func TestSendCommand(t *testing.T) {
 		t.Errorf("SendCommand failed: %v", err)
 	}
 
-	if len(mockClient.publishedTopics) > 0 {
-		if mockClient.publishedTopics[0] != "device/device-001/command" {
-			t.Errorf("expected topic device/device-001/command, got %s", mockClient.publishedTopics[0])
+	mockClient.mu.Lock()
+	topics := mockClient.publishedTopics
+	mockClient.mu.Unlock()
+
+	if len(topics) > 0 {
+		if topics[0] != "device/device-001/command" {
+			t.Errorf("expected topic device/device-001/command, got %s", topics[0])
 		}
 	}
 }

@@ -180,10 +180,10 @@ type DistributedLock struct {
 // NewDistributedLock creates a new distributed lock instance.
 func NewDistributedLock(repo LockRepo, lockKey string, owner string) *DistributedLock {
 	return &DistributedLock{
-		repo:  repo,
+		repo:   repo,
 		lockID: lockKey,
-		owner: owner,
-		ttl:   10 * time.Second,
+		owner:  owner,
+		ttl:    10 * time.Second,
 	}
 }
 

@@ -60,28 +60,28 @@ type Order struct {
 
 // DailyReport represents a daily report.
 type DailyReport struct {
-	LotID        string
-	Date         string
-	TotalEntries int
-	TotalExits   int
+	LotID         string
+	Date          string
+	TotalEntries  int
+	TotalExits    int
 	TotalVehicles int
-	TotalAmount  float64
+	TotalAmount   float64
 	TotalDiscount float64
-	NetAmount    float64
+	NetAmount     float64
 }
 
 // MonthlyReport represents a monthly report.
 type MonthlyReport struct {
-	LotID        string
-	Year         int
-	Month        int
-	TotalEntries int
-	TotalExits   int
+	LotID         string
+	Year          int
+	Month         int
+	TotalEntries  int
+	TotalExits    int
 	TotalVehicles int
-	TotalAmount  float64
+	TotalAmount   float64
 	TotalDiscount float64
-	NetAmount    float64
-	DailyReports []*DailyReport
+	NetAmount     float64
+	DailyReports  []*DailyReport
 }
 
 // AdminRepo defines the repository interface for admin operations.
@@ -299,12 +299,12 @@ func (uc *AdminUseCase) ListParkingRecords(ctx context.Context, req *v1.ListPark
 	var items []*v1.ParkingRecord
 	for _, rec := range records {
 		items = append(items, &v1.ParkingRecord{
-			Id:               rec.ID.String(),
-			LotId:            rec.LotID.String(),
-			PlateNumber:      rec.PlateNumber,
-			EntryTime:        rec.EntryTime.Unix(),
-			ParkingDuration:  int32(rec.ParkingDuration),
-			Status:           rec.Status,
+			Id:              rec.ID.String(),
+			LotId:           rec.LotID.String(),
+			PlateNumber:     rec.PlateNumber,
+			EntryTime:       rec.EntryTime.Unix(),
+			ParkingDuration: int32(rec.ParkingDuration),
+			Status:          rec.Status,
 		})
 	}
 

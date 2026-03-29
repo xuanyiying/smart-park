@@ -129,7 +129,7 @@ func main() {
 	if err != nil {
 		logHelper.Warnf("failed to connect vehicle service: %v, gate control disabled", err)
 	}
-	
+
 	var recordRepo biz.RecordRepo
 	var gateClient biz.GateControlService
 	if vehicleConn != nil {

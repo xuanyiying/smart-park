@@ -8,11 +8,11 @@ import (
 
 func TestNewClient(t *testing.T) {
 	cfg := &alipay.Config{
-		AppID:          "test_appid",
-		PrivateKey:     "test_private_key",
+		AppID:           "test_appid",
+		PrivateKey:      "test_private_key",
 		AlipayPublicKey: "test_public_key",
-		NotifyURL:      "https://example.com/notify",
-		IsProduction:   false,
+		NotifyURL:       "https://example.com/notify",
+		IsProduction:    false,
 	}
 
 	client, err := alipay.NewClient(cfg)
@@ -34,31 +34,31 @@ func TestConfigValidation(t *testing.T) {
 		{
 			name: "valid config",
 			config: &alipay.Config{
-				AppID:          "valid_appid",
-				PrivateKey:     "valid_private_key",
+				AppID:           "valid_appid",
+				PrivateKey:      "valid_private_key",
 				AlipayPublicKey: "valid_public_key",
-				NotifyURL:      "https://example.com/notify",
-				IsProduction:   false,
+				NotifyURL:       "https://example.com/notify",
+				IsProduction:    false,
 			},
 			wantErr: false,
 		},
 		{
 			name: "missing appid",
 			config: &alipay.Config{
-				PrivateKey:     "valid_private_key",
+				PrivateKey:      "valid_private_key",
 				AlipayPublicKey: "valid_public_key",
-				NotifyURL:      "https://example.com/notify",
-				IsProduction:   false,
+				NotifyURL:       "https://example.com/notify",
+				IsProduction:    false,
 			},
 			wantErr: true,
 		},
 		{
 			name: "missing private key",
 			config: &alipay.Config{
-				AppID:          "valid_appid",
+				AppID:           "valid_appid",
 				AlipayPublicKey: "valid_public_key",
-				NotifyURL:      "https://example.com/notify",
-				IsProduction:   false,
+				NotifyURL:       "https://example.com/notify",
+				IsProduction:    false,
 			},
 			wantErr: true,
 		},
