@@ -114,7 +114,7 @@ start_backend_services() {
         log_warning "Port 8001 is already in use, skipping vehicle service"
     else
         log_info "Starting vehicle service on port 8001..."
-        ./bin/vehicle -conf ./configs > logs/vehicle.log 2>&1 &
+        ./bin/vehicle -conf ./configs/vehicle.yaml > logs/vehicle.log 2>&1 &
         echo $! > /tmp/smart-park-vehicle.pid
         sleep 2
     fi
@@ -123,7 +123,7 @@ start_backend_services() {
         log_warning "Port 8002 is already in use, skipping billing service"
     else
         log_info "Starting billing service on port 8002..."
-        ./bin/billing -conf ./configs > logs/billing.log 2>&1 &
+        ./bin/billing -conf ./configs/billing.yaml > logs/billing.log 2>&1 &
         echo $! > /tmp/smart-park-billing.pid
         sleep 2
     fi
@@ -132,7 +132,7 @@ start_backend_services() {
         log_warning "Port 8003 is already in use, skipping payment service"
     else
         log_info "Starting payment service on port 8003..."
-        ./bin/payment -conf ./configs > logs/payment.log 2>&1 &
+        ./bin/payment -conf ./configs/payment.yaml > logs/payment.log 2>&1 &
         echo $! > /tmp/smart-park-payment.pid
         sleep 2
     fi
@@ -141,7 +141,7 @@ start_backend_services() {
         log_warning "Port 8004 is already in use, skipping admin service"
     else
         log_info "Starting admin service on port 8004..."
-        ./bin/admin -conf ./configs > logs/admin.log 2>&1 &
+        ./bin/admin -conf ./configs/admin.yaml > logs/admin.log 2>&1 &
         echo $! > /tmp/smart-park-admin.pid
         sleep 2
     fi
@@ -150,7 +150,7 @@ start_backend_services() {
         log_warning "Port 8000 is already in use, skipping gateway"
     else
         log_info "Starting gateway on port 8000..."
-        ./bin/gateway -conf ./configs > logs/gateway.log 2>&1 &
+        ./bin/gateway -conf ./configs/gateway.yaml > logs/gateway.log 2>&1 &
         echo $! > /tmp/smart-park-gateway.pid
         sleep 2
     fi
