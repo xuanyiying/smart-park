@@ -1,0 +1,55 @@
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 10s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 10s
+
+data:
+  database:
+    driver: postgres
+    source: postgres://postgres:postgres@localhost:5432/parking?sslmode=disable
+
+  redis:
+    addr: localhost:6379
+    password: ""
+    db: 0
+
+  etcd:
+    endpoints:
+      - localhost:2379
+
+services:
+  vehicle:
+    enabled: true
+    http_prefix: /api/v1/device
+    grpc_prefix: /api.v1.device
+
+  billing:
+    enabled: true
+    http_prefix: /api/v1/billing
+    grpc_prefix: /api.v1.billing
+
+  payment:
+    enabled: true
+    http_prefix: /api/v1/pay
+    grpc_prefix: /api.v1.payment
+
+  admin:
+    enabled: true
+    http_prefix: /api/v1/admin
+    grpc_prefix: /api.v1.admin
+
+auth:
+  jwt_secret: your-secret-key
+  expire_time: 24h
+
+log:
+  level: debug
+  output: stdout
+
+trace:
+  enabled: true
+  endpoint: http://localhost:14268/api/traces
+  sampler: 1.0
