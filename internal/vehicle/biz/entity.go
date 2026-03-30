@@ -116,11 +116,16 @@ type VehicleRepo interface {
 	GetParkingRecord(ctx context.Context, recordID uuid.UUID) (*ParkingRecord, error)
 	ListParkingRecordsByPlates(ctx context.Context, plateNumbers []string, page, pageSize int) ([]*ParkingRecord, int, error)
 	GetDeviceByCode(ctx context.Context, deviceCode string) (*Device, error)
+	GetDeviceByID(ctx context.Context, deviceID string) (*Device, error)
 	UpdateDeviceHeartbeat(ctx context.Context, deviceCode string) error
 	ListDevices(ctx context.Context, page, pageSize int) ([]*Device, int, error)
+	CreateDevice(ctx context.Context, device *Device) error
+	UpdateDevice(ctx context.Context, device *Device) error
+	DeleteDevice(ctx context.Context, deviceID string) error
 	GetLaneByDeviceCode(ctx context.Context, deviceCode string) (*Lane, error)
 	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 	CreateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error
 	GetPendingSyncRecords(ctx context.Context, limit int) ([]*OfflineSyncRecord, error)
 	UpdateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error
+	SeedData(ctx context.Context) error
 }

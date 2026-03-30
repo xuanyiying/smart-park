@@ -48,12 +48,12 @@ func RegisterUserServiceHTTPServer(s *http.Server, srv UserServiceHTTPServer) {
 	r.POST("/api/v1/user/login", _UserService_Login0_HTTP_Handler(srv))
 	r.GET("/api/v1/user/info", _UserService_GetUserInfo0_HTTP_Handler(srv))
 	r.POST("/api/v1/user/plates", _UserService_BindPlate0_HTTP_Handler(srv))
-	r.DELETE("/api/v1/user/plates/{plate_number}", _UserService_UnbindPlate0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/user/plates/{plateNumber}", _UserService_UnbindPlate0_HTTP_Handler(srv))
 	r.GET("/api/v1/user/plates", _UserService_ListPlates0_HTTP_Handler(srv))
 	r.GET("/api/v1/user/parking-records", _UserService_ListParkingRecords0_HTTP_Handler(srv))
-	r.GET("/api/v1/user/parking-records/{record_id}", _UserService_GetParkingRecord0_HTTP_Handler(srv))
+	r.GET("/api/v1/user/parking-records/{recordId}", _UserService_GetParkingRecord0_HTTP_Handler(srv))
 	r.POST("/api/v1/user/scan-pay", _UserService_ScanPay0_HTTP_Handler(srv))
-	r.GET("/api/v1/user/monthly-card/{plate_number}", _UserService_GetMonthlyCard0_HTTP_Handler(srv))
+	r.GET("/api/v1/user/monthly-card/{plateNumber}", _UserService_GetMonthlyCard0_HTTP_Handler(srv))
 	r.POST("/api/v1/user/monthly-card", _UserService_PurchaseMonthlyCard0_HTTP_Handler(srv))
 }
 
@@ -304,7 +304,7 @@ func (c *UserServiceHTTPClientImpl) BindPlate(ctx context.Context, in *BindPlate
 
 func (c *UserServiceHTTPClientImpl) GetMonthlyCard(ctx context.Context, in *GetMonthlyCardRequest, opts ...http.CallOption) (*GetMonthlyCardResponse, error) {
 	var out GetMonthlyCardResponse
-	pattern := "/api/v1/user/monthly-card/{plate_number}"
+	pattern := "/api/v1/user/monthly-card/{plateNumber}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserServiceGetMonthlyCard))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -317,7 +317,7 @@ func (c *UserServiceHTTPClientImpl) GetMonthlyCard(ctx context.Context, in *GetM
 
 func (c *UserServiceHTTPClientImpl) GetParkingRecord(ctx context.Context, in *GetParkingRecordRequest, opts ...http.CallOption) (*GetParkingRecordResponse, error) {
 	var out GetParkingRecordResponse
-	pattern := "/api/v1/user/parking-records/{record_id}"
+	pattern := "/api/v1/user/parking-records/{recordId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserServiceGetParkingRecord))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -408,7 +408,7 @@ func (c *UserServiceHTTPClientImpl) ScanPay(ctx context.Context, in *ScanPayRequ
 
 func (c *UserServiceHTTPClientImpl) UnbindPlate(ctx context.Context, in *UnbindPlateRequest, opts ...http.CallOption) (*UnbindPlateResponse, error) {
 	var out UnbindPlateResponse
-	pattern := "/api/v1/user/plates/{plate_number}"
+	pattern := "/api/v1/user/plates/{plateNumber}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserServiceUnbindPlate))
 	opts = append(opts, http.PathTemplate(pattern))

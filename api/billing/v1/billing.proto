@@ -5,7 +5,6 @@ package api.billing.v1;
 option go_package = "github.com/xuanyiying/smart-park/api/billing/v1;v1";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 service BillingService {
   rpc CalculateFee (CalculateFeeRequest) returns (CalculateFeeResponse) {
@@ -43,12 +42,12 @@ service BillingService {
 }
 
 message CalculateFeeRequest {
-  string record_id = 1;
-  string lot_id = 2;
-  string plate_number = 3;
-  int64 entry_time = 4;
-  int64 exit_time = 5;
-  string vehicle_type = 6;
+  string recordId = 1;
+  string lotId = 2;
+  string plateNumber = 3;
+  int64 entryTime = 4;
+  int64 exitTime = 5;
+  string vehicleType = 6;
 }
 
 message CalculateFeeResponse {
@@ -58,27 +57,27 @@ message CalculateFeeResponse {
 }
 
 message BillData {
-  string record_id = 1;
-  double base_amount = 2;
-  double discount_amount = 3;
-  double final_amount = 4;
-  repeated AppliedRule applied_rules = 5;
+  string recordId = 1;
+  double baseAmount = 2;
+  double discountAmount = 3;
+  double finalAmount = 4;
+  repeated AppliedRule appliedRules = 5;
 }
 
 message AppliedRule {
-  string rule_id = 1;
-  string rule_name = 2;
+  string ruleId = 1;
+  string ruleName = 2;
   double amount = 3;
 }
 
 message CreateBillingRuleRequest {
-  string lot_id = 1;
-  string rule_name = 2;
-  string rule_type = 3;
-  string conditions_json = 4;
-  string actions_json = 5;
+  string lotId = 1;
+  string ruleName = 2;
+  string ruleType = 3;
+  string conditionsJson = 4;
+  string actionsJson = 5;
   int32 priority = 6;
-  bool is_active = 7;
+  bool isActive = 7;
 }
 
 message CreateBillingRuleResponse {
@@ -89,12 +88,12 @@ message CreateBillingRuleResponse {
 
 message UpdateBillingRuleRequest {
   string id = 1;
-  string rule_name = 2;
-  string rule_type = 3;
-  string conditions_json = 4;
-  string actions_json = 5;
+  string ruleName = 2;
+  string ruleType = 3;
+  string conditionsJson = 4;
+  string actionsJson = 5;
   int32 priority = 6;
-  bool is_active = 7;
+  bool isActive = 7;
 }
 
 message UpdateBillingRuleResponse {
@@ -112,7 +111,7 @@ message DeleteBillingRuleResponse {
 }
 
 message GetBillingRulesRequest {
-  string lot_id = 1;
+  string lotId = 1;
 }
 
 message GetBillingRulesResponse {
@@ -123,12 +122,12 @@ message GetBillingRulesResponse {
 
 message BillingRule {
   string id = 1;
-  string lot_id = 2;
-  string rule_name = 3;
-  string rule_type = 4;
-  string conditions_json = 5;
-  string actions_json = 6;
+  string lotId = 2;
+  string ruleName = 3;
+  string ruleType = 4;
+  string conditionsJson = 5;
+  string actionsJson = 6;
   int32 priority = 7;
-  bool is_active = 8;
-  string created_at = 9;
+  bool isActive = 8;
+  string createdAt = 9;
 }

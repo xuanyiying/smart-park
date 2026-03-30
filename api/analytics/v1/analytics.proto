@@ -2,180 +2,180 @@ syntax = "proto3";
 
 package api.analytics.v1;
 
-option go_package = "github.com/xuanyiying/smart-park/api/analytics/v1;v1";
-
 import "google/api/annotations.proto";
 
+option go_package = "github.com/xuanyiying/smart-park/api/analytics/v1;v1";
+
 service AnalyticsService {
-  rpc GetLotAnalytics (GetLotAnalyticsRequest) returns (GetLotAnalyticsResponse) {
+  rpc GetLotAnalytics(GetLotAnalyticsRequest) returns (GetLotAnalyticsResponse) {
     option (google.api.http) = {
-      get: "/api/v1/analytics/lots/{lot_id}"
+      get: "/api/v1/analytics/lots/{lotId}",
     };
   }
-  
-  rpc GetRevenueTrend (GetRevenueTrendRequest) returns (GetRevenueTrendResponse) {
+
+  rpc GetRevenueTrend(GetRevenueTrendRequest) returns (GetRevenueTrendResponse) {
     option (google.api.http) = {
-      get: "/api/v1/analytics/revenue/trend"
+      get: "/api/v1/analytics/revenue/trend",
     };
   }
-  
-  rpc PredictPeakHours (PredictPeakHoursRequest) returns (PredictPeakHoursResponse) {
+
+  rpc PredictPeakHours(PredictPeakHoursRequest) returns (PredictPeakHoursResponse) {
     option (google.api.http) = {
-      get: "/api/v1/analytics/predict/peak-hours"
+      get: "/api/v1/analytics/predict/peak-hours",
     };
   }
-  
-  rpc GetOccupancyRate (GetOccupancyRateRequest) returns (GetOccupancyRateResponse) {
+
+  rpc GetOccupancyRate(GetOccupancyRateRequest) returns (GetOccupancyRateResponse) {
     option (google.api.http) = {
-      get: "/api/v1/analytics/occupancy"
+      get: "/api/v1/analytics/occupancy",
     };
   }
-  
-  rpc GetVehicleFlow (GetVehicleFlowRequest) returns (GetVehicleFlowResponse) {
+
+  rpc GetVehicleFlow(GetVehicleFlowRequest) returns (GetVehicleFlowResponse) {
     option (google.api.http) = {
-      get: "/api/v1/analytics/vehicle-flow"
+      get: "/api/v1/analytics/vehicle-flow",
     };
   }
 }
 
 message GetLotAnalyticsRequest {
-  string lot_id = 1;
-  string start_date = 2;
-  string end_date = 3;
+  string lotId     = 1;
+  string startDate = 2;
+  string endDate   = 3;
 }
 
 message GetLotAnalyticsResponse {
-  int32 code = 1;
-  string message = 2;
-  LotAnalyticsData data = 3;
+  int32            code    = 1;
+  string           message = 2;
+  LotAnalyticsData data    = 3;
 }
 
 message LotAnalyticsData {
-  string lot_id = 1;
-  string lot_name = 2;
-  int32 total_vehicles = 3;
-  double total_revenue = 4;
-  double avg_duration = 5;
-  double occupancy_rate = 6;
-  int32 peak_hour = 7;
-  repeated HourlyStats hourly_stats = 8;
-  repeated DailyStats daily_stats = 9;
+  string               lotId         = 1;
+  string               lotName       = 2;
+  int32                totalVehicles = 3;
+  double               totalRevenue  = 4;
+  double               avgDuration   = 5;
+  double               occupancyRate = 6;
+  int32                peakHour      = 7;
+  repeated HourlyStats hourlyStats   = 8;
+  repeated DailyStats  dailyStats    = 9;
 }
 
 message HourlyStats {
-  int32 hour = 1;
-  int32 vehicle_count = 2;
-  double revenue = 3;
+  int32  hour         = 1;
+  int32  vehicleCount = 2;
+  double revenue      = 3;
 }
 
 message DailyStats {
-  string date = 1;
-  int32 vehicle_count = 2;
-  double revenue = 3;
-  double occupancy_rate = 4;
+  string date          = 1;
+  int32  vehicleCount  = 2;
+  double revenue       = 3;
+  double occupancyRate = 4;
 }
 
 message GetRevenueTrendRequest {
-  string lot_id = 1;
+  string lotId  = 1;
   string period = 2; // day, week, month
-  int32 limit = 3;
+  int32  limit  = 3;
 }
 
 message GetRevenueTrendResponse {
-  int32 code = 1;
-  string message = 2;
-  RevenueTrendData data = 3;
+  int32            code    = 1;
+  string           message = 2;
+  RevenueTrendData data    = 3;
 }
 
 message RevenueTrendData {
-  repeated RevenuePoint points = 1;
-  double total_revenue = 2;
-  double avg_revenue = 3;
-  double growth_rate = 4;
+  repeated RevenuePoint points       = 1;
+  double                totalRevenue = 2;
+  double                avgRevenue   = 3;
+  double                growthRate   = 4;
 }
 
 message RevenuePoint {
-  string date = 1;
-  double revenue = 2;
-  int32 vehicle_count = 3;
+  string date         = 1;
+  double revenue      = 2;
+  int32  vehicleCount = 3;
 }
 
 message PredictPeakHoursRequest {
-  string lot_id = 1;
-  string date = 2;
+  string lotId = 1;
+  string date  = 2;
 }
 
 message PredictPeakHoursResponse {
-  int32 code = 1;
-  string message = 2;
-  PeakHoursPrediction data = 3;
+  int32               code    = 1;
+  string              message = 2;
+  PeakHoursPrediction data    = 3;
 }
 
 message PeakHoursPrediction {
-  string lot_id = 1;
-  string date = 2;
-  repeated PeakHour peak_hours = 3;
-  double confidence = 4;
+  string            lotId      = 1;
+  string            date       = 2;
+  repeated PeakHour peakHours  = 3;
+  double            confidence = 4;
 }
 
 message PeakHour {
-  int32 start_hour = 1;
-  int32 end_hour = 2;
-  int32 expected_vehicles = 3;
-  double probability = 4;
+  int32  startHour        = 1;
+  int32  endHour          = 2;
+  int32  expectedVehicles = 3;
+  double probability      = 4;
 }
 
 message GetOccupancyRateRequest {
-  string lot_id = 1;
-  string start_date = 2;
-  string end_date = 3;
+  string lotId     = 1;
+  string startDate = 2;
+  string endDate   = 3;
 }
 
 message GetOccupancyRateResponse {
-  int32 code = 1;
-  string message = 2;
-  OccupancyRateData data = 3;
+  int32             code    = 1;
+  string            message = 2;
+  OccupancyRateData data    = 3;
 }
 
 message OccupancyRateData {
-  string lot_id = 1;
-  double current_rate = 2;
-  double avg_rate = 3;
-  double max_rate = 4;
-  double min_rate = 5;
-  repeated OccupancyPoint points = 6;
+  string                  lotId       = 1;
+  double                  currentRate = 2;
+  double                  avgRate     = 3;
+  double                  maxRate     = 4;
+  double                  minRate     = 5;
+  repeated OccupancyPoint points      = 6;
 }
 
 message OccupancyPoint {
-  string timestamp = 1;
-  double rate = 2;
-  int32 occupied_spaces = 3;
-  int32 total_spaces = 4;
+  string timestamp      = 1;
+  double rate           = 2;
+  int32  occupiedSpaces = 3;
+  int32  totalSpaces    = 4;
 }
 
 message GetVehicleFlowRequest {
-  string lot_id = 1;
-  string date = 2;
+  string lotId = 1;
+  string date  = 2;
 }
 
 message GetVehicleFlowResponse {
-  int32 code = 1;
-  string message = 2;
-  VehicleFlowData data = 3;
+  int32           code    = 1;
+  string          message = 2;
+  VehicleFlowData data    = 3;
 }
 
 message VehicleFlowData {
-  string lot_id = 1;
-  string date = 2;
-  int32 total_entries = 3;
-  int32 total_exits = 4;
-  int32 current_vehicles = 5;
-  repeated FlowPoint flow_points = 6;
+  string             lotId           = 1;
+  string             date            = 2;
+  int32              totalEntries    = 3;
+  int32              totalExits      = 4;
+  int32              currentVehicles = 5;
+  repeated FlowPoint flowPoints      = 6;
 }
 
 message FlowPoint {
   string timestamp = 1;
-  int32 entries = 2;
-  int32 exits = 3;
-  int32 net_flow = 4;
+  int32  entries   = 2;
+  int32  exits     = 3;
+  int32  netFlow   = 4;
 }

@@ -24,9 +24,9 @@ const (
 
 type GetLotAnalyticsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	StartDate     string                 `protobuf:"bytes,2,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate       string                 `protobuf:"bytes,3,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	StartDate     string                 `protobuf:"bytes,2,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       string                 `protobuf:"bytes,3,opt,name=endDate,proto3" json:"endDate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -144,15 +144,15 @@ func (x *GetLotAnalyticsResponse) GetData() *LotAnalyticsData {
 
 type LotAnalyticsData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	LotName       string                 `protobuf:"bytes,2,opt,name=lot_name,json=lotName,proto3" json:"lot_name,omitempty"`
-	TotalVehicles int32                  `protobuf:"varint,3,opt,name=total_vehicles,json=totalVehicles,proto3" json:"total_vehicles,omitempty"`
-	TotalRevenue  float64                `protobuf:"fixed64,4,opt,name=total_revenue,json=totalRevenue,proto3" json:"total_revenue,omitempty"`
-	AvgDuration   float64                `protobuf:"fixed64,5,opt,name=avg_duration,json=avgDuration,proto3" json:"avg_duration,omitempty"`
-	OccupancyRate float64                `protobuf:"fixed64,6,opt,name=occupancy_rate,json=occupancyRate,proto3" json:"occupancy_rate,omitempty"`
-	PeakHour      int32                  `protobuf:"varint,7,opt,name=peak_hour,json=peakHour,proto3" json:"peak_hour,omitempty"`
-	HourlyStats   []*HourlyStats         `protobuf:"bytes,8,rep,name=hourly_stats,json=hourlyStats,proto3" json:"hourly_stats,omitempty"`
-	DailyStats    []*DailyStats          `protobuf:"bytes,9,rep,name=daily_stats,json=dailyStats,proto3" json:"daily_stats,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	LotName       string                 `protobuf:"bytes,2,opt,name=lotName,proto3" json:"lotName,omitempty"`
+	TotalVehicles int32                  `protobuf:"varint,3,opt,name=totalVehicles,proto3" json:"totalVehicles,omitempty"`
+	TotalRevenue  float64                `protobuf:"fixed64,4,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
+	AvgDuration   float64                `protobuf:"fixed64,5,opt,name=avgDuration,proto3" json:"avgDuration,omitempty"`
+	OccupancyRate float64                `protobuf:"fixed64,6,opt,name=occupancyRate,proto3" json:"occupancyRate,omitempty"`
+	PeakHour      int32                  `protobuf:"varint,7,opt,name=peakHour,proto3" json:"peakHour,omitempty"`
+	HourlyStats   []*HourlyStats         `protobuf:"bytes,8,rep,name=hourlyStats,proto3" json:"hourlyStats,omitempty"`
+	DailyStats    []*DailyStats          `protobuf:"bytes,9,rep,name=dailyStats,proto3" json:"dailyStats,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -253,7 +253,7 @@ func (x *LotAnalyticsData) GetDailyStats() []*DailyStats {
 type HourlyStats struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Hour          int32                  `protobuf:"varint,1,opt,name=hour,proto3" json:"hour,omitempty"`
-	VehicleCount  int32                  `protobuf:"varint,2,opt,name=vehicle_count,json=vehicleCount,proto3" json:"vehicle_count,omitempty"`
+	VehicleCount  int32                  `protobuf:"varint,2,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
 	Revenue       float64                `protobuf:"fixed64,3,opt,name=revenue,proto3" json:"revenue,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -313,9 +313,9 @@ func (x *HourlyStats) GetRevenue() float64 {
 type DailyStats struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	VehicleCount  int32                  `protobuf:"varint,2,opt,name=vehicle_count,json=vehicleCount,proto3" json:"vehicle_count,omitempty"`
+	VehicleCount  int32                  `protobuf:"varint,2,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
 	Revenue       float64                `protobuf:"fixed64,3,opt,name=revenue,proto3" json:"revenue,omitempty"`
-	OccupancyRate float64                `protobuf:"fixed64,4,opt,name=occupancy_rate,json=occupancyRate,proto3" json:"occupancy_rate,omitempty"`
+	OccupancyRate float64                `protobuf:"fixed64,4,opt,name=occupancyRate,proto3" json:"occupancyRate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -380,7 +380,7 @@ func (x *DailyStats) GetOccupancyRate() float64 {
 
 type GetRevenueTrendRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Period        string                 `protobuf:"bytes,2,opt,name=period,proto3" json:"period,omitempty"` // day, week, month
 	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -501,9 +501,9 @@ func (x *GetRevenueTrendResponse) GetData() *RevenueTrendData {
 type RevenueTrendData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Points        []*RevenuePoint        `protobuf:"bytes,1,rep,name=points,proto3" json:"points,omitempty"`
-	TotalRevenue  float64                `protobuf:"fixed64,2,opt,name=total_revenue,json=totalRevenue,proto3" json:"total_revenue,omitempty"`
-	AvgRevenue    float64                `protobuf:"fixed64,3,opt,name=avg_revenue,json=avgRevenue,proto3" json:"avg_revenue,omitempty"`
-	GrowthRate    float64                `protobuf:"fixed64,4,opt,name=growth_rate,json=growthRate,proto3" json:"growth_rate,omitempty"`
+	TotalRevenue  float64                `protobuf:"fixed64,2,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
+	AvgRevenue    float64                `protobuf:"fixed64,3,opt,name=avgRevenue,proto3" json:"avgRevenue,omitempty"`
+	GrowthRate    float64                `protobuf:"fixed64,4,opt,name=growthRate,proto3" json:"growthRate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -570,7 +570,7 @@ type RevenuePoint struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
 	Revenue       float64                `protobuf:"fixed64,2,opt,name=revenue,proto3" json:"revenue,omitempty"`
-	VehicleCount  int32                  `protobuf:"varint,3,opt,name=vehicle_count,json=vehicleCount,proto3" json:"vehicle_count,omitempty"`
+	VehicleCount  int32                  `protobuf:"varint,3,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -628,7 +628,7 @@ func (x *RevenuePoint) GetVehicleCount() int32 {
 
 type PredictPeakHoursRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -740,9 +740,9 @@ func (x *PredictPeakHoursResponse) GetData() *PeakHoursPrediction {
 
 type PeakHoursPrediction struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
-	PeakHours     []*PeakHour            `protobuf:"bytes,3,rep,name=peak_hours,json=peakHours,proto3" json:"peak_hours,omitempty"`
+	PeakHours     []*PeakHour            `protobuf:"bytes,3,rep,name=peakHours,proto3" json:"peakHours,omitempty"`
 	Confidence    float64                `protobuf:"fixed64,4,opt,name=confidence,proto3" json:"confidence,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -808,9 +808,9 @@ func (x *PeakHoursPrediction) GetConfidence() float64 {
 
 type PeakHour struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	StartHour        int32                  `protobuf:"varint,1,opt,name=start_hour,json=startHour,proto3" json:"start_hour,omitempty"`
-	EndHour          int32                  `protobuf:"varint,2,opt,name=end_hour,json=endHour,proto3" json:"end_hour,omitempty"`
-	ExpectedVehicles int32                  `protobuf:"varint,3,opt,name=expected_vehicles,json=expectedVehicles,proto3" json:"expected_vehicles,omitempty"`
+	StartHour        int32                  `protobuf:"varint,1,opt,name=startHour,proto3" json:"startHour,omitempty"`
+	EndHour          int32                  `protobuf:"varint,2,opt,name=endHour,proto3" json:"endHour,omitempty"`
+	ExpectedVehicles int32                  `protobuf:"varint,3,opt,name=expectedVehicles,proto3" json:"expectedVehicles,omitempty"`
 	Probability      float64                `protobuf:"fixed64,4,opt,name=probability,proto3" json:"probability,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -876,9 +876,9 @@ func (x *PeakHour) GetProbability() float64 {
 
 type GetOccupancyRateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	StartDate     string                 `protobuf:"bytes,2,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate       string                 `protobuf:"bytes,3,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	StartDate     string                 `protobuf:"bytes,2,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       string                 `protobuf:"bytes,3,opt,name=endDate,proto3" json:"endDate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -996,11 +996,11 @@ func (x *GetOccupancyRateResponse) GetData() *OccupancyRateData {
 
 type OccupancyRateData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	CurrentRate   float64                `protobuf:"fixed64,2,opt,name=current_rate,json=currentRate,proto3" json:"current_rate,omitempty"`
-	AvgRate       float64                `protobuf:"fixed64,3,opt,name=avg_rate,json=avgRate,proto3" json:"avg_rate,omitempty"`
-	MaxRate       float64                `protobuf:"fixed64,4,opt,name=max_rate,json=maxRate,proto3" json:"max_rate,omitempty"`
-	MinRate       float64                `protobuf:"fixed64,5,opt,name=min_rate,json=minRate,proto3" json:"min_rate,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	CurrentRate   float64                `protobuf:"fixed64,2,opt,name=currentRate,proto3" json:"currentRate,omitempty"`
+	AvgRate       float64                `protobuf:"fixed64,3,opt,name=avgRate,proto3" json:"avgRate,omitempty"`
+	MaxRate       float64                `protobuf:"fixed64,4,opt,name=maxRate,proto3" json:"maxRate,omitempty"`
+	MinRate       float64                `protobuf:"fixed64,5,opt,name=minRate,proto3" json:"minRate,omitempty"`
 	Points        []*OccupancyPoint      `protobuf:"bytes,6,rep,name=points,proto3" json:"points,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1082,8 +1082,8 @@ type OccupancyPoint struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Timestamp      string                 `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Rate           float64                `protobuf:"fixed64,2,opt,name=rate,proto3" json:"rate,omitempty"`
-	OccupiedSpaces int32                  `protobuf:"varint,3,opt,name=occupied_spaces,json=occupiedSpaces,proto3" json:"occupied_spaces,omitempty"`
-	TotalSpaces    int32                  `protobuf:"varint,4,opt,name=total_spaces,json=totalSpaces,proto3" json:"total_spaces,omitempty"`
+	OccupiedSpaces int32                  `protobuf:"varint,3,opt,name=occupiedSpaces,proto3" json:"occupiedSpaces,omitempty"`
+	TotalSpaces    int32                  `protobuf:"varint,4,opt,name=totalSpaces,proto3" json:"totalSpaces,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1148,7 +1148,7 @@ func (x *OccupancyPoint) GetTotalSpaces() int32 {
 
 type GetVehicleFlowRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1260,12 +1260,12 @@ func (x *GetVehicleFlowResponse) GetData() *VehicleFlowData {
 
 type VehicleFlowData struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	LotId           string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId           string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Date            string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
-	TotalEntries    int32                  `protobuf:"varint,3,opt,name=total_entries,json=totalEntries,proto3" json:"total_entries,omitempty"`
-	TotalExits      int32                  `protobuf:"varint,4,opt,name=total_exits,json=totalExits,proto3" json:"total_exits,omitempty"`
-	CurrentVehicles int32                  `protobuf:"varint,5,opt,name=current_vehicles,json=currentVehicles,proto3" json:"current_vehicles,omitempty"`
-	FlowPoints      []*FlowPoint           `protobuf:"bytes,6,rep,name=flow_points,json=flowPoints,proto3" json:"flow_points,omitempty"`
+	TotalEntries    int32                  `protobuf:"varint,3,opt,name=totalEntries,proto3" json:"totalEntries,omitempty"`
+	TotalExits      int32                  `protobuf:"varint,4,opt,name=totalExits,proto3" json:"totalExits,omitempty"`
+	CurrentVehicles int32                  `protobuf:"varint,5,opt,name=currentVehicles,proto3" json:"currentVehicles,omitempty"`
+	FlowPoints      []*FlowPoint           `protobuf:"bytes,6,rep,name=flowPoints,proto3" json:"flowPoints,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1347,7 +1347,7 @@ type FlowPoint struct {
 	Timestamp     string                 `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Entries       int32                  `protobuf:"varint,2,opt,name=entries,proto3" json:"entries,omitempty"`
 	Exits         int32                  `protobuf:"varint,3,opt,name=exits,proto3" json:"exits,omitempty"`
-	NetFlow       int32                  `protobuf:"varint,4,opt,name=net_flow,json=netFlow,proto3" json:"net_flow,omitempty"`
+	NetFlow       int32                  `protobuf:"varint,4,opt,name=netFlow,proto3" json:"netFlow,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1414,121 +1414,122 @@ var File_api_analytics_v1_analytics_proto protoreflect.FileDescriptor
 
 const file_api_analytics_v1_analytics_proto_rawDesc = "" +
 	"\n" +
-	" api/analytics/v1/analytics.proto\x12\x10api.analytics.v1\x1a\x1cgoogle/api/annotations.proto\"i\n" +
-	"\x16GetLotAnalyticsRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x1d\n" +
-	"\n" +
-	"start_date\x18\x02 \x01(\tR\tstartDate\x12\x19\n" +
-	"\bend_date\x18\x03 \x01(\tR\aendDate\"\x7f\n" +
+	" api/analytics/v1/analytics.proto\x12\x10api.analytics.v1\x1a\x1cgoogle/api/annotations.proto\"f\n" +
+	"\x16GetLotAnalyticsRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x1c\n" +
+	"\tstartDate\x18\x02 \x01(\tR\tstartDate\x12\x18\n" +
+	"\aendDate\x18\x03 \x01(\tR\aendDate\"\x7f\n" +
 	"\x17GetLotAnalyticsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x126\n" +
-	"\x04data\x18\x03 \x01(\v2\".api.analytics.v1.LotAnalyticsDataR\x04data\"\xf8\x02\n" +
-	"\x10LotAnalyticsData\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x19\n" +
-	"\blot_name\x18\x02 \x01(\tR\alotName\x12%\n" +
-	"\x0etotal_vehicles\x18\x03 \x01(\x05R\rtotalVehicles\x12#\n" +
-	"\rtotal_revenue\x18\x04 \x01(\x01R\ftotalRevenue\x12!\n" +
-	"\favg_duration\x18\x05 \x01(\x01R\vavgDuration\x12%\n" +
-	"\x0eoccupancy_rate\x18\x06 \x01(\x01R\roccupancyRate\x12\x1b\n" +
-	"\tpeak_hour\x18\a \x01(\x05R\bpeakHour\x12@\n" +
-	"\fhourly_stats\x18\b \x03(\v2\x1d.api.analytics.v1.HourlyStatsR\vhourlyStats\x12=\n" +
-	"\vdaily_stats\x18\t \x03(\v2\x1c.api.analytics.v1.DailyStatsR\n" +
-	"dailyStats\"`\n" +
+	"\x04data\x18\x03 \x01(\v2\".api.analytics.v1.LotAnalyticsDataR\x04data\"\xef\x02\n" +
+	"\x10LotAnalyticsData\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x18\n" +
+	"\alotName\x18\x02 \x01(\tR\alotName\x12$\n" +
+	"\rtotalVehicles\x18\x03 \x01(\x05R\rtotalVehicles\x12\"\n" +
+	"\ftotalRevenue\x18\x04 \x01(\x01R\ftotalRevenue\x12 \n" +
+	"\vavgDuration\x18\x05 \x01(\x01R\vavgDuration\x12$\n" +
+	"\roccupancyRate\x18\x06 \x01(\x01R\roccupancyRate\x12\x1a\n" +
+	"\bpeakHour\x18\a \x01(\x05R\bpeakHour\x12?\n" +
+	"\vhourlyStats\x18\b \x03(\v2\x1d.api.analytics.v1.HourlyStatsR\vhourlyStats\x12<\n" +
+	"\n" +
+	"dailyStats\x18\t \x03(\v2\x1c.api.analytics.v1.DailyStatsR\n" +
+	"dailyStats\"_\n" +
 	"\vHourlyStats\x12\x12\n" +
-	"\x04hour\x18\x01 \x01(\x05R\x04hour\x12#\n" +
-	"\rvehicle_count\x18\x02 \x01(\x05R\fvehicleCount\x12\x18\n" +
-	"\arevenue\x18\x03 \x01(\x01R\arevenue\"\x86\x01\n" +
+	"\x04hour\x18\x01 \x01(\x05R\x04hour\x12\"\n" +
+	"\fvehicleCount\x18\x02 \x01(\x05R\fvehicleCount\x12\x18\n" +
+	"\arevenue\x18\x03 \x01(\x01R\arevenue\"\x84\x01\n" +
 	"\n" +
 	"DailyStats\x12\x12\n" +
-	"\x04date\x18\x01 \x01(\tR\x04date\x12#\n" +
-	"\rvehicle_count\x18\x02 \x01(\x05R\fvehicleCount\x12\x18\n" +
-	"\arevenue\x18\x03 \x01(\x01R\arevenue\x12%\n" +
-	"\x0eoccupancy_rate\x18\x04 \x01(\x01R\roccupancyRate\"]\n" +
-	"\x16GetRevenueTrendRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x16\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\"\n" +
+	"\fvehicleCount\x18\x02 \x01(\x05R\fvehicleCount\x12\x18\n" +
+	"\arevenue\x18\x03 \x01(\x01R\arevenue\x12$\n" +
+	"\roccupancyRate\x18\x04 \x01(\x01R\roccupancyRate\"\\\n" +
+	"\x16GetRevenueTrendRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x16\n" +
 	"\x06period\x18\x02 \x01(\tR\x06period\x12\x14\n" +
 	"\x05limit\x18\x03 \x01(\x05R\x05limit\"\x7f\n" +
 	"\x17GetRevenueTrendResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x126\n" +
-	"\x04data\x18\x03 \x01(\v2\".api.analytics.v1.RevenueTrendDataR\x04data\"\xb1\x01\n" +
+	"\x04data\x18\x03 \x01(\v2\".api.analytics.v1.RevenueTrendDataR\x04data\"\xae\x01\n" +
 	"\x10RevenueTrendData\x126\n" +
-	"\x06points\x18\x01 \x03(\v2\x1e.api.analytics.v1.RevenuePointR\x06points\x12#\n" +
-	"\rtotal_revenue\x18\x02 \x01(\x01R\ftotalRevenue\x12\x1f\n" +
-	"\vavg_revenue\x18\x03 \x01(\x01R\n" +
-	"avgRevenue\x12\x1f\n" +
-	"\vgrowth_rate\x18\x04 \x01(\x01R\n" +
-	"growthRate\"a\n" +
+	"\x06points\x18\x01 \x03(\v2\x1e.api.analytics.v1.RevenuePointR\x06points\x12\"\n" +
+	"\ftotalRevenue\x18\x02 \x01(\x01R\ftotalRevenue\x12\x1e\n" +
+	"\n" +
+	"avgRevenue\x18\x03 \x01(\x01R\n" +
+	"avgRevenue\x12\x1e\n" +
+	"\n" +
+	"growthRate\x18\x04 \x01(\x01R\n" +
+	"growthRate\"`\n" +
 	"\fRevenuePoint\x12\x12\n" +
 	"\x04date\x18\x01 \x01(\tR\x04date\x12\x18\n" +
-	"\arevenue\x18\x02 \x01(\x01R\arevenue\x12#\n" +
-	"\rvehicle_count\x18\x03 \x01(\x05R\fvehicleCount\"D\n" +
-	"\x17PredictPeakHoursRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\arevenue\x18\x02 \x01(\x01R\arevenue\x12\"\n" +
+	"\fvehicleCount\x18\x03 \x01(\x05R\fvehicleCount\"C\n" +
+	"\x17PredictPeakHoursRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
 	"\x04date\x18\x02 \x01(\tR\x04date\"\x83\x01\n" +
 	"\x18PredictPeakHoursResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x129\n" +
-	"\x04data\x18\x03 \x01(\v2%.api.analytics.v1.PeakHoursPredictionR\x04data\"\x9b\x01\n" +
-	"\x13PeakHoursPrediction\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
-	"\x04date\x18\x02 \x01(\tR\x04date\x129\n" +
-	"\n" +
-	"peak_hours\x18\x03 \x03(\v2\x1a.api.analytics.v1.PeakHourR\tpeakHours\x12\x1e\n" +
+	"\x04data\x18\x03 \x01(\v2%.api.analytics.v1.PeakHoursPredictionR\x04data\"\x99\x01\n" +
+	"\x13PeakHoursPrediction\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x128\n" +
+	"\tpeakHours\x18\x03 \x03(\v2\x1a.api.analytics.v1.PeakHourR\tpeakHours\x12\x1e\n" +
 	"\n" +
 	"confidence\x18\x04 \x01(\x01R\n" +
-	"confidence\"\x93\x01\n" +
-	"\bPeakHour\x12\x1d\n" +
-	"\n" +
-	"start_hour\x18\x01 \x01(\x05R\tstartHour\x12\x19\n" +
-	"\bend_hour\x18\x02 \x01(\x05R\aendHour\x12+\n" +
-	"\x11expected_vehicles\x18\x03 \x01(\x05R\x10expectedVehicles\x12 \n" +
-	"\vprobability\x18\x04 \x01(\x01R\vprobability\"j\n" +
-	"\x17GetOccupancyRateRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x1d\n" +
-	"\n" +
-	"start_date\x18\x02 \x01(\tR\tstartDate\x12\x19\n" +
-	"\bend_date\x18\x03 \x01(\tR\aendDate\"\x81\x01\n" +
+	"confidence\"\x90\x01\n" +
+	"\bPeakHour\x12\x1c\n" +
+	"\tstartHour\x18\x01 \x01(\x05R\tstartHour\x12\x18\n" +
+	"\aendHour\x18\x02 \x01(\x05R\aendHour\x12*\n" +
+	"\x10expectedVehicles\x18\x03 \x01(\x05R\x10expectedVehicles\x12 \n" +
+	"\vprobability\x18\x04 \x01(\x01R\vprobability\"g\n" +
+	"\x17GetOccupancyRateRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x1c\n" +
+	"\tstartDate\x18\x02 \x01(\tR\tstartDate\x12\x18\n" +
+	"\aendDate\x18\x03 \x01(\tR\aendDate\"\x81\x01\n" +
 	"\x18GetOccupancyRateResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x127\n" +
-	"\x04data\x18\x03 \x01(\v2#.api.analytics.v1.OccupancyRateDataR\x04data\"\xd8\x01\n" +
-	"\x11OccupancyRateData\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12!\n" +
-	"\fcurrent_rate\x18\x02 \x01(\x01R\vcurrentRate\x12\x19\n" +
-	"\bavg_rate\x18\x03 \x01(\x01R\aavgRate\x12\x19\n" +
-	"\bmax_rate\x18\x04 \x01(\x01R\amaxRate\x12\x19\n" +
-	"\bmin_rate\x18\x05 \x01(\x01R\aminRate\x128\n" +
-	"\x06points\x18\x06 \x03(\v2 .api.analytics.v1.OccupancyPointR\x06points\"\x8e\x01\n" +
+	"\x04data\x18\x03 \x01(\v2#.api.analytics.v1.OccupancyRateDataR\x04data\"\xd3\x01\n" +
+	"\x11OccupancyRateData\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12 \n" +
+	"\vcurrentRate\x18\x02 \x01(\x01R\vcurrentRate\x12\x18\n" +
+	"\aavgRate\x18\x03 \x01(\x01R\aavgRate\x12\x18\n" +
+	"\amaxRate\x18\x04 \x01(\x01R\amaxRate\x12\x18\n" +
+	"\aminRate\x18\x05 \x01(\x01R\aminRate\x128\n" +
+	"\x06points\x18\x06 \x03(\v2 .api.analytics.v1.OccupancyPointR\x06points\"\x8c\x01\n" +
 	"\x0eOccupancyPoint\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\tR\ttimestamp\x12\x12\n" +
-	"\x04rate\x18\x02 \x01(\x01R\x04rate\x12'\n" +
-	"\x0foccupied_spaces\x18\x03 \x01(\x05R\x0eoccupiedSpaces\x12!\n" +
-	"\ftotal_spaces\x18\x04 \x01(\x05R\vtotalSpaces\"B\n" +
-	"\x15GetVehicleFlowRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04rate\x18\x02 \x01(\x01R\x04rate\x12&\n" +
+	"\x0eoccupiedSpaces\x18\x03 \x01(\x05R\x0eoccupiedSpaces\x12 \n" +
+	"\vtotalSpaces\x18\x04 \x01(\x05R\vtotalSpaces\"A\n" +
+	"\x15GetVehicleFlowRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
 	"\x04date\x18\x02 \x01(\tR\x04date\"}\n" +
 	"\x16GetVehicleFlowResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
-	"\x04data\x18\x03 \x01(\v2!.api.analytics.v1.VehicleFlowDataR\x04data\"\xeb\x01\n" +
-	"\x0fVehicleFlowData\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
-	"\x04date\x18\x02 \x01(\tR\x04date\x12#\n" +
-	"\rtotal_entries\x18\x03 \x01(\x05R\ftotalEntries\x12\x1f\n" +
-	"\vtotal_exits\x18\x04 \x01(\x05R\n" +
-	"totalExits\x12)\n" +
-	"\x10current_vehicles\x18\x05 \x01(\x05R\x0fcurrentVehicles\x12<\n" +
-	"\vflow_points\x18\x06 \x03(\v2\x1b.api.analytics.v1.FlowPointR\n" +
-	"flowPoints\"t\n" +
+	"\x04data\x18\x03 \x01(\v2!.api.analytics.v1.VehicleFlowDataR\x04data\"\xe6\x01\n" +
+	"\x0fVehicleFlowData\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x12\"\n" +
+	"\ftotalEntries\x18\x03 \x01(\x05R\ftotalEntries\x12\x1e\n" +
+	"\n" +
+	"totalExits\x18\x04 \x01(\x05R\n" +
+	"totalExits\x12(\n" +
+	"\x0fcurrentVehicles\x18\x05 \x01(\x05R\x0fcurrentVehicles\x12;\n" +
+	"\n" +
+	"flowPoints\x18\x06 \x03(\v2\x1b.api.analytics.v1.FlowPointR\n" +
+	"flowPoints\"s\n" +
 	"\tFlowPoint\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\tR\ttimestamp\x12\x18\n" +
 	"\aentries\x18\x02 \x01(\x05R\aentries\x12\x14\n" +
-	"\x05exits\x18\x03 \x01(\x05R\x05exits\x12\x19\n" +
-	"\bnet_flow\x18\x04 \x01(\x05R\anetFlow2\xef\x05\n" +
-	"\x10AnalyticsService\x12\x8f\x01\n" +
-	"\x0fGetLotAnalytics\x12(.api.analytics.v1.GetLotAnalyticsRequest\x1a).api.analytics.v1.GetLotAnalyticsResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/analytics/lots/{lot_id}\x12\x8f\x01\n" +
+	"\x05exits\x18\x03 \x01(\x05R\x05exits\x12\x18\n" +
+	"\anetFlow\x18\x04 \x01(\x05R\anetFlow2\xee\x05\n" +
+	"\x10AnalyticsService\x12\x8e\x01\n" +
+	"\x0fGetLotAnalytics\x12(.api.analytics.v1.GetLotAnalyticsRequest\x1a).api.analytics.v1.GetLotAnalyticsResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/analytics/lots/{lotId}\x12\x8f\x01\n" +
 	"\x0fGetRevenueTrend\x12(.api.analytics.v1.GetRevenueTrendRequest\x1a).api.analytics.v1.GetRevenueTrendResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/analytics/revenue/trend\x12\x97\x01\n" +
 	"\x10PredictPeakHours\x12).api.analytics.v1.PredictPeakHoursRequest\x1a*.api.analytics.v1.PredictPeakHoursResponse\",\x82\xd3\xe4\x93\x02&\x12$/api/v1/analytics/predict/peak-hours\x12\x8e\x01\n" +
 	"\x10GetOccupancyRate\x12).api.analytics.v1.GetOccupancyRateRequest\x1a*.api.analytics.v1.GetOccupancyRateResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/analytics/occupancy\x12\x8b\x01\n" +
@@ -1572,16 +1573,16 @@ var file_api_analytics_v1_analytics_proto_goTypes = []any{
 }
 var file_api_analytics_v1_analytics_proto_depIdxs = []int32{
 	2,  // 0: api.analytics.v1.GetLotAnalyticsResponse.data:type_name -> api.analytics.v1.LotAnalyticsData
-	3,  // 1: api.analytics.v1.LotAnalyticsData.hourly_stats:type_name -> api.analytics.v1.HourlyStats
-	4,  // 2: api.analytics.v1.LotAnalyticsData.daily_stats:type_name -> api.analytics.v1.DailyStats
+	3,  // 1: api.analytics.v1.LotAnalyticsData.hourlyStats:type_name -> api.analytics.v1.HourlyStats
+	4,  // 2: api.analytics.v1.LotAnalyticsData.dailyStats:type_name -> api.analytics.v1.DailyStats
 	7,  // 3: api.analytics.v1.GetRevenueTrendResponse.data:type_name -> api.analytics.v1.RevenueTrendData
 	8,  // 4: api.analytics.v1.RevenueTrendData.points:type_name -> api.analytics.v1.RevenuePoint
 	11, // 5: api.analytics.v1.PredictPeakHoursResponse.data:type_name -> api.analytics.v1.PeakHoursPrediction
-	12, // 6: api.analytics.v1.PeakHoursPrediction.peak_hours:type_name -> api.analytics.v1.PeakHour
+	12, // 6: api.analytics.v1.PeakHoursPrediction.peakHours:type_name -> api.analytics.v1.PeakHour
 	15, // 7: api.analytics.v1.GetOccupancyRateResponse.data:type_name -> api.analytics.v1.OccupancyRateData
 	16, // 8: api.analytics.v1.OccupancyRateData.points:type_name -> api.analytics.v1.OccupancyPoint
 	19, // 9: api.analytics.v1.GetVehicleFlowResponse.data:type_name -> api.analytics.v1.VehicleFlowData
-	20, // 10: api.analytics.v1.VehicleFlowData.flow_points:type_name -> api.analytics.v1.FlowPoint
+	20, // 10: api.analytics.v1.VehicleFlowData.flowPoints:type_name -> api.analytics.v1.FlowPoint
 	0,  // 11: api.analytics.v1.AnalyticsService.GetLotAnalytics:input_type -> api.analytics.v1.GetLotAnalyticsRequest
 	5,  // 12: api.analytics.v1.AnalyticsService.GetRevenueTrend:input_type -> api.analytics.v1.GetRevenueTrendRequest
 	9,  // 13: api.analytics.v1.AnalyticsService.PredictPeakHours:input_type -> api.analytics.v1.PredictPeakHoursRequest

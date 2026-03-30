@@ -36,10 +36,10 @@ type PaymentServiceHTTPServer interface {
 func RegisterPaymentServiceHTTPServer(s *http.Server, srv PaymentServiceHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/v1/pay/create", _PaymentService_CreatePayment0_HTTP_Handler(srv))
-	r.GET("/api/v1/pay/{order_id}/status", _PaymentService_GetPaymentStatus0_HTTP_Handler(srv))
+	r.GET("/api/v1/pay/{orderId}/status", _PaymentService_GetPaymentStatus0_HTTP_Handler(srv))
 	r.POST("/api/v1/pay/callback/wechat", _PaymentService_WechatCallback0_HTTP_Handler(srv))
 	r.POST("/api/v1/pay/callback/alipay", _PaymentService_AlipayCallback0_HTTP_Handler(srv))
-	r.POST("/api/v1/pay/{order_id}/refund", _PaymentService_Refund0_HTTP_Handler(srv))
+	r.POST("/api/v1/pay/{orderId}/refund", _PaymentService_Refund0_HTTP_Handler(srv))
 }
 
 func _PaymentService_CreatePayment0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx http.Context) error {
@@ -199,7 +199,7 @@ func (c *PaymentServiceHTTPClientImpl) CreatePayment(ctx context.Context, in *Cr
 
 func (c *PaymentServiceHTTPClientImpl) GetPaymentStatus(ctx context.Context, in *GetPaymentStatusRequest, opts ...http.CallOption) (*GetPaymentStatusResponse, error) {
 	var out GetPaymentStatusResponse
-	pattern := "/api/v1/pay/{order_id}/status"
+	pattern := "/api/v1/pay/{orderId}/status"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPaymentServiceGetPaymentStatus))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -212,7 +212,7 @@ func (c *PaymentServiceHTTPClientImpl) GetPaymentStatus(ctx context.Context, in 
 
 func (c *PaymentServiceHTTPClientImpl) Refund(ctx context.Context, in *RefundRequest, opts ...http.CallOption) (*RefundResponse, error) {
 	var out RefundResponse
-	pattern := "/api/v1/pay/{order_id}/refund"
+	pattern := "/api/v1/pay/{orderId}/refund"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPaymentServiceRefund))
 	opts = append(opts, http.PathTemplate(pattern))

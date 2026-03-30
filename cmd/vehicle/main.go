@@ -78,6 +78,12 @@ func main() {
 	// Initialize repositories
 	vehicleRepo := data.NewVehicleRepo(dataLayer)
 
+	// Seed device data
+	if err := vehicleRepo.SeedData(context.Background()); err != nil {
+		logHelper.Errorf("failed to seed device data: %v", err)
+		// Don't exit, just log the error
+	}
+
 	// Initialize MQTT client
 	var mqttClient mqtt.Client
 	if cfg.MQTT.Broker != "" {

@@ -3,19 +3,20 @@
 
 openapi: 3.0.3
 info:
-    title: VehicleService API
+    title: ChargingService API
     version: 0.0.1
 paths:
-    /api/v1/device/entry:
+    /api/v1/charging/connectors:
         post:
             tags:
-                - VehicleService
-            operationId: VehicleService_Entry
+                - ChargingService
+            description: Connector management
+            operationId: ChargingService_CreateConnector
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/EntryRequest'
+                            $ref: '#/components/schemas/CreateConnectorRequest'
                 required: true
             responses:
                 "200":
@@ -23,98 +24,20 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/EntryResponse'
+                                $ref: '#/components/schemas/CreateConnectorResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/device/exit:
-        post:
-            tags:
-                - VehicleService
-            operationId: VehicleService_Exit
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/ExitRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ExitResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/device/heartbeat:
-        post:
-            tags:
-                - VehicleService
-            operationId: VehicleService_Heartbeat
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/HeartbeatRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/HeartbeatResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/device/{deviceId}/command:
-        post:
-            tags:
-                - VehicleService
-            operationId: VehicleService_SendCommand
-            parameters:
-                - name: deviceId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/SendCommandRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SendCommandResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/device/{deviceId}/status:
+    /api/v1/charging/connectors/{connectorId}:
         get:
             tags:
-                - VehicleService
-            operationId: VehicleService_GetDeviceStatus
+                - ChargingService
+            operationId: ChargingService_GetConnector
             parameters:
-                - name: deviceId
+                - name: connectorId
                   in: path
                   required: true
                   schema:
@@ -125,19 +48,48 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetDeviceStatusResponse'
+                                $ref: '#/components/schemas/GetConnectorResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/devices:
+    /api/v1/charging/prices:
+        post:
+            tags:
+                - ChargingService
+            description: Price management
+            operationId: ChargingService_CreatePrice
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreatePriceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreatePriceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions:
         get:
             tags:
-                - VehicleService
-            operationId: VehicleService_ListDevices
+                - ChargingService
+            operationId: ChargingService_ListUserSessions
             parameters:
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
                 - name: page
                   in: query
                   schema:
@@ -154,25 +106,157 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListDevicesResponse'
+                                $ref: '#/components/schemas/ListUserSessionsResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/vehicle/records:
+    /api/v1/charging/sessions/start:
+        post:
+            tags:
+                - ChargingService
+            description: Charging session
+            operationId: ChargingService_StartCharging
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/StartChargingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/StartChargingResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}:
         get:
             tags:
-                - VehicleService
-            operationId: VehicleService_ListParkingRecords
+                - ChargingService
+            operationId: ChargingService_GetSession
             parameters:
-                - name: plateNumbers
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetSessionResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}/payment/confirm:
+        post:
+            tags:
+                - ChargingService
+            description: Payment
+            operationId: ChargingService_ConfirmPayment
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ConfirmPaymentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConfirmPaymentResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}/stop:
+        post:
+            tags:
+                - ChargingService
+            operationId: ChargingService_StopCharging
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/StopChargingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/StopChargingResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}/summary:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetChargingSummary
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetChargingSummaryResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListStations
+            parameters:
+                - name: lotId
                   in: query
                   schema:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 - name: page
                   in: query
                   schema:
@@ -189,20 +273,67 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListParkingRecordsResponse'
+                                $ref: '#/components/schemas/ListStationsResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/vehicle/records/{recordId}:
+        post:
+            tags:
+                - ChargingService
+            description: Station management
+            operationId: ChargingService_CreateStation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateStationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/available:
         get:
             tags:
-                - VehicleService
-            operationId: VehicleService_GetParkingRecord
+                - ChargingService
+            operationId: ChargingService_GetAvailableStations
             parameters:
-                - name: recordId
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetAvailableStationsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetStation
+            parameters:
+                - name: stationId
                   in: path
                   required: true
                   schema:
@@ -213,20 +344,48 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetParkingRecordResponse'
+                                $ref: '#/components/schemas/GetStationResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/vehicle/{plateNumber}:
-        get:
+        put:
             tags:
-                - VehicleService
-            operationId: VehicleService_GetVehicleInfo
+                - ChargingService
+            operationId: ChargingService_UpdateStation
             parameters:
-                - name: plateNumber
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateStationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - ChargingService
+            operationId: ChargingService_DeleteStation
+            parameters:
+                - name: stationId
                   in: path
                   required: true
                   schema:
@@ -237,7 +396,79 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetVehicleInfoResponse'
+                                $ref: '#/components/schemas/DeleteStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}/connectors:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListConnectors
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListConnectorsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}/price:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetCurrentPrice
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCurrentPriceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}/prices:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListPrices
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPricesResponse'
                 default:
                     description: Default error response
                     content:
@@ -246,69 +477,186 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        CommandData:
+        ChargingSummary:
             type: object
             properties:
-                commandId:
+                sessionId:
+                    type: string
+                stationName:
+                    type: string
+                connectorNum:
+                    type: integer
+                    format: int32
+                vehiclePlate:
+                    type: string
+                startTime:
+                    type: string
+                endTime:
+                    type: string
+                duration:
+                    type: number
+                    format: double
+                chargedEnergy:
+                    type: number
+                    format: double
+                cost:
+                    type: number
+                    format: double
+                serviceFee:
+                    type: number
+                    format: double
+                totalAmount:
+                    type: number
+                    format: double
+                paymentStatus:
+                    type: string
+        ConfirmPaymentRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                transactionId:
+                    type: string
+                paymentMethod:
+                    type: string
+                paidAmount:
+                    type: number
+                    format: double
+            description: Payment messages
+        ConfirmPaymentResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Session'
+        Connector:
+            type: object
+            properties:
+                id:
+                    type: string
+                stationId:
+                    type: string
+                number:
+                    type: integer
+                    format: int32
+                type:
                     type: string
                 status:
                     type: string
-        DeviceInfo:
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+                current:
+                    type: number
+                    format: double
+                faultCode:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        CreateConnectorRequest:
             type: object
             properties:
-                deviceId:
+                stationId:
                     type: string
-                status:
+                number:
+                    type: integer
+                    format: int32
+                type:
                     type: string
-                lastHeartbeat:
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+            description: Connector messages
+        CreateConnectorResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
-                online:
+                data:
+                    $ref: '#/components/schemas/Connector'
+        CreatePriceRequest:
+            type: object
+            properties:
+                stationId:
+                    type: string
+                name:
+                    type: string
+                startHour:
+                    type: integer
+                    format: int32
+                endHour:
+                    type: integer
+                    format: int32
+                pricePerKwh:
+                    type: number
+                    format: double
+                serviceFee:
+                    type: number
+                    format: double
+                peakLoad:
+                    type: number
+                    format: double
+                offPeakLoad:
+                    type: number
+                    format: double
+                isPeakHours:
                     type: boolean
-                laneId:
+                effectiveAt:
                     type: string
+                expiresAt:
+                    type: string
+            description: Price messages
+        CreatePriceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Price'
+        CreateStationRequest:
+            type: object
+            properties:
                 lotId:
                     type: string
-        DeviceStatus:
-            type: object
-            properties:
-                deviceId:
+                name:
                     type: string
-                online:
-                    type: boolean
-                status:
+                stationType:
                     type: string
-                lastHeartbeat:
+                connectorType:
                     type: string
-        EntryData:
-            type: object
-            properties:
-                recordId:
-                    type: string
-                plateNumber:
-                    type: string
-                allowed:
-                    type: boolean
-                gateOpen:
-                    type: boolean
-                displayMessage:
-                    type: string
-        EntryRequest:
-            type: object
-            properties:
-                deviceId:
-                    type: string
-                plateNumber:
-                    type: string
-                plateImageUrl:
-                    type: string
-                confidence:
+                maxPower:
                     type: number
                     format: double
-                vehicleType:
+                voltage:
+                    type: number
+                    format: double
+                totalConnectors:
+                    type: integer
+                    format: int32
+                location:
                     type: string
-                timestamp:
+                floor:
                     type: string
-        EntryResponse:
+            description: Station messages
+        CreateStationResponse:
             type: object
             properties:
                 code:
@@ -317,47 +665,16 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/EntryData'
-        ExitData:
+                    $ref: '#/components/schemas/Station'
+        DeleteStationResponse:
             type: object
             properties:
-                recordId:
-                    type: string
-                plateNumber:
-                    type: string
-                parkingDuration:
+                code:
                     type: integer
                     format: int32
-                amount:
-                    type: number
-                    format: double
-                discountAmount:
-                    type: number
-                    format: double
-                finalAmount:
-                    type: number
-                    format: double
-                allowed:
-                    type: boolean
-                gateOpen:
-                    type: boolean
-                displayMessage:
+                message:
                     type: string
-        ExitRequest:
-            type: object
-            properties:
-                deviceId:
-                    type: string
-                plateNumber:
-                    type: string
-                plateImageUrl:
-                    type: string
-                confidence:
-                    type: number
-                    format: double
-                timestamp:
-                    type: string
-        ExitResponse:
+        GetAvailableStationsResponse:
             type: object
             properties:
                 code:
@@ -366,8 +683,10 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ExitData'
-        GetDeviceStatusResponse:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Station'
+        GetChargingSummaryResponse:
             type: object
             properties:
                 code:
@@ -376,8 +695,8 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/DeviceStatus'
-        GetParkingRecordResponse:
+                    $ref: '#/components/schemas/ChargingSummary'
+        GetConnectorResponse:
             type: object
             properties:
                 code:
@@ -386,8 +705,8 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ParkingRecordInfo'
-        GetVehicleInfoResponse:
+                    $ref: '#/components/schemas/Connector'
+        GetCurrentPriceResponse:
             type: object
             properties:
                 code:
@@ -396,7 +715,27 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/VehicleInfo'
+                    $ref: '#/components/schemas/Price'
+        GetSessionResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Session'
+        GetStationResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Station'
         GoogleProtobufAny:
             type: object
             properties:
@@ -405,49 +744,157 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        HeartbeatRequest:
+        ListConnectorsResponse:
             type: object
             properties:
-                deviceId:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Connector'
+        ListPricesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Price'
+        ListStationsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Station'
+                total:
+                    type: string
+        ListUserSessionsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Session'
+                total:
+                    type: string
+        Price:
+            type: object
+            properties:
+                id:
+                    type: string
+                stationId:
+                    type: string
+                name:
+                    type: string
+                startHour:
+                    type: integer
+                    format: int32
+                endHour:
+                    type: integer
+                    format: int32
+                pricePerKwh:
+                    type: number
+                    format: double
+                serviceFee:
+                    type: number
+                    format: double
+                peakLoad:
+                    type: number
+                    format: double
+                offPeakLoad:
+                    type: number
+                    format: double
+                isPeakHours:
+                    type: boolean
+                effectiveAt:
+                    type: string
+                expiresAt:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        Session:
+            type: object
+            properties:
+                id:
+                    type: string
+                stationId:
+                    type: string
+                connectorId:
+                    type: string
+                userId:
+                    type: string
+                vehiclePlate:
+                    type: string
+                startTime:
+                    type: string
+                endTime:
+                    type: string
+                startEnergy:
+                    type: number
+                    format: double
+                endEnergy:
+                    type: number
+                    format: double
+                chargedEnergy:
+                    type: number
+                    format: double
+                cost:
+                    type: number
+                    format: double
+                serviceFee:
+                    type: number
+                    format: double
+                totalAmount:
+                    type: number
+                    format: double
                 status:
                     type: string
-                timestamp:
+                paymentStatus:
                     type: string
-        HeartbeatResponse:
+                payTime:
+                    type: string
+                paymentMethod:
+                    type: string
+                transactionId:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        StartChargingRequest:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
+                stationId:
                     type: string
-        ListDevicesResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
+                connectorId:
                     type: string
-                data:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/DeviceInfo'
-                total:
-                    type: integer
-                    format: int32
-        ListParkingRecordsData:
-            type: object
-            properties:
-                records:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ParkingRecordInfo'
-                total:
-                    type: integer
-                    format: int32
-        ListParkingRecordsResponse:
+                userId:
+                    type: string
+                vehiclePlate:
+                    type: string
+            description: Session messages
+        StartChargingResponse:
             type: object
             properties:
                 code:
@@ -456,63 +903,42 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ListParkingRecordsData'
-        ParkingRecordInfo:
+                    $ref: '#/components/schemas/Session'
+        Station:
             type: object
             properties:
-                recordId:
+                id:
                     type: string
                 lotId:
                     type: string
-                vehicleId:
+                name:
                     type: string
-                plateNumber:
+                stationType:
                     type: string
-                entryLaneId:
+                status:
                     type: string
-                entryTime:
+                connectorType:
                     type: string
-                entryImageUrl:
-                    type: string
-                recordStatus:
-                    type: string
-                exitTime:
-                    type: string
-                exitImageUrl:
-                    type: string
-                exitLaneId:
-                    type: string
-                exitDeviceId:
-                    type: string
-                parkingDuration:
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+                totalConnectors:
                     type: integer
                     format: int32
-                exitStatus:
-                    type: string
-                paymentLock:
+                availableConnectors:
                     type: integer
                     format: int32
-        SendCommandRequest:
-            type: object
-            properties:
-                deviceId:
+                location:
                     type: string
-                command:
+                floor:
                     type: string
-                params:
-                    type: object
-                    additionalProperties:
-                        type: string
-        SendCommandResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
+                createdAt:
                     type: string
-                data:
-                    $ref: '#/components/schemas/CommandData'
+                updatedAt:
+                    type: string
         Status:
             type: object
             properties:
@@ -529,18 +955,51 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        VehicleInfo:
+        StopChargingRequest:
             type: object
             properties:
-                plateNumber:
+                sessionId:
                     type: string
-                vehicleType:
+                userId:
                     type: string
-                ownerName:
+        StopChargingResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
-                ownerPhone:
+                data:
+                    $ref: '#/components/schemas/Session'
+        UpdateStationRequest:
+            type: object
+            properties:
+                stationId:
                     type: string
-                monthlyValidUntil:
+                name:
                     type: string
+                status:
+                    type: string
+                maxPower:
+                    type: number
+                    format: double
+                totalConnectors:
+                    type: integer
+                    format: int32
+                location:
+                    type: string
+                floor:
+                    type: string
+        UpdateStationResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Station'
 tags:
-    - name: VehicleService
+    - name: ChargingService

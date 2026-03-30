@@ -219,3 +219,73 @@ func (s *VehicleService) ListDevices(ctx context.Context, req *v1.ListDevicesReq
 		Total:   int32(total),
 	}, nil
 }
+
+// CreateDevice handles create device request.
+func (s *VehicleService) CreateDevice(ctx context.Context, req *v1.CreateDeviceRequest) (*v1.CreateDeviceResponse, error) {
+	device, err := s.deviceUseCase.CreateDevice(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CreateDevice failed: %v", err)
+		return &v1.CreateDeviceResponse{
+			Code:    500,
+			Message: "创建设备失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.CreateDeviceResponse{
+		Code:    0,
+		Message: "success",
+		Data:    device,
+	}, nil
+}
+
+// GetDevice handles get device request.
+func (s *VehicleService) GetDevice(ctx context.Context, req *v1.GetDeviceRequest) (*v1.GetDeviceResponse, error) {
+	device, err := s.deviceUseCase.GetDevice(ctx, req.DeviceId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDevice failed: %v", err)
+		return &v1.GetDeviceResponse{
+			Code:    500,
+			Message: "获取设备失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.GetDeviceResponse{
+		Code:    0,
+		Message: "success",
+		Data:    device,
+	}, nil
+}
+
+// UpdateDevice handles update device request.
+func (s *VehicleService) UpdateDevice(ctx context.Context, req *v1.UpdateDeviceRequest) (*v1.UpdateDeviceResponse, error) {
+	device, err := s.deviceUseCase.UpdateDevice(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateDevice failed: %v", err)
+		return &v1.UpdateDeviceResponse{
+			Code:    500,
+			Message: "更新设备失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.UpdateDeviceResponse{
+		Code:    0,
+		Message: "success",
+		Data:    device,
+	}, nil
+}
+
+// DeleteDevice handles delete device request.
+func (s *VehicleService) DeleteDevice(ctx context.Context, req *v1.DeleteDeviceRequest) (*v1.DeleteDeviceResponse, error) {
+	if err := s.deviceUseCase.DeleteDevice(ctx, req.DeviceId); err != nil {
+		s.log.WithContext(ctx).Errorf("DeleteDevice failed: %v", err)
+		return &v1.DeleteDeviceResponse{
+			Code:    500,
+			Message: "删除设备失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.DeleteDeviceResponse{
+		Code:    0,
+		Message: "success",
+	}, nil
+}

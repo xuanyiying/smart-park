@@ -73,6 +73,12 @@ func main() {
 	// Initialize repositories
 	billingRepo := data.NewBillingRuleRepo(dataLayer)
 
+	// Seed billing rules data
+	if err := billingRepo.SeedData(context.Background()); err != nil {
+		logHelper.Errorf("failed to seed billing rules: %v", err)
+		// Don't exit, just log the error
+	}
+
 	// Initialize business logic
 	billingUseCase := biz.NewBillingUseCase(billingRepo, logger)
 

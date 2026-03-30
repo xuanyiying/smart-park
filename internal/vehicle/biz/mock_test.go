@@ -132,3 +132,26 @@ func (m *MockVehicleRepo) GetPendingSyncRecords(ctx context.Context, limit int) 
 func (m *MockVehicleRepo) UpdateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error {
 	return nil
 }
+
+func (m *MockVehicleRepo) GetDeviceByID(ctx context.Context, deviceID string) (*Device, error) {
+	return m.Devices[deviceID], nil
+}
+
+func (m *MockVehicleRepo) CreateDevice(ctx context.Context, device *Device) error {
+	m.Devices[device.DeviceID] = device
+	return nil
+}
+
+func (m *MockVehicleRepo) UpdateDevice(ctx context.Context, device *Device) error {
+	m.Devices[device.DeviceID] = device
+	return nil
+}
+
+func (m *MockVehicleRepo) DeleteDevice(ctx context.Context, deviceID string) error {
+	delete(m.Devices, deviceID)
+	return nil
+}
+
+func (m *MockVehicleRepo) SeedData(ctx context.Context) error {
+	return nil
+}

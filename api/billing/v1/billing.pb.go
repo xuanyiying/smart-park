@@ -10,7 +10,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -25,12 +24,12 @@ const (
 
 type CalculateFeeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	LotId         string                 `protobuf:"bytes,2,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	PlateNumber   string                 `protobuf:"bytes,3,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	EntryTime     int64                  `protobuf:"varint,4,opt,name=entry_time,json=entryTime,proto3" json:"entry_time,omitempty"`
-	ExitTime      int64                  `protobuf:"varint,5,opt,name=exit_time,json=exitTime,proto3" json:"exit_time,omitempty"`
-	VehicleType   string                 `protobuf:"bytes,6,opt,name=vehicle_type,json=vehicleType,proto3" json:"vehicle_type,omitempty"`
+	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	LotId         string                 `protobuf:"bytes,2,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,3,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	EntryTime     int64                  `protobuf:"varint,4,opt,name=entryTime,proto3" json:"entryTime,omitempty"`
+	ExitTime      int64                  `protobuf:"varint,5,opt,name=exitTime,proto3" json:"exitTime,omitempty"`
+	VehicleType   string                 `protobuf:"bytes,6,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -169,11 +168,11 @@ func (x *CalculateFeeResponse) GetData() *BillData {
 
 type BillData struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	RecordId       string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	BaseAmount     float64                `protobuf:"fixed64,2,opt,name=base_amount,json=baseAmount,proto3" json:"base_amount,omitempty"`
-	DiscountAmount float64                `protobuf:"fixed64,3,opt,name=discount_amount,json=discountAmount,proto3" json:"discount_amount,omitempty"`
-	FinalAmount    float64                `protobuf:"fixed64,4,opt,name=final_amount,json=finalAmount,proto3" json:"final_amount,omitempty"`
-	AppliedRules   []*AppliedRule         `protobuf:"bytes,5,rep,name=applied_rules,json=appliedRules,proto3" json:"applied_rules,omitempty"`
+	RecordId       string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	BaseAmount     float64                `protobuf:"fixed64,2,opt,name=baseAmount,proto3" json:"baseAmount,omitempty"`
+	DiscountAmount float64                `protobuf:"fixed64,3,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
+	FinalAmount    float64                `protobuf:"fixed64,4,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
+	AppliedRules   []*AppliedRule         `protobuf:"bytes,5,rep,name=appliedRules,proto3" json:"appliedRules,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -245,8 +244,8 @@ func (x *BillData) GetAppliedRules() []*AppliedRule {
 
 type AppliedRule struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
-	RuleName      string                 `protobuf:"bytes,2,opt,name=rule_name,json=ruleName,proto3" json:"rule_name,omitempty"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=ruleId,proto3" json:"ruleId,omitempty"`
+	RuleName      string                 `protobuf:"bytes,2,opt,name=ruleName,proto3" json:"ruleName,omitempty"`
 	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -305,13 +304,13 @@ func (x *AppliedRule) GetAmount() float64 {
 
 type CreateBillingRuleRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	LotId          string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	RuleName       string                 `protobuf:"bytes,2,opt,name=rule_name,json=ruleName,proto3" json:"rule_name,omitempty"`
-	RuleType       string                 `protobuf:"bytes,3,opt,name=rule_type,json=ruleType,proto3" json:"rule_type,omitempty"`
-	ConditionsJson string                 `protobuf:"bytes,4,opt,name=conditions_json,json=conditionsJson,proto3" json:"conditions_json,omitempty"`
-	ActionsJson    string                 `protobuf:"bytes,5,opt,name=actions_json,json=actionsJson,proto3" json:"actions_json,omitempty"`
+	LotId          string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	RuleName       string                 `protobuf:"bytes,2,opt,name=ruleName,proto3" json:"ruleName,omitempty"`
+	RuleType       string                 `protobuf:"bytes,3,opt,name=ruleType,proto3" json:"ruleType,omitempty"`
+	ConditionsJson string                 `protobuf:"bytes,4,opt,name=conditionsJson,proto3" json:"conditionsJson,omitempty"`
+	ActionsJson    string                 `protobuf:"bytes,5,opt,name=actionsJson,proto3" json:"actionsJson,omitempty"`
 	Priority       int32                  `protobuf:"varint,6,opt,name=priority,proto3" json:"priority,omitempty"`
-	IsActive       bool                   `protobuf:"varint,7,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	IsActive       bool                   `protobuf:"varint,7,opt,name=isActive,proto3" json:"isActive,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -458,12 +457,12 @@ func (x *CreateBillingRuleResponse) GetData() *BillingRule {
 type UpdateBillingRuleRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	RuleName       string                 `protobuf:"bytes,2,opt,name=rule_name,json=ruleName,proto3" json:"rule_name,omitempty"`
-	RuleType       string                 `protobuf:"bytes,3,opt,name=rule_type,json=ruleType,proto3" json:"rule_type,omitempty"`
-	ConditionsJson string                 `protobuf:"bytes,4,opt,name=conditions_json,json=conditionsJson,proto3" json:"conditions_json,omitempty"`
-	ActionsJson    string                 `protobuf:"bytes,5,opt,name=actions_json,json=actionsJson,proto3" json:"actions_json,omitempty"`
+	RuleName       string                 `protobuf:"bytes,2,opt,name=ruleName,proto3" json:"ruleName,omitempty"`
+	RuleType       string                 `protobuf:"bytes,3,opt,name=ruleType,proto3" json:"ruleType,omitempty"`
+	ConditionsJson string                 `protobuf:"bytes,4,opt,name=conditionsJson,proto3" json:"conditionsJson,omitempty"`
+	ActionsJson    string                 `protobuf:"bytes,5,opt,name=actionsJson,proto3" json:"actionsJson,omitempty"`
 	Priority       int32                  `protobuf:"varint,6,opt,name=priority,proto3" json:"priority,omitempty"`
-	IsActive       bool                   `protobuf:"varint,7,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	IsActive       bool                   `protobuf:"varint,7,opt,name=isActive,proto3" json:"isActive,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -697,7 +696,7 @@ func (x *DeleteBillingRuleResponse) GetMessage() string {
 
 type GetBillingRulesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -802,14 +801,14 @@ func (x *GetBillingRulesResponse) GetData() []*BillingRule {
 type BillingRule struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	LotId          string                 `protobuf:"bytes,2,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	RuleName       string                 `protobuf:"bytes,3,opt,name=rule_name,json=ruleName,proto3" json:"rule_name,omitempty"`
-	RuleType       string                 `protobuf:"bytes,4,opt,name=rule_type,json=ruleType,proto3" json:"rule_type,omitempty"`
-	ConditionsJson string                 `protobuf:"bytes,5,opt,name=conditions_json,json=conditionsJson,proto3" json:"conditions_json,omitempty"`
-	ActionsJson    string                 `protobuf:"bytes,6,opt,name=actions_json,json=actionsJson,proto3" json:"actions_json,omitempty"`
+	LotId          string                 `protobuf:"bytes,2,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	RuleName       string                 `protobuf:"bytes,3,opt,name=ruleName,proto3" json:"ruleName,omitempty"`
+	RuleType       string                 `protobuf:"bytes,4,opt,name=ruleType,proto3" json:"ruleType,omitempty"`
+	ConditionsJson string                 `protobuf:"bytes,5,opt,name=conditionsJson,proto3" json:"conditionsJson,omitempty"`
+	ActionsJson    string                 `protobuf:"bytes,6,opt,name=actionsJson,proto3" json:"actionsJson,omitempty"`
 	Priority       int32                  `protobuf:"varint,7,opt,name=priority,proto3" json:"priority,omitempty"`
-	IsActive       bool                   `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	IsActive       bool                   `protobuf:"varint,8,opt,name=isActive,proto3" json:"isActive,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -911,50 +910,50 @@ var File_api_billing_v1_billing_proto protoreflect.FileDescriptor
 
 const file_api_billing_v1_billing_proto_rawDesc = "" +
 	"\n" +
-	"\x1capi/billing/v1/billing.proto\x12\x0eapi.billing.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xcb\x01\n" +
-	"\x13CalculateFeeRequest\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x15\n" +
-	"\x06lot_id\x18\x02 \x01(\tR\x05lotId\x12!\n" +
-	"\fplate_number\x18\x03 \x01(\tR\vplateNumber\x12\x1d\n" +
-	"\n" +
-	"entry_time\x18\x04 \x01(\x03R\tentryTime\x12\x1b\n" +
-	"\texit_time\x18\x05 \x01(\x03R\bexitTime\x12!\n" +
-	"\fvehicle_type\x18\x06 \x01(\tR\vvehicleType\"r\n" +
+	"\x1capi/billing/v1/billing.proto\x12\x0eapi.billing.v1\x1a\x1cgoogle/api/annotations.proto\"\xc5\x01\n" +
+	"\x13CalculateFeeRequest\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x14\n" +
+	"\x05lotId\x18\x02 \x01(\tR\x05lotId\x12 \n" +
+	"\vplateNumber\x18\x03 \x01(\tR\vplateNumber\x12\x1c\n" +
+	"\tentryTime\x18\x04 \x01(\x03R\tentryTime\x12\x1a\n" +
+	"\bexitTime\x18\x05 \x01(\x03R\bexitTime\x12 \n" +
+	"\vvehicleType\x18\x06 \x01(\tR\vvehicleType\"r\n" +
 	"\x14CalculateFeeResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.billing.v1.BillDataR\x04data\"\xd6\x01\n" +
-	"\bBillData\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x1f\n" +
-	"\vbase_amount\x18\x02 \x01(\x01R\n" +
-	"baseAmount\x12'\n" +
-	"\x0fdiscount_amount\x18\x03 \x01(\x01R\x0ediscountAmount\x12!\n" +
-	"\ffinal_amount\x18\x04 \x01(\x01R\vfinalAmount\x12@\n" +
-	"\rapplied_rules\x18\x05 \x03(\v2\x1b.api.billing.v1.AppliedRuleR\fappliedRules\"[\n" +
-	"\vAppliedRule\x12\x17\n" +
-	"\arule_id\x18\x01 \x01(\tR\x06ruleId\x12\x1b\n" +
-	"\trule_name\x18\x02 \x01(\tR\bruleName\x12\x16\n" +
-	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xf0\x01\n" +
-	"\x18CreateBillingRuleRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x1b\n" +
-	"\trule_name\x18\x02 \x01(\tR\bruleName\x12\x1b\n" +
-	"\trule_type\x18\x03 \x01(\tR\bruleType\x12'\n" +
-	"\x0fconditions_json\x18\x04 \x01(\tR\x0econditionsJson\x12!\n" +
-	"\factions_json\x18\x05 \x01(\tR\vactionsJson\x12\x1a\n" +
-	"\bpriority\x18\x06 \x01(\x05R\bpriority\x12\x1b\n" +
-	"\tis_active\x18\a \x01(\bR\bisActive\"z\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.billing.v1.BillDataR\x04data\"\xd1\x01\n" +
+	"\bBillData\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x1e\n" +
+	"\n" +
+	"baseAmount\x18\x02 \x01(\x01R\n" +
+	"baseAmount\x12&\n" +
+	"\x0ediscountAmount\x18\x03 \x01(\x01R\x0ediscountAmount\x12 \n" +
+	"\vfinalAmount\x18\x04 \x01(\x01R\vfinalAmount\x12?\n" +
+	"\fappliedRules\x18\x05 \x03(\v2\x1b.api.billing.v1.AppliedRuleR\fappliedRules\"Y\n" +
+	"\vAppliedRule\x12\x16\n" +
+	"\x06ruleId\x18\x01 \x01(\tR\x06ruleId\x12\x1a\n" +
+	"\bruleName\x18\x02 \x01(\tR\bruleName\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xea\x01\n" +
+	"\x18CreateBillingRuleRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x1a\n" +
+	"\bruleName\x18\x02 \x01(\tR\bruleName\x12\x1a\n" +
+	"\bruleType\x18\x03 \x01(\tR\bruleType\x12&\n" +
+	"\x0econditionsJson\x18\x04 \x01(\tR\x0econditionsJson\x12 \n" +
+	"\vactionsJson\x18\x05 \x01(\tR\vactionsJson\x12\x1a\n" +
+	"\bpriority\x18\x06 \x01(\x05R\bpriority\x12\x1a\n" +
+	"\bisActive\x18\a \x01(\bR\bisActive\"z\n" +
 	"\x19CreateBillingRuleResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.billing.v1.BillingRuleR\x04data\"\xe9\x01\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.billing.v1.BillingRuleR\x04data\"\xe4\x01\n" +
 	"\x18UpdateBillingRuleRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\trule_name\x18\x02 \x01(\tR\bruleName\x12\x1b\n" +
-	"\trule_type\x18\x03 \x01(\tR\bruleType\x12'\n" +
-	"\x0fconditions_json\x18\x04 \x01(\tR\x0econditionsJson\x12!\n" +
-	"\factions_json\x18\x05 \x01(\tR\vactionsJson\x12\x1a\n" +
-	"\bpriority\x18\x06 \x01(\x05R\bpriority\x12\x1b\n" +
-	"\tis_active\x18\a \x01(\bR\bisActive\"I\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bruleName\x18\x02 \x01(\tR\bruleName\x12\x1a\n" +
+	"\bruleType\x18\x03 \x01(\tR\bruleType\x12&\n" +
+	"\x0econditionsJson\x18\x04 \x01(\tR\x0econditionsJson\x12 \n" +
+	"\vactionsJson\x18\x05 \x01(\tR\vactionsJson\x12\x1a\n" +
+	"\bpriority\x18\x06 \x01(\x05R\bpriority\x12\x1a\n" +
+	"\bisActive\x18\a \x01(\bR\bisActive\"I\n" +
 	"\x19UpdateBillingRuleResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"*\n" +
@@ -962,24 +961,23 @@ const file_api_billing_v1_billing_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"I\n" +
 	"\x19DeleteBillingRuleResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"/\n" +
-	"\x16GetBillingRulesRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\"x\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\".\n" +
+	"\x16GetBillingRulesRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\"x\n" +
 	"\x17GetBillingRulesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x03(\v2\x1b.api.billing.v1.BillingRuleR\x04data\"\x92\x02\n" +
+	"\x04data\x18\x03 \x03(\v2\x1b.api.billing.v1.BillingRuleR\x04data\"\x8b\x02\n" +
 	"\vBillingRule\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x15\n" +
-	"\x06lot_id\x18\x02 \x01(\tR\x05lotId\x12\x1b\n" +
-	"\trule_name\x18\x03 \x01(\tR\bruleName\x12\x1b\n" +
-	"\trule_type\x18\x04 \x01(\tR\bruleType\x12'\n" +
-	"\x0fconditions_json\x18\x05 \x01(\tR\x0econditionsJson\x12!\n" +
-	"\factions_json\x18\x06 \x01(\tR\vactionsJson\x12\x1a\n" +
-	"\bpriority\x18\a \x01(\x05R\bpriority\x12\x1b\n" +
-	"\tis_active\x18\b \x01(\bR\bisActive\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt2\xdb\x05\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05lotId\x18\x02 \x01(\tR\x05lotId\x12\x1a\n" +
+	"\bruleName\x18\x03 \x01(\tR\bruleName\x12\x1a\n" +
+	"\bruleType\x18\x04 \x01(\tR\bruleType\x12&\n" +
+	"\x0econditionsJson\x18\x05 \x01(\tR\x0econditionsJson\x12 \n" +
+	"\vactionsJson\x18\x06 \x01(\tR\vactionsJson\x12\x1a\n" +
+	"\bpriority\x18\a \x01(\x05R\bpriority\x12\x1a\n" +
+	"\bisActive\x18\b \x01(\bR\bisActive\x12\x1c\n" +
+	"\tcreatedAt\x18\t \x01(\tR\tcreatedAt2\xdb\x05\n" +
 	"\x0eBillingService\x12\x7f\n" +
 	"\fCalculateFee\x12#.api.billing.v1.CalculateFeeRequest\x1a$.api.billing.v1.CalculateFeeResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/billing/calculate\x12\x90\x01\n" +
 	"\x11CreateBillingRule\x12(.api.billing.v1.CreateBillingRuleRequest\x1a).api.billing.v1.CreateBillingRuleResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/admin/billing/rules\x12\x95\x01\n" +
@@ -1017,7 +1015,7 @@ var file_api_billing_v1_billing_proto_goTypes = []any{
 }
 var file_api_billing_v1_billing_proto_depIdxs = []int32{
 	2,  // 0: api.billing.v1.CalculateFeeResponse.data:type_name -> api.billing.v1.BillData
-	3,  // 1: api.billing.v1.BillData.applied_rules:type_name -> api.billing.v1.AppliedRule
+	3,  // 1: api.billing.v1.BillData.appliedRules:type_name -> api.billing.v1.AppliedRule
 	12, // 2: api.billing.v1.CreateBillingRuleResponse.data:type_name -> api.billing.v1.BillingRule
 	12, // 3: api.billing.v1.GetBillingRulesResponse.data:type_name -> api.billing.v1.BillingRule
 	0,  // 4: api.billing.v1.BillingService.CalculateFee:input_type -> api.billing.v1.CalculateFeeRequest

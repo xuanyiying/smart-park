@@ -377,7 +377,7 @@ func (x *UpdateParkingLotResponse) GetMessage() string {
 type ListParkingLotsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -491,7 +491,7 @@ type ParkingLotListData struct {
 	List          []*ParkingLot          `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -561,8 +561,8 @@ type ParkingLot struct {
 	Address       string                 `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
 	Lanes         int32                  `protobuf:"varint,4,opt,name=lanes,proto3" json:"lanes,omitempty"`
 	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -648,12 +648,12 @@ func (x *ParkingLot) GetUpdatedAt() string {
 
 type ListParkingRecordsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	StartTime     string                 `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       string                 `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	PlateNumber   string                 `protobuf:"bytes,4,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	StartTime     string                 `protobuf:"bytes,2,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,3,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,4,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,6,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,6,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -795,7 +795,7 @@ type ParkingRecordListData struct {
 	List          []*ParkingRecord       `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -861,11 +861,11 @@ func (x *ParkingRecordListData) GetPageSize() int32 {
 type ParkingRecord struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	LotId           string                 `protobuf:"bytes,2,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	PlateNumber     string                 `protobuf:"bytes,3,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	EntryTime       int64                  `protobuf:"varint,4,opt,name=entry_time,json=entryTime,proto3" json:"entry_time,omitempty"`
-	ExitTime        int64                  `protobuf:"varint,5,opt,name=exit_time,json=exitTime,proto3" json:"exit_time,omitempty"`
-	ParkingDuration int32                  `protobuf:"varint,6,opt,name=parking_duration,json=parkingDuration,proto3" json:"parking_duration,omitempty"`
+	LotId           string                 `protobuf:"bytes,2,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	PlateNumber     string                 `protobuf:"bytes,3,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	EntryTime       int64                  `protobuf:"varint,4,opt,name=entryTime,proto3" json:"entryTime,omitempty"`
+	ExitTime        int64                  `protobuf:"varint,5,opt,name=exitTime,proto3" json:"exitTime,omitempty"`
+	ParkingDuration int32                  `protobuf:"varint,6,opt,name=parkingDuration,proto3" json:"parkingDuration,omitempty"`
 	Status          string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -952,10 +952,10 @@ func (x *ParkingRecord) GetStatus() string {
 
 type ListOrdersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1083,7 +1083,7 @@ type OrderListData struct {
 	List          []*Order               `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1253,15 +1253,15 @@ func (x *GetOrderResponse) GetData() *Order {
 type Order struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	RecordId       string                 `protobuf:"bytes,2,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	LotId          string                 `protobuf:"bytes,3,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
-	PlateNumber    string                 `protobuf:"bytes,4,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
+	RecordId       string                 `protobuf:"bytes,2,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	LotId          string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	PlateNumber    string                 `protobuf:"bytes,4,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	Amount         float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	DiscountAmount float64                `protobuf:"fixed64,6,opt,name=discount_amount,json=discountAmount,proto3" json:"discount_amount,omitempty"`
-	FinalAmount    float64                `protobuf:"fixed64,7,opt,name=final_amount,json=finalAmount,proto3" json:"final_amount,omitempty"`
+	DiscountAmount float64                `protobuf:"fixed64,6,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
+	FinalAmount    float64                `protobuf:"fixed64,7,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
 	Status         string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
-	PayTime        string                 `protobuf:"bytes,9,opt,name=pay_time,json=payTime,proto3" json:"pay_time,omitempty"`
-	PayMethod      string                 `protobuf:"bytes,10,opt,name=pay_method,json=payMethod,proto3" json:"pay_method,omitempty"`
+	PayTime        string                 `protobuf:"bytes,9,opt,name=payTime,proto3" json:"payTime,omitempty"`
+	PayMethod      string                 `protobuf:"bytes,10,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1368,11 +1368,11 @@ func (x *Order) GetPayMethod() string {
 
 type CreateVehicleRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber       string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	VehicleType       string                 `protobuf:"bytes,2,opt,name=vehicle_type,json=vehicleType,proto3" json:"vehicle_type,omitempty"`
-	OwnerName         string                 `protobuf:"bytes,3,opt,name=owner_name,json=ownerName,proto3" json:"owner_name,omitempty"`
-	OwnerPhone        string                 `protobuf:"bytes,4,opt,name=owner_phone,json=ownerPhone,proto3" json:"owner_phone,omitempty"`
-	MonthlyValidUntil string                 `protobuf:"bytes,5,opt,name=monthly_valid_until,json=monthlyValidUntil,proto3" json:"monthly_valid_until,omitempty"`
+	PlateNumber       string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	VehicleType       string                 `protobuf:"bytes,2,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
+	OwnerName         string                 `protobuf:"bytes,3,opt,name=ownerName,proto3" json:"ownerName,omitempty"`
+	OwnerPhone        string                 `protobuf:"bytes,4,opt,name=ownerPhone,proto3" json:"ownerPhone,omitempty"`
+	MonthlyValidUntil string                 `protobuf:"bytes,5,opt,name=monthlyValidUntil,proto3" json:"monthlyValidUntil,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1504,9 +1504,9 @@ func (x *CreateVehicleResponse) GetData() *Vehicle {
 
 type ListVehiclesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	VehicleType   string                 `protobuf:"bytes,1,opt,name=vehicle_type,json=vehicleType,proto3" json:"vehicle_type,omitempty"`
+	VehicleType   string                 `protobuf:"bytes,1,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
 	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1627,7 +1627,7 @@ type VehicleListData struct {
 	List          []*Vehicle             `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1693,12 +1693,12 @@ func (x *VehicleListData) GetPageSize() int32 {
 type Vehicle struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	PlateNumber       string                 `protobuf:"bytes,2,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	VehicleType       string                 `protobuf:"bytes,3,opt,name=vehicle_type,json=vehicleType,proto3" json:"vehicle_type,omitempty"`
-	OwnerName         string                 `protobuf:"bytes,4,opt,name=owner_name,json=ownerName,proto3" json:"owner_name,omitempty"`
-	OwnerPhone        string                 `protobuf:"bytes,5,opt,name=owner_phone,json=ownerPhone,proto3" json:"owner_phone,omitempty"`
-	MonthlyValidUntil string                 `protobuf:"bytes,6,opt,name=monthly_valid_until,json=monthlyValidUntil,proto3" json:"monthly_valid_until,omitempty"`
-	CreatedAt         string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	PlateNumber       string                 `protobuf:"bytes,2,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	VehicleType       string                 `protobuf:"bytes,3,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
+	OwnerName         string                 `protobuf:"bytes,4,opt,name=ownerName,proto3" json:"ownerName,omitempty"`
+	OwnerPhone        string                 `protobuf:"bytes,5,opt,name=ownerPhone,proto3" json:"ownerPhone,omitempty"`
+	MonthlyValidUntil string                 `protobuf:"bytes,6,opt,name=monthlyValidUntil,proto3" json:"monthlyValidUntil,omitempty"`
+	CreatedAt         string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1784,7 +1784,7 @@ func (x *Vehicle) GetCreatedAt() string {
 
 type GetDailyReportRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1896,14 +1896,14 @@ func (x *GetDailyReportResponse) GetData() *DailyReport {
 
 type DailyReport struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
-	TotalEntries  int32                  `protobuf:"varint,3,opt,name=total_entries,json=totalEntries,proto3" json:"total_entries,omitempty"`
-	TotalExits    int32                  `protobuf:"varint,4,opt,name=total_exits,json=totalExits,proto3" json:"total_exits,omitempty"`
-	TotalVehicles int32                  `protobuf:"varint,5,opt,name=total_vehicles,json=totalVehicles,proto3" json:"total_vehicles,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,6,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	TotalDiscount float64                `protobuf:"fixed64,7,opt,name=total_discount,json=totalDiscount,proto3" json:"total_discount,omitempty"`
-	NetAmount     float64                `protobuf:"fixed64,8,opt,name=net_amount,json=netAmount,proto3" json:"net_amount,omitempty"`
+	TotalEntries  int32                  `protobuf:"varint,3,opt,name=totalEntries,proto3" json:"totalEntries,omitempty"`
+	TotalExits    int32                  `protobuf:"varint,4,opt,name=totalExits,proto3" json:"totalExits,omitempty"`
+	TotalVehicles int32                  `protobuf:"varint,5,opt,name=totalVehicles,proto3" json:"totalVehicles,omitempty"`
+	TotalAmount   float64                `protobuf:"fixed64,6,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	TotalDiscount float64                `protobuf:"fixed64,7,opt,name=totalDiscount,proto3" json:"totalDiscount,omitempty"`
+	NetAmount     float64                `protobuf:"fixed64,8,opt,name=netAmount,proto3" json:"netAmount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1996,7 +1996,7 @@ func (x *DailyReport) GetNetAmount() float64 {
 
 type GetMonthlyReportRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Year          int32                  `protobuf:"varint,2,opt,name=year,proto3" json:"year,omitempty"`
 	Month         int32                  `protobuf:"varint,3,opt,name=month,proto3" json:"month,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2116,16 +2116,16 @@ func (x *GetMonthlyReportResponse) GetData() *MonthlyReport {
 
 type MonthlyReport struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Year          int32                  `protobuf:"varint,2,opt,name=year,proto3" json:"year,omitempty"`
 	Month         int32                  `protobuf:"varint,3,opt,name=month,proto3" json:"month,omitempty"`
-	TotalEntries  int32                  `protobuf:"varint,4,opt,name=total_entries,json=totalEntries,proto3" json:"total_entries,omitempty"`
-	TotalExits    int32                  `protobuf:"varint,5,opt,name=total_exits,json=totalExits,proto3" json:"total_exits,omitempty"`
-	TotalVehicles int32                  `protobuf:"varint,6,opt,name=total_vehicles,json=totalVehicles,proto3" json:"total_vehicles,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,7,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	TotalDiscount float64                `protobuf:"fixed64,8,opt,name=total_discount,json=totalDiscount,proto3" json:"total_discount,omitempty"`
-	NetAmount     float64                `protobuf:"fixed64,9,opt,name=net_amount,json=netAmount,proto3" json:"net_amount,omitempty"`
-	DailyReports  []*DailyReport         `protobuf:"bytes,10,rep,name=daily_reports,json=dailyReports,proto3" json:"daily_reports,omitempty"`
+	TotalEntries  int32                  `protobuf:"varint,4,opt,name=totalEntries,proto3" json:"totalEntries,omitempty"`
+	TotalExits    int32                  `protobuf:"varint,5,opt,name=totalExits,proto3" json:"totalExits,omitempty"`
+	TotalVehicles int32                  `protobuf:"varint,6,opt,name=totalVehicles,proto3" json:"totalVehicles,omitempty"`
+	TotalAmount   float64                `protobuf:"fixed64,7,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	TotalDiscount float64                `protobuf:"fixed64,8,opt,name=totalDiscount,proto3" json:"totalDiscount,omitempty"`
+	NetAmount     float64                `protobuf:"fixed64,9,opt,name=netAmount,proto3" json:"netAmount,omitempty"`
+	DailyReports  []*DailyReport         `protobuf:"bytes,10,rep,name=dailyReports,proto3" json:"dailyReports,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2347,7 +2347,7 @@ type LoginData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expiresAt,proto3" json:"expiresAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2579,7 +2579,7 @@ func (x *GetCurrentUserResponse) GetData() *User {
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2693,7 +2693,7 @@ type UserListData struct {
 	List          []*User                `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3167,164 +3167,158 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x06status\x18\x05 \x01(\tR\x06status\"H\n" +
 	"\x18UpdateParkingLotResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"I\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"H\n" +
 	"\x16ListParkingLotsRequest\x12\x12\n" +
-	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"}\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"}\n" +
 	"\x17ListParkingLotsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x124\n" +
-	"\x04data\x18\x03 \x01(\v2 .api.admin.v1.ParkingLotListDataR\x04data\"\x89\x01\n" +
+	"\x04data\x18\x03 \x01(\v2 .api.admin.v1.ParkingLotListDataR\x04data\"\x88\x01\n" +
 	"\x12ParkingLotListData\x12,\n" +
 	"\x04list\x18\x01 \x03(\v2\x18.api.admin.v1.ParkingLotR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\xb6\x01\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\xb4\x01\n" +
 	"\n" +
 	"ParkingLot\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x03 \x01(\tR\aaddress\x12\x14\n" +
 	"\x05lanes\x18\x04 \x01(\x05R\x05lanes\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\a \x01(\tR\tupdatedAt\"\xc0\x01\n" +
-	"\x19ListParkingRecordsRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x1d\n" +
-	"\n" +
-	"start_time\x18\x02 \x01(\tR\tstartTime\x12\x19\n" +
-	"\bend_time\x18\x03 \x01(\tR\aendTime\x12!\n" +
-	"\fplate_number\x18\x04 \x01(\tR\vplateNumber\x12\x12\n" +
-	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x06 \x01(\x05R\bpageSize\"\x83\x01\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1c\n" +
+	"\tcreatedAt\x18\x06 \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\a \x01(\tR\tupdatedAt\"\xbb\x01\n" +
+	"\x19ListParkingRecordsRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x1c\n" +
+	"\tstartTime\x18\x02 \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\x03 \x01(\tR\aendTime\x12 \n" +
+	"\vplateNumber\x18\x04 \x01(\tR\vplateNumber\x12\x12\n" +
+	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x06 \x01(\x05R\bpageSize\"\x83\x01\n" +
 	"\x1aListParkingRecordsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x127\n" +
-	"\x04data\x18\x03 \x01(\v2#.api.admin.v1.ParkingRecordListDataR\x04data\"\x8f\x01\n" +
+	"\x04data\x18\x03 \x01(\v2#.api.admin.v1.ParkingRecordListDataR\x04data\"\x8e\x01\n" +
 	"\x15ParkingRecordListData\x12/\n" +
 	"\x04list\x18\x01 \x03(\v2\x1b.api.admin.v1.ParkingRecordR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\xd8\x01\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\xd3\x01\n" +
 	"\rParkingRecord\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x15\n" +
-	"\x06lot_id\x18\x02 \x01(\tR\x05lotId\x12!\n" +
-	"\fplate_number\x18\x03 \x01(\tR\vplateNumber\x12\x1d\n" +
-	"\n" +
-	"entry_time\x18\x04 \x01(\x03R\tentryTime\x12\x1b\n" +
-	"\texit_time\x18\x05 \x01(\x03R\bexitTime\x12)\n" +
-	"\x10parking_duration\x18\x06 \x01(\x05R\x0fparkingDuration\x12\x16\n" +
-	"\x06status\x18\a \x01(\tR\x06status\"s\n" +
-	"\x11ListOrdersRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05lotId\x18\x02 \x01(\tR\x05lotId\x12 \n" +
+	"\vplateNumber\x18\x03 \x01(\tR\vplateNumber\x12\x1c\n" +
+	"\tentryTime\x18\x04 \x01(\x03R\tentryTime\x12\x1a\n" +
+	"\bexitTime\x18\x05 \x01(\x03R\bexitTime\x12(\n" +
+	"\x0fparkingDuration\x18\x06 \x01(\x05R\x0fparkingDuration\x12\x16\n" +
+	"\x06status\x18\a \x01(\tR\x06status\"q\n" +
+	"\x11ListOrdersRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"s\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"s\n" +
 	"\x12ListOrdersResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.admin.v1.OrderListDataR\x04data\"\x7f\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.admin.v1.OrderListDataR\x04data\"~\n" +
 	"\rOrderListData\x12'\n" +
 	"\x04list\x18\x01 \x03(\v2\x13.api.admin.v1.OrderR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"!\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"!\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"i\n" +
 	"\x10GetOrderResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12'\n" +
-	"\x04data\x18\x03 \x01(\v2\x13.api.admin.v1.OrderR\x04data\"\xa4\x02\n" +
+	"\x04data\x18\x03 \x01(\v2\x13.api.admin.v1.OrderR\x04data\"\x9d\x02\n" +
 	"\x05Order\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\trecord_id\x18\x02 \x01(\tR\brecordId\x12\x15\n" +
-	"\x06lot_id\x18\x03 \x01(\tR\x05lotId\x12!\n" +
-	"\fplate_number\x18\x04 \x01(\tR\vplateNumber\x12\x16\n" +
-	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12'\n" +
-	"\x0fdiscount_amount\x18\x06 \x01(\x01R\x0ediscountAmount\x12!\n" +
-	"\ffinal_amount\x18\a \x01(\x01R\vfinalAmount\x12\x16\n" +
-	"\x06status\x18\b \x01(\tR\x06status\x12\x19\n" +
-	"\bpay_time\x18\t \x01(\tR\apayTime\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\brecordId\x18\x02 \x01(\tR\brecordId\x12\x14\n" +
+	"\x05lotId\x18\x03 \x01(\tR\x05lotId\x12 \n" +
+	"\vplateNumber\x18\x04 \x01(\tR\vplateNumber\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12&\n" +
+	"\x0ediscountAmount\x18\x06 \x01(\x01R\x0ediscountAmount\x12 \n" +
+	"\vfinalAmount\x18\a \x01(\x01R\vfinalAmount\x12\x16\n" +
+	"\x06status\x18\b \x01(\tR\x06status\x12\x18\n" +
+	"\apayTime\x18\t \x01(\tR\apayTime\x12\x1c\n" +
+	"\tpayMethod\x18\n" +
+	" \x01(\tR\tpayMethod\"\xc6\x01\n" +
+	"\x14CreateVehicleRequest\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\x12 \n" +
+	"\vvehicleType\x18\x02 \x01(\tR\vvehicleType\x12\x1c\n" +
+	"\townerName\x18\x03 \x01(\tR\townerName\x12\x1e\n" +
 	"\n" +
-	"pay_method\x18\n" +
-	" \x01(\tR\tpayMethod\"\xcc\x01\n" +
-	"\x14CreateVehicleRequest\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\x12!\n" +
-	"\fvehicle_type\x18\x02 \x01(\tR\vvehicleType\x12\x1d\n" +
-	"\n" +
-	"owner_name\x18\x03 \x01(\tR\townerName\x12\x1f\n" +
-	"\vowner_phone\x18\x04 \x01(\tR\n" +
-	"ownerPhone\x12.\n" +
-	"\x13monthly_valid_until\x18\x05 \x01(\tR\x11monthlyValidUntil\"p\n" +
+	"ownerPhone\x18\x04 \x01(\tR\n" +
+	"ownerPhone\x12,\n" +
+	"\x11monthlyValidUntil\x18\x05 \x01(\tR\x11monthlyValidUntil\"p\n" +
 	"\x15CreateVehicleResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12)\n" +
-	"\x04data\x18\x03 \x01(\v2\x15.api.admin.v1.VehicleR\x04data\"i\n" +
-	"\x13ListVehiclesRequest\x12!\n" +
-	"\fvehicle_type\x18\x01 \x01(\tR\vvehicleType\x12\x12\n" +
-	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\"w\n" +
+	"\x04data\x18\x03 \x01(\v2\x15.api.admin.v1.VehicleR\x04data\"g\n" +
+	"\x13ListVehiclesRequest\x12 \n" +
+	"\vvehicleType\x18\x01 \x01(\tR\vvehicleType\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x03 \x01(\x05R\bpageSize\"w\n" +
 	"\x14ListVehiclesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x121\n" +
-	"\x04data\x18\x03 \x01(\v2\x1d.api.admin.v1.VehicleListDataR\x04data\"\x83\x01\n" +
+	"\x04data\x18\x03 \x01(\v2\x1d.api.admin.v1.VehicleListDataR\x04data\"\x82\x01\n" +
 	"\x0fVehicleListData\x12)\n" +
 	"\x04list\x18\x01 \x03(\v2\x15.api.admin.v1.VehicleR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\xee\x01\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\xe7\x01\n" +
 	"\aVehicle\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fplate_number\x18\x02 \x01(\tR\vplateNumber\x12!\n" +
-	"\fvehicle_type\x18\x03 \x01(\tR\vvehicleType\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
+	"\vplateNumber\x18\x02 \x01(\tR\vplateNumber\x12 \n" +
+	"\vvehicleType\x18\x03 \x01(\tR\vvehicleType\x12\x1c\n" +
+	"\townerName\x18\x04 \x01(\tR\townerName\x12\x1e\n" +
 	"\n" +
-	"owner_name\x18\x04 \x01(\tR\townerName\x12\x1f\n" +
-	"\vowner_phone\x18\x05 \x01(\tR\n" +
-	"ownerPhone\x12.\n" +
-	"\x13monthly_valid_until\x18\x06 \x01(\tR\x11monthlyValidUntil\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\a \x01(\tR\tcreatedAt\"B\n" +
-	"\x15GetDailyReportRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"ownerPhone\x18\x05 \x01(\tR\n" +
+	"ownerPhone\x12,\n" +
+	"\x11monthlyValidUntil\x18\x06 \x01(\tR\x11monthlyValidUntil\x12\x1c\n" +
+	"\tcreatedAt\x18\a \x01(\tR\tcreatedAt\"A\n" +
+	"\x15GetDailyReportRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
 	"\x04date\x18\x02 \x01(\tR\x04date\"u\n" +
 	"\x16GetDailyReportResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12-\n" +
-	"\x04data\x18\x03 \x01(\v2\x19.api.admin.v1.DailyReportR\x04data\"\x8e\x02\n" +
-	"\vDailyReport\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
-	"\x04date\x18\x02 \x01(\tR\x04date\x12#\n" +
-	"\rtotal_entries\x18\x03 \x01(\x05R\ftotalEntries\x12\x1f\n" +
-	"\vtotal_exits\x18\x04 \x01(\x05R\n" +
-	"totalExits\x12%\n" +
-	"\x0etotal_vehicles\x18\x05 \x01(\x05R\rtotalVehicles\x12!\n" +
-	"\ftotal_amount\x18\x06 \x01(\x01R\vtotalAmount\x12%\n" +
-	"\x0etotal_discount\x18\a \x01(\x01R\rtotalDiscount\x12\x1d\n" +
+	"\x04data\x18\x03 \x01(\v2\x19.api.admin.v1.DailyReportR\x04data\"\x87\x02\n" +
+	"\vDailyReport\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x12\"\n" +
+	"\ftotalEntries\x18\x03 \x01(\x05R\ftotalEntries\x12\x1e\n" +
 	"\n" +
-	"net_amount\x18\b \x01(\x01R\tnetAmount\"Z\n" +
-	"\x17GetMonthlyReportRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"totalExits\x18\x04 \x01(\x05R\n" +
+	"totalExits\x12$\n" +
+	"\rtotalVehicles\x18\x05 \x01(\x05R\rtotalVehicles\x12 \n" +
+	"\vtotalAmount\x18\x06 \x01(\x01R\vtotalAmount\x12$\n" +
+	"\rtotalDiscount\x18\a \x01(\x01R\rtotalDiscount\x12\x1c\n" +
+	"\tnetAmount\x18\b \x01(\x01R\tnetAmount\"Y\n" +
+	"\x17GetMonthlyReportRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
 	"\x04year\x18\x02 \x01(\x05R\x04year\x12\x14\n" +
 	"\x05month\x18\x03 \x01(\x05R\x05month\"y\n" +
 	"\x18GetMonthlyReportResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.admin.v1.MonthlyReportR\x04data\"\xe6\x02\n" +
-	"\rMonthlyReport\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.admin.v1.MonthlyReportR\x04data\"\xde\x02\n" +
+	"\rMonthlyReport\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
 	"\x04year\x18\x02 \x01(\x05R\x04year\x12\x14\n" +
-	"\x05month\x18\x03 \x01(\x05R\x05month\x12#\n" +
-	"\rtotal_entries\x18\x04 \x01(\x05R\ftotalEntries\x12\x1f\n" +
-	"\vtotal_exits\x18\x05 \x01(\x05R\n" +
-	"totalExits\x12%\n" +
-	"\x0etotal_vehicles\x18\x06 \x01(\x05R\rtotalVehicles\x12!\n" +
-	"\ftotal_amount\x18\a \x01(\x01R\vtotalAmount\x12%\n" +
-	"\x0etotal_discount\x18\b \x01(\x01R\rtotalDiscount\x12\x1d\n" +
+	"\x05month\x18\x03 \x01(\x05R\x05month\x12\"\n" +
+	"\ftotalEntries\x18\x04 \x01(\x05R\ftotalEntries\x12\x1e\n" +
 	"\n" +
-	"net_amount\x18\t \x01(\x01R\tnetAmount\x12>\n" +
-	"\rdaily_reports\x18\n" +
+	"totalExits\x18\x05 \x01(\x05R\n" +
+	"totalExits\x12$\n" +
+	"\rtotalVehicles\x18\x06 \x01(\x05R\rtotalVehicles\x12 \n" +
+	"\vtotalAmount\x18\a \x01(\x01R\vtotalAmount\x12$\n" +
+	"\rtotalDiscount\x18\b \x01(\x01R\rtotalDiscount\x12\x1c\n" +
+	"\tnetAmount\x18\t \x01(\x01R\tnetAmount\x12=\n" +
+	"\fdailyReports\x18\n" +
 	" \x03(\v2\x19.api.admin.v1.DailyReportR\fdailyReports\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
@@ -3332,12 +3326,11 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\rLoginResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
-	"\x04data\x18\x03 \x01(\v2\x17.api.admin.v1.LoginDataR\x04data\"h\n" +
+	"\x04data\x18\x03 \x01(\v2\x17.api.admin.v1.LoginDataR\x04data\"g\n" +
 	"\tLoginData\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12&\n" +
-	"\x04user\x18\x02 \x01(\v2\x12.api.admin.v1.UserR\x04user\x12\x1d\n" +
-	"\n" +
-	"expires_at\x18\x03 \x01(\x03R\texpiresAt\"r\n" +
+	"\x04user\x18\x02 \x01(\v2\x12.api.admin.v1.UserR\x04user\x12\x1c\n" +
+	"\texpiresAt\x18\x03 \x01(\x03R\texpiresAt\"r\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x12\n" +
@@ -3348,19 +3341,19 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x16GetCurrentUserResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
-	"\x04data\x18\x03 \x01(\v2\x12.api.admin.v1.UserR\x04data\"C\n" +
+	"\x04data\x18\x03 \x01(\v2\x12.api.admin.v1.UserR\x04data\"B\n" +
 	"\x10ListUsersRequest\x12\x12\n" +
-	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"q\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"q\n" +
 	"\x11ListUsersResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
-	"\x04data\x18\x03 \x01(\v2\x1a.api.admin.v1.UserListDataR\x04data\"}\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.admin.v1.UserListDataR\x04data\"|\n" +
 	"\fUserListData\x12&\n" +
 	"\x04list\x18\x01 \x03(\v2\x12.api.admin.v1.UserR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\xa1\x01\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\xa1\x01\n" +
 	"\x11CreateUserRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
@@ -3488,7 +3481,7 @@ var file_api_admin_v1_admin_proto_depIdxs = []int32{
 	25, // 11: api.admin.v1.VehicleListData.list:type_name -> api.admin.v1.Vehicle
 	28, // 12: api.admin.v1.GetDailyReportResponse.data:type_name -> api.admin.v1.DailyReport
 	31, // 13: api.admin.v1.GetMonthlyReportResponse.data:type_name -> api.admin.v1.MonthlyReport
-	28, // 14: api.admin.v1.MonthlyReport.daily_reports:type_name -> api.admin.v1.DailyReport
+	28, // 14: api.admin.v1.MonthlyReport.dailyReports:type_name -> api.admin.v1.DailyReport
 	34, // 15: api.admin.v1.LoginResponse.data:type_name -> api.admin.v1.LoginData
 	35, // 16: api.admin.v1.LoginData.user:type_name -> api.admin.v1.User
 	35, // 17: api.admin.v1.GetCurrentUserResponse.data:type_name -> api.admin.v1.User

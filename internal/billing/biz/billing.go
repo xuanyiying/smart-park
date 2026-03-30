@@ -157,6 +157,7 @@ type BillingRuleRepo interface {
 	UpdateBillingRule(ctx context.Context, rule *BillingRule) error
 	DeleteBillingRule(ctx context.Context, ruleID uuid.UUID) error
 	ListBillingRules(ctx context.Context, lotID uuid.UUID, page, pageSize int) ([]*BillingRule, int64, error)
+	SeedData(ctx context.Context) error
 }
 
 // BillingUseCase implements billing business logic.
@@ -407,7 +408,8 @@ func (uc *BillingUseCase) DeleteBillingRule(ctx context.Context, req *v1.DeleteB
 func (uc *BillingUseCase) GetBillingRules(ctx context.Context, req *v1.GetBillingRulesRequest) ([]*v1.BillingRule, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
-		return nil, err
+		// 如果 lot_id 不是有效的 UUID，返回空列表而不是错误
+		return []*v1.BillingRule{}, nil
 	}
 
 	rules, err := uc.repo.GetRulesByLotID(ctx, lotID)

@@ -492,3 +492,124 @@ func toBizOfflineSyncRecord(record *ent.OfflineSyncRecord) *biz.OfflineSyncRecor
 	}
 	return bizRecord
 }
+
+// GetDeviceByID retrieves a device by device ID.
+func (r *vehicleRepo) GetDeviceByID(ctx context.Context, deviceID string) (*biz.Device, error) {
+	d, err := r.data.db.Device.Query().
+		Where(device.DeviceID(deviceID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &biz.Device{
+		ID:            d.ID,
+		DeviceID:      d.DeviceID,
+		LotID:         d.LotID,
+		LaneID:        d.LaneID,
+		DeviceType:    string(d.DeviceType),
+		DeviceSecret:  d.DeviceSecret,
+		GateID:        d.GateID,
+		Enabled:       d.Enabled,
+		Status:        string(d.Status),
+		LastHeartbeat: d.LastHeartbeat,
+	}, nil
+}
+
+// CreateDevice creates a new device.
+func (r *vehicleRepo) CreateDevice(ctx context.Context, d *biz.Device) error {
+	deviceType := device.DeviceTypeCamera
+	switch d.DeviceType {
+	case "gate":
+		deviceType = device.DeviceTypeGate
+	case "display":
+		deviceType = device.DeviceTypeDisplay
+	case "payment_kiosk":
+		deviceType = device.DeviceTypePaymentKiosk
+	case "sensor":
+		deviceType = device.DeviceTypeSensor
+	}
+
+	status := device.StatusActive
+	switch d.Status {
+	case "offline":
+		status = device.StatusOffline
+	case "disabled":
+		status = device.StatusDisabled
+	}
+
+	// Generate device secret if not provided
+	deviceSecret := d.DeviceSecret
+	if deviceSecret == "" {
+		deviceSecret = "secret_" + d.DeviceID
+	}
+
+	create := r.data.db.Device.Create().
+		SetDeviceID(d.DeviceID).
+		SetDeviceSecret(deviceSecret).
+		SetDeviceType(deviceType).
+		SetStatus(status)
+
+	if d.LotID != nil {
+		create.SetLotID(*d.LotID)
+	}
+	if d.LaneID != nil {
+		create.SetLaneID(*d.LaneID)
+	}
+
+	_, err := create.Save(ctx)
+	return err
+}
+
+// UpdateDevice updates an existing device.
+func (r *vehicleRepo) UpdateDevice(ctx context.Context, d *biz.Device) error {
+	deviceType := device.DeviceTypeCamera
+	switch d.DeviceType {
+	case "gate":
+		deviceType = device.DeviceTypeGate
+	case "display":
+		deviceType = device.DeviceTypeDisplay
+	case "payment_kiosk":
+		deviceType = device.DeviceTypePaymentKiosk
+	case "sensor":
+		deviceType = device.DeviceTypeSensor
+	}
+
+	status := device.StatusActive
+	switch d.Status {
+	case "offline":
+		status = device.StatusOffline
+	case "disabled":
+		status = device.StatusDisabled
+	}
+
+	update := r.data.db.Device.Update().
+		Where(device.DeviceID(d.DeviceID)).
+		SetDeviceType(deviceType).
+		SetStatus(status)
+
+	if d.LotID != nil {
+		update.SetLotID(*d.LotID)
+	} else {
+		update.ClearLotID()
+	}
+	if d.LaneID != nil {
+		update.SetLaneID(*d.LaneID)
+	} else {
+		update.ClearLaneID()
+	}
+
+	_, err := update.Save(ctx)
+	return err
+}
+
+// DeleteDevice deletes a device by device ID.
+func (r *vehicleRepo) DeleteDevice(ctx context.Context, deviceID string) error {
+	_, err := r.data.db.Device.Delete().
+		Where(device.DeviceID(deviceID)).
+		Exec(ctx)
+	return err
+}

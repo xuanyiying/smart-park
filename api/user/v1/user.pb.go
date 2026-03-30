@@ -10,7 +10,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -130,8 +129,8 @@ func (x *LoginResponse) GetData() *LoginData {
 type LoginData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	OpenId        string                 `protobuf:"bytes,2,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
-	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	OpenId        string                 `protobuf:"bytes,2,opt,name=openId,proto3" json:"openId,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expiresAt,proto3" json:"expiresAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -285,12 +284,12 @@ func (x *GetUserInfoResponse) GetData() *UserInfo {
 
 type UserInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OpenId        string                 `protobuf:"bytes,2,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	OpenId        string                 `protobuf:"bytes,2,opt,name=openId,proto3" json:"openId,omitempty"`
 	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
 	Avatar        string                 `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
 	Phone         string                 `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
-	CreatedAt     int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -369,9 +368,9 @@ func (x *UserInfo) GetCreatedAt() int64 {
 
 type BindPlateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	OwnerName     string                 `protobuf:"bytes,2,opt,name=owner_name,json=ownerName,proto3" json:"owner_name,omitempty"`
-	OwnerPhone    string                 `protobuf:"bytes,3,opt,name=owner_phone,json=ownerPhone,proto3" json:"owner_phone,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	OwnerName     string                 `protobuf:"bytes,2,opt,name=ownerName,proto3" json:"ownerName,omitempty"`
+	OwnerPhone    string                 `protobuf:"bytes,3,opt,name=ownerPhone,proto3" json:"ownerPhone,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -481,7 +480,7 @@ func (x *BindPlateResponse) GetMessage() string {
 
 type UnbindPlateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -578,7 +577,7 @@ func (x *UnbindPlateResponse) GetMessage() string {
 type ListPlatesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -741,11 +740,11 @@ func (x *ListPlatesData) GetTotal() int32 {
 
 type PlateInfo struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber       string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	VehicleType       string                 `protobuf:"bytes,2,opt,name=vehicle_type,json=vehicleType,proto3" json:"vehicle_type,omitempty"`
-	OwnerName         string                 `protobuf:"bytes,3,opt,name=owner_name,json=ownerName,proto3" json:"owner_name,omitempty"`
-	OwnerPhone        string                 `protobuf:"bytes,4,opt,name=owner_phone,json=ownerPhone,proto3" json:"owner_phone,omitempty"`
-	MonthlyValidUntil string                 `protobuf:"bytes,5,opt,name=monthly_valid_until,json=monthlyValidUntil,proto3" json:"monthly_valid_until,omitempty"`
+	PlateNumber       string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	VehicleType       string                 `protobuf:"bytes,2,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
+	OwnerName         string                 `protobuf:"bytes,3,opt,name=ownerName,proto3" json:"ownerName,omitempty"`
+	OwnerPhone        string                 `protobuf:"bytes,4,opt,name=ownerPhone,proto3" json:"ownerPhone,omitempty"`
+	MonthlyValidUntil string                 `protobuf:"bytes,5,opt,name=monthlyValidUntil,proto3" json:"monthlyValidUntil,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -817,9 +816,9 @@ func (x *PlateInfo) GetMonthlyValidUntil() string {
 
 type ListParkingRecordsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -989,11 +988,11 @@ func (x *ListParkingRecordsData) GetTotal() int32 {
 
 type ParkingRecordInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	PlateNumber   string                 `protobuf:"bytes,2,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	LotName       string                 `protobuf:"bytes,3,opt,name=lot_name,json=lotName,proto3" json:"lot_name,omitempty"`
-	EntryTime     string                 `protobuf:"bytes,4,opt,name=entry_time,json=entryTime,proto3" json:"entry_time,omitempty"`
-	ExitTime      string                 `protobuf:"bytes,5,opt,name=exit_time,json=exitTime,proto3" json:"exit_time,omitempty"`
+	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,2,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	LotName       string                 `protobuf:"bytes,3,opt,name=lotName,proto3" json:"lotName,omitempty"`
+	EntryTime     string                 `protobuf:"bytes,4,opt,name=entryTime,proto3" json:"entryTime,omitempty"`
+	ExitTime      string                 `protobuf:"bytes,5,opt,name=exitTime,proto3" json:"exitTime,omitempty"`
 	Duration      int32                  `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty"`
 	Amount        float64                `protobuf:"fixed64,7,opt,name=amount,proto3" json:"amount,omitempty"`
 	Status        string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
@@ -1089,7 +1088,7 @@ func (x *ParkingRecordInfo) GetStatus() string {
 
 type GetParkingRecordRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1193,9 +1192,9 @@ func (x *GetParkingRecordResponse) GetData() *ParkingRecordInfo {
 
 type ScanPayRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	PayMethod     string                 `protobuf:"bytes,2,opt,name=pay_method,json=payMethod,proto3" json:"pay_method,omitempty"`
-	OpenId        string                 `protobuf:"bytes,3,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	PayMethod     string                 `protobuf:"bytes,2,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
+	OpenId        string                 `protobuf:"bytes,3,opt,name=openId,proto3" json:"openId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1313,11 +1312,11 @@ func (x *ScanPayResponse) GetData() *ScanPayData {
 
 type ScanPayData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
 	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayUrl        string                 `protobuf:"bytes,3,opt,name=pay_url,json=payUrl,proto3" json:"pay_url,omitempty"`
-	QrCode        string                 `protobuf:"bytes,4,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
-	ExpireTime    string                 `protobuf:"bytes,5,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
+	PayUrl        string                 `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
+	QrCode        string                 `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
+	ExpireTime    string                 `protobuf:"bytes,5,opt,name=expireTime,proto3" json:"expireTime,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1389,7 +1388,7 @@ func (x *ScanPayData) GetExpireTime() string {
 
 type GetMonthlyCardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1493,10 +1492,10 @@ func (x *GetMonthlyCardResponse) GetData() *MonthlyCardInfo {
 
 type MonthlyCardInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
-	ValidUntil    string                 `protobuf:"bytes,2,opt,name=valid_until,json=validUntil,proto3" json:"valid_until,omitempty"`
-	DaysRemaining int32                  `protobuf:"varint,3,opt,name=days_remaining,json=daysRemaining,proto3" json:"days_remaining,omitempty"`
-	IsValid       bool                   `protobuf:"varint,4,opt,name=is_valid,json=isValid,proto3" json:"is_valid,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	ValidUntil    string                 `protobuf:"bytes,2,opt,name=validUntil,proto3" json:"validUntil,omitempty"`
+	DaysRemaining int32                  `protobuf:"varint,3,opt,name=daysRemaining,proto3" json:"daysRemaining,omitempty"`
+	IsValid       bool                   `protobuf:"varint,4,opt,name=isValid,proto3" json:"isValid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1561,10 +1560,10 @@ func (x *MonthlyCardInfo) GetIsValid() bool {
 
 type PurchaseMonthlyCardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plate_number,json=plateNumber,proto3" json:"plate_number,omitempty"`
+	PlateNumber   string                 `protobuf:"bytes,1,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	Months        int32                  `protobuf:"varint,2,opt,name=months,proto3" json:"months,omitempty"`
-	PayMethod     string                 `protobuf:"bytes,3,opt,name=pay_method,json=payMethod,proto3" json:"pay_method,omitempty"`
-	OpenId        string                 `protobuf:"bytes,4,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
+	PayMethod     string                 `protobuf:"bytes,3,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
+	OpenId        string                 `protobuf:"bytes,4,opt,name=openId,proto3" json:"openId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1689,10 +1688,10 @@ func (x *PurchaseMonthlyCardResponse) GetData() *PurchaseMonthlyCardData {
 
 type PurchaseMonthlyCardData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
 	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayUrl        string                 `protobuf:"bytes,3,opt,name=pay_url,json=payUrl,proto3" json:"pay_url,omitempty"`
-	QrCode        string                 `protobuf:"bytes,4,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
+	PayUrl        string                 `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
+	QrCode        string                 `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1759,144 +1758,141 @@ var File_api_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_api_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\"\n" +
+	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\"\"\n" +
 	"\fLoginRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\"i\n" +
 	"\rLoginResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12*\n" +
-	"\x04data\x18\x03 \x01(\v2\x16.api.user.v1.LoginDataR\x04data\"Y\n" +
+	"\x04data\x18\x03 \x01(\v2\x16.api.user.v1.LoginDataR\x04data\"W\n" +
 	"\tLoginData\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12\x17\n" +
-	"\aopen_id\x18\x02 \x01(\tR\x06openId\x12\x1d\n" +
-	"\n" +
-	"expires_at\x18\x03 \x01(\x03R\texpiresAt\"\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x16\n" +
+	"\x06openId\x18\x02 \x01(\tR\x06openId\x12\x1c\n" +
+	"\texpiresAt\x18\x03 \x01(\x03R\texpiresAt\"\x14\n" +
 	"\x12GetUserInfoRequest\"n\n" +
 	"\x13GetUserInfoResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12)\n" +
-	"\x04data\x18\x03 \x01(\v2\x15.api.user.v1.UserInfoR\x04data\"\xa5\x01\n" +
-	"\bUserInfo\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x17\n" +
-	"\aopen_id\x18\x02 \x01(\tR\x06openId\x12\x1a\n" +
+	"\x04data\x18\x03 \x01(\v2\x15.api.user.v1.UserInfoR\x04data\"\xa2\x01\n" +
+	"\bUserInfo\x12\x16\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06openId\x18\x02 \x01(\tR\x06openId\x12\x1a\n" +
 	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x16\n" +
 	"\x06avatar\x18\x04 \x01(\tR\x06avatar\x12\x14\n" +
-	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1d\n" +
+	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1c\n" +
+	"\tcreatedAt\x18\x06 \x01(\x03R\tcreatedAt\"r\n" +
+	"\x10BindPlateRequest\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\x12\x1c\n" +
+	"\townerName\x18\x02 \x01(\tR\townerName\x12\x1e\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\x03R\tcreatedAt\"u\n" +
-	"\x10BindPlateRequest\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\x12\x1d\n" +
-	"\n" +
-	"owner_name\x18\x02 \x01(\tR\townerName\x12\x1f\n" +
-	"\vowner_phone\x18\x03 \x01(\tR\n" +
+	"ownerPhone\x18\x03 \x01(\tR\n" +
 	"ownerPhone\"A\n" +
 	"\x11BindPlateResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"7\n" +
-	"\x12UnbindPlateRequest\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\"C\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"6\n" +
+	"\x12UnbindPlateRequest\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\"C\n" +
 	"\x13UnbindPlateResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"D\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"C\n" +
 	"\x11ListPlatesRequest\x12\x12\n" +
-	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"s\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"s\n" +
 	"\x12ListPlatesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
 	"\x04data\x18\x03 \x01(\v2\x1b.api.user.v1.ListPlatesDataR\x04data\"V\n" +
 	"\x0eListPlatesData\x12.\n" +
 	"\x06plates\x18\x01 \x03(\v2\x16.api.user.v1.PlateInfoR\x06plates\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xc1\x01\n" +
-	"\tPlateInfo\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\x12!\n" +
-	"\fvehicle_type\x18\x02 \x01(\tR\vvehicleType\x12\x1d\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xbb\x01\n" +
+	"\tPlateInfo\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\x12 \n" +
+	"\vvehicleType\x18\x02 \x01(\tR\vvehicleType\x12\x1c\n" +
+	"\townerName\x18\x03 \x01(\tR\townerName\x12\x1e\n" +
 	"\n" +
-	"owner_name\x18\x03 \x01(\tR\townerName\x12\x1f\n" +
-	"\vowner_phone\x18\x04 \x01(\tR\n" +
-	"ownerPhone\x12.\n" +
-	"\x13monthly_valid_until\x18\x05 \x01(\tR\x11monthlyValidUntil\"o\n" +
-	"\x19ListParkingRecordsRequest\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\x12\x12\n" +
-	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\"\x83\x01\n" +
+	"ownerPhone\x18\x04 \x01(\tR\n" +
+	"ownerPhone\x12,\n" +
+	"\x11monthlyValidUntil\x18\x05 \x01(\tR\x11monthlyValidUntil\"m\n" +
+	"\x19ListParkingRecordsRequest\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x03 \x01(\x05R\bpageSize\"\x83\x01\n" +
 	"\x1aListParkingRecordsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x127\n" +
 	"\x04data\x18\x03 \x01(\v2#.api.user.v1.ListParkingRecordsDataR\x04data\"h\n" +
 	"\x16ListParkingRecordsData\x128\n" +
 	"\arecords\x18\x01 \x03(\v2\x1e.api.user.v1.ParkingRecordInfoR\arecords\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xf6\x01\n" +
-	"\x11ParkingRecordInfo\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12!\n" +
-	"\fplate_number\x18\x02 \x01(\tR\vplateNumber\x12\x19\n" +
-	"\blot_name\x18\x03 \x01(\tR\alotName\x12\x1d\n" +
-	"\n" +
-	"entry_time\x18\x04 \x01(\tR\tentryTime\x12\x1b\n" +
-	"\texit_time\x18\x05 \x01(\tR\bexitTime\x12\x1a\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xf1\x01\n" +
+	"\x11ParkingRecordInfo\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\x12 \n" +
+	"\vplateNumber\x18\x02 \x01(\tR\vplateNumber\x12\x18\n" +
+	"\alotName\x18\x03 \x01(\tR\alotName\x12\x1c\n" +
+	"\tentryTime\x18\x04 \x01(\tR\tentryTime\x12\x1a\n" +
+	"\bexitTime\x18\x05 \x01(\tR\bexitTime\x12\x1a\n" +
 	"\bduration\x18\x06 \x01(\x05R\bduration\x12\x16\n" +
 	"\x06amount\x18\a \x01(\x01R\x06amount\x12\x16\n" +
-	"\x06status\x18\b \x01(\tR\x06status\"6\n" +
-	"\x17GetParkingRecordRequest\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\"|\n" +
+	"\x06status\x18\b \x01(\tR\x06status\"5\n" +
+	"\x17GetParkingRecordRequest\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\"|\n" +
 	"\x18GetParkingRecordResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x122\n" +
-	"\x04data\x18\x03 \x01(\v2\x1e.api.user.v1.ParkingRecordInfoR\x04data\"e\n" +
-	"\x0eScanPayRequest\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x1d\n" +
-	"\n" +
-	"pay_method\x18\x02 \x01(\tR\tpayMethod\x12\x17\n" +
-	"\aopen_id\x18\x03 \x01(\tR\x06openId\"m\n" +
+	"\x04data\x18\x03 \x01(\v2\x1e.api.user.v1.ParkingRecordInfoR\x04data\"b\n" +
+	"\x0eScanPayRequest\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x1c\n" +
+	"\tpayMethod\x18\x02 \x01(\tR\tpayMethod\x12\x16\n" +
+	"\x06openId\x18\x03 \x01(\tR\x06openId\"m\n" +
 	"\x0fScanPayResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.user.v1.ScanPayDataR\x04data\"\x93\x01\n" +
-	"\vScanPayData\x12\x19\n" +
-	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x17\n" +
-	"\apay_url\x18\x03 \x01(\tR\x06payUrl\x12\x17\n" +
-	"\aqr_code\x18\x04 \x01(\tR\x06qrCode\x12\x1f\n" +
-	"\vexpire_time\x18\x05 \x01(\tR\n" +
-	"expireTime\":\n" +
-	"\x15GetMonthlyCardRequest\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\"x\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.user.v1.ScanPayDataR\x04data\"\x8f\x01\n" +
+	"\vScanPayData\x12\x18\n" +
+	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06payUrl\x18\x03 \x01(\tR\x06payUrl\x12\x16\n" +
+	"\x06qrCode\x18\x04 \x01(\tR\x06qrCode\x12\x1e\n" +
+	"\n" +
+	"expireTime\x18\x05 \x01(\tR\n" +
+	"expireTime\"9\n" +
+	"\x15GetMonthlyCardRequest\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\"x\n" +
 	"\x16GetMonthlyCardResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x120\n" +
-	"\x04data\x18\x03 \x01(\v2\x1c.api.user.v1.MonthlyCardInfoR\x04data\"\x97\x01\n" +
-	"\x0fMonthlyCardInfo\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\x12\x1f\n" +
-	"\vvalid_until\x18\x02 \x01(\tR\n" +
-	"validUntil\x12%\n" +
-	"\x0edays_remaining\x18\x03 \x01(\x05R\rdaysRemaining\x12\x19\n" +
-	"\bis_valid\x18\x04 \x01(\bR\aisValid\"\x8f\x01\n" +
-	"\x1aPurchaseMonthlyCardRequest\x12!\n" +
-	"\fplate_number\x18\x01 \x01(\tR\vplateNumber\x12\x16\n" +
-	"\x06months\x18\x02 \x01(\x05R\x06months\x12\x1d\n" +
+	"\x04data\x18\x03 \x01(\v2\x1c.api.user.v1.MonthlyCardInfoR\x04data\"\x93\x01\n" +
+	"\x0fMonthlyCardInfo\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\x12\x1e\n" +
 	"\n" +
-	"pay_method\x18\x03 \x01(\tR\tpayMethod\x12\x17\n" +
-	"\aopen_id\x18\x04 \x01(\tR\x06openId\"\x85\x01\n" +
+	"validUntil\x18\x02 \x01(\tR\n" +
+	"validUntil\x12$\n" +
+	"\rdaysRemaining\x18\x03 \x01(\x05R\rdaysRemaining\x12\x18\n" +
+	"\aisValid\x18\x04 \x01(\bR\aisValid\"\x8c\x01\n" +
+	"\x1aPurchaseMonthlyCardRequest\x12 \n" +
+	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\x12\x16\n" +
+	"\x06months\x18\x02 \x01(\x05R\x06months\x12\x1c\n" +
+	"\tpayMethod\x18\x03 \x01(\tR\tpayMethod\x12\x16\n" +
+	"\x06openId\x18\x04 \x01(\tR\x06openId\"\x85\x01\n" +
 	"\x1bPurchaseMonthlyCardResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x128\n" +
-	"\x04data\x18\x03 \x01(\v2$.api.user.v1.PurchaseMonthlyCardDataR\x04data\"~\n" +
-	"\x17PurchaseMonthlyCardData\x12\x19\n" +
-	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x17\n" +
-	"\apay_url\x18\x03 \x01(\tR\x06payUrl\x12\x17\n" +
-	"\aqr_code\x18\x04 \x01(\tR\x06qrCode2\xd8\t\n" +
+	"\x04data\x18\x03 \x01(\v2$.api.user.v1.PurchaseMonthlyCardDataR\x04data\"{\n" +
+	"\x17PurchaseMonthlyCardData\x12\x18\n" +
+	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06payUrl\x18\x03 \x01(\tR\x06payUrl\x12\x16\n" +
+	"\x06qrCode\x18\x04 \x01(\tR\x06qrCode2\xd5\t\n" +
 	"\vUserService\x12]\n" +
 	"\x05Login\x12\x19.api.user.v1.LoginRequest\x1a\x1a.api.user.v1.LoginResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/user/login\x12k\n" +
 	"\vGetUserInfo\x12\x1f.api.user.v1.GetUserInfoRequest\x1a .api.user.v1.GetUserInfoResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/user/info\x12j\n" +
-	"\tBindPlate\x12\x1d.api.user.v1.BindPlateRequest\x1a\x1e.api.user.v1.BindPlateResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/user/plates\x12|\n" +
-	"\vUnbindPlate\x12\x1f.api.user.v1.UnbindPlateRequest\x1a .api.user.v1.UnbindPlateResponse\"*\x82\xd3\xe4\x93\x02$*\"/api/v1/user/plates/{plate_number}\x12j\n" +
+	"\tBindPlate\x12\x1d.api.user.v1.BindPlateRequest\x1a\x1e.api.user.v1.BindPlateResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/user/plates\x12{\n" +
+	"\vUnbindPlate\x12\x1f.api.user.v1.UnbindPlateRequest\x1a .api.user.v1.UnbindPlateResponse\")\x82\xd3\xe4\x93\x02#*!/api/v1/user/plates/{plateNumber}\x12j\n" +
 	"\n" +
 	"ListPlates\x12\x1e.api.user.v1.ListPlatesRequest\x1a\x1f.api.user.v1.ListPlatesResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/user/plates\x12\x8b\x01\n" +
-	"\x12ListParkingRecords\x12&.api.user.v1.ListParkingRecordsRequest\x1a'.api.user.v1.ListParkingRecordsResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/user/parking-records\x12\x91\x01\n" +
-	"\x10GetParkingRecord\x12$.api.user.v1.GetParkingRecordRequest\x1a%.api.user.v1.GetParkingRecordResponse\"0\x82\xd3\xe4\x93\x02*\x12(/api/v1/user/parking-records/{record_id}\x12f\n" +
-	"\aScanPay\x12\x1b.api.user.v1.ScanPayRequest\x1a\x1c.api.user.v1.ScanPayResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/user/scan-pay\x12\x8b\x01\n" +
-	"\x0eGetMonthlyCard\x12\".api.user.v1.GetMonthlyCardRequest\x1a#.api.user.v1.GetMonthlyCardResponse\"0\x82\xd3\xe4\x93\x02*\x12(/api/v1/user/monthly-card/{plate_number}\x12\x8e\x01\n" +
+	"\x12ListParkingRecords\x12&.api.user.v1.ListParkingRecordsRequest\x1a'.api.user.v1.ListParkingRecordsResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/user/parking-records\x12\x90\x01\n" +
+	"\x10GetParkingRecord\x12$.api.user.v1.GetParkingRecordRequest\x1a%.api.user.v1.GetParkingRecordResponse\"/\x82\xd3\xe4\x93\x02)\x12'/api/v1/user/parking-records/{recordId}\x12f\n" +
+	"\aScanPay\x12\x1b.api.user.v1.ScanPayRequest\x1a\x1c.api.user.v1.ScanPayResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/user/scan-pay\x12\x8a\x01\n" +
+	"\x0eGetMonthlyCard\x12\".api.user.v1.GetMonthlyCardRequest\x1a#.api.user.v1.GetMonthlyCardResponse\"/\x82\xd3\xe4\x93\x02)\x12'/api/v1/user/monthly-card/{plateNumber}\x12\x8e\x01\n" +
 	"\x13PurchaseMonthlyCard\x12'.api.user.v1.PurchaseMonthlyCardRequest\x1a(.api.user.v1.PurchaseMonthlyCardResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/user/monthly-cardB1Z/github.com/xuanyiying/smart-park/api/user/v1;v1b\x06proto3"
 
 var (

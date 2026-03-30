@@ -2,245 +2,321 @@ syntax = "proto3";
 
 package api.vehicle.v1;
 
+import "google/api/annotations.proto";
+
 option go_package = "github.com/xuanyiying/smart-park/api/vehicle/v1;v1";
 
-import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
-
 service VehicleService {
-  rpc Entry (EntryRequest) returns (EntryResponse) {
+  rpc Entry(EntryRequest) returns (EntryResponse) {
     option (google.api.http) = {
-      post: "/api/v1/device/entry"
-      body: "*"
+      post: "/api/v1/device/entry",
+      body: "*",
     };
   }
 
-  rpc Exit (ExitRequest) returns (ExitResponse) {
+  rpc Exit(ExitRequest) returns (ExitResponse) {
     option (google.api.http) = {
-      post: "/api/v1/device/exit"
-      body: "*"
+      post: "/api/v1/device/exit",
+      body: "*",
     };
   }
 
-  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {
     option (google.api.http) = {
-      post: "/api/v1/device/heartbeat"
-      body: "*"
+      post: "/api/v1/device/heartbeat",
+      body: "*",
     };
   }
 
-  rpc GetDeviceStatus (GetDeviceStatusRequest) returns (GetDeviceStatusResponse) {
+  rpc GetDeviceStatus(GetDeviceStatusRequest) returns (GetDeviceStatusResponse) {
     option (google.api.http) = {
-      get: "/api/v1/device/{device_id}/status"
+      get: "/api/v1/device/{deviceId}/status",
     };
   }
 
-  rpc SendCommand (SendCommandRequest) returns (SendCommandResponse) {
+  rpc SendCommand(SendCommandRequest) returns (SendCommandResponse) {
     option (google.api.http) = {
-      post: "/api/v1/device/{device_id}/command"
-      body: "*"
+      post: "/api/v1/device/{deviceId}/command",
+      body: "*",
     };
   }
 
-  rpc GetVehicleInfo (GetVehicleInfoRequest) returns (GetVehicleInfoResponse) {
+  rpc GetVehicleInfo(GetVehicleInfoRequest) returns (GetVehicleInfoResponse) {
     option (google.api.http) = {
-      get: "/api/v1/vehicle/{plate_number}"
+      get: "/api/v1/vehicle/{plateNumber}",
     };
   }
 
-  rpc ListParkingRecords (ListParkingRecordsRequest) returns (ListParkingRecordsResponse) {
+  rpc ListParkingRecords(ListParkingRecordsRequest) returns (ListParkingRecordsResponse) {
     option (google.api.http) = {
-      get: "/api/v1/vehicle/records"
+      get: "/api/v1/vehicle/records",
     };
   }
 
-  rpc GetParkingRecord (GetParkingRecordRequest) returns (GetParkingRecordResponse) {
+  rpc GetParkingRecord(GetParkingRecordRequest) returns (GetParkingRecordResponse) {
     option (google.api.http) = {
-      get: "/api/v1/vehicle/records/{record_id}"
+      get: "/api/v1/vehicle/records/{recordId}",
     };
   }
 
-  rpc ListDevices (ListDevicesRequest) returns (ListDevicesResponse) {
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse) {
     option (google.api.http) = {
-      get: "/api/v1/devices"
+      get: "/api/v1/devices",
+    };
+  }
+
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/devices",
+      body: "*",
+    };
+  }
+
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/{deviceId}",
+    };
+  }
+
+  rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse) {
+    option (google.api.http) = {
+      put:  "/api/v1/devices/{deviceId}",
+      body: "*",
+    };
+  }
+
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/devices/{deviceId}",
     };
   }
 }
 
 message EntryRequest {
-  string device_id = 1;
-  string plate_number = 2;
-  string plate_image_url = 3;
-  double confidence = 4;
-  string vehicle_type = 5;
-  string timestamp = 6;
+  string deviceId      = 1;
+  string plateNumber   = 2;
+  string plateImageUrl = 3;
+  double confidence    = 4;
+  string vehicleType   = 5;
+  string timestamp     = 6;
 }
 
 message EntryResponse {
-  int32 code = 1;
-  string message = 2;
-  EntryData data = 3;
+  int32     code    = 1;
+  string    message = 2;
+  EntryData data    = 3;
 }
 
 message EntryData {
-  string record_id = 1;
-  string plate_number = 2;
-  bool allowed = 3;
-  bool gate_open = 4;
-  string display_message = 5;
+  string recordId       = 1;
+  string plateNumber    = 2;
+  bool   allowed        = 3;
+  bool   gateOpen       = 4;
+  string displayMessage = 5;
 }
 
 message ExitRequest {
-  string device_id = 1;
-  string plate_number = 2;
-  string plate_image_url = 3;
-  double confidence = 4;
-  string timestamp = 5;
+  string deviceId      = 1;
+  string plateNumber   = 2;
+  string plateImageUrl = 3;
+  double confidence    = 4;
+  string timestamp     = 5;
 }
 
 message ExitResponse {
-  int32 code = 1;
-  string message = 2;
-  ExitData data = 3;
+  int32    code    = 1;
+  string   message = 2;
+  ExitData data    = 3;
 }
 
 message ExitData {
-  string record_id = 1;
-  string plate_number = 2;
-  int32 parking_duration = 3;
-  double amount = 4;
-  double discount_amount = 5;
-  double final_amount = 6;
-  bool allowed = 7;
-  bool gate_open = 8;
-  string display_message = 9;
+  string recordId        = 1;
+  string plateNumber     = 2;
+  int32  parkingDuration = 3;
+  double amount          = 4;
+  double discountAmount  = 5;
+  double finalAmount     = 6;
+  bool   allowed         = 7;
+  bool   gateOpen        = 8;
+  string displayMessage  = 9;
 }
 
 message HeartbeatRequest {
-  string device_id = 1;
-  string status = 2;
+  string deviceId  = 1;
+  string status    = 2;
   string timestamp = 3;
 }
 
 message HeartbeatResponse {
-  int32 code = 1;
+  int32  code    = 1;
   string message = 2;
 }
 
 message GetDeviceStatusRequest {
-  string device_id = 1;
+  string deviceId = 1;
 }
 
 message GetDeviceStatusResponse {
-  int32 code = 1;
-  string message = 2;
-  DeviceStatus data = 3;
+  int32        code    = 1;
+  string       message = 2;
+  DeviceStatus data    = 3;
 }
 
 message DeviceStatus {
-  string device_id = 1;
-  bool online = 2;
-  string status = 3;
-  string last_heartbeat = 4;
+  string deviceId      = 1;
+  bool   online        = 2;
+  string status        = 3;
+  string lastHeartbeat = 4;
 }
 
 message SendCommandRequest {
-  string device_id = 1;
-  string command = 2;
-  map<string, string> params = 3;
+  string              deviceId = 1;
+  string              command  = 2;
+  map<string, string> params   = 3;
 }
 
 message SendCommandResponse {
-  int32 code = 1;
-  string message = 2;
-  CommandData data = 3;
+  int32       code    = 1;
+  string      message = 2;
+  CommandData data    = 3;
 }
 
 message CommandData {
-  string command_id = 1;
-  string status = 2;
+  string commandId = 1;
+  string status    = 2;
 }
 
 message GetVehicleInfoRequest {
-  string plate_number = 1;
+  string plateNumber = 1;
 }
 
 message GetVehicleInfoResponse {
-  int32 code = 1;
-  string message = 2;
-  VehicleInfo data = 3;
+  int32       code    = 1;
+  string      message = 2;
+  VehicleInfo data    = 3;
 }
 
 message VehicleInfo {
-  string plate_number = 1;
-  string vehicle_type = 2;
-  string owner_name = 3;
-  string owner_phone = 4;
-  string monthly_valid_until = 5;
+  string plateNumber       = 1;
+  string vehicleType       = 2;
+  string ownerName         = 3;
+  string ownerPhone        = 4;
+  string monthlyValidUntil = 5;
 }
 
 message ListParkingRecordsRequest {
-  repeated string plate_numbers = 1;
-  int32 page = 2;
-  int32 page_size = 3;
+  repeated string plateNumbers = 1;
+  int32           page         = 2;
+  int32           pageSize     = 3;
 }
 
 message ListParkingRecordsResponse {
-  int32 code = 1;
-  string message = 2;
-  ListParkingRecordsData data = 3;
+  int32                  code    = 1;
+  string                 message = 2;
+  ListParkingRecordsData data    = 3;
 }
 
 message ListParkingRecordsData {
   repeated ParkingRecordInfo records = 1;
-  int32 total = 2;
+  int32                      total   = 2;
 }
 
 message GetParkingRecordRequest {
-  string record_id = 1;
+  string recordId = 1;
 }
 
 message GetParkingRecordResponse {
-  int32 code = 1;
-  string message = 2;
-  ParkingRecordInfo data = 3;
+  int32             code    = 1;
+  string            message = 2;
+  ParkingRecordInfo data    = 3;
 }
 
 message ParkingRecordInfo {
-  string record_id = 1;
-  string lot_id = 2;
-  string vehicle_id = 3;
-  string plate_number = 4;
-  string entry_lane_id = 5;
-  string entry_time = 6;
-  string entry_image_url = 7;
-  string record_status = 8;
-  string exit_time = 9;
-  string exit_image_url = 10;
-  string exit_lane_id = 11;
-  string exit_device_id = 12;
-  int32 parking_duration = 13;
-  string exit_status = 14;
-  int32 payment_lock = 15;
+  string recordId        = 1;
+  string lotId           = 2;
+  string vehicleId       = 3;
+  string plateNumber     = 4;
+  string entryLaneId     = 5;
+  string entryTime       = 6;
+  string entryImageUrl   = 7;
+  string recordStatus    = 8;
+  string exitTime        = 9;
+  string exitImageUrl    = 10;
+  string exitLaneId      = 11;
+  string exitDeviceId    = 12;
+  int32  parkingDuration = 13;
+  string exitStatus      = 14;
+  int32  paymentLock     = 15;
 }
 
 message ListDevicesRequest {
-  int32 page = 1;
-  int32 page_size = 2;
+  int32 page     = 1;
+  int32 pageSize = 2;
 }
 
 message ListDevicesResponse {
-  int32 code = 1;
-  string message = 2;
-  repeated DeviceInfo data = 3;
-  int32 total = 4;
+  int32               code    = 1;
+  string              message = 2;
+  repeated DeviceInfo data    = 3;
+  int32               total   = 4;
 }
 
 message DeviceInfo {
-  string device_id = 1;
-  string status = 2;
-  string last_heartbeat = 3;
-  bool online = 4;
-  string lane_id = 5;
-  string lot_id = 6;
+  string deviceId      = 1;
+  string status        = 2;
+  string lastHeartbeat = 3;
+  bool   online        = 4;
+  string laneId        = 5;
+  string lotId         = 6;
+  string deviceType    = 7;
+  string deviceSecret  = 8;
+  string createdAt     = 9;
+  string updatedAt     = 10;
+}
+
+message CreateDeviceRequest {
+  string deviceId   = 1;
+  string deviceType = 2;
+  string lotId      = 3;
+  string laneId     = 4;
+  string status     = 5;
+}
+
+message CreateDeviceResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
+}
+
+message GetDeviceRequest {
+  string deviceId = 1;
+}
+
+message GetDeviceResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
+}
+
+message UpdateDeviceRequest {
+  string deviceId   = 1;
+  string deviceType = 2;
+  string lotId      = 3;
+  string laneId     = 4;
+  string status     = 5;
+}
+
+message UpdateDeviceResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
+}
+
+message DeleteDeviceRequest {
+  string deviceId = 1;
+}
+
+message DeleteDeviceResponse {
+  int32  code    = 1;
+  string message = 2;
 }

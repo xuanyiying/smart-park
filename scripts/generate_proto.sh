@@ -16,6 +16,10 @@ generate_service api/admin/v1/admin.proto
 generate_service api/billing/v1/billing.proto
 generate_service api/payment/v1/payment.proto
 generate_service api/vehicle/v1/vehicle.proto
+generate_service api/user/v1/user.proto
+generate_service api/analytics/v1/analytics.proto
+generate_service api/multitenancy/v1/multitenancy.proto
+generate_service api/charging/v1/charging.proto
 
 echo "Proto generation complete!"
 echo ""

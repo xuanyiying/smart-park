@@ -24,11 +24,11 @@ const (
 
 type CreatePaymentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
 	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayMethod     string                 `protobuf:"bytes,3,opt,name=pay_method,json=payMethod,proto3" json:"pay_method,omitempty"`
-	OpenId        string                 `protobuf:"bytes,4,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
-	NotifyUrl     string                 `protobuf:"bytes,5,opt,name=notify_url,json=notifyUrl,proto3" json:"notify_url,omitempty"`
+	PayMethod     string                 `protobuf:"bytes,3,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
+	OpenId        string                 `protobuf:"bytes,4,opt,name=openId,proto3" json:"openId,omitempty"`
+	NotifyUrl     string                 `protobuf:"bytes,5,opt,name=notifyUrl,proto3" json:"notifyUrl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -160,11 +160,11 @@ func (x *CreatePaymentResponse) GetData() *PaymentData {
 
 type PaymentData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
 	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayUrl        string                 `protobuf:"bytes,3,opt,name=pay_url,json=payUrl,proto3" json:"pay_url,omitempty"`
-	QrCode        string                 `protobuf:"bytes,4,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
-	ExpireTime    string                 `protobuf:"bytes,5,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
+	PayUrl        string                 `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
+	QrCode        string                 `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
+	ExpireTime    string                 `protobuf:"bytes,5,opt,name=expireTime,proto3" json:"expireTime,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -236,7 +236,7 @@ func (x *PaymentData) GetExpireTime() string {
 
 type GetPaymentStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -340,10 +340,10 @@ func (x *GetPaymentStatusResponse) GetData() *PaymentStatusData {
 
 type PaymentStatusData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	PayTime       string                 `protobuf:"bytes,3,opt,name=pay_time,json=payTime,proto3" json:"pay_time,omitempty"`
-	PayMethod     string                 `protobuf:"bytes,4,opt,name=pay_method,json=payMethod,proto3" json:"pay_method,omitempty"`
+	PayTime       string                 `protobuf:"bytes,3,opt,name=payTime,proto3" json:"payTime,omitempty"`
+	PayMethod     string                 `protobuf:"bytes,4,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -408,13 +408,13 @@ func (x *PaymentStatusData) GetPayMethod() string {
 
 type WechatCallbackRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReturnCode    string                 `protobuf:"bytes,1,opt,name=return_code,json=returnCode,proto3" json:"return_code,omitempty"`
-	ReturnMsg     string                 `protobuf:"bytes,2,opt,name=return_msg,json=returnMsg,proto3" json:"return_msg,omitempty"`
-	ResultCode    string                 `protobuf:"bytes,3,opt,name=result_code,json=resultCode,proto3" json:"result_code,omitempty"`
-	TransactionId string                 `protobuf:"bytes,4,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`
-	OutTradeNo    string                 `protobuf:"bytes,5,opt,name=out_trade_no,json=outTradeNo,proto3" json:"out_trade_no,omitempty"`
-	TotalFee      string                 `protobuf:"bytes,6,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
-	TimeEnd       string                 `protobuf:"bytes,7,opt,name=time_end,json=timeEnd,proto3" json:"time_end,omitempty"`
+	ReturnCode    string                 `protobuf:"bytes,1,opt,name=returnCode,proto3" json:"returnCode,omitempty"`
+	ReturnMsg     string                 `protobuf:"bytes,2,opt,name=returnMsg,proto3" json:"returnMsg,omitempty"`
+	ResultCode    string                 `protobuf:"bytes,3,opt,name=resultCode,proto3" json:"resultCode,omitempty"`
+	TransactionId string                 `protobuf:"bytes,4,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
+	OutTradeNo    string                 `protobuf:"bytes,5,opt,name=outTradeNo,proto3" json:"outTradeNo,omitempty"`
+	TotalFee      string                 `protobuf:"bytes,6,opt,name=totalFee,proto3" json:"totalFee,omitempty"`
+	TimeEnd       string                 `protobuf:"bytes,7,opt,name=timeEnd,proto3" json:"timeEnd,omitempty"`
 	Sign          string                 `protobuf:"bytes,8,opt,name=sign,proto3" json:"sign,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -508,8 +508,8 @@ func (x *WechatCallbackRequest) GetSign() string {
 
 type WechatCallbackResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReturnCode    string                 `protobuf:"bytes,1,opt,name=return_code,json=returnCode,proto3" json:"return_code,omitempty"`
-	ReturnMsg     string                 `protobuf:"bytes,2,opt,name=return_msg,json=returnMsg,proto3" json:"return_msg,omitempty"`
+	ReturnCode    string                 `protobuf:"bytes,1,opt,name=returnCode,proto3" json:"returnCode,omitempty"`
+	ReturnMsg     string                 `protobuf:"bytes,2,opt,name=returnMsg,proto3" json:"returnMsg,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -560,11 +560,11 @@ func (x *WechatCallbackResponse) GetReturnMsg() string {
 
 type AlipayCallbackRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TradeStatus   string                 `protobuf:"bytes,1,opt,name=trade_status,json=tradeStatus,proto3" json:"trade_status,omitempty"`
-	TradeNo       string                 `protobuf:"bytes,2,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty"`
-	OutTradeNo    string                 `protobuf:"bytes,3,opt,name=out_trade_no,json=outTradeNo,proto3" json:"out_trade_no,omitempty"`
-	TotalAmount   string                 `protobuf:"bytes,4,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	GmtPayment    string                 `protobuf:"bytes,5,opt,name=gmt_payment,json=gmtPayment,proto3" json:"gmt_payment,omitempty"`
+	TradeStatus   string                 `protobuf:"bytes,1,opt,name=tradeStatus,proto3" json:"tradeStatus,omitempty"`
+	TradeNo       string                 `protobuf:"bytes,2,opt,name=tradeNo,proto3" json:"tradeNo,omitempty"`
+	OutTradeNo    string                 `protobuf:"bytes,3,opt,name=outTradeNo,proto3" json:"outTradeNo,omitempty"`
+	TotalAmount   string                 `protobuf:"bytes,4,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	GmtPayment    string                 `protobuf:"bytes,5,opt,name=gmtPayment,proto3" json:"gmtPayment,omitempty"`
 	Sign          string                 `protobuf:"bytes,6,opt,name=sign,proto3" json:"sign,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -696,7 +696,7 @@ func (x *AlipayCallbackResponse) GetMsg() string {
 
 type RefundRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
 	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -808,7 +808,7 @@ func (x *RefundResponse) GetData() *RefundData {
 
 type RefundData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RefundId      string                 `protobuf:"bytes,1,opt,name=refund_id,json=refundId,proto3" json:"refund_id,omitempty"`
+	RefundId      string                 `protobuf:"bytes,1,opt,name=refundId,proto3" json:"refundId,omitempty"`
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -862,85 +862,87 @@ var File_api_payment_v1_payment_proto protoreflect.FileDescriptor
 
 const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\n" +
-	"\x1capi/payment/v1/payment.proto\x12\x0eapi.payment.v1\x1a\x1cgoogle/api/annotations.proto\"\xa2\x01\n" +
-	"\x14CreatePaymentRequest\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x1d\n" +
-	"\n" +
-	"pay_method\x18\x03 \x01(\tR\tpayMethod\x12\x17\n" +
-	"\aopen_id\x18\x04 \x01(\tR\x06openId\x12\x1d\n" +
-	"\n" +
-	"notify_url\x18\x05 \x01(\tR\tnotifyUrl\"v\n" +
+	"\x1capi/payment/v1/payment.proto\x12\x0eapi.payment.v1\x1a\x1cgoogle/api/annotations.proto\"\x9e\x01\n" +
+	"\x14CreatePaymentRequest\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x1c\n" +
+	"\tpayMethod\x18\x03 \x01(\tR\tpayMethod\x12\x16\n" +
+	"\x06openId\x18\x04 \x01(\tR\x06openId\x12\x1c\n" +
+	"\tnotifyUrl\x18\x05 \x01(\tR\tnotifyUrl\"v\n" +
 	"\x15CreatePaymentResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.payment.v1.PaymentDataR\x04data\"\x93\x01\n" +
-	"\vPaymentData\x12\x19\n" +
-	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x17\n" +
-	"\apay_url\x18\x03 \x01(\tR\x06payUrl\x12\x17\n" +
-	"\aqr_code\x18\x04 \x01(\tR\x06qrCode\x12\x1f\n" +
-	"\vexpire_time\x18\x05 \x01(\tR\n" +
-	"expireTime\"4\n" +
-	"\x17GetPaymentStatusRequest\x12\x19\n" +
-	"\border_id\x18\x01 \x01(\tR\aorderId\"\x7f\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.payment.v1.PaymentDataR\x04data\"\x8f\x01\n" +
+	"\vPaymentData\x12\x18\n" +
+	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06payUrl\x18\x03 \x01(\tR\x06payUrl\x12\x16\n" +
+	"\x06qrCode\x18\x04 \x01(\tR\x06qrCode\x12\x1e\n" +
+	"\n" +
+	"expireTime\x18\x05 \x01(\tR\n" +
+	"expireTime\"3\n" +
+	"\x17GetPaymentStatusRequest\x12\x18\n" +
+	"\aorderId\x18\x01 \x01(\tR\aorderId\"\x7f\n" +
 	"\x18GetPaymentStatusResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
-	"\x04data\x18\x03 \x01(\v2!.api.payment.v1.PaymentStatusDataR\x04data\"\x80\x01\n" +
-	"\x11PaymentStatusData\x12\x19\n" +
-	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
-	"\bpay_time\x18\x03 \x01(\tR\apayTime\x12\x1d\n" +
+	"\x04data\x18\x03 \x01(\v2!.api.payment.v1.PaymentStatusDataR\x04data\"}\n" +
+	"\x11PaymentStatusData\x12\x18\n" +
+	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n" +
+	"\apayTime\x18\x03 \x01(\tR\apayTime\x12\x1c\n" +
+	"\tpayMethod\x18\x04 \x01(\tR\tpayMethod\"\x85\x02\n" +
+	"\x15WechatCallbackRequest\x12\x1e\n" +
 	"\n" +
-	"pay_method\x18\x04 \x01(\tR\tpayMethod\"\x8d\x02\n" +
-	"\x15WechatCallbackRequest\x12\x1f\n" +
-	"\vreturn_code\x18\x01 \x01(\tR\n" +
-	"returnCode\x12\x1d\n" +
+	"returnCode\x18\x01 \x01(\tR\n" +
+	"returnCode\x12\x1c\n" +
+	"\treturnMsg\x18\x02 \x01(\tR\treturnMsg\x12\x1e\n" +
 	"\n" +
-	"return_msg\x18\x02 \x01(\tR\treturnMsg\x12\x1f\n" +
-	"\vresult_code\x18\x03 \x01(\tR\n" +
-	"resultCode\x12%\n" +
-	"\x0etransaction_id\x18\x04 \x01(\tR\rtransactionId\x12 \n" +
-	"\fout_trade_no\x18\x05 \x01(\tR\n" +
-	"outTradeNo\x12\x1b\n" +
-	"\ttotal_fee\x18\x06 \x01(\tR\btotalFee\x12\x19\n" +
-	"\btime_end\x18\a \x01(\tR\atimeEnd\x12\x12\n" +
-	"\x04sign\x18\b \x01(\tR\x04sign\"X\n" +
-	"\x16WechatCallbackResponse\x12\x1f\n" +
-	"\vreturn_code\x18\x01 \x01(\tR\n" +
-	"returnCode\x12\x1d\n" +
+	"resultCode\x18\x03 \x01(\tR\n" +
+	"resultCode\x12$\n" +
+	"\rtransactionId\x18\x04 \x01(\tR\rtransactionId\x12\x1e\n" +
 	"\n" +
-	"return_msg\x18\x02 \x01(\tR\treturnMsg\"\xcf\x01\n" +
-	"\x15AlipayCallbackRequest\x12!\n" +
-	"\ftrade_status\x18\x01 \x01(\tR\vtradeStatus\x12\x19\n" +
-	"\btrade_no\x18\x02 \x01(\tR\atradeNo\x12 \n" +
-	"\fout_trade_no\x18\x03 \x01(\tR\n" +
-	"outTradeNo\x12!\n" +
-	"\ftotal_amount\x18\x04 \x01(\tR\vtotalAmount\x12\x1f\n" +
-	"\vgmt_payment\x18\x05 \x01(\tR\n" +
+	"outTradeNo\x18\x05 \x01(\tR\n" +
+	"outTradeNo\x12\x1a\n" +
+	"\btotalFee\x18\x06 \x01(\tR\btotalFee\x12\x18\n" +
+	"\atimeEnd\x18\a \x01(\tR\atimeEnd\x12\x12\n" +
+	"\x04sign\x18\b \x01(\tR\x04sign\"V\n" +
+	"\x16WechatCallbackResponse\x12\x1e\n" +
+	"\n" +
+	"returnCode\x18\x01 \x01(\tR\n" +
+	"returnCode\x12\x1c\n" +
+	"\treturnMsg\x18\x02 \x01(\tR\treturnMsg\"\xc9\x01\n" +
+	"\x15AlipayCallbackRequest\x12 \n" +
+	"\vtradeStatus\x18\x01 \x01(\tR\vtradeStatus\x12\x18\n" +
+	"\atradeNo\x18\x02 \x01(\tR\atradeNo\x12\x1e\n" +
+	"\n" +
+	"outTradeNo\x18\x03 \x01(\tR\n" +
+	"outTradeNo\x12 \n" +
+	"\vtotalAmount\x18\x04 \x01(\tR\vtotalAmount\x12\x1e\n" +
+	"\n" +
+	"gmtPayment\x18\x05 \x01(\tR\n" +
 	"gmtPayment\x12\x12\n" +
 	"\x04sign\x18\x06 \x01(\tR\x04sign\">\n" +
 	"\x16AlipayCallbackResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"B\n" +
-	"\rRefundRequest\x12\x19\n" +
-	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg\"A\n" +
+	"\rRefundRequest\x12\x18\n" +
+	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\"n\n" +
 	"\x0eRefundResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
-	"\x04data\x18\x03 \x01(\v2\x1a.api.payment.v1.RefundDataR\x04data\"A\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.payment.v1.RefundDataR\x04data\"@\n" +
 	"\n" +
-	"RefundData\x12\x1b\n" +
-	"\trefund_id\x18\x01 \x01(\tR\brefundId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2\xa3\x05\n" +
+	"RefundData\x12\x1a\n" +
+	"\brefundId\x18\x01 \x01(\tR\brefundId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status2\xa1\x05\n" +
 	"\x0ePaymentService\x12{\n" +
-	"\rCreatePayment\x12$.api.payment.v1.CreatePaymentRequest\x1a%.api.payment.v1.CreatePaymentResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/pay/create\x12\x8c\x01\n" +
-	"\x10GetPaymentStatus\x12'.api.payment.v1.GetPaymentStatusRequest\x1a(.api.payment.v1.GetPaymentStatusResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/pay/{order_id}/status\x12\x87\x01\n" +
+	"\rCreatePayment\x12$.api.payment.v1.CreatePaymentRequest\x1a%.api.payment.v1.CreatePaymentResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/pay/create\x12\x8b\x01\n" +
+	"\x10GetPaymentStatus\x12'.api.payment.v1.GetPaymentStatusRequest\x1a(.api.payment.v1.GetPaymentStatusResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/pay/{orderId}/status\x12\x87\x01\n" +
 	"\x0eWechatCallback\x12%.api.payment.v1.WechatCallbackRequest\x1a&.api.payment.v1.WechatCallbackResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/pay/callback/wechat\x12\x87\x01\n" +
-	"\x0eAlipayCallback\x12%.api.payment.v1.AlipayCallbackRequest\x1a&.api.payment.v1.AlipayCallbackResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/pay/callback/alipay\x12q\n" +
-	"\x06Refund\x12\x1d.api.payment.v1.RefundRequest\x1a\x1e.api.payment.v1.RefundResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/pay/{order_id}/refundB4Z2github.com/xuanyiying/smart-park/api/payment/v1;v1b\x06proto3"
+	"\x0eAlipayCallback\x12%.api.payment.v1.AlipayCallbackRequest\x1a&.api.payment.v1.AlipayCallbackResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/pay/callback/alipay\x12p\n" +
+	"\x06Refund\x12\x1d.api.payment.v1.RefundRequest\x1a\x1e.api.payment.v1.RefundResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/pay/{orderId}/refundB4Z2github.com/xuanyiying/smart-park/api/payment/v1;v1b\x06proto3"
 
 var (
 	file_api_payment_v1_payment_proto_rawDescOnce sync.Once

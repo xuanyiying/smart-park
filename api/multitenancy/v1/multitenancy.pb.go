@@ -10,7 +10,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -145,7 +144,7 @@ func (x *CreateTenantResponse) GetData() *Tenant {
 
 type GetTenantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -353,7 +352,7 @@ func (x *GetTenantByCodeResponse) GetData() *Tenant {
 
 type UpdateTenantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Config        *TenantConfig          `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -473,7 +472,7 @@ func (x *UpdateTenantResponse) GetData() *Tenant {
 
 type DeleteTenantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -570,7 +569,7 @@ func (x *DeleteTenantResponse) GetMessage() string {
 type ListTenantsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -689,7 +688,7 @@ func (x *ListTenantsResponse) GetTotal() int64 {
 
 type EnableTenantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -785,7 +784,7 @@ func (x *EnableTenantResponse) GetMessage() string {
 
 type DisableTenantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -881,7 +880,7 @@ func (x *DisableTenantResponse) GetMessage() string {
 
 type CheckFeatureRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
 	Feature       string                 `protobuf:"bytes,2,opt,name=feature,proto3" json:"feature,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -935,7 +934,7 @@ type CheckFeatureResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	HasFeature    bool                   `protobuf:"varint,3,opt,name=has_feature,json=hasFeature,proto3" json:"has_feature,omitempty"`
+	HasFeature    bool                   `protobuf:"varint,3,opt,name=hasFeature,proto3" json:"hasFeature,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -993,9 +992,9 @@ func (x *CheckFeatureResponse) GetHasFeature() bool {
 
 type CheckQuotaRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	ResourceType  string                 `protobuf:"bytes,2,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"` // parking_lots, devices, users
-	CurrentCount  int32                  `protobuf:"varint,3,opt,name=current_count,json=currentCount,proto3" json:"current_count,omitempty"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenantId,proto3" json:"tenantId,omitempty"`
+	ResourceType  string                 `protobuf:"bytes,2,opt,name=resourceType,proto3" json:"resourceType,omitempty"` // parking_lots, devices, users
+	CurrentCount  int32                  `protobuf:"varint,3,opt,name=currentCount,proto3" json:"currentCount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1134,9 +1133,9 @@ type Tenant struct {
 	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
 	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"` // active, disabled, expired
 	Config        *TenantConfig          `protobuf:"bytes,5,opt,name=config,proto3" json:"config,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	ExpiredAt     string                 `protobuf:"bytes,8,opt,name=expired_at,json=expiredAt,proto3" json:"expired_at,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	ExpiredAt     string                 `protobuf:"bytes,8,opt,name=expiredAt,proto3" json:"expiredAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1229,12 +1228,12 @@ func (x *Tenant) GetExpiredAt() string {
 
 type TenantConfig struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	MaxParkingLots int32                  `protobuf:"varint,1,opt,name=max_parking_lots,json=maxParkingLots,proto3" json:"max_parking_lots,omitempty"`
-	MaxDevices     int32                  `protobuf:"varint,2,opt,name=max_devices,json=maxDevices,proto3" json:"max_devices,omitempty"`
-	MaxUsers       int32                  `protobuf:"varint,3,opt,name=max_users,json=maxUsers,proto3" json:"max_users,omitempty"`
-	StorageQuota   int64                  `protobuf:"varint,4,opt,name=storage_quota,json=storageQuota,proto3" json:"storage_quota,omitempty"`
+	MaxParkingLots int32                  `protobuf:"varint,1,opt,name=maxParkingLots,proto3" json:"maxParkingLots,omitempty"`
+	MaxDevices     int32                  `protobuf:"varint,2,opt,name=maxDevices,proto3" json:"maxDevices,omitempty"`
+	MaxUsers       int32                  `protobuf:"varint,3,opt,name=maxUsers,proto3" json:"maxUsers,omitempty"`
+	StorageQuota   int64                  `protobuf:"varint,4,opt,name=storageQuota,proto3" json:"storageQuota,omitempty"`
 	Features       []string               `protobuf:"bytes,5,rep,name=features,proto3" json:"features,omitempty"`
-	CustomDomain   string                 `protobuf:"bytes,6,opt,name=custom_domain,json=customDomain,proto3" json:"custom_domain,omitempty"`
+	CustomDomain   string                 `protobuf:"bytes,6,opt,name=customDomain,proto3" json:"customDomain,omitempty"`
 	Timezone       string                 `protobuf:"bytes,7,opt,name=timezone,proto3" json:"timezone,omitempty"`
 	Currency       string                 `protobuf:"bytes,8,opt,name=currency,proto3" json:"currency,omitempty"`
 	Language       string                 `protobuf:"bytes,9,opt,name=language,proto3" json:"language,omitempty"`
@@ -1339,7 +1338,7 @@ var File_api_multitenancy_v1_multitenancy_proto protoreflect.FileDescriptor
 
 const file_api_multitenancy_v1_multitenancy_proto_rawDesc = "" +
 	"\n" +
-	"&api/multitenancy/v1/multitenancy.proto\x12\x13api.multitenancy.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"x\n" +
+	"&api/multitenancy/v1/multitenancy.proto\x12\x13api.multitenancy.v1\x1a\x1cgoogle/api/annotations.proto\"x\n" +
 	"\x13CreateTenantRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\x129\n" +
@@ -1347,9 +1346,9 @@ const file_api_multitenancy_v1_multitenancy_proto_rawDesc = "" +
 	"\x14CreateTenantResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.multitenancy.v1.TenantR\x04data\"/\n" +
-	"\x10GetTenantRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"r\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.multitenancy.v1.TenantR\x04data\".\n" +
+	"\x10GetTenantRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\"r\n" +
 	"\x11GetTenantResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
@@ -1359,91 +1358,90 @@ const file_api_multitenancy_v1_multitenancy_proto_rawDesc = "" +
 	"\x17GetTenantByCodeResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.multitenancy.v1.TenantR\x04data\"\x81\x01\n" +
-	"\x13UpdateTenantRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.multitenancy.v1.TenantR\x04data\"\x80\x01\n" +
+	"\x13UpdateTenantRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
 	"\x06config\x18\x03 \x01(\v2!.api.multitenancy.v1.TenantConfigR\x06config\"u\n" +
 	"\x14UpdateTenantResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
-	"\x04data\x18\x03 \x01(\v2\x1b.api.multitenancy.v1.TenantR\x04data\"2\n" +
-	"\x13DeleteTenantRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"D\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.multitenancy.v1.TenantR\x04data\"1\n" +
+	"\x13DeleteTenantRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\"D\n" +
 	"\x14DeleteTenantResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"E\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"D\n" +
 	"\x12ListTenantsRequest\x12\x12\n" +
-	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x8a\x01\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"\x8a\x01\n" +
 	"\x13ListTenantsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
 	"\x04data\x18\x03 \x03(\v2\x1b.api.multitenancy.v1.TenantR\x04data\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x03R\x05total\"2\n" +
-	"\x13EnableTenantRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"D\n" +
+	"\x05total\x18\x04 \x01(\x03R\x05total\"1\n" +
+	"\x13EnableTenantRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\"D\n" +
 	"\x14EnableTenantResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"3\n" +
-	"\x14DisableTenantRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"E\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"2\n" +
+	"\x14DisableTenantRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\"E\n" +
 	"\x15DisableTenantResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"L\n" +
-	"\x13CheckFeatureRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12\x18\n" +
-	"\afeature\x18\x02 \x01(\tR\afeature\"e\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"K\n" +
+	"\x13CheckFeatureRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\x12\x18\n" +
+	"\afeature\x18\x02 \x01(\tR\afeature\"d\n" +
 	"\x14CheckFeatureResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1f\n" +
-	"\vhas_feature\x18\x03 \x01(\bR\n" +
-	"hasFeature\"z\n" +
-	"\x11CheckQuotaRequest\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12#\n" +
-	"\rresource_type\x18\x02 \x01(\tR\fresourceType\x12#\n" +
-	"\rcurrent_count\x18\x03 \x01(\x05R\fcurrentCount\"\x90\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1e\n" +
+	"\n" +
+	"hasFeature\x18\x03 \x01(\bR\n" +
+	"hasFeature\"w\n" +
+	"\x11CheckQuotaRequest\x12\x1a\n" +
+	"\btenantId\x18\x01 \x01(\tR\btenantId\x12\"\n" +
+	"\fresourceType\x18\x02 \x01(\tR\fresourceType\x12\"\n" +
+	"\fcurrentCount\x18\x03 \x01(\x05R\fcurrentCount\"\x90\x01\n" +
 	"\x12CheckQuotaResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
 	"\aallowed\x18\x03 \x01(\bR\aallowed\x12\x14\n" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12\x1c\n" +
-	"\tremaining\x18\x05 \x01(\x05R\tremaining\"\xf0\x01\n" +
+	"\tremaining\x18\x05 \x01(\x05R\tremaining\"\xed\x01\n" +
 	"\x06Tenant\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
 	"\x04code\x18\x03 \x01(\tR\x04code\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x129\n" +
-	"\x06config\x18\x05 \x01(\v2!.api.multitenancy.v1.TenantConfigR\x06config\x12\x1d\n" +
+	"\x06config\x18\x05 \x01(\v2!.api.multitenancy.v1.TenantConfigR\x06config\x12\x1c\n" +
+	"\tcreatedAt\x18\x06 \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\a \x01(\tR\tupdatedAt\x12\x1c\n" +
+	"\texpiredAt\x18\b \x01(\tR\texpiredAt\"\xaa\x02\n" +
+	"\fTenantConfig\x12&\n" +
+	"\x0emaxParkingLots\x18\x01 \x01(\x05R\x0emaxParkingLots\x12\x1e\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\a \x01(\tR\tupdatedAt\x12\x1d\n" +
-	"\n" +
-	"expired_at\x18\b \x01(\tR\texpiredAt\"\xb0\x02\n" +
-	"\fTenantConfig\x12(\n" +
-	"\x10max_parking_lots\x18\x01 \x01(\x05R\x0emaxParkingLots\x12\x1f\n" +
-	"\vmax_devices\x18\x02 \x01(\x05R\n" +
-	"maxDevices\x12\x1b\n" +
-	"\tmax_users\x18\x03 \x01(\x05R\bmaxUsers\x12#\n" +
-	"\rstorage_quota\x18\x04 \x01(\x03R\fstorageQuota\x12\x1a\n" +
-	"\bfeatures\x18\x05 \x03(\tR\bfeatures\x12#\n" +
-	"\rcustom_domain\x18\x06 \x01(\tR\fcustomDomain\x12\x1a\n" +
+	"maxDevices\x18\x02 \x01(\x05R\n" +
+	"maxDevices\x12\x1a\n" +
+	"\bmaxUsers\x18\x03 \x01(\x05R\bmaxUsers\x12\"\n" +
+	"\fstorageQuota\x18\x04 \x01(\x03R\fstorageQuota\x12\x1a\n" +
+	"\bfeatures\x18\x05 \x03(\tR\bfeatures\x12\"\n" +
+	"\fcustomDomain\x18\x06 \x01(\tR\fcustomDomain\x12\x1a\n" +
 	"\btimezone\x18\a \x01(\tR\btimezone\x12\x1a\n" +
 	"\bcurrency\x18\b \x01(\tR\bcurrency\x12\x1a\n" +
-	"\blanguage\x18\t \x01(\tR\blanguage2\xc8\v\n" +
+	"\blanguage\x18\t \x01(\tR\blanguage2\xc1\v\n" +
 	"\rTenantService\x12\x85\x01\n" +
-	"\fCreateTenant\x12(.api.multitenancy.v1.CreateTenantRequest\x1a).api.multitenancy.v1.CreateTenantResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/admin/tenants\x12\x85\x01\n" +
-	"\tGetTenant\x12%.api.multitenancy.v1.GetTenantRequest\x1a&.api.multitenancy.v1.GetTenantResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/admin/tenants/{tenant_id}\x12\x97\x01\n" +
-	"\x0fGetTenantByCode\x12+.api.multitenancy.v1.GetTenantByCodeRequest\x1a,.api.multitenancy.v1.GetTenantByCodeResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/admin/tenants/code/{code}\x12\x91\x01\n" +
-	"\fUpdateTenant\x12(.api.multitenancy.v1.UpdateTenantRequest\x1a).api.multitenancy.v1.UpdateTenantResponse\",\x82\xd3\xe4\x93\x02&:\x01*\x1a!/api/v1/admin/tenants/{tenant_id}\x12\x8e\x01\n" +
-	"\fDeleteTenant\x12(.api.multitenancy.v1.DeleteTenantRequest\x1a).api.multitenancy.v1.DeleteTenantResponse\")\x82\xd3\xe4\x93\x02#*!/api/v1/admin/tenants/{tenant_id}\x12\x7f\n" +
-	"\vListTenants\x12'.api.multitenancy.v1.ListTenantsRequest\x1a(.api.multitenancy.v1.ListTenantsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/admin/tenants\x12\x95\x01\n" +
-	"\fEnableTenant\x12(.api.multitenancy.v1.EnableTenantRequest\x1a).api.multitenancy.v1.EnableTenantResponse\"0\x82\xd3\xe4\x93\x02*\"(/api/v1/admin/tenants/{tenant_id}/enable\x12\x99\x01\n" +
-	"\rDisableTenant\x12).api.multitenancy.v1.DisableTenantRequest\x1a*.api.multitenancy.v1.DisableTenantResponse\"1\x82\xd3\xe4\x93\x02+\")/api/v1/admin/tenants/{tenant_id}/disable\x12\xa1\x01\n" +
-	"\fCheckFeature\x12(.api.multitenancy.v1.CheckFeatureRequest\x1a).api.multitenancy.v1.CheckFeatureResponse\"<\x82\xd3\xe4\x93\x026\x124/api/v1/admin/tenants/{tenant_id}/features/{feature}\x12\x8e\x01\n" +
+	"\fCreateTenant\x12(.api.multitenancy.v1.CreateTenantRequest\x1a).api.multitenancy.v1.CreateTenantResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/admin/tenants\x12\x84\x01\n" +
+	"\tGetTenant\x12%.api.multitenancy.v1.GetTenantRequest\x1a&.api.multitenancy.v1.GetTenantResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/admin/tenants/{tenantId}\x12\x97\x01\n" +
+	"\x0fGetTenantByCode\x12+.api.multitenancy.v1.GetTenantByCodeRequest\x1a,.api.multitenancy.v1.GetTenantByCodeResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/admin/tenants/code/{code}\x12\x90\x01\n" +
+	"\fUpdateTenant\x12(.api.multitenancy.v1.UpdateTenantRequest\x1a).api.multitenancy.v1.UpdateTenantResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/admin/tenants/{tenantId}\x12\x8d\x01\n" +
+	"\fDeleteTenant\x12(.api.multitenancy.v1.DeleteTenantRequest\x1a).api.multitenancy.v1.DeleteTenantResponse\"(\x82\xd3\xe4\x93\x02\"* /api/v1/admin/tenants/{tenantId}\x12\x7f\n" +
+	"\vListTenants\x12'.api.multitenancy.v1.ListTenantsRequest\x1a(.api.multitenancy.v1.ListTenantsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/admin/tenants\x12\x94\x01\n" +
+	"\fEnableTenant\x12(.api.multitenancy.v1.EnableTenantRequest\x1a).api.multitenancy.v1.EnableTenantResponse\"/\x82\xd3\xe4\x93\x02)\"'/api/v1/admin/tenants/{tenantId}/enable\x12\x98\x01\n" +
+	"\rDisableTenant\x12).api.multitenancy.v1.DisableTenantRequest\x1a*.api.multitenancy.v1.DisableTenantResponse\"0\x82\xd3\xe4\x93\x02*\"(/api/v1/admin/tenants/{tenantId}/disable\x12\xa0\x01\n" +
+	"\fCheckFeature\x12(.api.multitenancy.v1.CheckFeatureRequest\x1a).api.multitenancy.v1.CheckFeatureResponse\";\x82\xd3\xe4\x93\x025\x123/api/v1/admin/tenants/{tenantId}/features/{feature}\x12\x8d\x01\n" +
 	"\n" +
-	"CheckQuota\x12&.api.multitenancy.v1.CheckQuotaRequest\x1a'.api.multitenancy.v1.CheckQuotaResponse\"/\x82\xd3\xe4\x93\x02)\x12'/api/v1/admin/tenants/{tenant_id}/quotaB9Z7github.com/xuanyiying/smart-park/api/multitenancy/v1;v1b\x06proto3"
+	"CheckQuota\x12&.api.multitenancy.v1.CheckQuotaRequest\x1a'.api.multitenancy.v1.CheckQuotaResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/admin/tenants/{tenantId}/quotaB9Z7github.com/xuanyiying/smart-park/api/multitenancy/v1;v1b\x06proto3"
 
 var (
 	file_api_multitenancy_v1_multitenancy_proto_rawDescOnce sync.Once

@@ -10,7 +10,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -26,13 +25,13 @@ const (
 // Station messages
 type CreateStationRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	LotId           string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId           string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	StationType     string                 `protobuf:"bytes,3,opt,name=station_type,json=stationType,proto3" json:"station_type,omitempty"` // ac, dc, fast_dc
-	ConnectorType   string                 `protobuf:"bytes,4,opt,name=connector_type,json=connectorType,proto3" json:"connector_type,omitempty"`
-	MaxPower        float64                `protobuf:"fixed64,5,opt,name=max_power,json=maxPower,proto3" json:"max_power,omitempty"`
+	StationType     string                 `protobuf:"bytes,3,opt,name=stationType,proto3" json:"stationType,omitempty"` // ac, dc, fast_dc
+	ConnectorType   string                 `protobuf:"bytes,4,opt,name=connectorType,proto3" json:"connectorType,omitempty"`
+	MaxPower        float64                `protobuf:"fixed64,5,opt,name=maxPower,proto3" json:"maxPower,omitempty"`
 	Voltage         float64                `protobuf:"fixed64,6,opt,name=voltage,proto3" json:"voltage,omitempty"`
-	TotalConnectors int32                  `protobuf:"varint,7,opt,name=total_connectors,json=totalConnectors,proto3" json:"total_connectors,omitempty"`
+	TotalConnectors int32                  `protobuf:"varint,7,opt,name=totalConnectors,proto3" json:"totalConnectors,omitempty"`
 	Location        string                 `protobuf:"bytes,8,opt,name=location,proto3" json:"location,omitempty"`
 	Floor           string                 `protobuf:"bytes,9,opt,name=floor,proto3" json:"floor,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -194,7 +193,7 @@ func (x *CreateStationResponse) GetData() *Station {
 
 type GetStationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -298,11 +297,11 @@ func (x *GetStationResponse) GetData() *Station {
 
 type UpdateStationRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	StationId       string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId       string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Status          string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"` // available, offline, maintenance
-	MaxPower        float64                `protobuf:"fixed64,4,opt,name=max_power,json=maxPower,proto3" json:"max_power,omitempty"`
-	TotalConnectors int32                  `protobuf:"varint,5,opt,name=total_connectors,json=totalConnectors,proto3" json:"total_connectors,omitempty"`
+	MaxPower        float64                `protobuf:"fixed64,4,opt,name=maxPower,proto3" json:"maxPower,omitempty"`
+	TotalConnectors int32                  `protobuf:"varint,5,opt,name=totalConnectors,proto3" json:"totalConnectors,omitempty"`
 	Location        string                 `protobuf:"bytes,6,opt,name=location,proto3" json:"location,omitempty"`
 	Floor           string                 `protobuf:"bytes,7,opt,name=floor,proto3" json:"floor,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -450,7 +449,7 @@ func (x *UpdateStationResponse) GetData() *Station {
 
 type DeleteStationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -546,9 +545,9 @@ func (x *DeleteStationResponse) GetMessage() string {
 
 type ListStationsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -674,7 +673,7 @@ func (x *ListStationsResponse) GetTotal() int64 {
 
 type GetAvailableStationsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LotId         string                 `protobuf:"bytes,1,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -779,19 +778,19 @@ func (x *GetAvailableStationsResponse) GetData() []*Station {
 type Station struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	LotId               string                 `protobuf:"bytes,2,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	LotId               string                 `protobuf:"bytes,2,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	Name                string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	StationType         string                 `protobuf:"bytes,4,opt,name=station_type,json=stationType,proto3" json:"station_type,omitempty"`
+	StationType         string                 `protobuf:"bytes,4,opt,name=stationType,proto3" json:"stationType,omitempty"`
 	Status              string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	ConnectorType       string                 `protobuf:"bytes,6,opt,name=connector_type,json=connectorType,proto3" json:"connector_type,omitempty"`
-	MaxPower            float64                `protobuf:"fixed64,7,opt,name=max_power,json=maxPower,proto3" json:"max_power,omitempty"`
+	ConnectorType       string                 `protobuf:"bytes,6,opt,name=connectorType,proto3" json:"connectorType,omitempty"`
+	MaxPower            float64                `protobuf:"fixed64,7,opt,name=maxPower,proto3" json:"maxPower,omitempty"`
 	Voltage             float64                `protobuf:"fixed64,8,opt,name=voltage,proto3" json:"voltage,omitempty"`
-	TotalConnectors     int32                  `protobuf:"varint,9,opt,name=total_connectors,json=totalConnectors,proto3" json:"total_connectors,omitempty"`
-	AvailableConnectors int32                  `protobuf:"varint,10,opt,name=available_connectors,json=availableConnectors,proto3" json:"available_connectors,omitempty"`
+	TotalConnectors     int32                  `protobuf:"varint,9,opt,name=totalConnectors,proto3" json:"totalConnectors,omitempty"`
+	AvailableConnectors int32                  `protobuf:"varint,10,opt,name=availableConnectors,proto3" json:"availableConnectors,omitempty"`
 	Location            string                 `protobuf:"bytes,11,opt,name=location,proto3" json:"location,omitempty"`
 	Floor               string                 `protobuf:"bytes,12,opt,name=floor,proto3" json:"floor,omitempty"`
-	CreatedAt           string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt           string                 `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	CreatedAt           string                 `protobuf:"bytes,13,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt           string                 `protobuf:"bytes,14,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -927,10 +926,10 @@ func (x *Station) GetUpdatedAt() string {
 // Connector messages
 type CreateConnectorRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	Number        int32                  `protobuf:"varint,2,opt,name=number,proto3" json:"number,omitempty"`
 	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"` // ac, dc, fast_dc
-	MaxPower      float64                `protobuf:"fixed64,4,opt,name=max_power,json=maxPower,proto3" json:"max_power,omitempty"`
+	MaxPower      float64                `protobuf:"fixed64,4,opt,name=maxPower,proto3" json:"maxPower,omitempty"`
 	Voltage       float64                `protobuf:"fixed64,5,opt,name=voltage,proto3" json:"voltage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1063,7 +1062,7 @@ func (x *CreateConnectorResponse) GetData() *Connector {
 
 type GetConnectorRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ConnectorId   string                 `protobuf:"bytes,1,opt,name=connector_id,json=connectorId,proto3" json:"connector_id,omitempty"`
+	ConnectorId   string                 `protobuf:"bytes,1,opt,name=connectorId,proto3" json:"connectorId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1167,7 +1166,7 @@ func (x *GetConnectorResponse) GetData() *Connector {
 
 type ListConnectorsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1272,16 +1271,16 @@ func (x *ListConnectorsResponse) GetData() []*Connector {
 type Connector struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	StationId     string                 `protobuf:"bytes,2,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,2,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	Number        int32                  `protobuf:"varint,3,opt,name=number,proto3" json:"number,omitempty"`
 	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
 	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"` // available, charging, faulted, offline
-	MaxPower      float64                `protobuf:"fixed64,6,opt,name=max_power,json=maxPower,proto3" json:"max_power,omitempty"`
+	MaxPower      float64                `protobuf:"fixed64,6,opt,name=maxPower,proto3" json:"maxPower,omitempty"`
 	Voltage       float64                `protobuf:"fixed64,7,opt,name=voltage,proto3" json:"voltage,omitempty"`
 	Current       float64                `protobuf:"fixed64,8,opt,name=current,proto3" json:"current,omitempty"`
-	FaultCode     string                 `protobuf:"bytes,9,opt,name=fault_code,json=faultCode,proto3" json:"fault_code,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	FaultCode     string                 `protobuf:"bytes,9,opt,name=faultCode,proto3" json:"faultCode,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,10,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,11,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1396,10 +1395,10 @@ func (x *Connector) GetUpdatedAt() string {
 // Session messages
 type StartChargingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
-	ConnectorId   string                 `protobuf:"bytes,2,opt,name=connector_id,json=connectorId,proto3" json:"connector_id,omitempty"`
-	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	VehiclePlate  string                 `protobuf:"bytes,4,opt,name=vehicle_plate,json=vehiclePlate,proto3" json:"vehicle_plate,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
+	ConnectorId   string                 `protobuf:"bytes,2,opt,name=connectorId,proto3" json:"connectorId,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=userId,proto3" json:"userId,omitempty"`
+	VehiclePlate  string                 `protobuf:"bytes,4,opt,name=vehiclePlate,proto3" json:"vehiclePlate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1524,8 +1523,8 @@ func (x *StartChargingResponse) GetData() *Session {
 
 type StopChargingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=userId,proto3" json:"userId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1636,7 +1635,7 @@ func (x *StopChargingResponse) GetData() *Session {
 
 type GetSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1740,9 +1739,9 @@ func (x *GetSessionResponse) GetData() *Session {
 
 type ListUserSessionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
 	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1868,7 +1867,7 @@ func (x *ListUserSessionsResponse) GetTotal() int64 {
 
 type GetChargingSummaryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1973,25 +1972,25 @@ func (x *GetChargingSummaryResponse) GetData() *ChargingSummary {
 type Session struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	StationId     string                 `protobuf:"bytes,2,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
-	ConnectorId   string                 `protobuf:"bytes,3,opt,name=connector_id,json=connectorId,proto3" json:"connector_id,omitempty"`
-	UserId        string                 `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	VehiclePlate  string                 `protobuf:"bytes,5,opt,name=vehicle_plate,json=vehiclePlate,proto3" json:"vehicle_plate,omitempty"`
-	StartTime     string                 `protobuf:"bytes,6,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       string                 `protobuf:"bytes,7,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	StartEnergy   float64                `protobuf:"fixed64,8,opt,name=start_energy,json=startEnergy,proto3" json:"start_energy,omitempty"`
-	EndEnergy     float64                `protobuf:"fixed64,9,opt,name=end_energy,json=endEnergy,proto3" json:"end_energy,omitempty"`
-	ChargedEnergy float64                `protobuf:"fixed64,10,opt,name=charged_energy,json=chargedEnergy,proto3" json:"charged_energy,omitempty"`
+	StationId     string                 `protobuf:"bytes,2,opt,name=stationId,proto3" json:"stationId,omitempty"`
+	ConnectorId   string                 `protobuf:"bytes,3,opt,name=connectorId,proto3" json:"connectorId,omitempty"`
+	UserId        string                 `protobuf:"bytes,4,opt,name=userId,proto3" json:"userId,omitempty"`
+	VehiclePlate  string                 `protobuf:"bytes,5,opt,name=vehiclePlate,proto3" json:"vehiclePlate,omitempty"`
+	StartTime     string                 `protobuf:"bytes,6,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,7,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	StartEnergy   float64                `protobuf:"fixed64,8,opt,name=startEnergy,proto3" json:"startEnergy,omitempty"`
+	EndEnergy     float64                `protobuf:"fixed64,9,opt,name=endEnergy,proto3" json:"endEnergy,omitempty"`
+	ChargedEnergy float64                `protobuf:"fixed64,10,opt,name=chargedEnergy,proto3" json:"chargedEnergy,omitempty"`
 	Cost          float64                `protobuf:"fixed64,11,opt,name=cost,proto3" json:"cost,omitempty"`
-	ServiceFee    float64                `protobuf:"fixed64,12,opt,name=service_fee,json=serviceFee,proto3" json:"service_fee,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,13,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	Status        string                 `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`                                    // pending, charging, completed, cancelled, expired
-	PaymentStatus string                 `protobuf:"bytes,15,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // pending, paid, refunded, failed
-	PayTime       string                 `protobuf:"bytes,16,opt,name=pay_time,json=payTime,proto3" json:"pay_time,omitempty"`
-	PaymentMethod string                 `protobuf:"bytes,17,opt,name=payment_method,json=paymentMethod,proto3" json:"payment_method,omitempty"`
-	TransactionId string                 `protobuf:"bytes,18,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,19,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,20,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	ServiceFee    float64                `protobuf:"fixed64,12,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
+	TotalAmount   float64                `protobuf:"fixed64,13,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	Status        string                 `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`               // pending, charging, completed, cancelled, expired
+	PaymentStatus string                 `protobuf:"bytes,15,opt,name=paymentStatus,proto3" json:"paymentStatus,omitempty"` // pending, paid, refunded, failed
+	PayTime       string                 `protobuf:"bytes,16,opt,name=payTime,proto3" json:"payTime,omitempty"`
+	PaymentMethod string                 `protobuf:"bytes,17,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
+	TransactionId string                 `protobuf:"bytes,18,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,19,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,20,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2168,18 +2167,18 @@ func (x *Session) GetUpdatedAt() string {
 
 type ChargingSummary struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	StationName   string                 `protobuf:"bytes,2,opt,name=station_name,json=stationName,proto3" json:"station_name,omitempty"`
-	ConnectorNum  int32                  `protobuf:"varint,3,opt,name=connector_num,json=connectorNum,proto3" json:"connector_num,omitempty"`
-	VehiclePlate  string                 `protobuf:"bytes,4,opt,name=vehicle_plate,json=vehiclePlate,proto3" json:"vehicle_plate,omitempty"`
-	StartTime     string                 `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       string                 `protobuf:"bytes,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
+	StationName   string                 `protobuf:"bytes,2,opt,name=stationName,proto3" json:"stationName,omitempty"`
+	ConnectorNum  int32                  `protobuf:"varint,3,opt,name=connectorNum,proto3" json:"connectorNum,omitempty"`
+	VehiclePlate  string                 `protobuf:"bytes,4,opt,name=vehiclePlate,proto3" json:"vehiclePlate,omitempty"`
+	StartTime     string                 `protobuf:"bytes,5,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,6,opt,name=endTime,proto3" json:"endTime,omitempty"`
 	Duration      float64                `protobuf:"fixed64,7,opt,name=duration,proto3" json:"duration,omitempty"` // hours
-	ChargedEnergy float64                `protobuf:"fixed64,8,opt,name=charged_energy,json=chargedEnergy,proto3" json:"charged_energy,omitempty"`
+	ChargedEnergy float64                `protobuf:"fixed64,8,opt,name=chargedEnergy,proto3" json:"chargedEnergy,omitempty"`
 	Cost          float64                `protobuf:"fixed64,9,opt,name=cost,proto3" json:"cost,omitempty"`
-	ServiceFee    float64                `protobuf:"fixed64,10,opt,name=service_fee,json=serviceFee,proto3" json:"service_fee,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,11,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	PaymentStatus string                 `protobuf:"bytes,12,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"`
+	ServiceFee    float64                `protobuf:"fixed64,10,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
+	TotalAmount   float64                `protobuf:"fixed64,11,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	PaymentStatus string                 `protobuf:"bytes,12,opt,name=paymentStatus,proto3" json:"paymentStatus,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2301,17 +2300,17 @@ func (x *ChargingSummary) GetPaymentStatus() string {
 // Price messages
 type CreatePriceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	StartHour     int32                  `protobuf:"varint,3,opt,name=start_hour,json=startHour,proto3" json:"start_hour,omitempty"`
-	EndHour       int32                  `protobuf:"varint,4,opt,name=end_hour,json=endHour,proto3" json:"end_hour,omitempty"`
-	PricePerKwh   float64                `protobuf:"fixed64,5,opt,name=price_per_kwh,json=pricePerKwh,proto3" json:"price_per_kwh,omitempty"`
-	ServiceFee    float64                `protobuf:"fixed64,6,opt,name=service_fee,json=serviceFee,proto3" json:"service_fee,omitempty"`
-	PeakLoad      float64                `protobuf:"fixed64,7,opt,name=peak_load,json=peakLoad,proto3" json:"peak_load,omitempty"`
-	OffPeakLoad   float64                `protobuf:"fixed64,8,opt,name=off_peak_load,json=offPeakLoad,proto3" json:"off_peak_load,omitempty"`
-	IsPeakHours   bool                   `protobuf:"varint,9,opt,name=is_peak_hours,json=isPeakHours,proto3" json:"is_peak_hours,omitempty"`
-	EffectiveAt   string                 `protobuf:"bytes,10,opt,name=effective_at,json=effectiveAt,proto3" json:"effective_at,omitempty"`
-	ExpiresAt     string                 `protobuf:"bytes,11,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	StartHour     int32                  `protobuf:"varint,3,opt,name=startHour,proto3" json:"startHour,omitempty"`
+	EndHour       int32                  `protobuf:"varint,4,opt,name=endHour,proto3" json:"endHour,omitempty"`
+	PricePerKwh   float64                `protobuf:"fixed64,5,opt,name=pricePerKwh,proto3" json:"pricePerKwh,omitempty"`
+	ServiceFee    float64                `protobuf:"fixed64,6,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
+	PeakLoad      float64                `protobuf:"fixed64,7,opt,name=peakLoad,proto3" json:"peakLoad,omitempty"`
+	OffPeakLoad   float64                `protobuf:"fixed64,8,opt,name=offPeakLoad,proto3" json:"offPeakLoad,omitempty"`
+	IsPeakHours   bool                   `protobuf:"varint,9,opt,name=isPeakHours,proto3" json:"isPeakHours,omitempty"`
+	EffectiveAt   string                 `protobuf:"bytes,10,opt,name=effectiveAt,proto3" json:"effectiveAt,omitempty"`
+	ExpiresAt     string                 `protobuf:"bytes,11,opt,name=expiresAt,proto3" json:"expiresAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2485,7 +2484,7 @@ func (x *CreatePriceResponse) GetData() *Price {
 
 type GetCurrentPriceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2589,7 +2588,7 @@ func (x *GetCurrentPriceResponse) GetData() *Price {
 
 type ListPricesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationId     string                 `protobuf:"bytes,1,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2694,19 +2693,19 @@ func (x *ListPricesResponse) GetData() []*Price {
 type Price struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	StationId     string                 `protobuf:"bytes,2,opt,name=station_id,json=stationId,proto3" json:"station_id,omitempty"`
+	StationId     string                 `protobuf:"bytes,2,opt,name=stationId,proto3" json:"stationId,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	StartHour     int32                  `protobuf:"varint,4,opt,name=start_hour,json=startHour,proto3" json:"start_hour,omitempty"`
-	EndHour       int32                  `protobuf:"varint,5,opt,name=end_hour,json=endHour,proto3" json:"end_hour,omitempty"`
-	PricePerKwh   float64                `protobuf:"fixed64,6,opt,name=price_per_kwh,json=pricePerKwh,proto3" json:"price_per_kwh,omitempty"`
-	ServiceFee    float64                `protobuf:"fixed64,7,opt,name=service_fee,json=serviceFee,proto3" json:"service_fee,omitempty"`
-	PeakLoad      float64                `protobuf:"fixed64,8,opt,name=peak_load,json=peakLoad,proto3" json:"peak_load,omitempty"`
-	OffPeakLoad   float64                `protobuf:"fixed64,9,opt,name=off_peak_load,json=offPeakLoad,proto3" json:"off_peak_load,omitempty"`
-	IsPeakHours   bool                   `protobuf:"varint,10,opt,name=is_peak_hours,json=isPeakHours,proto3" json:"is_peak_hours,omitempty"`
-	EffectiveAt   string                 `protobuf:"bytes,11,opt,name=effective_at,json=effectiveAt,proto3" json:"effective_at,omitempty"`
-	ExpiresAt     string                 `protobuf:"bytes,12,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	StartHour     int32                  `protobuf:"varint,4,opt,name=startHour,proto3" json:"startHour,omitempty"`
+	EndHour       int32                  `protobuf:"varint,5,opt,name=endHour,proto3" json:"endHour,omitempty"`
+	PricePerKwh   float64                `protobuf:"fixed64,6,opt,name=pricePerKwh,proto3" json:"pricePerKwh,omitempty"`
+	ServiceFee    float64                `protobuf:"fixed64,7,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
+	PeakLoad      float64                `protobuf:"fixed64,8,opt,name=peakLoad,proto3" json:"peakLoad,omitempty"`
+	OffPeakLoad   float64                `protobuf:"fixed64,9,opt,name=offPeakLoad,proto3" json:"offPeakLoad,omitempty"`
+	IsPeakHours   bool                   `protobuf:"varint,10,opt,name=isPeakHours,proto3" json:"isPeakHours,omitempty"`
+	EffectiveAt   string                 `protobuf:"bytes,11,opt,name=effectiveAt,proto3" json:"effectiveAt,omitempty"`
+	ExpiresAt     string                 `protobuf:"bytes,12,opt,name=expiresAt,proto3" json:"expiresAt,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,13,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,14,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2842,10 +2841,10 @@ func (x *Price) GetUpdatedAt() string {
 // Payment messages
 type ConfirmPaymentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	TransactionId string                 `protobuf:"bytes,2,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`
-	PaymentMethod string                 `protobuf:"bytes,3,opt,name=payment_method,json=paymentMethod,proto3" json:"payment_method,omitempty"`
-	PaidAmount    float64                `protobuf:"fixed64,4,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
+	TransactionId string                 `protobuf:"bytes,2,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
+	PaymentMethod string                 `protobuf:"bytes,3,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
+	PaidAmount    float64                `protobuf:"fixed64,4,opt,name=paidAmount,proto3" json:"paidAmount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2972,297 +2971,269 @@ var File_api_charging_v1_charging_proto protoreflect.FileDescriptor
 
 const file_api_charging_v1_charging_proto_rawDesc = "" +
 	"\n" +
-	"\x1eapi/charging/v1/charging.proto\x12\x0fapi.charging.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x9f\x02\n" +
-	"\x14CreateStationRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
-	"\fstation_type\x18\x03 \x01(\tR\vstationType\x12%\n" +
-	"\x0econnector_type\x18\x04 \x01(\tR\rconnectorType\x12\x1b\n" +
-	"\tmax_power\x18\x05 \x01(\x01R\bmaxPower\x12\x18\n" +
-	"\avoltage\x18\x06 \x01(\x01R\avoltage\x12)\n" +
-	"\x10total_connectors\x18\a \x01(\x05R\x0ftotalConnectors\x12\x1a\n" +
+	"\x1eapi/charging/v1/charging.proto\x12\x0fapi.charging.v1\x1a\x1cgoogle/api/annotations.proto\"\x9a\x02\n" +
+	"\x14CreateStationRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vstationType\x18\x03 \x01(\tR\vstationType\x12$\n" +
+	"\rconnectorType\x18\x04 \x01(\tR\rconnectorType\x12\x1a\n" +
+	"\bmaxPower\x18\x05 \x01(\x01R\bmaxPower\x12\x18\n" +
+	"\avoltage\x18\x06 \x01(\x01R\avoltage\x12(\n" +
+	"\x0ftotalConnectors\x18\a \x01(\x05R\x0ftotalConnectors\x12\x1a\n" +
 	"\blocation\x18\b \x01(\tR\blocation\x12\x14\n" +
 	"\x05floor\x18\t \x01(\tR\x05floor\"s\n" +
 	"\x15CreateStationResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.StationR\x04data\"2\n" +
-	"\x11GetStationRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\"p\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.StationR\x04data\"1\n" +
+	"\x11GetStationRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\"p\n" +
 	"\x12GetStationResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.StationR\x04data\"\xdb\x01\n" +
-	"\x14UpdateStationRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.StationR\x04data\"\xd8\x01\n" +
+	"\x14UpdateStationRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1b\n" +
-	"\tmax_power\x18\x04 \x01(\x01R\bmaxPower\x12)\n" +
-	"\x10total_connectors\x18\x05 \x01(\x05R\x0ftotalConnectors\x12\x1a\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1a\n" +
+	"\bmaxPower\x18\x04 \x01(\x01R\bmaxPower\x12(\n" +
+	"\x0ftotalConnectors\x18\x05 \x01(\x05R\x0ftotalConnectors\x12\x1a\n" +
 	"\blocation\x18\x06 \x01(\tR\blocation\x12\x14\n" +
 	"\x05floor\x18\a \x01(\tR\x05floor\"s\n" +
 	"\x15UpdateStationResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.StationR\x04data\"5\n" +
-	"\x14DeleteStationRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\"E\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.StationR\x04data\"4\n" +
+	"\x14DeleteStationRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\"E\n" +
 	"\x15DeleteStationResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"]\n" +
-	"\x13ListStationsRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
-	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\"\x88\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"[\n" +
+	"\x13ListStationsRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x03 \x01(\x05R\bpageSize\"\x88\x01\n" +
 	"\x14ListStationsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
 	"\x04data\x18\x03 \x03(\v2\x18.api.charging.v1.StationR\x04data\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x03R\x05total\"4\n" +
-	"\x1bGetAvailableStationsRequest\x12\x15\n" +
-	"\x06lot_id\x18\x01 \x01(\tR\x05lotId\"z\n" +
+	"\x05total\x18\x04 \x01(\x03R\x05total\"3\n" +
+	"\x1bGetAvailableStationsRequest\x12\x14\n" +
+	"\x05lotId\x18\x01 \x01(\tR\x05lotId\"z\n" +
 	"\x1cGetAvailableStationsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x03(\v2\x18.api.charging.v1.StationR\x04data\"\xab\x03\n" +
+	"\x04data\x18\x03 \x03(\v2\x18.api.charging.v1.StationR\x04data\"\xa3\x03\n" +
 	"\aStation\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x15\n" +
-	"\x06lot_id\x18\x02 \x01(\tR\x05lotId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12!\n" +
-	"\fstation_type\x18\x04 \x01(\tR\vstationType\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\x12%\n" +
-	"\x0econnector_type\x18\x06 \x01(\tR\rconnectorType\x12\x1b\n" +
-	"\tmax_power\x18\a \x01(\x01R\bmaxPower\x12\x18\n" +
-	"\avoltage\x18\b \x01(\x01R\avoltage\x12)\n" +
-	"\x10total_connectors\x18\t \x01(\x05R\x0ftotalConnectors\x121\n" +
-	"\x14available_connectors\x18\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05lotId\x18\x02 \x01(\tR\x05lotId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vstationType\x18\x04 \x01(\tR\vstationType\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12$\n" +
+	"\rconnectorType\x18\x06 \x01(\tR\rconnectorType\x12\x1a\n" +
+	"\bmaxPower\x18\a \x01(\x01R\bmaxPower\x12\x18\n" +
+	"\avoltage\x18\b \x01(\x01R\avoltage\x12(\n" +
+	"\x0ftotalConnectors\x18\t \x01(\x05R\x0ftotalConnectors\x120\n" +
+	"\x13availableConnectors\x18\n" +
 	" \x01(\x05R\x13availableConnectors\x12\x1a\n" +
 	"\blocation\x18\v \x01(\tR\blocation\x12\x14\n" +
-	"\x05floor\x18\f \x01(\tR\x05floor\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\r \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\x0e \x01(\tR\tupdatedAt\"\x9a\x01\n" +
-	"\x16CreateConnectorRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\x12\x16\n" +
+	"\x05floor\x18\f \x01(\tR\x05floor\x12\x1c\n" +
+	"\tcreatedAt\x18\r \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\x0e \x01(\tR\tupdatedAt\"\x98\x01\n" +
+	"\x16CreateConnectorRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\x12\x16\n" +
 	"\x06number\x18\x02 \x01(\x05R\x06number\x12\x12\n" +
-	"\x04type\x18\x03 \x01(\tR\x04type\x12\x1b\n" +
-	"\tmax_power\x18\x04 \x01(\x01R\bmaxPower\x12\x18\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x1a\n" +
+	"\bmaxPower\x18\x04 \x01(\x01R\bmaxPower\x12\x18\n" +
 	"\avoltage\x18\x05 \x01(\x01R\avoltage\"w\n" +
 	"\x17CreateConnectorResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
-	"\x04data\x18\x03 \x01(\v2\x1a.api.charging.v1.ConnectorR\x04data\"8\n" +
-	"\x13GetConnectorRequest\x12!\n" +
-	"\fconnector_id\x18\x01 \x01(\tR\vconnectorId\"t\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.charging.v1.ConnectorR\x04data\"7\n" +
+	"\x13GetConnectorRequest\x12 \n" +
+	"\vconnectorId\x18\x01 \x01(\tR\vconnectorId\"t\n" +
 	"\x14GetConnectorResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
-	"\x04data\x18\x03 \x01(\v2\x1a.api.charging.v1.ConnectorR\x04data\"6\n" +
-	"\x15ListConnectorsRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\"v\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.charging.v1.ConnectorR\x04data\"5\n" +
+	"\x15ListConnectorsRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\"v\n" +
 	"\x16ListConnectorsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
-	"\x04data\x18\x03 \x03(\v2\x1a.api.charging.v1.ConnectorR\x04data\"\xac\x02\n" +
+	"\x04data\x18\x03 \x03(\v2\x1a.api.charging.v1.ConnectorR\x04data\"\xa7\x02\n" +
 	"\tConnector\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x02 \x01(\tR\tstationId\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
+	"\tstationId\x18\x02 \x01(\tR\tstationId\x12\x16\n" +
 	"\x06number\x18\x03 \x01(\x05R\x06number\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1b\n" +
-	"\tmax_power\x18\x06 \x01(\x01R\bmaxPower\x12\x18\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1a\n" +
+	"\bmaxPower\x18\x06 \x01(\x01R\bmaxPower\x12\x18\n" +
 	"\avoltage\x18\a \x01(\x01R\avoltage\x12\x18\n" +
-	"\acurrent\x18\b \x01(\x01R\acurrent\x12\x1d\n" +
-	"\n" +
-	"fault_code\x18\t \x01(\tR\tfaultCode\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\n" +
-	" \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\v \x01(\tR\tupdatedAt\"\x96\x01\n" +
-	"\x14StartChargingRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\x12!\n" +
-	"\fconnector_id\x18\x02 \x01(\tR\vconnectorId\x12\x17\n" +
-	"\auser_id\x18\x03 \x01(\tR\x06userId\x12#\n" +
-	"\rvehicle_plate\x18\x04 \x01(\tR\fvehiclePlate\"s\n" +
+	"\acurrent\x18\b \x01(\x01R\acurrent\x12\x1c\n" +
+	"\tfaultCode\x18\t \x01(\tR\tfaultCode\x12\x1c\n" +
+	"\tcreatedAt\x18\n" +
+	" \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\v \x01(\tR\tupdatedAt\"\x92\x01\n" +
+	"\x14StartChargingRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\x12 \n" +
+	"\vconnectorId\x18\x02 \x01(\tR\vconnectorId\x12\x16\n" +
+	"\x06userId\x18\x03 \x01(\tR\x06userId\x12\"\n" +
+	"\fvehiclePlate\x18\x04 \x01(\tR\fvehiclePlate\"s\n" +
 	"\x15StartChargingResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data\"M\n" +
-	"\x13StopChargingRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"r\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data\"K\n" +
+	"\x13StopChargingRequest\x12\x1c\n" +
+	"\tsessionId\x18\x01 \x01(\tR\tsessionId\x12\x16\n" +
+	"\x06userId\x18\x02 \x01(\tR\x06userId\"r\n" +
 	"\x14StopChargingResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data\"2\n" +
-	"\x11GetSessionRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\"p\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data\"1\n" +
+	"\x11GetSessionRequest\x12\x1c\n" +
+	"\tsessionId\x18\x01 \x01(\tR\tsessionId\"p\n" +
 	"\x12GetSessionResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data\"c\n" +
-	"\x17ListUserSessionsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\"\x8c\x01\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data\"a\n" +
+	"\x17ListUserSessionsRequest\x12\x16\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x03 \x01(\x05R\bpageSize\"\x8c\x01\n" +
 	"\x18ListUserSessionsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
 	"\x04data\x18\x03 \x03(\v2\x18.api.charging.v1.SessionR\x04data\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x03R\x05total\":\n" +
-	"\x19GetChargingSummaryRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\"\x80\x01\n" +
+	"\x05total\x18\x04 \x01(\x03R\x05total\"9\n" +
+	"\x19GetChargingSummaryRequest\x12\x1c\n" +
+	"\tsessionId\x18\x01 \x01(\tR\tsessionId\"\x80\x01\n" +
 	"\x1aGetChargingSummaryResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x124\n" +
-	"\x04data\x18\x03 \x01(\v2 .api.charging.v1.ChargingSummaryR\x04data\"\xfa\x04\n" +
+	"\x04data\x18\x03 \x01(\v2 .api.charging.v1.ChargingSummaryR\x04data\"\xe9\x04\n" +
 	"\aSession\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x02 \x01(\tR\tstationId\x12!\n" +
-	"\fconnector_id\x18\x03 \x01(\tR\vconnectorId\x12\x17\n" +
-	"\auser_id\x18\x04 \x01(\tR\x06userId\x12#\n" +
-	"\rvehicle_plate\x18\x05 \x01(\tR\fvehiclePlate\x12\x1d\n" +
-	"\n" +
-	"start_time\x18\x06 \x01(\tR\tstartTime\x12\x19\n" +
-	"\bend_time\x18\a \x01(\tR\aendTime\x12!\n" +
-	"\fstart_energy\x18\b \x01(\x01R\vstartEnergy\x12\x1d\n" +
-	"\n" +
-	"end_energy\x18\t \x01(\x01R\tendEnergy\x12%\n" +
-	"\x0echarged_energy\x18\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
+	"\tstationId\x18\x02 \x01(\tR\tstationId\x12 \n" +
+	"\vconnectorId\x18\x03 \x01(\tR\vconnectorId\x12\x16\n" +
+	"\x06userId\x18\x04 \x01(\tR\x06userId\x12\"\n" +
+	"\fvehiclePlate\x18\x05 \x01(\tR\fvehiclePlate\x12\x1c\n" +
+	"\tstartTime\x18\x06 \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\a \x01(\tR\aendTime\x12 \n" +
+	"\vstartEnergy\x18\b \x01(\x01R\vstartEnergy\x12\x1c\n" +
+	"\tendEnergy\x18\t \x01(\x01R\tendEnergy\x12$\n" +
+	"\rchargedEnergy\x18\n" +
 	" \x01(\x01R\rchargedEnergy\x12\x12\n" +
-	"\x04cost\x18\v \x01(\x01R\x04cost\x12\x1f\n" +
-	"\vservice_fee\x18\f \x01(\x01R\n" +
-	"serviceFee\x12!\n" +
-	"\ftotal_amount\x18\r \x01(\x01R\vtotalAmount\x12\x16\n" +
-	"\x06status\x18\x0e \x01(\tR\x06status\x12%\n" +
-	"\x0epayment_status\x18\x0f \x01(\tR\rpaymentStatus\x12\x19\n" +
-	"\bpay_time\x18\x10 \x01(\tR\apayTime\x12%\n" +
-	"\x0epayment_method\x18\x11 \x01(\tR\rpaymentMethod\x12%\n" +
-	"\x0etransaction_id\x18\x12 \x01(\tR\rtransactionId\x12\x1d\n" +
+	"\x04cost\x18\v \x01(\x01R\x04cost\x12\x1e\n" +
 	"\n" +
-	"created_at\x18\x13 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"serviceFee\x18\f \x01(\x01R\n" +
+	"serviceFee\x12 \n" +
+	"\vtotalAmount\x18\r \x01(\x01R\vtotalAmount\x12\x16\n" +
+	"\x06status\x18\x0e \x01(\tR\x06status\x12$\n" +
+	"\rpaymentStatus\x18\x0f \x01(\tR\rpaymentStatus\x12\x18\n" +
+	"\apayTime\x18\x10 \x01(\tR\apayTime\x12$\n" +
+	"\rpaymentMethod\x18\x11 \x01(\tR\rpaymentMethod\x12$\n" +
+	"\rtransactionId\x18\x12 \x01(\tR\rtransactionId\x12\x1c\n" +
+	"\tcreatedAt\x18\x13 \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\x14 \x01(\tR\tupdatedAt\"\x8f\x03\n" +
+	"\x0fChargingSummary\x12\x1c\n" +
+	"\tsessionId\x18\x01 \x01(\tR\tsessionId\x12 \n" +
+	"\vstationName\x18\x02 \x01(\tR\vstationName\x12\"\n" +
+	"\fconnectorNum\x18\x03 \x01(\x05R\fconnectorNum\x12\"\n" +
+	"\fvehiclePlate\x18\x04 \x01(\tR\fvehiclePlate\x12\x1c\n" +
+	"\tstartTime\x18\x05 \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\x06 \x01(\tR\aendTime\x12\x1a\n" +
+	"\bduration\x18\a \x01(\x01R\bduration\x12$\n" +
+	"\rchargedEnergy\x18\b \x01(\x01R\rchargedEnergy\x12\x12\n" +
+	"\x04cost\x18\t \x01(\x01R\x04cost\x12\x1e\n" +
 	"\n" +
-	"updated_at\x18\x14 \x01(\tR\tupdatedAt\"\x99\x03\n" +
-	"\x0fChargingSummary\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12!\n" +
-	"\fstation_name\x18\x02 \x01(\tR\vstationName\x12#\n" +
-	"\rconnector_num\x18\x03 \x01(\x05R\fconnectorNum\x12#\n" +
-	"\rvehicle_plate\x18\x04 \x01(\tR\fvehiclePlate\x12\x1d\n" +
-	"\n" +
-	"start_time\x18\x05 \x01(\tR\tstartTime\x12\x19\n" +
-	"\bend_time\x18\x06 \x01(\tR\aendTime\x12\x1a\n" +
-	"\bduration\x18\a \x01(\x01R\bduration\x12%\n" +
-	"\x0echarged_energy\x18\b \x01(\x01R\rchargedEnergy\x12\x12\n" +
-	"\x04cost\x18\t \x01(\x01R\x04cost\x12\x1f\n" +
-	"\vservice_fee\x18\n" +
+	"serviceFee\x18\n" +
 	" \x01(\x01R\n" +
-	"serviceFee\x12!\n" +
-	"\ftotal_amount\x18\v \x01(\x01R\vtotalAmount\x12%\n" +
-	"\x0epayment_status\x18\f \x01(\tR\rpaymentStatus\"\xed\x02\n" +
-	"\x12CreatePriceRequest\x12\x1d\n" +
+	"serviceFee\x12 \n" +
+	"\vtotalAmount\x18\v \x01(\x01R\vtotalAmount\x12$\n" +
+	"\rpaymentStatus\x18\f \x01(\tR\rpaymentStatus\"\xe0\x02\n" +
+	"\x12CreatePriceRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\tstartHour\x18\x03 \x01(\x05R\tstartHour\x12\x18\n" +
+	"\aendHour\x18\x04 \x01(\x05R\aendHour\x12 \n" +
+	"\vpricePerKwh\x18\x05 \x01(\x01R\vpricePerKwh\x12\x1e\n" +
 	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
-	"\n" +
-	"start_hour\x18\x03 \x01(\x05R\tstartHour\x12\x19\n" +
-	"\bend_hour\x18\x04 \x01(\x05R\aendHour\x12\"\n" +
-	"\rprice_per_kwh\x18\x05 \x01(\x01R\vpricePerKwh\x12\x1f\n" +
-	"\vservice_fee\x18\x06 \x01(\x01R\n" +
-	"serviceFee\x12\x1b\n" +
-	"\tpeak_load\x18\a \x01(\x01R\bpeakLoad\x12\"\n" +
-	"\roff_peak_load\x18\b \x01(\x01R\voffPeakLoad\x12\"\n" +
-	"\ris_peak_hours\x18\t \x01(\bR\visPeakHours\x12!\n" +
-	"\feffective_at\x18\n" +
-	" \x01(\tR\veffectiveAt\x12\x1d\n" +
-	"\n" +
-	"expires_at\x18\v \x01(\tR\texpiresAt\"o\n" +
+	"serviceFee\x18\x06 \x01(\x01R\n" +
+	"serviceFee\x12\x1a\n" +
+	"\bpeakLoad\x18\a \x01(\x01R\bpeakLoad\x12 \n" +
+	"\voffPeakLoad\x18\b \x01(\x01R\voffPeakLoad\x12 \n" +
+	"\visPeakHours\x18\t \x01(\bR\visPeakHours\x12 \n" +
+	"\veffectiveAt\x18\n" +
+	" \x01(\tR\veffectiveAt\x12\x1c\n" +
+	"\texpiresAt\x18\v \x01(\tR\texpiresAt\"o\n" +
 	"\x13CreatePriceResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12*\n" +
-	"\x04data\x18\x03 \x01(\v2\x16.api.charging.v1.PriceR\x04data\"7\n" +
-	"\x16GetCurrentPriceRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\"s\n" +
+	"\x04data\x18\x03 \x01(\v2\x16.api.charging.v1.PriceR\x04data\"6\n" +
+	"\x16GetCurrentPriceRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\"s\n" +
 	"\x17GetCurrentPriceResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12*\n" +
-	"\x04data\x18\x03 \x01(\v2\x16.api.charging.v1.PriceR\x04data\"2\n" +
-	"\x11ListPricesRequest\x12\x1d\n" +
-	"\n" +
-	"station_id\x18\x01 \x01(\tR\tstationId\"n\n" +
+	"\x04data\x18\x03 \x01(\v2\x16.api.charging.v1.PriceR\x04data\"1\n" +
+	"\x11ListPricesRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\tR\tstationId\"n\n" +
 	"\x12ListPricesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12*\n" +
-	"\x04data\x18\x03 \x03(\v2\x16.api.charging.v1.PriceR\x04data\"\xae\x03\n" +
+	"\x04data\x18\x03 \x03(\v2\x16.api.charging.v1.PriceR\x04data\"\x9f\x03\n" +
 	"\x05Price\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
+	"\tstationId\x18\x02 \x01(\tR\tstationId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1c\n" +
+	"\tstartHour\x18\x04 \x01(\x05R\tstartHour\x12\x18\n" +
+	"\aendHour\x18\x05 \x01(\x05R\aendHour\x12 \n" +
+	"\vpricePerKwh\x18\x06 \x01(\x01R\vpricePerKwh\x12\x1e\n" +
 	"\n" +
-	"station_id\x18\x02 \x01(\tR\tstationId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1d\n" +
+	"serviceFee\x18\a \x01(\x01R\n" +
+	"serviceFee\x12\x1a\n" +
+	"\bpeakLoad\x18\b \x01(\x01R\bpeakLoad\x12 \n" +
+	"\voffPeakLoad\x18\t \x01(\x01R\voffPeakLoad\x12 \n" +
+	"\visPeakHours\x18\n" +
+	" \x01(\bR\visPeakHours\x12 \n" +
+	"\veffectiveAt\x18\v \x01(\tR\veffectiveAt\x12\x1c\n" +
+	"\texpiresAt\x18\f \x01(\tR\texpiresAt\x12\x1c\n" +
+	"\tcreatedAt\x18\r \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\x0e \x01(\tR\tupdatedAt\"\xa1\x01\n" +
+	"\x15ConfirmPaymentRequest\x12\x1c\n" +
+	"\tsessionId\x18\x01 \x01(\tR\tsessionId\x12$\n" +
+	"\rtransactionId\x18\x02 \x01(\tR\rtransactionId\x12$\n" +
+	"\rpaymentMethod\x18\x03 \x01(\tR\rpaymentMethod\x12\x1e\n" +
 	"\n" +
-	"start_hour\x18\x04 \x01(\x05R\tstartHour\x12\x19\n" +
-	"\bend_hour\x18\x05 \x01(\x05R\aendHour\x12\"\n" +
-	"\rprice_per_kwh\x18\x06 \x01(\x01R\vpricePerKwh\x12\x1f\n" +
-	"\vservice_fee\x18\a \x01(\x01R\n" +
-	"serviceFee\x12\x1b\n" +
-	"\tpeak_load\x18\b \x01(\x01R\bpeakLoad\x12\"\n" +
-	"\roff_peak_load\x18\t \x01(\x01R\voffPeakLoad\x12\"\n" +
-	"\ris_peak_hours\x18\n" +
-	" \x01(\bR\visPeakHours\x12!\n" +
-	"\feffective_at\x18\v \x01(\tR\veffectiveAt\x12\x1d\n" +
-	"\n" +
-	"expires_at\x18\f \x01(\tR\texpiresAt\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\r \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\x0e \x01(\tR\tupdatedAt\"\xa5\x01\n" +
-	"\x15ConfirmPaymentRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12%\n" +
-	"\x0etransaction_id\x18\x02 \x01(\tR\rtransactionId\x12%\n" +
-	"\x0epayment_method\x18\x03 \x01(\tR\rpaymentMethod\x12\x1f\n" +
-	"\vpaid_amount\x18\x04 \x01(\x01R\n" +
+	"paidAmount\x18\x04 \x01(\x01R\n" +
 	"paidAmount\"t\n" +
 	"\x16ConfirmPaymentResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data2\xd9\x14\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.charging.v1.SessionR\x04data2\xce\x14\n" +
 	"\x0fChargingService\x12\x84\x01\n" +
-	"\rCreateStation\x12%.api.charging.v1.CreateStationRequest\x1a&.api.charging.v1.CreateStationResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/charging/stations\x12\x85\x01\n" +
+	"\rCreateStation\x12%.api.charging.v1.CreateStationRequest\x1a&.api.charging.v1.CreateStationResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/charging/stations\x12\x84\x01\n" +
 	"\n" +
-	"GetStation\x12\".api.charging.v1.GetStationRequest\x1a#.api.charging.v1.GetStationResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/charging/stations/{station_id}\x12\x91\x01\n" +
-	"\rUpdateStation\x12%.api.charging.v1.UpdateStationRequest\x1a&.api.charging.v1.UpdateStationResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\x1a&/api/v1/charging/stations/{station_id}\x12\x8e\x01\n" +
-	"\rDeleteStation\x12%.api.charging.v1.DeleteStationRequest\x1a&.api.charging.v1.DeleteStationResponse\".\x82\xd3\xe4\x93\x02(*&/api/v1/charging/stations/{station_id}\x12~\n" +
+	"GetStation\x12\".api.charging.v1.GetStationRequest\x1a#.api.charging.v1.GetStationResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/charging/stations/{stationId}\x12\x90\x01\n" +
+	"\rUpdateStation\x12%.api.charging.v1.UpdateStationRequest\x1a&.api.charging.v1.UpdateStationResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\x1a%/api/v1/charging/stations/{stationId}\x12\x8d\x01\n" +
+	"\rDeleteStation\x12%.api.charging.v1.DeleteStationRequest\x1a&.api.charging.v1.DeleteStationResponse\"-\x82\xd3\xe4\x93\x02'*%/api/v1/charging/stations/{stationId}\x12~\n" +
 	"\fListStations\x12$.api.charging.v1.ListStationsRequest\x1a%.api.charging.v1.ListStationsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/charging/stations\x12\xa0\x01\n" +
 	"\x14GetAvailableStations\x12,.api.charging.v1.GetAvailableStationsRequest\x1a-.api.charging.v1.GetAvailableStationsResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/charging/stations/available\x12\x8c\x01\n" +
-	"\x0fCreateConnector\x12'.api.charging.v1.CreateConnectorRequest\x1a(.api.charging.v1.CreateConnectorResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/charging/connectors\x12\x8f\x01\n" +
-	"\fGetConnector\x12$.api.charging.v1.GetConnectorRequest\x1a%.api.charging.v1.GetConnectorResponse\"2\x82\xd3\xe4\x93\x02,\x12*/api/v1/charging/connectors/{connector_id}\x12\x9c\x01\n" +
-	"\x0eListConnectors\x12&.api.charging.v1.ListConnectorsRequest\x1a'.api.charging.v1.ListConnectorsResponse\"9\x82\xd3\xe4\x93\x023\x121/api/v1/charging/stations/{station_id}/connectors\x12\x8a\x01\n" +
-	"\rStartCharging\x12%.api.charging.v1.StartChargingRequest\x1a&.api.charging.v1.StartChargingResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/charging/sessions/start\x12\x93\x01\n" +
-	"\fStopCharging\x12$.api.charging.v1.StopChargingRequest\x1a%.api.charging.v1.StopChargingResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/api/v1/charging/sessions/{session_id}/stop\x12\x85\x01\n" +
+	"\x0fCreateConnector\x12'.api.charging.v1.CreateConnectorRequest\x1a(.api.charging.v1.CreateConnectorResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/charging/connectors\x12\x8e\x01\n" +
+	"\fGetConnector\x12$.api.charging.v1.GetConnectorRequest\x1a%.api.charging.v1.GetConnectorResponse\"1\x82\xd3\xe4\x93\x02+\x12)/api/v1/charging/connectors/{connectorId}\x12\x9b\x01\n" +
+	"\x0eListConnectors\x12&.api.charging.v1.ListConnectorsRequest\x1a'.api.charging.v1.ListConnectorsResponse\"8\x82\xd3\xe4\x93\x022\x120/api/v1/charging/stations/{stationId}/connectors\x12\x8a\x01\n" +
+	"\rStartCharging\x12%.api.charging.v1.StartChargingRequest\x1a&.api.charging.v1.StartChargingResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/charging/sessions/start\x12\x92\x01\n" +
+	"\fStopCharging\x12$.api.charging.v1.StopChargingRequest\x1a%.api.charging.v1.StopChargingResponse\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/api/v1/charging/sessions/{sessionId}/stop\x12\x84\x01\n" +
 	"\n" +
-	"GetSession\x12\".api.charging.v1.GetSessionRequest\x1a#.api.charging.v1.GetSessionResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/charging/sessions/{session_id}\x12\x8a\x01\n" +
-	"\x10ListUserSessions\x12(.api.charging.v1.ListUserSessionsRequest\x1a).api.charging.v1.ListUserSessionsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/charging/sessions\x12\xa5\x01\n" +
-	"\x12GetChargingSummary\x12*.api.charging.v1.GetChargingSummaryRequest\x1a+.api.charging.v1.GetChargingSummaryResponse\"6\x82\xd3\xe4\x93\x020\x12./api/v1/charging/sessions/{session_id}/summary\x12|\n" +
-	"\vCreatePrice\x12#.api.charging.v1.CreatePriceRequest\x1a$.api.charging.v1.CreatePriceResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/charging/prices\x12\x9a\x01\n" +
-	"\x0fGetCurrentPrice\x12'.api.charging.v1.GetCurrentPriceRequest\x1a(.api.charging.v1.GetCurrentPriceResponse\"4\x82\xd3\xe4\x93\x02.\x12,/api/v1/charging/stations/{station_id}/price\x12\x8c\x01\n" +
+	"GetSession\x12\".api.charging.v1.GetSessionRequest\x1a#.api.charging.v1.GetSessionResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/charging/sessions/{sessionId}\x12\x8a\x01\n" +
+	"\x10ListUserSessions\x12(.api.charging.v1.ListUserSessionsRequest\x1a).api.charging.v1.ListUserSessionsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/charging/sessions\x12\xa4\x01\n" +
+	"\x12GetChargingSummary\x12*.api.charging.v1.GetChargingSummaryRequest\x1a+.api.charging.v1.GetChargingSummaryResponse\"5\x82\xd3\xe4\x93\x02/\x12-/api/v1/charging/sessions/{sessionId}/summary\x12|\n" +
+	"\vCreatePrice\x12#.api.charging.v1.CreatePriceRequest\x1a$.api.charging.v1.CreatePriceResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/charging/prices\x12\x99\x01\n" +
+	"\x0fGetCurrentPrice\x12'.api.charging.v1.GetCurrentPriceRequest\x1a(.api.charging.v1.GetCurrentPriceResponse\"3\x82\xd3\xe4\x93\x02-\x12+/api/v1/charging/stations/{stationId}/price\x12\x8b\x01\n" +
 	"\n" +
-	"ListPrices\x12\".api.charging.v1.ListPricesRequest\x1a#.api.charging.v1.ListPricesResponse\"5\x82\xd3\xe4\x93\x02/\x12-/api/v1/charging/stations/{station_id}/prices\x12\xa4\x01\n" +
-	"\x0eConfirmPayment\x12&.api.charging.v1.ConfirmPaymentRequest\x1a'.api.charging.v1.ConfirmPaymentResponse\"A\x82\xd3\xe4\x93\x02;:\x01*\"6/api/v1/charging/sessions/{session_id}/payment/confirmB5Z3github.com/xuanyiying/smart-park/api/charging/v1;v1b\x06proto3"
+	"ListPrices\x12\".api.charging.v1.ListPricesRequest\x1a#.api.charging.v1.ListPricesResponse\"4\x82\xd3\xe4\x93\x02.\x12,/api/v1/charging/stations/{stationId}/prices\x12\xa3\x01\n" +
+	"\x0eConfirmPayment\x12&.api.charging.v1.ConfirmPaymentRequest\x1a'.api.charging.v1.ConfirmPaymentResponse\"@\x82\xd3\xe4\x93\x02::\x01*\"5/api/v1/charging/sessions/{sessionId}/payment/confirmB5Z3github.com/xuanyiying/smart-park/api/charging/v1;v1b\x06proto3"
 
 var (
 	file_api_charging_v1_charging_proto_rawDescOnce sync.Once
