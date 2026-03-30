@@ -9,6 +9,8 @@ routes:
     target: localhost:8002
   - path: /api/v1/pay
     target: localhost:8003
+  - path: /api/v1/admin/billing
+    target: localhost:8002
   - path: /api/v1/admin
     target: localhost:8004
   - path: /api/v1/user
