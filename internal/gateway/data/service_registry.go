@@ -43,6 +43,12 @@ func (r *ServiceRegistry) Close() error {
 
 // ServiceHealthCheck 服务健康检查
 func (r *ServiceRegistry) ServiceHealthCheck(ctx context.Context, serviceName string) (bool, error) {
-	// TODO: 实现健康检查逻辑
-	return true, nil
+	// 通过验证 ETCD 中是否至少有一个对应服务的实例活跃，来判断健康状态
+	prefix := "/microservices/" + serviceName
+	resp, err := r.client.Get(ctx, prefix, clientv3.WithPrefix(), clientv3.WithLimit(1))
+	if err != nil {
+		r.log.Errorf("health check error for %s: %v", serviceName, err)
+		return false, err
+	}
+	return len(resp.Kvs) > 0, nil
 }

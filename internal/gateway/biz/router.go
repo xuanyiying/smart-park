@@ -54,7 +54,7 @@ func NewStaticDiscovery(routes []*RouteConfig) *StaticDiscovery {
 			{
 				ID:      serviceName + "-1",
 				Name:    serviceName,
-				Address: "localhost", // TODO: 从配置或服务发现获取
+				Address: serviceName, // 使用 serviceName 作为默认域名
 				Port:    mustParseInt(parts[1]),
 			},
 		}

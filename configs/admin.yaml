@@ -4,7 +4,7 @@ server:
 
 database:
   driver: postgres
-  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  source: "host=localhost user=postgres password=your_secure_password dbname=parking port=5432 sslmode=disable"
 
 redis:
   addr: "localhost:6379"

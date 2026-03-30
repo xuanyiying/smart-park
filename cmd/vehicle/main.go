@@ -122,20 +122,20 @@ func main() {
 	// Initialize distributed lock repository
 	lockRepo := lock.NewRedisLockRepo(redisClient, logger, "smart-park:vehicle")
 
-	// Initialize billing service client (using mock for now, should be replaced with real gRPC connection)
+	// Initialize billing service client
 	var billingClient billing.Client
 	if cfg.Billing != nil && cfg.Billing.Endpoint != "" {
-		// TODO: Create real gRPC connection to billing service
-		// conn, err := grpc.Dial(cfg.Billing.Endpoint, grpc.WithInsecure())
-		// if err != nil {
-		//     logHelper.Errorf("failed to connect billing service: %v", err)
-		//     os.Exit(1)
-		// }
-		// billingGrpcClient := billingv1.NewBillingServiceClient(conn)
-		// billingClient = billing.NewClient(billingGrpcClient, logger)
-		_ = billingv1.BillingServiceClient(nil) // Placeholder to keep import
-		logHelper.Warn("billing service client not implemented, using mock")
-		billingClient = &mockBillingClient{}
+		conn, err := grpc.DialInsecure(
+			context.Background(),
+			grpc.WithEndpoint(cfg.Billing.Endpoint),
+		)
+		if err != nil {
+			logHelper.Errorf("failed to connect billing service: %v", err)
+			os.Exit(1)
+		}
+		billingGrpcClient := billingv1.NewBillingServiceClient(conn)
+		billingClient = billing.NewClient(billingGrpcClient, logger)
+		logHelper.Infof("billing service client connected to %s", cfg.Billing.Endpoint)
 	} else {
 		logHelper.Warn("billing config not provided, using mock client")
 		billingClient = &mockBillingClient{}

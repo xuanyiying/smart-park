@@ -117,9 +117,29 @@ func (s *GatewayService) HealthCheck(ctx context.Context) (map[string]bool, erro
 	routes := s.router.GetAllRoutes()
 	health := make(map[string]bool)
 
+	client := &http.Client{Timeout: 2 * time.Second}
 	for _, route := range routes {
-		// TODO: 实现实际的健康检查
-		health[route.Path] = true
+		target, err := s.router.GetServiceTarget(ctx, route.Path)
+		if err != nil || target == "" {
+			health[route.Path] = false
+			continue
+		}
+
+		// 简单的 HTTP ping，假设如果服务存活其端口是可达的
+		resp, err := client.Get(fmt.Sprintf("http://%s/", target))
+		if err != nil {
+			// 在开发环境中，如果只是代理被拒绝，我们也认为可能存在但不可达状态
+			// 为了防止因为没根路径而报警，我们直接简单检查错误信息中是否包含 connection refused 等
+			if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "no such host") {
+				health[route.Path] = false
+			} else {
+				// 只要能建立连接返回404或401等，都说明服务存在
+				health[route.Path] = true
+			}
+		} else {
+			health[route.Path] = true
+			resp.Body.Close()
+		}
 	}
 
 	return health, nil
@@ -141,10 +161,16 @@ func (s *GatewayService) StreamProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 创建 WebSocket 代理
-	// TODO: 实现 WebSocket 代理逻辑
-	s.log.Infof("stream proxy: %s -> %s", r.URL.Path, target)
-	http.Error(w, "WebSocket proxy not implemented", http.StatusNotImplemented)
+	// 创建 WebSocket 代理 (Go 1.12+ httputil.ReverseProxy 自动处理 Upgrade)
+	proxy, err := s.createProxy(target)
+	if err != nil {
+		s.log.Errorf("failed to create websocket proxy for %s: %v", target, err)
+		http.Error(w, "Bad Gateway", http.StatusBadGateway)
+		return
+	}
+
+	s.log.Infof("stream proxy upgrading: %s -> %s", r.URL.Path, target)
+	proxy.ServeHTTP(w, r)
 }
 
 // ReadinessProbe 就绪探针
