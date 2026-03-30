@@ -143,12 +143,14 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 	exitTime := time.Now()
 	duration := int(exitTime.Sub(record.EntryTime).Seconds())
 
+	// Calculate fee first, before updating the record
+	vehicle, vehicleType := uc.getVehicleInfo(ctx, req.PlateNumber)
+	amount, discountAmount, finalAmount := uc.calculateExitFee(ctx, record, lane, exitTime, vehicle, vehicleType)
+
+	// Only update the record after fee calculation succeeds
 	if err := uc.updateParkingRecordForExit(ctx, record, req, device, lane, exitTime, duration); err != nil {
 		return nil, err
 	}
-
-	vehicle, vehicleType := uc.getVehicleInfo(ctx, req.PlateNumber)
-	amount, discountAmount, finalAmount := uc.calculateExitFee(ctx, record, lane, exitTime, vehicle, vehicleType)
 
 	return uc.buildExitResponse(record, req, duration, amount, discountAmount, finalAmount), nil
 }
@@ -177,21 +179,21 @@ func (uc *EntryExitUseCase) withDistributedLock(ctx context.Context, lockKey str
 }
 
 func (uc *EntryExitUseCase) createParkingRecord(req *v1.EntryRequest, lane *Lane, vehicle *Vehicle) *ParkingRecord {
+	plateNumber := req.PlateNumber
 	record := &ParkingRecord{
-		ID:            uuid.New(),
-		LotID:         lane.LotID,
-		EntryLaneID:   lane.ID,
-		EntryTime:     time.Now(),
-		EntryImageURL: req.PlateImageUrl,
-		RecordStatus:  RecordStatusEntry,
-		ExitStatus:    ExitStatusUnpaid,
+		ID:                uuid.New(),
+		LotID:             lane.LotID,
+		EntryLaneID:       lane.ID,
+		EntryTime:         time.Now(),
+		EntryImageURL:     req.PlateImageUrl,
+		RecordStatus:      RecordStatusEntry,
+		ExitStatus:        ExitStatusUnpaid,
+		PlateNumber:       &plateNumber,
+		PlateNumberSource: "camera",
 	}
 
 	if vehicle != nil {
 		record.VehicleID = &vehicle.ID
-		plateNumber := req.PlateNumber
-		record.PlateNumber = &plateNumber
-		record.PlateNumberSource = "camera"
 	}
 
 	return record

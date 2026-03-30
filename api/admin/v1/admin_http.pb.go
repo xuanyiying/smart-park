@@ -20,7 +20,10 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationAdminServiceCreateParkingLot = "/api.admin.v1.AdminService/CreateParkingLot"
+const OperationAdminServiceCreateUser = "/api.admin.v1.AdminService/CreateUser"
 const OperationAdminServiceCreateVehicle = "/api.admin.v1.AdminService/CreateVehicle"
+const OperationAdminServiceDeleteUser = "/api.admin.v1.AdminService/DeleteUser"
+const OperationAdminServiceGetCurrentUser = "/api.admin.v1.AdminService/GetCurrentUser"
 const OperationAdminServiceGetDailyReport = "/api.admin.v1.AdminService/GetDailyReport"
 const OperationAdminServiceGetMonthlyReport = "/api.admin.v1.AdminService/GetMonthlyReport"
 const OperationAdminServiceGetOrder = "/api.admin.v1.AdminService/GetOrder"
@@ -28,12 +31,18 @@ const OperationAdminServiceGetParkingLot = "/api.admin.v1.AdminService/GetParkin
 const OperationAdminServiceListOrders = "/api.admin.v1.AdminService/ListOrders"
 const OperationAdminServiceListParkingLots = "/api.admin.v1.AdminService/ListParkingLots"
 const OperationAdminServiceListParkingRecords = "/api.admin.v1.AdminService/ListParkingRecords"
+const OperationAdminServiceListUsers = "/api.admin.v1.AdminService/ListUsers"
 const OperationAdminServiceListVehicles = "/api.admin.v1.AdminService/ListVehicles"
+const OperationAdminServiceLogin = "/api.admin.v1.AdminService/Login"
 const OperationAdminServiceUpdateParkingLot = "/api.admin.v1.AdminService/UpdateParkingLot"
+const OperationAdminServiceUpdateUser = "/api.admin.v1.AdminService/UpdateUser"
 
 type AdminServiceHTTPServer interface {
 	CreateParkingLot(context.Context, *CreateParkingLotRequest) (*CreateParkingLotResponse, error)
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	CreateVehicle(context.Context, *CreateVehicleRequest) (*CreateVehicleResponse, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
+	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	GetDailyReport(context.Context, *GetDailyReportRequest) (*GetDailyReportResponse, error)
 	GetMonthlyReport(context.Context, *GetMonthlyReportRequest) (*GetMonthlyReportResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
@@ -41,12 +50,22 @@ type AdminServiceHTTPServer interface {
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error)
 	ListParkingLots(context.Context, *ListParkingLotsRequest) (*ListParkingLotsResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
+	// ListUsers User Management
+	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error)
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	UpdateParkingLot(context.Context, *UpdateParkingLotRequest) (*UpdateParkingLotResponse, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 }
 
 func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) {
 	r := s.Route("/")
+	r.POST("/api/v1/admin/login", _AdminService_Login0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/user", _AdminService_GetCurrentUser0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/users", _AdminService_ListUsers0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/users", _AdminService_CreateUser0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/users/{id}", _AdminService_UpdateUser0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/users/{id}", _AdminService_DeleteUser0_HTTP_Handler(srv))
 	r.POST("/api/v1/admin/lots", _AdminService_CreateParkingLot0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/lots/{id}", _AdminService_GetParkingLot0_HTTP_Handler(srv))
 	r.PUT("/api/v1/admin/lots/{id}", _AdminService_UpdateParkingLot0_HTTP_Handler(srv))
@@ -58,6 +77,135 @@ func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) 
 	r.GET("/api/v1/admin/vehicles", _AdminService_ListVehicles0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/reports/daily", _AdminService_GetDailyReport0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/reports/monthly", _AdminService_GetMonthlyReport0_HTTP_Handler(srv))
+}
+
+func _AdminService_Login0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LoginRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceLogin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Login(ctx, req.(*LoginRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_GetCurrentUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCurrentUserRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceGetCurrentUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCurrentUser(ctx, req.(*GetCurrentUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetCurrentUserResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_ListUsers0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListUsersRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceListUsers)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListUsers(ctx, req.(*ListUsersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListUsersResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_CreateUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateUserRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceCreateUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateUser(ctx, req.(*CreateUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateUserResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_UpdateUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceUpdateUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUser(ctx, req.(*UpdateUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateUserResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_DeleteUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteUserRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceDeleteUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteUser(ctx, req.(*DeleteUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteUserResponse)
+		return ctx.Result(200, reply)
+	}
 }
 
 func _AdminService_CreateParkingLot0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
@@ -289,7 +437,10 @@ func _AdminService_GetMonthlyReport0_HTTP_Handler(srv AdminServiceHTTPServer) fu
 
 type AdminServiceHTTPClient interface {
 	CreateParkingLot(ctx context.Context, req *CreateParkingLotRequest, opts ...http.CallOption) (rsp *CreateParkingLotResponse, err error)
+	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *CreateUserResponse, err error)
 	CreateVehicle(ctx context.Context, req *CreateVehicleRequest, opts ...http.CallOption) (rsp *CreateVehicleResponse, err error)
+	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *DeleteUserResponse, err error)
+	GetCurrentUser(ctx context.Context, req *GetCurrentUserRequest, opts ...http.CallOption) (rsp *GetCurrentUserResponse, err error)
 	GetDailyReport(ctx context.Context, req *GetDailyReportRequest, opts ...http.CallOption) (rsp *GetDailyReportResponse, err error)
 	GetMonthlyReport(ctx context.Context, req *GetMonthlyReportRequest, opts ...http.CallOption) (rsp *GetMonthlyReportResponse, err error)
 	GetOrder(ctx context.Context, req *GetOrderRequest, opts ...http.CallOption) (rsp *GetOrderResponse, err error)
@@ -297,8 +448,11 @@ type AdminServiceHTTPClient interface {
 	ListOrders(ctx context.Context, req *ListOrdersRequest, opts ...http.CallOption) (rsp *ListOrdersResponse, err error)
 	ListParkingLots(ctx context.Context, req *ListParkingLotsRequest, opts ...http.CallOption) (rsp *ListParkingLotsResponse, err error)
 	ListParkingRecords(ctx context.Context, req *ListParkingRecordsRequest, opts ...http.CallOption) (rsp *ListParkingRecordsResponse, err error)
+	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersResponse, err error)
 	ListVehicles(ctx context.Context, req *ListVehiclesRequest, opts ...http.CallOption) (rsp *ListVehiclesResponse, err error)
+	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
 	UpdateParkingLot(ctx context.Context, req *UpdateParkingLotRequest, opts ...http.CallOption) (rsp *UpdateParkingLotResponse, err error)
+	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *UpdateUserResponse, err error)
 }
 
 type AdminServiceHTTPClientImpl struct {
@@ -322,6 +476,19 @@ func (c *AdminServiceHTTPClientImpl) CreateParkingLot(ctx context.Context, in *C
 	return &out, nil
 }
 
+func (c *AdminServiceHTTPClientImpl) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...http.CallOption) (*CreateUserResponse, error) {
+	var out CreateUserResponse
+	pattern := "/api/v1/admin/users"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceCreateUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *AdminServiceHTTPClientImpl) CreateVehicle(ctx context.Context, in *CreateVehicleRequest, opts ...http.CallOption) (*CreateVehicleResponse, error) {
 	var out CreateVehicleResponse
 	pattern := "/api/v1/admin/vehicles"
@@ -329,6 +496,32 @@ func (c *AdminServiceHTTPClientImpl) CreateVehicle(ctx context.Context, in *Crea
 	opts = append(opts, http.Operation(OperationAdminServiceCreateVehicle))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...http.CallOption) (*DeleteUserResponse, error) {
+	var out DeleteUserResponse
+	pattern := "/api/v1/admin/users/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAdminServiceDeleteUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...http.CallOption) (*GetCurrentUserResponse, error) {
+	var out GetCurrentUserResponse
+	pattern := "/api/v1/admin/user"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAdminServiceGetCurrentUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -426,6 +619,19 @@ func (c *AdminServiceHTTPClientImpl) ListParkingRecords(ctx context.Context, in 
 	return &out, nil
 }
 
+func (c *AdminServiceHTTPClientImpl) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...http.CallOption) (*ListUsersResponse, error) {
+	var out ListUsersResponse
+	pattern := "/api/v1/admin/users"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAdminServiceListUsers))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *AdminServiceHTTPClientImpl) ListVehicles(ctx context.Context, in *ListVehiclesRequest, opts ...http.CallOption) (*ListVehiclesResponse, error) {
 	var out ListVehiclesResponse
 	pattern := "/api/v1/admin/vehicles"
@@ -439,11 +645,37 @@ func (c *AdminServiceHTTPClientImpl) ListVehicles(ctx context.Context, in *ListV
 	return &out, nil
 }
 
+func (c *AdminServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginResponse, error) {
+	var out LoginResponse
+	pattern := "/api/v1/admin/login"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceLogin))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *AdminServiceHTTPClientImpl) UpdateParkingLot(ctx context.Context, in *UpdateParkingLotRequest, opts ...http.CallOption) (*UpdateParkingLotResponse, error) {
 	var out UpdateParkingLotResponse
 	pattern := "/api/v1/admin/lots/{id}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAdminServiceUpdateParkingLot))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...http.CallOption) (*UpdateUserResponse, error) {
+	var out UpdateUserResponse
+	pattern := "/api/v1/admin/users/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceUpdateUser))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {

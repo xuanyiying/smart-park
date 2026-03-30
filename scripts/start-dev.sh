@@ -150,19 +150,19 @@ start_microservices() {
     log_info "Starting microservices..."
     
     # Start services in order with delays to avoid resource issues
-    start_service "admin" "8004" "9004" "./configs"
+    start_service "admin" "8004" "9004" "./configs/admin.yaml"
     sleep 2
     
-    start_service "vehicle" "8001" "9001" "./configs"
+    start_service "vehicle" "8001" "9001" "./configs/vehicle.yaml"
     sleep 2
     
-    start_service "billing" "8002" "9002" "./configs"
+    start_service "billing" "8002" "9002" "./configs/billing.yaml"
     sleep 2
     
-    start_service "payment" "8003" "9003" "./configs"
+    start_service "payment" "8003" "9003" "./configs/payment.yaml"
     sleep 2
     
-    start_service "gateway" "8000" "9000" "./configs"
+    start_service "gateway" "8000" "9000" "./configs/gateway.yaml"
     
     log_success "All microservices started"
 }

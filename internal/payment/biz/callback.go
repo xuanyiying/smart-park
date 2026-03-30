@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/google/uuid"
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 )
 
@@ -76,9 +77,15 @@ func (uc *PaymentUseCase) buildWechatErrorResponse(msg string) *v1.WechatCallbac
 }
 
 func (uc *PaymentUseCase) processWechatPayment(ctx context.Context, req *v1.WechatCallbackRequest) error {
-	order, err := uc.orderRepo.GetOrderByTransactionID(ctx, req.TransactionId)
+	// Look up order by OutTradeNo (order ID), not TransactionId
+	// TransactionId is set only after payment is confirmed
+	orderID, err := uuid.Parse(req.OutTradeNo)
 	if err != nil {
-		return fmt.Errorf("order not found")
+		return fmt.Errorf("invalid out_trade_no: %w", err)
+	}
+	order, err := uc.orderRepo.GetOrder(ctx, orderID)
+	if err != nil || order == nil {
+		return fmt.Errorf("order not found: %s", req.OutTradeNo)
 	}
 
 	if order.Status != string(StatusPending) {
@@ -218,9 +225,15 @@ func (uc *PaymentUseCase) buildAlipayErrorResponse(msg string) *v1.AlipayCallbac
 }
 
 func (uc *PaymentUseCase) processAlipayPayment(ctx context.Context, req *v1.AlipayCallbackRequest) error {
-	order, err := uc.orderRepo.GetOrderByTransactionID(ctx, req.TradeNo)
+	// Look up order by OutTradeNo (order ID), not TradeNo
+	// TradeNo is the Alipay transaction ID, set only after payment
+	orderID, err := uuid.Parse(req.OutTradeNo)
 	if err != nil {
-		return fmt.Errorf("order not found")
+		return fmt.Errorf("invalid out_trade_no: %w", err)
+	}
+	order, err := uc.orderRepo.GetOrder(ctx, orderID)
+	if err != nil || order == nil {
+		return fmt.Errorf("order not found: %s", req.OutTradeNo)
 	}
 
 	if order.Status != string(StatusPending) {
@@ -339,11 +352,13 @@ func buildSignString(fields map[string]string, excludeKey string) string {
 	sort.Strings(keys)
 
 	var sb strings.Builder
-	for _, k := range keys {
+	for i, k := range keys {
+		if i > 0 {
+			sb.WriteString("&")
+		}
 		sb.WriteString(k)
 		sb.WriteString("=")
 		sb.WriteString(fields[k])
-		sb.WriteString("&")
 	}
 	return sb.String()
 }
@@ -351,20 +366,20 @@ func buildSignString(fields map[string]string, excludeKey string) string {
 func buildSignStringWithAmpersand(fields map[string]string) string {
 	var keys []string
 	for k := range fields {
-		keys = append(keys, k)
+		if fields[k] != "" {
+			keys = append(keys, k)
+		}
 	}
 	sort.Strings(keys)
 
 	var sb strings.Builder
 	for i, k := range keys {
-		if fields[k] != "" {
-			if i > 0 {
-				sb.WriteString("&")
-			}
-			sb.WriteString(k)
-			sb.WriteString("=")
-			sb.WriteString(fields[k])
+		if i > 0 {
+			sb.WriteString("&")
 		}
+		sb.WriteString(k)
+		sb.WriteString("=")
+		sb.WriteString(fields[k])
 	}
 	return sb.String()
 }

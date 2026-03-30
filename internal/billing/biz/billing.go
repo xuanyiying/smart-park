@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -287,7 +288,7 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 		case "ceil":
 			amount = ceilToDecimal(amount, 2)
 		case "max_daily":
-			days := int(hours/24) + 1
+			days := int(math.Ceil(hours / 24))
 			if days < 1 {
 				days = 1
 			}

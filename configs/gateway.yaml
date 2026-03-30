@@ -16,7 +16,7 @@ routes:
 
 etcd:
   endpoints:
-    - "localhost:2379"
+    - "localhost:2380"
   timeout: 5s
 
 log:

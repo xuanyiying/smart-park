@@ -44,7 +44,7 @@ func NewVehicleRepo(data *Data) biz.VehicleRepo {
 
 // GetVehicleByPlate retrieves a vehicle by plate number.
 func (r *vehicleRepo) GetVehicleByPlate(ctx context.Context, plateNumber string) (*biz.Vehicle, error) {
-	v, err := r.data.db.Vehicle.Query().
+	v, err := r.clientFromCtx(ctx).Vehicle.Query().
 		Where(vehicle.PlateNumber(plateNumber)).
 		Only(ctx)
 	if err != nil {
@@ -115,7 +115,7 @@ func (r *vehicleRepo) UpdateVehicle(ctx context.Context, v *biz.Vehicle) error {
 
 // GetEntryRecord retrieves an active entry record by plate number.
 func (r *vehicleRepo) GetEntryRecord(ctx context.Context, plateNumber string) (*biz.ParkingRecord, error) {
-	record, err := r.data.db.ParkingRecord.Query().
+	record, err := r.clientFromCtx(ctx).ParkingRecord.Query().
 		Where(
 			parkingrecord.PlateNumber(plateNumber),
 			parkingrecord.RecordStatusIn(parkingrecord.RecordStatusEntry, parkingrecord.RecordStatusExiting),
@@ -133,7 +133,7 @@ func (r *vehicleRepo) GetEntryRecord(ctx context.Context, plateNumber string) (*
 
 // CreateParkingRecord creates a new parking record.
 func (r *vehicleRepo) CreateParkingRecord(ctx context.Context, rec *biz.ParkingRecord) error {
-	create := r.data.db.ParkingRecord.Create().
+	create := r.clientFromCtx(ctx).ParkingRecord.Create().
 		SetID(rec.ID).
 		SetLotID(rec.LotID).
 		SetEntryLaneID(rec.EntryLaneID).
@@ -165,7 +165,7 @@ func (r *vehicleRepo) CreateParkingRecord(ctx context.Context, rec *biz.ParkingR
 
 // UpdateParkingRecord updates a parking record.
 func (r *vehicleRepo) UpdateParkingRecord(ctx context.Context, rec *biz.ParkingRecord) error {
-	update := r.data.db.ParkingRecord.UpdateOneID(rec.ID)
+	update := r.clientFromCtx(ctx).ParkingRecord.UpdateOneID(rec.ID)
 
 	if rec.ExitTime != nil {
 		update.SetExitTime(*rec.ExitTime)
@@ -341,7 +341,10 @@ func toBizParkingRecord(record *ent.ParkingRecord) *biz.ParkingRecord {
 	}
 }
 
+type txCtxKey struct{}
+
 // WithTx executes a function within a transaction.
+// The tx client is injected into context so downstream operations use the transaction.
 func (r *vehicleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
 	tx, err := r.data.db.Tx(ctx)
 	if err != nil {
@@ -355,7 +358,10 @@ func (r *vehicleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) e
 		}
 	}()
 
-	if err := fn(ctx); err != nil {
+	// Inject tx client into context so all downstream DB operations use it
+	txCtx := context.WithValue(ctx, txCtxKey{}, tx)
+
+	if err := fn(txCtx); err != nil {
 		if rerr := tx.Rollback(); rerr != nil {
 			return rerr
 		}
@@ -363,6 +369,14 @@ func (r *vehicleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) e
 	}
 
 	return tx.Commit()
+}
+
+// clientFromCtx returns the ent client from context (tx client if in transaction, otherwise original).
+func (r *vehicleRepo) clientFromCtx(ctx context.Context) *ent.Client {
+	if tx, ok := ctx.Value(txCtxKey{}).(*ent.Tx); ok {
+		return tx.Client()
+	}
+	return r.data.db
 }
 
 // CreateOfflineSyncRecord creates an offline sync record.

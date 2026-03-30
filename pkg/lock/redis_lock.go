@@ -10,6 +10,27 @@ import (
 	"github.com/google/uuid"
 )
 
+// Lua scripts for atomic lock operations.
+var (
+	// releaseLockScript atomically checks ownership and deletes the lock.
+	releaseLockScript = redis.NewScript(`
+		if redis.call("GET", KEYS[1]) == ARGV[1] then
+			return redis.call("DEL", KEYS[1])
+		else
+			return 0
+		end
+	`)
+
+	// extendLockScript atomically checks ownership and extends TTL.
+	extendLockScript = redis.NewScript(`
+		if redis.call("GET", KEYS[1]) == ARGV[1] then
+			return redis.call("PEXPIRE", KEYS[1], ARGV[2])
+		else
+			return 0
+		end
+	`)
+)
+
 // RedisLockRepo implements LockRepo using Redis.
 type RedisLockRepo struct {
 	client *redis.Client
@@ -46,57 +67,45 @@ func (r *RedisLockRepo) AcquireLock(ctx context.Context, lockKey string, owner s
 	return success, nil
 }
 
-// ReleaseLock releases a distributed lock.
+// ReleaseLock releases a distributed lock atomically using a Lua script.
+// This ensures that only the owner can release the lock, and it cannot
+// accidentally delete a lock acquired by another process between GET and DEL.
 func (r *RedisLockRepo) ReleaseLock(ctx context.Context, lockKey string, owner string) error {
 	key := r.formatKey(lockKey)
 
-	// Verify that we own the lock before releasing
-	currentOwner, err := r.client.Get(ctx, key).Result()
+	result, err := releaseLockScript.Run(ctx, r.client, []string{key}, owner).Int64()
 	if err != nil {
 		if err == redis.Nil {
 			r.log.WithContext(ctx).Warnf("lock already expired or not exists - Key: %s", key)
 			return nil
 		}
-		r.log.WithContext(ctx).Errorf("failed to get lock owner - Key: %s: %v", key, err)
-		return fmt.Errorf("failed to verify lock owner: %w", err)
-	}
-
-	if currentOwner != owner {
-		r.log.WithContext(ctx).Warnf("cannot release lock - not owner - Key: %s, CurrentOwner: %s, RequestedOwner: %s",
-			key, currentOwner, owner)
-		return fmt.Errorf("cannot release lock: not the owner")
-	}
-
-	// Delete the lock
-	if err := r.client.Del(ctx, key).Err(); err != nil {
-		r.log.WithContext(ctx).Errorf("failed to delete lock - Key: %s: %v", key, err)
+		r.log.WithContext(ctx).Errorf("failed to release lock - Key: %s: %v", key, err)
 		return fmt.Errorf("failed to release lock: %w", err)
+	}
+
+	if result == 0 {
+		r.log.WithContext(ctx).Warnf("cannot release lock - not owner - Key: %s, Owner: %s", key, owner)
+		return fmt.Errorf("cannot release lock: not the owner")
 	}
 
 	r.log.WithContext(ctx).Debugf("lock released - Key: %s, Owner: %s", key, owner)
 	return nil
 }
 
-// ExtendLock extends the TTL of an existing lock.
+// ExtendLock extends the TTL of an existing lock atomically using a Lua script.
 func (r *RedisLockRepo) ExtendLock(ctx context.Context, lockKey string, owner string, ttl time.Duration) error {
 	key := r.formatKey(lockKey)
 
-	// Verify ownership before extending
-	currentOwner, err := r.client.Get(ctx, key).Result()
+	result, err := extendLockScript.Run(ctx, r.client, []string{key}, owner, int64(ttl/time.Millisecond)).Int64()
 	if err != nil {
 		if err == redis.Nil {
 			return fmt.Errorf("lock does not exist or has expired")
 		}
-		return fmt.Errorf("failed to get lock owner: %w", err)
-	}
-
-	if currentOwner != owner {
-		return fmt.Errorf("cannot extend lock: not the owner")
-	}
-
-	// Extend the TTL
-	if err := r.client.Expire(ctx, key, ttl).Err(); err != nil {
 		return fmt.Errorf("failed to extend lock: %w", err)
+	}
+
+	if result == 0 {
+		return fmt.Errorf("cannot extend lock: not the owner")
 	}
 
 	r.log.WithContext(ctx).Debugf("lock extended - Key: %s, Owner: %s, NewTTL: %v", key, owner, ttl)
@@ -175,15 +184,17 @@ type DistributedLock struct {
 	lockID string
 	owner  string
 	ttl    time.Duration
+	log    *log.Helper
 }
 
 // NewDistributedLock creates a new distributed lock instance.
-func NewDistributedLock(repo LockRepo, lockKey string, owner string) *DistributedLock {
+func NewDistributedLock(repo LockRepo, lockKey string, owner string, logger log.Logger) *DistributedLock {
 	return &DistributedLock{
 		repo:   repo,
 		lockID: lockKey,
 		owner:  owner,
 		ttl:    10 * time.Second,
+		log:    log.NewHelper(logger),
 	}
 }
 
@@ -199,7 +210,9 @@ func (dl *DistributedLock) WithLock(ctx context.Context, fn func() error) error 
 
 	defer func() {
 		if err := dl.repo.ReleaseLock(ctx, dl.lockID, dl.owner); err != nil {
-			dl.repo.(interface{ GetLogHelper() *log.Helper }).GetLogHelper().WithContext(ctx).Warnf("warning: failed to release lock: %v", err)
+			if dl.log != nil {
+				dl.log.WithContext(ctx).Warnf("warning: failed to release lock: %v", err)
+			}
 		}
 	}()
 

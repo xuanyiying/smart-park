@@ -23,7 +23,7 @@ func (v *vehicleClientAdapter) GetParkingRecord(ctx context.Context, recordID st
 	if err != nil {
 		return nil, err
 	}
-	if resp.Code != 200 {
+	if resp.Code != 0 {
 		return nil, fmt.Errorf("get parking record failed: %s", resp.Message)
 	}
 	return resp.Data, nil
