@@ -191,3 +191,31 @@ func (s *VehicleService) GetParkingRecord(ctx context.Context, req *v1.GetParkin
 		Data:    info,
 	}, nil
 }
+
+// ListDevices handles list devices request.
+func (s *VehicleService) ListDevices(ctx context.Context, req *v1.ListDevicesRequest) (*v1.ListDevicesResponse, error) {
+	page := int(req.Page)
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	devices, total, err := s.deviceUseCase.ListDevices(ctx, page, pageSize)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListDevices failed: %v", err)
+		return &v1.ListDevicesResponse{
+			Code:    500,
+			Message: "获取设备列表失败",
+		}, nil
+	}
+
+	return &v1.ListDevicesResponse{
+		Code:    0,
+		Message: "success",
+		Data:    devices,
+		Total:   int32(total),
+	}, nil
+}

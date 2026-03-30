@@ -27,6 +27,7 @@ const (
 	VehicleService_GetVehicleInfo_FullMethodName     = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
 	VehicleService_ListParkingRecords_FullMethodName = "/api.vehicle.v1.VehicleService/ListParkingRecords"
 	VehicleService_GetParkingRecord_FullMethodName   = "/api.vehicle.v1.VehicleService/GetParkingRecord"
+	VehicleService_ListDevices_FullMethodName        = "/api.vehicle.v1.VehicleService/ListDevices"
 )
 
 // VehicleServiceClient is the client API for VehicleService service.
@@ -41,6 +42,7 @@ type VehicleServiceClient interface {
 	GetVehicleInfo(ctx context.Context, in *GetVehicleInfoRequest, opts ...grpc.CallOption) (*GetVehicleInfoResponse, error)
 	ListParkingRecords(ctx context.Context, in *ListParkingRecordsRequest, opts ...grpc.CallOption) (*ListParkingRecordsResponse, error)
 	GetParkingRecord(ctx context.Context, in *GetParkingRecordRequest, opts ...grpc.CallOption) (*GetParkingRecordResponse, error)
+	ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...grpc.CallOption) (*ListDevicesResponse, error)
 }
 
 type vehicleServiceClient struct {
@@ -131,6 +133,16 @@ func (c *vehicleServiceClient) GetParkingRecord(ctx context.Context, in *GetPark
 	return out, nil
 }
 
+func (c *vehicleServiceClient) ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...grpc.CallOption) (*ListDevicesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListDevicesResponse)
+	err := c.cc.Invoke(ctx, VehicleService_ListDevices_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VehicleServiceServer is the server API for VehicleService service.
 // All implementations must embed UnimplementedVehicleServiceServer
 // for forward compatibility.
@@ -143,6 +155,7 @@ type VehicleServiceServer interface {
 	GetVehicleInfo(context.Context, *GetVehicleInfoRequest) (*GetVehicleInfoResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
 	GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error)
+	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
 	mustEmbedUnimplementedVehicleServiceServer()
 }
 
@@ -176,6 +189,9 @@ func (UnimplementedVehicleServiceServer) ListParkingRecords(context.Context, *Li
 }
 func (UnimplementedVehicleServiceServer) GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetParkingRecord not implemented")
+}
+func (UnimplementedVehicleServiceServer) ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDevices not implemented")
 }
 func (UnimplementedVehicleServiceServer) mustEmbedUnimplementedVehicleServiceServer() {}
 func (UnimplementedVehicleServiceServer) testEmbeddedByValue()                        {}
@@ -342,6 +358,24 @@ func _VehicleService_GetParkingRecord_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VehicleService_ListDevices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).ListDevices(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_ListDevices_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).ListDevices(ctx, req.(*ListDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VehicleService_ServiceDesc is the grpc.ServiceDesc for VehicleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -380,6 +414,10 @@ var VehicleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetParkingRecord",
 			Handler:    _VehicleService_GetParkingRecord_Handler,
+		},
+		{
+			MethodName: "ListDevices",
+			Handler:    _VehicleService_ListDevices_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

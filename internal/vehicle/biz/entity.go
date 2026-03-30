@@ -117,6 +117,7 @@ type VehicleRepo interface {
 	ListParkingRecordsByPlates(ctx context.Context, plateNumbers []string, page, pageSize int) ([]*ParkingRecord, int, error)
 	GetDeviceByCode(ctx context.Context, deviceCode string) (*Device, error)
 	UpdateDeviceHeartbeat(ctx context.Context, deviceCode string) error
+	ListDevices(ctx context.Context, page, pageSize int) ([]*Device, int, error)
 	GetLaneByDeviceCode(ctx context.Context, deviceCode string) (*Lane, error)
 	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 	CreateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error

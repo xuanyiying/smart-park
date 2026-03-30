@@ -283,6 +283,46 @@ func (r *vehicleRepo) UpdateDeviceHeartbeat(ctx context.Context, deviceCode stri
 		Exec(ctx)
 }
 
+// ListDevices retrieves all devices with pagination.
+func (r *vehicleRepo) ListDevices(ctx context.Context, page, pageSize int) ([]*biz.Device, int, error) {
+	query := r.data.db.Device.Query()
+
+	// Get total count
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Apply pagination
+	offset := (page - 1) * pageSize
+	devices, err := query.
+		Offset(offset).
+		Limit(pageSize).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Convert to biz entities
+	result := make([]*biz.Device, len(devices))
+	for i, d := range devices {
+		result[i] = &biz.Device{
+			ID:            d.ID,
+			DeviceID:      d.DeviceID,
+			LotID:         d.LotID,
+			LaneID:        d.LaneID,
+			DeviceType:    string(d.DeviceType),
+			DeviceSecret:  d.DeviceSecret,
+			GateID:        d.GateID,
+			Enabled:       d.Enabled,
+			Status:        string(d.Status),
+			LastHeartbeat: d.LastHeartbeat,
+		}
+	}
+
+	return result, total, nil
+}
+
 // GetLaneByDeviceCode retrieves a lane by device code.
 func (r *vehicleRepo) GetLaneByDeviceCode(ctx context.Context, deviceCode string) (*biz.Lane, error) {
 	// First get the device

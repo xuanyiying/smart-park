@@ -59,6 +59,12 @@ service VehicleService {
       get: "/api/v1/vehicle/records/{record_id}"
     };
   }
+
+  rpc ListDevices (ListDevicesRequest) returns (ListDevicesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices"
+    };
+  }
 }
 
 message EntryRequest {
@@ -216,4 +222,25 @@ message ParkingRecordInfo {
   int32 parking_duration = 13;
   string exit_status = 14;
   int32 payment_lock = 15;
+}
+
+message ListDevicesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListDevicesResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated DeviceInfo data = 3;
+  int32 total = 4;
+}
+
+message DeviceInfo {
+  string device_id = 1;
+  string status = 2;
+  string last_heartbeat = 3;
+  bool online = 4;
+  string lane_id = 5;
+  string lot_id = 6;
 }

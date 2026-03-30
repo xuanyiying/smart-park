@@ -1555,6 +1555,210 @@ func (x *ParkingRecordInfo) GetPaymentLock() int32 {
 	return 0
 }
 
+type ListDevicesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDevicesRequest) Reset() {
+	*x = ListDevicesRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDevicesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDevicesRequest) ProtoMessage() {}
+
+func (x *ListDevicesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDevicesRequest.ProtoReflect.Descriptor instead.
+func (*ListDevicesRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListDevicesRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListDevicesRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type ListDevicesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*DeviceInfo          `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDevicesResponse) Reset() {
+	*x = ListDevicesResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDevicesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDevicesResponse) ProtoMessage() {}
+
+func (x *ListDevicesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDevicesResponse.ProtoReflect.Descriptor instead.
+func (*ListDevicesResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ListDevicesResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListDevicesResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListDevicesResponse) GetData() []*DeviceInfo {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *ListDevicesResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type DeviceInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	LastHeartbeat string                 `protobuf:"bytes,3,opt,name=last_heartbeat,json=lastHeartbeat,proto3" json:"last_heartbeat,omitempty"`
+	Online        bool                   `protobuf:"varint,4,opt,name=online,proto3" json:"online,omitempty"`
+	LaneId        string                 `protobuf:"bytes,5,opt,name=lane_id,json=laneId,proto3" json:"lane_id,omitempty"`
+	LotId         string                 `protobuf:"bytes,6,opt,name=lot_id,json=lotId,proto3" json:"lot_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceInfo) Reset() {
+	*x = DeviceInfo{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceInfo) ProtoMessage() {}
+
+func (x *DeviceInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceInfo.ProtoReflect.Descriptor instead.
+func (*DeviceInfo) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *DeviceInfo) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetLastHeartbeat() string {
+	if x != nil {
+		return x.LastHeartbeat
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetOnline() bool {
+	if x != nil {
+		return x.Online
+	}
+	return false
+}
+
+func (x *DeviceInfo) GetLaneId() string {
+	if x != nil {
+		return x.LaneId
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetLotId() string {
+	if x != nil {
+		return x.LotId
+	}
+	return ""
+}
+
 var File_api_vehicle_v1_vehicle_proto protoreflect.FileDescriptor
 
 const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
@@ -1685,7 +1889,23 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\x10parking_duration\x18\r \x01(\x05R\x0fparkingDuration\x12\x1f\n" +
 	"\vexit_status\x18\x0e \x01(\tR\n" +
 	"exitStatus\x12!\n" +
-	"\fpayment_lock\x18\x0f \x01(\x05R\vpaymentLock2\x97\b\n" +
+	"\fpayment_lock\x18\x0f \x01(\x05R\vpaymentLock\"E\n" +
+	"\x12ListDevicesRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x89\x01\n" +
+	"\x13ListDevicesResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
+	"\x04data\x18\x03 \x03(\v2\x1a.api.vehicle.v1.DeviceInfoR\x04data\x12\x14\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\"\xb0\x01\n" +
+	"\n" +
+	"DeviceInfo\x12\x1b\n" +
+	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12%\n" +
+	"\x0elast_heartbeat\x18\x03 \x01(\tR\rlastHeartbeat\x12\x16\n" +
+	"\x06online\x18\x04 \x01(\bR\x06online\x12\x17\n" +
+	"\alane_id\x18\x05 \x01(\tR\x06laneId\x12\x15\n" +
+	"\x06lot_id\x18\x06 \x01(\tR\x05lotId2\x88\t\n" +
 	"\x0eVehicleService\x12e\n" +
 	"\x05Entry\x12\x1c.api.vehicle.v1.EntryRequest\x1a\x1d.api.vehicle.v1.EntryResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/device/entry\x12a\n" +
 	"\x04Exit\x12\x1b.api.vehicle.v1.ExitRequest\x1a\x1c.api.vehicle.v1.ExitResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/device/exit\x12u\n" +
@@ -1694,7 +1914,8 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\vSendCommand\x12\".api.vehicle.v1.SendCommandRequest\x1a#.api.vehicle.v1.SendCommandResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/device/{device_id}/command\x12\x87\x01\n" +
 	"\x0eGetVehicleInfo\x12%.api.vehicle.v1.GetVehicleInfoRequest\x1a&.api.vehicle.v1.GetVehicleInfoResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/vehicle/{plate_number}\x12\x8c\x01\n" +
 	"\x12ListParkingRecords\x12).api.vehicle.v1.ListParkingRecordsRequest\x1a*.api.vehicle.v1.ListParkingRecordsResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/vehicle/records\x12\x92\x01\n" +
-	"\x10GetParkingRecord\x12'.api.vehicle.v1.GetParkingRecordRequest\x1a(.api.vehicle.v1.GetParkingRecordResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/vehicle/records/{record_id}B4Z2github.com/xuanyiying/smart-park/api/vehicle/v1;v1b\x06proto3"
+	"\x10GetParkingRecord\x12'.api.vehicle.v1.GetParkingRecordRequest\x1a(.api.vehicle.v1.GetParkingRecordResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/vehicle/records/{record_id}\x12o\n" +
+	"\vListDevices\x12\".api.vehicle.v1.ListDevicesRequest\x1a#.api.vehicle.v1.ListDevicesResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/devicesB4Z2github.com/xuanyiying/smart-park/api/vehicle/v1;v1b\x06proto3"
 
 var (
 	file_api_vehicle_v1_vehicle_proto_rawDescOnce sync.Once
@@ -1708,7 +1929,7 @@ func file_api_vehicle_v1_vehicle_proto_rawDescGZIP() []byte {
 	return file_api_vehicle_v1_vehicle_proto_rawDescData
 }
 
-var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
 	(*EntryRequest)(nil),               // 0: api.vehicle.v1.EntryRequest
 	(*EntryResponse)(nil),              // 1: api.vehicle.v1.EntryResponse
@@ -1733,39 +1954,45 @@ var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
 	(*GetParkingRecordRequest)(nil),    // 20: api.vehicle.v1.GetParkingRecordRequest
 	(*GetParkingRecordResponse)(nil),   // 21: api.vehicle.v1.GetParkingRecordResponse
 	(*ParkingRecordInfo)(nil),          // 22: api.vehicle.v1.ParkingRecordInfo
-	nil,                                // 23: api.vehicle.v1.SendCommandRequest.ParamsEntry
+	(*ListDevicesRequest)(nil),         // 23: api.vehicle.v1.ListDevicesRequest
+	(*ListDevicesResponse)(nil),        // 24: api.vehicle.v1.ListDevicesResponse
+	(*DeviceInfo)(nil),                 // 25: api.vehicle.v1.DeviceInfo
+	nil,                                // 26: api.vehicle.v1.SendCommandRequest.ParamsEntry
 }
 var file_api_vehicle_v1_vehicle_proto_depIdxs = []int32{
 	2,  // 0: api.vehicle.v1.EntryResponse.data:type_name -> api.vehicle.v1.EntryData
 	5,  // 1: api.vehicle.v1.ExitResponse.data:type_name -> api.vehicle.v1.ExitData
 	10, // 2: api.vehicle.v1.GetDeviceStatusResponse.data:type_name -> api.vehicle.v1.DeviceStatus
-	23, // 3: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
+	26, // 3: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
 	13, // 4: api.vehicle.v1.SendCommandResponse.data:type_name -> api.vehicle.v1.CommandData
 	16, // 5: api.vehicle.v1.GetVehicleInfoResponse.data:type_name -> api.vehicle.v1.VehicleInfo
 	19, // 6: api.vehicle.v1.ListParkingRecordsResponse.data:type_name -> api.vehicle.v1.ListParkingRecordsData
 	22, // 7: api.vehicle.v1.ListParkingRecordsData.records:type_name -> api.vehicle.v1.ParkingRecordInfo
 	22, // 8: api.vehicle.v1.GetParkingRecordResponse.data:type_name -> api.vehicle.v1.ParkingRecordInfo
-	0,  // 9: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
-	3,  // 10: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
-	6,  // 11: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
-	8,  // 12: api.vehicle.v1.VehicleService.GetDeviceStatus:input_type -> api.vehicle.v1.GetDeviceStatusRequest
-	11, // 13: api.vehicle.v1.VehicleService.SendCommand:input_type -> api.vehicle.v1.SendCommandRequest
-	14, // 14: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
-	17, // 15: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
-	20, // 16: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
-	1,  // 17: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
-	4,  // 18: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
-	7,  // 19: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
-	9,  // 20: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
-	12, // 21: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
-	15, // 22: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
-	18, // 23: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
-	21, // 24: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
-	17, // [17:25] is the sub-list for method output_type
-	9,  // [9:17] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	25, // 9: api.vehicle.v1.ListDevicesResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	0,  // 10: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
+	3,  // 11: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
+	6,  // 12: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
+	8,  // 13: api.vehicle.v1.VehicleService.GetDeviceStatus:input_type -> api.vehicle.v1.GetDeviceStatusRequest
+	11, // 14: api.vehicle.v1.VehicleService.SendCommand:input_type -> api.vehicle.v1.SendCommandRequest
+	14, // 15: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
+	17, // 16: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
+	20, // 17: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
+	23, // 18: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
+	1,  // 19: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
+	4,  // 20: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
+	7,  // 21: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
+	9,  // 22: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
+	12, // 23: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
+	15, // 24: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
+	18, // 25: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
+	21, // 26: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
+	24, // 27: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
+	19, // [19:28] is the sub-list for method output_type
+	10, // [10:19] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_api_vehicle_v1_vehicle_proto_init() }
@@ -1779,7 +2006,7 @@ func file_api_vehicle_v1_vehicle_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_vehicle_v1_vehicle_proto_rawDesc), len(file_api_vehicle_v1_vehicle_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

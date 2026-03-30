@@ -105,6 +105,14 @@ func (m *MockVehicleRepo) GetLaneByDeviceCode(ctx context.Context, deviceCode st
 	return m.Lanes[deviceCode], nil
 }
 
+func (m *MockVehicleRepo) ListDevices(ctx context.Context, page, pageSize int) ([]*Device, int, error) {
+	var devices []*Device
+	for _, d := range m.Devices {
+		devices = append(devices, d)
+	}
+	return devices, len(devices), nil
+}
+
 func (m *MockVehicleRepo) ListParkingRecordsByPlates(ctx context.Context, plateNumbers []string, page, pageSize int) ([]*ParkingRecord, int, error) {
 	return nil, 0, nil
 }

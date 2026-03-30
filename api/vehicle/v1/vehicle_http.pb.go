@@ -25,6 +25,7 @@ const OperationVehicleServiceGetDeviceStatus = "/api.vehicle.v1.VehicleService/G
 const OperationVehicleServiceGetParkingRecord = "/api.vehicle.v1.VehicleService/GetParkingRecord"
 const OperationVehicleServiceGetVehicleInfo = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
 const OperationVehicleServiceHeartbeat = "/api.vehicle.v1.VehicleService/Heartbeat"
+const OperationVehicleServiceListDevices = "/api.vehicle.v1.VehicleService/ListDevices"
 const OperationVehicleServiceListParkingRecords = "/api.vehicle.v1.VehicleService/ListParkingRecords"
 const OperationVehicleServiceSendCommand = "/api.vehicle.v1.VehicleService/SendCommand"
 
@@ -35,6 +36,7 @@ type VehicleServiceHTTPServer interface {
 	GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error)
 	GetVehicleInfo(context.Context, *GetVehicleInfoRequest) (*GetVehicleInfoResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
 	SendCommand(context.Context, *SendCommandRequest) (*SendCommandResponse, error)
 }
@@ -49,6 +51,7 @@ func RegisterVehicleServiceHTTPServer(s *http.Server, srv VehicleServiceHTTPServ
 	r.GET("/api/v1/vehicle/{plate_number}", _VehicleService_GetVehicleInfo0_HTTP_Handler(srv))
 	r.GET("/api/v1/vehicle/records", _VehicleService_ListParkingRecords0_HTTP_Handler(srv))
 	r.GET("/api/v1/vehicle/records/{record_id}", _VehicleService_GetParkingRecord0_HTTP_Handler(srv))
+	r.GET("/api/v1/devices", _VehicleService_ListDevices0_HTTP_Handler(srv))
 }
 
 func _VehicleService_Entry0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
@@ -227,6 +230,25 @@ func _VehicleService_GetParkingRecord0_HTTP_Handler(srv VehicleServiceHTTPServer
 	}
 }
 
+func _VehicleService_ListDevices0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListDevicesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceListDevices)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListDevices(ctx, req.(*ListDevicesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListDevicesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type VehicleServiceHTTPClient interface {
 	Entry(ctx context.Context, req *EntryRequest, opts ...http.CallOption) (rsp *EntryResponse, err error)
 	Exit(ctx context.Context, req *ExitRequest, opts ...http.CallOption) (rsp *ExitResponse, err error)
@@ -234,6 +256,7 @@ type VehicleServiceHTTPClient interface {
 	GetParkingRecord(ctx context.Context, req *GetParkingRecordRequest, opts ...http.CallOption) (rsp *GetParkingRecordResponse, err error)
 	GetVehicleInfo(ctx context.Context, req *GetVehicleInfoRequest, opts ...http.CallOption) (rsp *GetVehicleInfoResponse, err error)
 	Heartbeat(ctx context.Context, req *HeartbeatRequest, opts ...http.CallOption) (rsp *HeartbeatResponse, err error)
+	ListDevices(ctx context.Context, req *ListDevicesRequest, opts ...http.CallOption) (rsp *ListDevicesResponse, err error)
 	ListParkingRecords(ctx context.Context, req *ListParkingRecordsRequest, opts ...http.CallOption) (rsp *ListParkingRecordsResponse, err error)
 	SendCommand(ctx context.Context, req *SendCommandRequest, opts ...http.CallOption) (rsp *SendCommandResponse, err error)
 }
@@ -318,6 +341,19 @@ func (c *VehicleServiceHTTPClientImpl) Heartbeat(ctx context.Context, in *Heartb
 	opts = append(opts, http.Operation(OperationVehicleServiceHeartbeat))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...http.CallOption) (*ListDevicesResponse, error) {
+	var out ListDevicesResponse
+	pattern := "/api/v1/devices"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceListDevices))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

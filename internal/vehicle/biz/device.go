@@ -69,3 +69,44 @@ func (uc *DeviceUseCase) GetDeviceStatus(ctx context.Context, deviceID string) (
 		LastHeartbeat: lastHeartbeat,
 	}, nil
 }
+
+// ListDevices lists all devices with pagination.
+func (uc *DeviceUseCase) ListDevices(ctx context.Context, page, pageSize int) ([]*v1.DeviceInfo, int, error) {
+	devices, total, err := uc.vehicleRepo.ListDevices(ctx, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	result := make([]*v1.DeviceInfo, len(devices))
+	for i, d := range devices {
+		online := false
+		if d.LastHeartbeat != nil {
+			online = time.Since(*d.LastHeartbeat) < uc.config.DeviceOnlineThreshold
+		}
+
+		var lastHeartbeat string
+		if d.LastHeartbeat != nil {
+			lastHeartbeat = d.LastHeartbeat.Format(time.RFC3339)
+		}
+
+		laneID := ""
+		if d.LaneID != nil {
+			laneID = d.LaneID.String()
+		}
+		lotID := ""
+		if d.LotID != nil {
+			lotID = d.LotID.String()
+		}
+
+		result[i] = &v1.DeviceInfo{
+			DeviceId:      d.DeviceID,
+			Status:        d.Status,
+			LastHeartbeat: lastHeartbeat,
+			Online:        online,
+			LaneId:        laneID,
+			LotId:         lotID,
+		}
+	}
+
+	return result, total, nil
+}

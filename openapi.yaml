@@ -3,19 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: AdminService API
+    title: VehicleService API
     version: 0.0.1
 paths:
-    /api/v1/admin/login:
+    /api/v1/device/entry:
         post:
             tags:
-                - AdminService
-            operationId: AdminService_Login
+                - VehicleService
+            operationId: VehicleService_Entry
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/LoginRequest'
+                            $ref: '#/components/schemas/EntryRequest'
                 required: true
             responses:
                 "200":
@@ -23,18 +23,120 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/LoginResponse'
+                                $ref: '#/components/schemas/EntryResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/admin/lots:
+    /api/v1/device/exit:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_Exit
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ExitRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ExitResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/heartbeat:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_Heartbeat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/HeartbeatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HeartbeatResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/command:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_SendCommand
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SendCommandRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SendCommandResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/status:
         get:
             tags:
-                - AdminService
-            operationId: AdminService_ListParkingLots
+                - VehicleService
+            operationId: VehicleService_GetDeviceStatus
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceStatusResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/devices:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListDevices
             parameters:
                 - name: page
                   in: query
@@ -52,172 +154,25 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListParkingLotsResponse'
+                                $ref: '#/components/schemas/ListDevicesResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-        post:
-            tags:
-                - AdminService
-            operationId: AdminService_CreateParkingLot
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateParkingLotRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CreateParkingLotResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/lots/{id}:
+    /api/v1/vehicle/records:
         get:
             tags:
-                - AdminService
-            operationId: AdminService_GetParkingLot
+                - VehicleService
+            operationId: VehicleService_ListParkingRecords
             parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetParkingLotResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        put:
-            tags:
-                - AdminService
-            operationId: AdminService_UpdateParkingLot
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateParkingLotRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/UpdateParkingLotResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/orders:
-        get:
-            tags:
-                - AdminService
-            operationId: AdminService_ListOrders
-            parameters:
-                - name: lotId
+                - name: plateNumbers
                   in: query
                   schema:
-                    type: string
-                - name: status
-                  in: query
-                  schema:
-                    type: string
-                - name: page
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageSize
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListOrdersResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/orders/{id}:
-        get:
-            tags:
-                - AdminService
-            operationId: AdminService_GetOrder
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetOrderResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/records:
-        get:
-            tags:
-                - AdminService
-            operationId: AdminService_ListParkingRecords
-            parameters:
-                - name: lotId
-                  in: query
-                  schema:
-                    type: string
-                - name: startTime
-                  in: query
-                  schema:
-                    type: string
-                - name: endTime
-                  in: query
-                  schema:
-                    type: string
-                - name: plateNumber
-                  in: query
-                  schema:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 - name: page
                   in: query
                   schema:
@@ -241,173 +196,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/admin/reports/daily:
+    /api/v1/vehicle/records/{recordId}:
         get:
             tags:
-                - AdminService
-            operationId: AdminService_GetDailyReport
+                - VehicleService
+            operationId: VehicleService_GetParkingRecord
             parameters:
-                - name: lotId
-                  in: query
-                  schema:
-                    type: string
-                - name: date
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetDailyReportResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/reports/monthly:
-        get:
-            tags:
-                - AdminService
-            operationId: AdminService_GetMonthlyReport
-            parameters:
-                - name: lotId
-                  in: query
-                  schema:
-                    type: string
-                - name: year
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: month
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetMonthlyReportResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/user:
-        get:
-            tags:
-                - AdminService
-            operationId: AdminService_GetCurrentUser
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetCurrentUserResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/users:
-        get:
-            tags:
-                - AdminService
-            description: User Management
-            operationId: AdminService_ListUsers
-            parameters:
-                - name: page
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageSize
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListUsersResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        post:
-            tags:
-                - AdminService
-            operationId: AdminService_CreateUser
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateUserRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CreateUserResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/admin/users/{id}:
-        put:
-            tags:
-                - AdminService
-            operationId: AdminService_UpdateUser
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateUserRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/UpdateUserResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        delete:
-            tags:
-                - AdminService
-            operationId: AdminService_DeleteUser
-            parameters:
-                - name: id
+                - name: recordId
                   in: path
                   required: true
                   schema:
@@ -418,63 +213,31 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/DeleteUserResponse'
+                                $ref: '#/components/schemas/GetParkingRecordResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/admin/vehicles:
+    /api/v1/vehicle/{plateNumber}:
         get:
             tags:
-                - AdminService
-            operationId: AdminService_ListVehicles
+                - VehicleService
+            operationId: VehicleService_GetVehicleInfo
             parameters:
-                - name: vehicleType
-                  in: query
+                - name: plateNumber
+                  in: path
+                  required: true
                   schema:
                     type: string
-                - name: page
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageSize
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListVehiclesResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        post:
-            tags:
-                - AdminService
-            operationId: AdminService_CreateVehicle
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateVehicleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CreateVehicleResponse'
+                                $ref: '#/components/schemas/GetVehicleInfoResponse'
                 default:
                     description: Default error response
                     content:
@@ -483,286 +246,88 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        CreateParkingLotRequest:
+        CommandData:
             type: object
             properties:
-                name:
-                    type: string
-                address:
-                    type: string
-                lanes:
-                    type: integer
-                    format: int32
-        CreateParkingLotResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/ParkingLot'
-        CreateUserRequest:
-            type: object
-            properties:
-                username:
-                    type: string
-                password:
-                    type: string
-                name:
-                    type: string
-                role:
-                    type: string
-                email:
+                commandId:
                     type: string
                 status:
                     type: string
-        CreateUserResponse:
+        DeviceInfo:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
+                deviceId:
                     type: string
-                data:
-                    $ref: '#/components/schemas/User'
-        CreateVehicleRequest:
-            type: object
-            properties:
-                plateNumber:
+                status:
                     type: string
-                vehicleType:
+                lastHeartbeat:
                     type: string
-                ownerName:
+                online:
+                    type: boolean
+                laneId:
                     type: string
-                ownerPhone:
-                    type: string
-                monthlyValidUntil:
-                    type: string
-        CreateVehicleResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/Vehicle'
-        DailyReport:
-            type: object
-            properties:
                 lotId:
                     type: string
-                date:
-                    type: string
-                totalEntries:
-                    type: integer
-                    format: int32
-                totalExits:
-                    type: integer
-                    format: int32
-                totalVehicles:
-                    type: integer
-                    format: int32
-                totalAmount:
-                    type: number
-                    format: double
-                totalDiscount:
-                    type: number
-                    format: double
-                netAmount:
-                    type: number
-                    format: double
-        DeleteUserResponse:
+        DeviceStatus:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
+                deviceId:
                     type: string
-        GetCurrentUserResponse:
+                online:
+                    type: boolean
+                status:
+                    type: string
+                lastHeartbeat:
+                    type: string
+        EntryData:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/User'
-        GetDailyReportResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/DailyReport'
-        GetMonthlyReportResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/MonthlyReport'
-        GetOrderResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/Order'
-        GetParkingLotResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/ParkingLot'
-        GoogleProtobufAny:
-            type: object
-            properties:
-                '@type':
-                    type: string
-                    description: The type of the serialized message.
-            additionalProperties: true
-            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListOrdersResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/OrderListData'
-        ListParkingLotsResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/ParkingLotListData'
-        ListParkingRecordsResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/ParkingRecordListData'
-        ListUsersResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/UserListData'
-        ListVehiclesResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/VehicleListData'
-        LoginData:
-            type: object
-            properties:
-                token:
-                    type: string
-                user:
-                    $ref: '#/components/schemas/User'
-                expiresAt:
-                    type: string
-        LoginRequest:
-            type: object
-            properties:
-                username:
-                    type: string
-                password:
-                    type: string
-            description: Login messages
-        LoginResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/LoginData'
-        MonthlyReport:
-            type: object
-            properties:
-                lotId:
-                    type: string
-                year:
-                    type: integer
-                    format: int32
-                month:
-                    type: integer
-                    format: int32
-                totalEntries:
-                    type: integer
-                    format: int32
-                totalExits:
-                    type: integer
-                    format: int32
-                totalVehicles:
-                    type: integer
-                    format: int32
-                totalAmount:
-                    type: number
-                    format: double
-                totalDiscount:
-                    type: number
-                    format: double
-                netAmount:
-                    type: number
-                    format: double
-                dailyReports:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/DailyReport'
-        Order:
-            type: object
-            properties:
-                id:
-                    type: string
                 recordId:
                     type: string
-                lotId:
+                plateNumber:
+                    type: string
+                allowed:
+                    type: boolean
+                gateOpen:
+                    type: boolean
+                displayMessage:
+                    type: string
+        EntryRequest:
+            type: object
+            properties:
+                deviceId:
                     type: string
                 plateNumber:
                     type: string
+                plateImageUrl:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                vehicleType:
+                    type: string
+                timestamp:
+                    type: string
+        EntryResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/EntryData'
+        ExitData:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                plateNumber:
+                    type: string
+                parkingDuration:
+                    type: integer
+                    format: int32
                 amount:
                     type: number
                     format: double
@@ -772,96 +337,182 @@ components:
                 finalAmount:
                     type: number
                     format: double
-                status:
+                allowed:
+                    type: boolean
+                gateOpen:
+                    type: boolean
+                displayMessage:
                     type: string
-                payTime:
-                    type: string
-                payMethod:
-                    type: string
-        OrderListData:
+        ExitRequest:
             type: object
             properties:
-                list:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Order'
-                total:
-                    type: integer
-                    format: int32
-                page:
-                    type: integer
-                    format: int32
-                pageSize:
-                    type: integer
-                    format: int32
-        ParkingLot:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
-                address:
-                    type: string
-                lanes:
-                    type: integer
-                    format: int32
-                status:
-                    type: string
-                createdAt:
-                    type: string
-                updatedAt:
-                    type: string
-        ParkingLotListData:
-            type: object
-            properties:
-                list:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ParkingLot'
-                total:
-                    type: integer
-                    format: int32
-                page:
-                    type: integer
-                    format: int32
-                pageSize:
-                    type: integer
-                    format: int32
-        ParkingRecord:
-            type: object
-            properties:
-                id:
-                    type: string
-                lotId:
+                deviceId:
                     type: string
                 plateNumber:
                     type: string
+                plateImageUrl:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                timestamp:
+                    type: string
+        ExitResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ExitData'
+        GetDeviceStatusResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DeviceStatus'
+        GetParkingRecordResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ParkingRecordInfo'
+        GetVehicleInfoResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/VehicleInfo'
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        HeartbeatRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                status:
+                    type: string
+                timestamp:
+                    type: string
+        HeartbeatResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        ListDevicesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DeviceInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListParkingRecordsData:
+            type: object
+            properties:
+                records:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ParkingRecordInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListParkingRecordsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ListParkingRecordsData'
+        ParkingRecordInfo:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                lotId:
+                    type: string
+                vehicleId:
+                    type: string
+                plateNumber:
+                    type: string
+                entryLaneId:
+                    type: string
                 entryTime:
                     type: string
+                entryImageUrl:
+                    type: string
+                recordStatus:
+                    type: string
                 exitTime:
+                    type: string
+                exitImageUrl:
+                    type: string
+                exitLaneId:
+                    type: string
+                exitDeviceId:
                     type: string
                 parkingDuration:
                     type: integer
                     format: int32
-                status:
+                exitStatus:
                     type: string
-        ParkingRecordListData:
+                paymentLock:
+                    type: integer
+                    format: int32
+        SendCommandRequest:
             type: object
             properties:
-                list:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ParkingRecord'
-                total:
+                deviceId:
+                    type: string
+                command:
+                    type: string
+                params:
+                    type: object
+                    additionalProperties:
+                        type: string
+        SendCommandResponse:
+            type: object
+            properties:
+                code:
                     type: integer
                     format: int32
-                page:
-                    type: integer
-                    format: int32
-                pageSize:
-                    type: integer
-                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/CommandData'
         Status:
             type: object
             properties:
@@ -878,87 +529,9 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        UpdateParkingLotRequest:
+        VehicleInfo:
             type: object
             properties:
-                id:
-                    type: string
-                name:
-                    type: string
-                address:
-                    type: string
-                lanes:
-                    type: integer
-                    format: int32
-                status:
-                    type: string
-        UpdateParkingLotResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-        UpdateUserRequest:
-            type: object
-            properties:
-                id:
-                    type: string
-                username:
-                    type: string
-                name:
-                    type: string
-                role:
-                    type: string
-                email:
-                    type: string
-                status:
-                    type: string
-        UpdateUserResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/User'
-        User:
-            type: object
-            properties:
-                id:
-                    type: string
-                username:
-                    type: string
-                name:
-                    type: string
-                role:
-                    type: string
-                avatar:
-                    type: string
-        UserListData:
-            type: object
-            properties:
-                list:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/User'
-                total:
-                    type: integer
-                    format: int32
-                page:
-                    type: integer
-                    format: int32
-                pageSize:
-                    type: integer
-                    format: int32
-        Vehicle:
-            type: object
-            properties:
-                id:
-                    type: string
                 plateNumber:
                     type: string
                 vehicleType:
@@ -969,23 +542,5 @@ components:
                     type: string
                 monthlyValidUntil:
                     type: string
-                createdAt:
-                    type: string
-        VehicleListData:
-            type: object
-            properties:
-                list:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Vehicle'
-                total:
-                    type: integer
-                    format: int32
-                page:
-                    type: integer
-                    format: int32
-                pageSize:
-                    type: integer
-                    format: int32
 tags:
-    - name: AdminService
+    - name: VehicleService
