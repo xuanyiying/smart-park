@@ -10,6 +10,7 @@ import (
 )
 
 func TestMQTTClientConnect(t *testing.T) {
+	t.Skip("需要真实的 MQTT Broker 才能运行")
 	config := &mqtt.Config{
 		Broker:   "tcp://localhost:1883",
 		ClientID: "test-client",

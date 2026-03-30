@@ -167,20 +167,16 @@ func (s *ChargingService) CreateConnector(ctx context.Context, req *v1.CreateCon
 		return &v1.CreateConnectorResponse{Code: 400, Message: "无效的充电桩ID"}, nil
 	}
 
-	// TODO: Implement connector creation in biz layer
-	s.log.WithContext(ctx).Warnf("CreateConnector not fully implemented")
+	connector, err := s.uc.CreateConnector(ctx, stationID, int(req.Number), biz.ConnectorType(req.Type), req.MaxPower, req.Voltage)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CreateConnector failed: %v", err)
+		return &v1.CreateConnectorResponse{Code: 500, Message: "创建连接器失败"}, nil
+	}
 
 	return &v1.CreateConnectorResponse{
 		Code:    0,
 		Message: "success",
-		Data: &v1.Connector{
-			StationId: stationID.String(),
-			Number:    req.Number,
-			Type:      req.Type,
-			MaxPower:  req.MaxPower,
-			Voltage:   req.Voltage,
-			Status:    "available",
-		},
+		Data:    toProtoConnector(connector),
 	}, nil
 }
 

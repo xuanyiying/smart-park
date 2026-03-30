@@ -102,8 +102,8 @@ func (uc *UserUseCase) getOpenIDFromWechat(ctx context.Context, code string) (st
 		return openID, nil
 	}
 
-	uc.log.WithContext(ctx).Warn("wechat client not configured, using mock openid")
-	return "mock_openid_" + code, nil
+	uc.log.WithContext(ctx).Warn("wechat client not configured, cannot authenticate user")
+	return "", fmt.Errorf("wechat client not configured")
 }
 
 func (uc *UserUseCase) BindPlate(ctx context.Context, userID string, req *v1.BindPlateRequest) error {

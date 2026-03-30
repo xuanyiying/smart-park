@@ -137,9 +137,8 @@ func (uc *PaymentUseCase) generateWechatPayment(ctx context.Context, order *Orde
 	amountInCents := int64(order.FinalAmount * 100)
 
 	if uc.wechatClient == nil {
-		uc.log.WithContext(ctx).Warn("wechat client not configured, using mock")
-		payURL, qrCode := uc.mockWechatPayURL(order.ID.String(), req.OpenId)
-		return payURL, qrCode, nil
+		uc.log.WithContext(ctx).Error("wechat client not configured, cannot generate payment")
+		return "", "", fmt.Errorf("wechat client not configured")
 	}
 
 	if req.OpenId != "" {
@@ -171,17 +170,13 @@ func (uc *PaymentUseCase) generateWechatNativePay(ctx context.Context, order *Or
 	return codeURL, codeURL, nil
 }
 
-// mockWechatPayURL generates mock WeChat pay URL.
-func (uc *PaymentUseCase) mockWechatPayURL(orderID string, openID string) (string, string) {
-	return "https://wxpay.example.com/pay/" + orderID, "weixin://wxpay/example/" + orderID
-}
+
 
 // generateAlipayPayment generates Alipay payment URL.
 func (uc *PaymentUseCase) generateAlipayPayment(ctx context.Context, order *Order, req *v1.CreatePaymentRequest) (string, string, error) {
 	if uc.alipayClient == nil {
-		uc.log.WithContext(ctx).Warn("alipay client not configured, using mock")
-		payURL, qrCode := uc.mockAlipayURL(order.ID.String())
-		return payURL, qrCode, nil
+		uc.log.WithContext(ctx).Error("alipay client not configured, cannot generate payment")
+		return "", "", fmt.Errorf("alipay client not configured")
 	}
 
 	qrCode, err := uc.alipayClient.CreateTradePreCreate(ctx, order.ID.String(), order.FinalAmount, uc.bizConfig.DefaultDescription)
@@ -193,10 +188,7 @@ func (uc *PaymentUseCase) generateAlipayPayment(ctx context.Context, order *Orde
 	return qrCode, qrCode, nil
 }
 
-// mockAlipayURL generates mock Alipay URL.
-func (uc *PaymentUseCase) mockAlipayURL(orderID string) (string, string) {
-	return "https://alipay.example.com/pay/" + orderID, "https://qr.alipay.com/" + orderID
-}
+
 
 // GetPaymentStatus retrieves payment status.
 func (uc *PaymentUseCase) GetPaymentStatus(ctx context.Context, orderID string) (*v1.PaymentStatusData, error) {

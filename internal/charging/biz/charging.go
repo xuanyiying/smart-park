@@ -580,6 +580,45 @@ func (uc *ChargingUseCase) ExpireOldSessions(ctx context.Context) (int64, error)
 	return uc.repo.ExpireOldSessions(ctx, uc.config.MaxSessionDuration)
 }
 
+// CreateConnector creates a new connector.
+func (uc *ChargingUseCase) CreateConnector(ctx context.Context, stationID uuid.UUID, number int, connType ConnectorType, maxPower, voltage float64) (*Connector, error) {
+	station, err := uc.repo.GetStation(ctx, stationID)
+	if err != nil {
+		return nil, ErrStationNotFound
+	}
+
+	// Fetch existing connectors to validate total count constraint
+	existing, _ := uc.repo.ListConnectors(ctx, stationID)
+	if len(existing) >= station.TotalConnectors {
+		return nil, fmt.Errorf("station has reached maximum capacity of %d connectors", station.TotalConnectors)
+	}
+
+	current := 0.0
+	if voltage > 0 {
+		current = maxPower * 1000 / voltage
+	}
+
+	connector := &Connector{
+		ID:        uuid.New(),
+		StationID: stationID,
+		Number:    number,
+		Type:      connType,
+		Status:    ConnectorStatusAvailable,
+		MaxPower:  maxPower,
+		Voltage:   voltage,
+		Current:   current,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := uc.repo.CreateConnector(ctx, connector); err != nil {
+		return nil, fmt.Errorf("failed to create connector: %w", err)
+	}
+
+	uc.log.Infow("connector created", "connector_id", connector.ID, "station_id", stationID, "number", number)
+	return connector, nil
+}
+
 // GetConnector retrieves a connector by ID.
 func (uc *ChargingUseCase) GetConnector(ctx context.Context, connectorID uuid.UUID) (*Connector, error) {
 	return uc.repo.GetConnector(ctx, connectorID)
