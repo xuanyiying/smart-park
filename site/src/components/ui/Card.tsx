@@ -13,7 +13,7 @@ export function Card({
   const baseStyles = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl transition-all';
 
   const hoverStyles = hoverable
-    ? 'cursor-pointer hover:border-sky-500 hover:shadow-lg hover:shadow-sky-500/10'
+    ? 'cursor-pointer hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/15'
     : '';
 
   return (

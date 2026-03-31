@@ -39,7 +39,7 @@ export function Header({ darkMode, setDarkMode }: HeaderProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors text-sm font-medium"
+                className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm font-medium"
               >
                 {item.label}
               </Link>
@@ -87,7 +87,7 @@ export function Header({ darkMode, setDarkMode }: HeaderProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-slate-600 dark:text-slate-400 hover:text-sky-600 transition-colors"
+                  className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}

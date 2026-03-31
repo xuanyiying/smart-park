@@ -29,7 +29,7 @@ export function Input({
           w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600
           bg-white dark:bg-slate-800 text-slate-900 dark:text-white
           placeholder-slate-400
-          focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none
+          focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none
           transition-all
           disabled:opacity-50 disabled:cursor-not-allowed
           ${error ? 'border-red-500 focus:ring-red-500' : ''}

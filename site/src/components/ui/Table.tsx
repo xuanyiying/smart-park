@@ -56,7 +56,7 @@ export function TableBody({ children, className = '' }: TableBodyProps) {
 export function TableRow({ children, className = '' }: TableRowProps) {
   return (
     <tr
-      className={`border-t border-slate-100 dark:border-slate-700 ${className}`}
+      className={`border-t border-slate-100 dark:border-slate-700 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-colors ${className}`}
     >
       {children}
     </tr>

@@ -5,33 +5,45 @@
 
 :root {
   /* 浅色模式 - 默认 */
-  --background: #ffffff;
+  --background: #fafbfc;
   --foreground: #0f172a;
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
 
-  /* 天蓝色系 */
-  --primary: #1a8fee;
-  --primary-dark: #1472de;
-  --primary-light: #3898f8;
-  --primary-50: #f0f9ff;
-  --primary-100: #e0f2fe;
+  /* 蓝紫渐变系 - 大胆视觉风 */
+  --primary: #6366f1;           /* 靛蓝紫 */
+  --primary-dark: #4f46e5;      /* 深靛蓝 */
+  --primary-light: #8b5cf6;     /* 紫罗兰 */
+  --accent: #06b6d4;            /* 青色强调 */
+  --accent-light: #22d3ee;      /* 亮青色 */
+
+  /* 渐变色彩 */
+  --gradient-start: #6366f1;
+  --gradient-mid: #8b5cf6;
+  --gradient-end: #ec4899;      /* 粉色终点 */
+
+  /* 功能色 */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 }
 
 .dark {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --card-bg: #1e293b;
-  --card-border: #334155;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card-bg: #18181b;
+  --card-border: #27272a;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
 }
 
 * {
@@ -53,7 +65,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 滚动条 - 蓝色系 */
+/* 滚动条 - 蓝紫渐变系 */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -63,103 +75,152 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
 }
 
-/* 渐变文字 - 蓝色系 */
+/* 渐变文字 - 蓝紫渐变系 */
 .gradient-text {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--gradient-end) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* 卡片样式 */
+/* 卡片样式 - 大胆视觉风 */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
+  border-radius: 20px;
   transition: all 0.3s ease;
 }
 
 .card:hover {
   border-color: var(--primary);
-  box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 20px 60px -15px rgba(99, 102, 241, 0.25);
+  transform: translateY(-4px);
 }
 
-/* 按钮渐变 - 天蓝色系 */
+/* 按钮渐变 - 蓝紫渐变 */
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--gradient-end) 100%);
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.4);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.5);
 }
 
-/* 图标背景 */
+/* 图标背景 - 渐变色块 */
 .icon-bg {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
 }
 
-/* 网格背景 */
+/* 网格背景 - 蓝紫色调 */
 .grid-bg {
   background-image:
-    linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
 .dark .grid-bg {
   background-image:
-    linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.08) 1px, transparent 1px);
 }
 
-/* 动画 */
+/* 动画 - 更明显 */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(2deg); }
+  50% { transform: translateY(-25px) rotate(0deg); }
+  75% { transform: translateY(-15px) rotate(-2deg); }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 8s ease-in-out infinite;
 }
 
 .animate-pulse-slow {
-  animation: pulse 4s ease-in-out infinite;
+  animation: pulse 5s ease-in-out infinite;
+}
+
+/* 闪电动画效果 */
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
 }
 
 /* Dashboard 预览样式 */
 .dashboard-preview {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f0f9ff 100%);
 }
 
 .dark .dashboard-preview {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #18181b 0%, #1e1b4b 50%, #0f172a 100%);
 }
 
-/* 侧边栏样式 */
+/* 侧边栏样式 - 蓝紫渐变 */
 .sidebar-item {
   transition: all 0.2s ease;
 }
 
 .sidebar-item:hover {
-  background: rgba(14, 165, 233, 0.1);
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
 }
 
 .sidebar-item.active {
-  background: rgba(14, 165, 233, 0.15);
-  color: #0ea5e9;
-  border-right: 3px solid #0ea5e9;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
+  color: var(--primary);
+  border-right: 3px solid var(--primary);
+}
+
+/* 玻璃态效果 */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass {
+  background: rgba(24, 24, 27, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 渐变边框 */
+.gradient-border {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: 20px;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--gradient-end));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
