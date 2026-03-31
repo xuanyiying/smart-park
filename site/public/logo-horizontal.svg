@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <defs>
+    <linearGradient id="hGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Logo 图标部分 -->
+  <g transform="translate(10, 10)">
+    <rect x="0" y="0" width="80" height="80" rx="16" fill="url(#hGradient)"/>
+    <text x="40" y="55" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white" text-anchor="middle">P</text>
+    <circle cx="40" cy="18" r="4" fill="white"/>
+    <circle cx="28" cy="22" r="2.5" fill="rgba(255,255,255,0.6)"/>
+    <circle cx="52" cy="22" r="2.5" fill="rgba(255,255,255,0.6)"/>
+  </g>
+
+  <!-- 文字部分 -->
+  <g transform="translate(110, 35)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#1E40AF">Smart</text>
+    <text x="0" y="32" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#3B82F6">Park</text>
+
+    <!-- 副标题 -->
+    <text x="0" y="52" font-family="Arial, sans-serif" font-size="11" fill="#6B7280">智慧停车管理系统</text>
+  </g>
+</svg>
