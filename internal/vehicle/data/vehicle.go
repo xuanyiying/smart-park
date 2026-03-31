@@ -24,6 +24,8 @@ func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
 		log: log.NewHelper(logger),
 	}
 
+	RegisterTenantHooks(db)
+
 	cleanup := func() {
 		if err := d.db.Close(); err != nil {
 			d.log.Errorf("failed to close database: %v", err)
