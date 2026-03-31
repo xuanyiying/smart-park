@@ -420,6 +420,11 @@ func (r *chargingRepo) ListPrices(ctx context.Context, stationID uuid.UUID) ([]*
 	return result, nil
 }
 
+// DeletePrice deletes a price configuration.
+func (r *chargingRepo) DeletePrice(ctx context.Context, priceID uuid.UUID) error {
+	return r.data.db.Price.DeleteOneID(priceID).Exec(ctx)
+}
+
 // Helper functions to convert ent types to biz types
 func toBizStation(s *ent.Station) *biz.Station {
 	return &biz.Station{

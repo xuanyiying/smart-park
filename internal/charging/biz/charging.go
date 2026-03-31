@@ -56,6 +56,7 @@ type ChargingRepo interface {
 	CreatePrice(ctx context.Context, price *Price) error
 	GetPrice(ctx context.Context, priceID uuid.UUID) (*Price, error)
 	UpdatePrice(ctx context.Context, price *Price) error
+	DeletePrice(ctx context.Context, priceID uuid.UUID) error
 	GetCurrentPrice(ctx context.Context, stationID uuid.UUID) (*Price, error)
 	ListPrices(ctx context.Context, stationID uuid.UUID) ([]*Price, error)
 }
@@ -632,4 +633,12 @@ func (uc *ChargingUseCase) ListConnectors(ctx context.Context, stationID uuid.UU
 // ListPrices retrieves price configurations for a station.
 func (uc *ChargingUseCase) ListPrices(ctx context.Context, stationID uuid.UUID) ([]*Price, error) {
 	return uc.repo.ListPrices(ctx, stationID)
+}
+
+// DeletePrice deletes a price configuration.
+func (uc *ChargingUseCase) DeletePrice(ctx context.Context, priceID uuid.UUID) error {
+	if err := uc.repo.DeletePrice(ctx, priceID); err != nil {
+		return fmt.Errorf("failed to delete price: %w", err)
+	}
+	return nil
 }

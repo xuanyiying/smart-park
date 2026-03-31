@@ -245,7 +245,20 @@ func (s *ChargingService) StartCharging(ctx context.Context, req *v1.StartChargi
 	session, err := s.uc.StartCharging(ctx, stationID, connectorID, userID, req.VehiclePlate)
 	if err != nil {
 		s.log.WithContext(ctx).Errorf("StartCharging failed: %v", err)
-		return &v1.StartChargingResponse{Code: 500, Message: "开始充电失败"}, nil
+		switch err {
+		case biz.ErrStationNotFound:
+			return &v1.StartChargingResponse{Code: 404, Message: "充电桩不存在"}, nil
+		case biz.ErrStationNotAvailable:
+			return &v1.StartChargingResponse{Code: 400, Message: "充电桩不可用"}, nil
+		case biz.ErrConnectorNotFound:
+			return &v1.StartChargingResponse{Code: 404, Message: "连接器不存在"}, nil
+		case biz.ErrConnectorNotAvailable:
+			return &v1.StartChargingResponse{Code: 400, Message: "连接器不可用"}, nil
+		case biz.ErrConnectorInUse:
+			return &v1.StartChargingResponse{Code: 400, Message: "连接器正在使用中"}, nil
+		default:
+			return &v1.StartChargingResponse{Code: 500, Message: "开始充电失败"}, nil
+		}
 	}
 
 	return &v1.StartChargingResponse{
@@ -270,7 +283,16 @@ func (s *ChargingService) StopCharging(ctx context.Context, req *v1.StopCharging
 	session, err := s.uc.StopCharging(ctx, sessionID, userID)
 	if err != nil {
 		s.log.WithContext(ctx).Errorf("StopCharging failed: %v", err)
-		return &v1.StopChargingResponse{Code: 500, Message: "停止充电失败"}, nil
+		switch err {
+		case biz.ErrSessionNotFound:
+			return &v1.StopChargingResponse{Code: 404, Message: "会话不存在"}, nil
+		case biz.ErrUnauthorizedAccess:
+			return &v1.StopChargingResponse{Code: 401, Message: "未授权访问"}, nil
+		case biz.ErrSessionNotActive:
+			return &v1.StopChargingResponse{Code: 400, Message: "会话未处于充电状态"}, nil
+		default:
+			return &v1.StopChargingResponse{Code: 500, Message: "停止充电失败"}, nil
+		}
 	}
 
 	return &v1.StopChargingResponse{
@@ -428,6 +450,68 @@ func (s *ChargingService) ListPrices(ctx context.Context, req *v1.ListPricesRequ
 		Message: "success",
 		Data:    data,
 	}, nil
+}
+
+// UpdatePrice updates a price configuration.
+func (s *ChargingService) UpdatePrice(ctx context.Context, req *v1.UpdatePriceRequest) (*v1.UpdatePriceResponse, error) {
+	priceID, err := uuid.Parse(req.PriceId)
+	if err != nil {
+		return &v1.UpdatePriceResponse{Code: 400, Message: "无效的价格ID"}, nil
+	}
+
+	price, err := s.uc.GetPrice(ctx, priceID)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetPrice failed: %v", err)
+		return &v1.UpdatePriceResponse{Code: 404, Message: "价格配置不存在"}, nil
+	}
+
+	effectiveAt, _ := time.Parse(time.RFC3339, req.EffectiveAt)
+	if effectiveAt.IsZero() {
+		effectiveAt = price.EffectiveAt
+	}
+
+	var expiresAt time.Time
+	if req.ExpiresAt != "" {
+		expiresAt, _ = time.Parse(time.RFC3339, req.ExpiresAt)
+	}
+
+	price.Name = req.Name
+	price.StartHour = int(req.StartHour)
+	price.EndHour = int(req.EndHour)
+	price.PricePerKWh = req.PricePerKwh
+	price.ServiceFee = req.ServiceFee
+	price.PeakLoad = req.PeakLoad
+	price.OffPeakLoad = req.OffPeakLoad
+	price.IsPeakHours = req.IsPeakHours
+	price.EffectiveAt = effectiveAt
+	price.ExpiresAt = expiresAt
+	price.UpdatedAt = time.Now()
+
+	if err := s.uc.UpdatePrice(ctx, price); err != nil {
+		s.log.WithContext(ctx).Errorf("UpdatePrice failed: %v", err)
+		return &v1.UpdatePriceResponse{Code: 500, Message: "更新价格配置失败"}, nil
+	}
+
+	return &v1.UpdatePriceResponse{
+		Code:    0,
+		Message: "success",
+		Data:    toProtoPrice(price),
+	}, nil
+}
+
+// DeletePrice deletes a price configuration.
+func (s *ChargingService) DeletePrice(ctx context.Context, req *v1.DeletePriceRequest) (*v1.DeletePriceResponse, error) {
+	priceID, err := uuid.Parse(req.PriceId)
+	if err != nil {
+		return &v1.DeletePriceResponse{Code: 400, Message: "无效的价格ID"}, nil
+	}
+
+	if err := s.uc.DeletePrice(ctx, priceID); err != nil {
+		s.log.WithContext(ctx).Errorf("DeletePrice failed: %v", err)
+		return &v1.DeletePriceResponse{Code: 500, Message: "删除价格配置失败"}, nil
+	}
+
+	return &v1.DeletePriceResponse{Code: 0, Message: "success"}, nil
 }
 
 // ConfirmPayment confirms payment for a charging session.

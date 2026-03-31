@@ -107,6 +107,19 @@ service ChargingService {
     };
   }
 
+  rpc UpdatePrice(UpdatePriceRequest) returns (UpdatePriceResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/charging/prices/{priceId}",
+      body: "*",
+    };
+  }
+
+  rpc DeletePrice(DeletePriceRequest) returns (DeletePriceResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/charging/prices/{priceId}",
+    };
+  }
+
   rpc GetCurrentPrice(GetCurrentPriceRequest) returns (GetCurrentPriceResponse) {
     option (google.api.http) = {
       get: "/api/v1/charging/stations/{stationId}/price",
@@ -406,6 +419,35 @@ message ListPricesResponse {
   int32          code    = 1;
   string         message = 2;
   repeated Price data    = 3;
+}
+
+message UpdatePriceRequest {
+  string priceId     = 1;
+  string name        = 2;
+  int32  startHour   = 3;
+  int32  endHour     = 4;
+  double pricePerKwh = 5;
+  double serviceFee  = 6;
+  double peakLoad    = 7;
+  double offPeakLoad = 8;
+  bool   isPeakHours = 9;
+  string effectiveAt = 10;
+  string expiresAt   = 11;
+}
+
+message UpdatePriceResponse {
+  int32  code    = 1;
+  string message = 2;
+  Price  data    = 3;
+}
+
+message DeletePriceRequest {
+  string priceId = 1;
+}
+
+message DeletePriceResponse {
+  int32  code    = 1;
+  string message = 2;
 }
 
 message Price {
