@@ -18,6 +18,8 @@ func (BillingRule) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("lot_id", uuid.UUID{}).
 			Comment("停车场ID"),
 		field.String("rule_name").
@@ -54,6 +56,7 @@ func (BillingRule) Fields() []ent.Field {
 
 func (BillingRule) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("lot_id", "priority").StorageKey("idx_billing_rules_lot_priority"),
 		index.Fields("lot_id", "is_active"),
 	}

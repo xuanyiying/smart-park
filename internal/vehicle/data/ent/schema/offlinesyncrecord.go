@@ -18,6 +18,8 @@ func (OfflineSyncRecord) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.String("offline_id").
 			MaxLen(64).
 			Unique().
@@ -67,6 +69,7 @@ func (OfflineSyncRecord) Fields() []ent.Field {
 
 func (OfflineSyncRecord) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("offline_id").Unique().StorageKey("idx_offline_id"),
 		index.Fields("lot_id", "sync_status").StorageKey("idx_offline_lot_status"),
 		index.Fields("sync_status").StorageKey("idx_offline_status"),
