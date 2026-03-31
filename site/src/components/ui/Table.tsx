@@ -7,10 +7,12 @@ interface TableProps {
 
 interface TableHeadProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface TableBodyProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface TableRowProps {

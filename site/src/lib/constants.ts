@@ -158,7 +158,15 @@ export const casesData = [
 ] as const;
 
 // Pricing data
-export const pricingData = [
+export const pricingData: Array<{
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  cta: string;
+  highlighted?: boolean;
+}> = [
   {
     name: '基础版',
     price: '免费',
@@ -172,6 +180,7 @@ export const pricingData = [
       '社区支持',
     ],
     cta: '立即开始',
+    highlighted: false,
   },
   {
     name: '专业版',
@@ -203,6 +212,7 @@ export const pricingData = [
       'SLA 服务保障',
     ],
     cta: '联系销售',
+    highlighted: false,
   },
 ] as const;
 

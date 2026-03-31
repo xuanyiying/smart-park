@@ -3,7 +3,7 @@ import React from 'react';
 interface ContainerProps {
   children: React.ReactNode;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: React.ElementType;
 }
 
 /**
