@@ -38,6 +38,21 @@ func (Device) Fields() []ent.Field {
 		field.Enum("device_type").
 			Values("camera", "gate", "display", "payment_kiosk", "sensor").
 			Comment("设备类型"),
+		field.String("manufacturer").
+			MaxLen(64).
+			Optional().
+			Comment("设备厂商"),
+		field.String("model").
+			MaxLen(64).
+			Optional().
+			Comment("设备型号"),
+		field.String("firmware_version").
+			MaxLen(32).
+			Optional().
+			Comment("固件版本"),
+		field.JSON("vendor_specific_config", map[string]interface{}{}).
+			Optional().
+			Comment("厂商特定配置"),
 		field.String("gate_id").
 			MaxLen(64).
 			Optional().
@@ -53,6 +68,20 @@ func (Device) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("最后心跳时间"),
+		field.Time("last_online").
+			Optional().
+			Nillable().
+			Comment("最后在线时间"),
+		field.String("fault_info").
+			MaxLen(512).
+			Optional().
+			Comment("故障信息"),
+		field.Int("heartbeat_count").
+			Default(0).
+			Comment("心跳次数"),
+		field.Int("offline_count").
+			Default(0).
+			Comment("离线次数"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

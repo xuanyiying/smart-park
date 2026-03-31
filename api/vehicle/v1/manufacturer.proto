@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package api.vehicle.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/xuanyiying/smart-park/api/vehicle/v1;v1";
+
+message Manufacturer {
+  string id           = 1;
+  string name         = 2;
+  string website      = 3;
+  string contactInfo  = 4;
+  string description  = 5;
+  string createdAt    = 6;
+  string updatedAt    = 7;
+}
+
+message CreateManufacturerRequest {
+  string name        = 1;
+  string website     = 2;
+  string contactInfo = 3;
+  string description = 4;
+}
+
+message CreateManufacturerResponse {
+  int32       code    = 1;
+  string      message = 2;
+  Manufacturer data    = 3;
+}
+
+message UpdateManufacturerRequest {
+  string id          = 1;
+  string name        = 2;
+  string website     = 3;
+  string contactInfo = 4;
+  string description = 5;
+}
+
+message UpdateManufacturerResponse {
+  int32       code    = 1;
+  string      message = 2;
+  Manufacturer data    = 3;
+}
+
+message GetManufacturerRequest {
+  string id = 1;
+}
+
+message GetManufacturerResponse {
+  int32       code    = 1;
+  string      message = 2;
+  Manufacturer data    = 3;
+}
+
+message ListManufacturersRequest {
+  int32 page     = 1;
+  int32 pageSize = 2;
+}
+
+message ListManufacturersResponse {
+  int32              code    = 1;
+  string             message = 2;
+  repeated Manufacturer data    = 3;
+  int32              total   = 4;
+}
+
+message DeleteManufacturerRequest {
+  string id = 1;
+}
+
+message DeleteManufacturerResponse {
+  int32  code    = 1;
+  string message = 2;
+}

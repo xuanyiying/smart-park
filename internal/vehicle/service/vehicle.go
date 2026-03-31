@@ -14,30 +14,33 @@ import (
 type VehicleService struct {
 	v1.UnimplementedVehicleServiceServer
 
-	entryExitUseCase *biz.EntryExitUseCase
-	deviceUseCase    *biz.DeviceUseCase
-	vehicleUseCase   *biz.VehicleQueryUseCase
-	commandUseCase   *biz.CommandUseCase
-	recordUseCase    *biz.RecordQueryUseCase
-	log              *log.Helper
+	entryExitUseCase     *biz.EntryExitUseCase
+	deviceUseCase        *biz.DeviceUseCase
+	manufacturerUseCase  *biz.ManufacturerUseCase
+	vehicleUseCase       *biz.VehicleQueryUseCase
+	commandUseCase       *biz.CommandUseCase
+	recordUseCase        *biz.RecordQueryUseCase
+	log                  *log.Helper
 }
 
 // NewVehicleService creates a new VehicleService.
 func NewVehicleService(
 	entryExitUseCase *biz.EntryExitUseCase,
 	deviceUseCase *biz.DeviceUseCase,
+	manufacturerUseCase *biz.ManufacturerUseCase,
 	vehicleUseCase *biz.VehicleQueryUseCase,
 	commandUseCase *biz.CommandUseCase,
 	recordUseCase *biz.RecordQueryUseCase,
 	logger log.Logger,
 ) *VehicleService {
 	return &VehicleService{
-		entryExitUseCase: entryExitUseCase,
-		deviceUseCase:    deviceUseCase,
-		vehicleUseCase:   vehicleUseCase,
-		commandUseCase:   commandUseCase,
-		recordUseCase:    recordUseCase,
-		log:              log.NewHelper(logger),
+		entryExitUseCase:     entryExitUseCase,
+		deviceUseCase:        deviceUseCase,
+		manufacturerUseCase:  manufacturerUseCase,
+		vehicleUseCase:       vehicleUseCase,
+		commandUseCase:       commandUseCase,
+		recordUseCase:        recordUseCase,
+		log:                  log.NewHelper(logger),
 	}
 }
 
@@ -285,6 +288,104 @@ func (s *VehicleService) DeleteDevice(ctx context.Context, req *v1.DeleteDeviceR
 	}
 
 	return &v1.DeleteDeviceResponse{
+		Code:    0,
+		Message: "success",
+	}, nil
+}
+
+// CreateManufacturer handles create manufacturer request.
+func (s *VehicleService) CreateManufacturer(ctx context.Context, req *v1.CreateManufacturerRequest) (*v1.CreateManufacturerResponse, error) {
+	manufacturer, err := s.manufacturerUseCase.CreateManufacturer(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CreateManufacturer failed: %v", err)
+		return &v1.CreateManufacturerResponse{
+			Code:    500,
+			Message: "创建厂商失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.CreateManufacturerResponse{
+		Code:    0,
+		Message: "success",
+		Data:    manufacturer,
+	}, nil
+}
+
+// GetManufacturer handles get manufacturer request.
+func (s *VehicleService) GetManufacturer(ctx context.Context, req *v1.GetManufacturerRequest) (*v1.GetManufacturerResponse, error) {
+	manufacturer, err := s.manufacturerUseCase.GetManufacturer(ctx, req.Id)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetManufacturer failed: %v", err)
+		return &v1.GetManufacturerResponse{
+			Code:    500,
+			Message: "获取厂商失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.GetManufacturerResponse{
+		Code:    0,
+		Message: "success",
+		Data:    manufacturer,
+	}, nil
+}
+
+// ListManufacturers handles list manufacturers request.
+func (s *VehicleService) ListManufacturers(ctx context.Context, req *v1.ListManufacturersRequest) (*v1.ListManufacturersResponse, error) {
+	page := int(req.Page)
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := int(req.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	manufacturers, total, err := s.manufacturerUseCase.ListManufacturers(ctx, page, pageSize)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListManufacturers failed: %v", err)
+		return &v1.ListManufacturersResponse{
+			Code:    500,
+			Message: "获取厂商列表失败",
+		}, nil
+	}
+
+	return &v1.ListManufacturersResponse{
+		Code:    0,
+		Message: "success",
+		Data:    manufacturers,
+		Total:   int32(total),
+	}, nil
+}
+
+// UpdateManufacturer handles update manufacturer request.
+func (s *VehicleService) UpdateManufacturer(ctx context.Context, req *v1.UpdateManufacturerRequest) (*v1.UpdateManufacturerResponse, error) {
+	manufacturer, err := s.manufacturerUseCase.UpdateManufacturer(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateManufacturer failed: %v", err)
+		return &v1.UpdateManufacturerResponse{
+			Code:    500,
+			Message: "更新厂商失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.UpdateManufacturerResponse{
+		Code:    0,
+		Message: "success",
+		Data:    manufacturer,
+	}, nil
+}
+
+// DeleteManufacturer handles delete manufacturer request.
+func (s *VehicleService) DeleteManufacturer(ctx context.Context, req *v1.DeleteManufacturerRequest) (*v1.DeleteManufacturerResponse, error) {
+	if err := s.manufacturerUseCase.DeleteManufacturer(ctx, req.Id); err != nil {
+		s.log.WithContext(ctx).Errorf("DeleteManufacturer failed: %v", err)
+		return &v1.DeleteManufacturerResponse{
+			Code:    500,
+			Message: "删除厂商失败: " + err.Error(),
+		}, nil
+	}
+
+	return &v1.DeleteManufacturerResponse{
 		Code:    0,
 		Message: "success",
 	}, nil
