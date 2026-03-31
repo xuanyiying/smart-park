@@ -16,6 +16,16 @@ routes:
   - path: /api/v1/user
     target: localhost:8005
 
+# JWT 认证配置
+jwt:
+  public_key_path: "./keys/public.pem"
+  # 跳过认证的路径 (可选)
+  skip_paths:
+    - "/health"
+    - "/ready"
+    - "/api/v1/user/login"
+    - "/api/v1/user/register"
+
 etcd:
   endpoints:
     - "localhost:2380"

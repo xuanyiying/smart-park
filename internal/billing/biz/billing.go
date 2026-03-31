@@ -90,28 +90,49 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 		minutes := ctx.Duration.Minutes()
 		switch cond.Operator {
 		case "gte":
-			return minutes >= cond.Value.(float64)
+			if val, ok := cond.Value.(float64); ok {
+				return minutes >= val
+			}
 		case "lte":
-			return minutes <= cond.Value.(float64)
+			if val, ok := cond.Value.(float64); ok {
+				return minutes <= val
+			}
 		case "gt":
-			return minutes > cond.Value.(float64)
+			if val, ok := cond.Value.(float64); ok {
+				return minutes > val
+			}
 		case "lt":
-			return minutes < cond.Value.(float64)
+			if val, ok := cond.Value.(float64); ok {
+				return minutes < val
+			}
 		case "eq":
-			return minutes == cond.Value.(float64)
+			if val, ok := cond.Value.(float64); ok {
+				return minutes == val
+			}
 		}
 		return false
 
 	case "time_range":
+		valueMap, ok := cond.Value.(map[string]interface{})
+		if !ok {
+			return false
+		}
+		start, ok1 := valueMap["start"].(float64)
+		end, ok2 := valueMap["end"].(float64)
+		if !ok1 || !ok2 {
+			return false
+		}
 		hour := float64(ctx.ExitTime.Hour()) + float64(ctx.ExitTime.Minute())/60.0
-		start := cond.Value.(map[string]interface{})["start"].(float64)
-		end := cond.Value.(map[string]interface{})["end"].(float64)
 		return hour >= start && hour <= end
 
 	case "day_of_week":
+		days, ok := cond.Value.([]interface{})
+		if !ok {
+			return false
+		}
 		weekday := int(ctx.ExitTime.Weekday())
-		for _, day := range cond.Value.([]interface{}) {
-			if int(day.(float64)) == weekday {
+		for _, day := range days {
+			if dayNum, ok := day.(float64); ok && int(dayNum) == weekday {
 				return true
 			}
 		}

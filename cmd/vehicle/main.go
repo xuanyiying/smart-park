@@ -130,22 +130,21 @@ func main() {
 
 	// Initialize billing service client
 	var billingClient billing.Client
-	if cfg.Billing != nil && cfg.Billing.Endpoint != "" {
-		conn, err := grpc.DialInsecure(
-			context.Background(),
-			grpc.WithEndpoint(cfg.Billing.Endpoint),
-		)
-		if err != nil {
-			logHelper.Errorf("failed to connect billing service: %v", err)
-			os.Exit(1)
-		}
-		billingGrpcClient := billingv1.NewBillingServiceClient(conn)
-		billingClient = billing.NewClient(billingGrpcClient, logger)
-		logHelper.Infof("billing service client connected to %s", cfg.Billing.Endpoint)
-	} else {
-		logHelper.Warn("billing config not provided, using mock client")
-		billingClient = &mockBillingClient{}
+	if cfg.Billing == nil || cfg.Billing.Endpoint == "" {
+		logHelper.Error("billing service endpoint is required")
+		os.Exit(1)
 	}
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint(cfg.Billing.Endpoint),
+	)
+	if err != nil {
+		logHelper.Errorf("failed to connect billing service: %v", err)
+		os.Exit(1)
+	}
+	billingGrpcClient := billingv1.NewBillingServiceClient(conn)
+	billingClient = billing.NewClient(billingGrpcClient, logger)
+	logHelper.Infof("billing service client connected to %s", cfg.Billing.Endpoint)
 
 	// Initialize business logic layer
 	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, logger)
@@ -176,19 +175,4 @@ func main() {
 	if err := app.Run(); err != nil {
 		logHelper.Error(err)
 	}
-}
-
-// mockBillingClient is a mock implementation of billing.Client for development.
-type mockBillingClient struct{}
-
-func (m *mockBillingClient) CalculateFee(ctx context.Context, recordID string, lotID string, entryTime, exitTime int64, vehicleType string) (*billing.FeeResult, error) {
-	// Simple mock calculation: 2 yuan per hour
-	duration := float64(exitTime-entryTime) / 3600.0
-	baseAmount := duration * 2.0
-
-	return &billing.FeeResult{
-		BaseAmount:     baseAmount,
-		DiscountAmount: 0,
-		FinalAmount:    baseAmount,
-	}, nil
 }

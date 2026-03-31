@@ -239,7 +239,13 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 
 	refundID := uuid.New().String()
 
-	uc.processRefund(ctx, order, refundID)
+	if err := uc.processRefund(ctx, order, refundID); err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to process refund: %v", err)
+		return &v1.RefundData{
+			RefundId: "",
+			Status:   "failed",
+		}, nil
+	}
 
 	if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to update order for refund: %v", err)
@@ -253,20 +259,38 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 }
 
 // processRefund processes the refund for the order.
-func (uc *PaymentUseCase) processRefund(ctx context.Context, order *Order, refundID string) {
+func (uc *PaymentUseCase) processRefund(ctx context.Context, order *Order, refundID string) error {
+	refundAmount := order.FinalAmount
+
 	switch PayMethod(order.PayMethod) {
 	case MethodWechat:
-		if uc.wechatClient != nil {
-			uc.log.WithContext(ctx).Infof("Processing WeChat refund for order %s", order.ID)
+		if uc.wechatClient == nil {
+			return fmt.Errorf("wechat client not configured")
+		}
+		uc.log.WithContext(ctx).Infof("Processing WeChat refund for order %s, amount: %.2f", order.ID, refundAmount)
+		// Convert to cents
+		totalAmount := int64(order.FinalAmount * 100)
+		refundAmount := int64(refundAmount * 100)
+		if err := uc.wechatClient.Refund(ctx, order.ID.String(), refundID, totalAmount, refundAmount); err != nil {
+			uc.log.WithContext(ctx).Errorf("WeChat refund failed: %v", err)
+			return fmt.Errorf("wechat refund failed: %w", err)
 		}
 	case MethodAlipay:
-		if uc.alipayClient != nil {
-			uc.log.WithContext(ctx).Infof("Processing Alipay refund for order %s", order.ID)
+		if uc.alipayClient == nil {
+			return fmt.Errorf("alipay client not configured")
 		}
+		uc.log.WithContext(ctx).Infof("Processing Alipay refund for order %s, amount: %.2f", order.ID, refundAmount)
+		if err := uc.alipayClient.Refund(ctx, order.ID.String(), refundID, refundAmount); err != nil {
+			uc.log.WithContext(ctx).Errorf("Alipay refund failed: %v", err)
+			return fmt.Errorf("alipay refund failed: %w", err)
+		}
+	default:
+		return fmt.Errorf("unknown payment method: %s", order.PayMethod)
 	}
 
 	now := time.Now()
 	order.Status = string(StatusRefunded)
 	order.RefundedAt = &now
 	order.RefundTransactionID = refundID
+	return nil
 }

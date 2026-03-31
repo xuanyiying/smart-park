@@ -14,6 +14,7 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/jsapi"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/native"
+	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
 )
 
 type Client struct {
@@ -132,4 +133,47 @@ func (c *Client) signJSAPI(timeStamp, nonceStr, packageStr string) (string, erro
 	}
 
 	return base64.StdEncoding.EncodeToString(signature), nil
+}
+
+// Refund requests a refund for a paid order.
+func (c *Client) Refund(ctx context.Context, orderID, refundID string, totalAmount, refundAmount int64) error {
+	svc := refunddomestic.RefundsApiService{Client: c.client}
+
+	_, _, err := svc.Create(ctx, refunddomestic.CreateRequest{
+		OutTradeNo:  core.String(orderID),
+		OutRefundNo: core.String(refundID),
+		Reason:      core.String("用户申请退款"),
+		NotifyUrl:   core.String(c.config.NotifyURL + "/refund"),
+		Amount: &refunddomestic.AmountReq{
+			Total:    core.Int64(totalAmount),
+			Refund:   core.Int64(refundAmount),
+			Currency: core.String("CNY"),
+		},
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to create refund: %w", err)
+	}
+
+	return nil
+}
+
+// QueryRefund queries the refund status.
+func (c *Client) QueryRefund(ctx context.Context, orderID, refundID string) (string, error) {
+	svc := refunddomestic.RefundsApiService{Client: c.client}
+
+	// Use QueryByOutRefundNo - the API only needs out_refund_no
+	resp, _, err := svc.QueryByOutRefundNo(ctx, refunddomestic.QueryByOutRefundNoRequest{
+		OutRefundNo: core.String(refundID),
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("failed to query refund: %w", err)
+	}
+
+	if resp.Status != nil {
+		return string(*resp.Status), nil
+	}
+
+	return "", nil
 }

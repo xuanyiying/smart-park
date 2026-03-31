@@ -92,14 +92,17 @@ func (uc *EntryExitUseCase) processEntryTransaction(ctx context.Context, req *v1
 	}
 	uc.log.WithContext(ctx).Infof("[ENTRY] Found lane - LaneID: %s, LotID: %s", lane.ID, lane.LotID)
 
-	vehicle, _ := uc.vehicleRepo.GetVehicleByPlate(ctx, req.PlateNumber)
+	vehicle, err := uc.vehicleRepo.GetVehicleByPlate(ctx, req.PlateNumber)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get vehicle info: %w", err)
+	}
 
 	existingRecord, err := uc.vehicleRepo.GetEntryRecord(ctx, req.PlateNumber)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check existing entry: %w", err)
 	}
 	if existingRecord != nil {
-		uc.log.WithContext(ctx).Warnf("[ENTRY] Duplicate entry - PlateNumber: %s", req.PlateNumber)
+		uc.log.WithContext(ctx).Warnf("[ENTRY] Duplicate entry - PlateNumber: [REDACTED]")
 		return &v1.EntryData{
 			PlateNumber:    req.PlateNumber,
 			Allowed:        false,
@@ -145,7 +148,10 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 
 	// Calculate fee first, before updating the record
 	vehicle, vehicleType := uc.getVehicleInfo(ctx, req.PlateNumber)
-	amount, discountAmount, finalAmount := uc.calculateExitFee(ctx, record, lane, exitTime, vehicle, vehicleType)
+	amount, discountAmount, finalAmount, err := uc.calculateExitFee(ctx, record, lane, exitTime, vehicle, vehicleType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to calculate fee: %w", err)
+	}
 
 	// Only update the record after fee calculation succeeds
 	if err := uc.updateParkingRecordForExit(ctx, record, req, device, lane, exitTime, duration); err != nil {
@@ -238,7 +244,8 @@ func (uc *EntryExitUseCase) getVehicleInfo(ctx context.Context, plateNumber stri
 	vehicleType := VehicleTypeTemporary
 	vehicle, err := uc.vehicleRepo.GetVehicleByPlate(ctx, plateNumber)
 	if err != nil {
-		uc.log.WithContext(ctx).Warnf("[EXIT] Failed to get vehicle info: %v", err)
+		uc.log.WithContext(ctx).Warnf("[EXIT] Failed to get vehicle info: %v, using default type", err)
+		return nil, vehicleType
 	}
 	if vehicle != nil {
 		vehicleType = vehicle.VehicleType
@@ -246,12 +253,12 @@ func (uc *EntryExitUseCase) getVehicleInfo(ctx context.Context, plateNumber stri
 	return vehicle, vehicleType
 }
 
-func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *ParkingRecord, lane *Lane, exitTime time.Time, vehicle *Vehicle, vehicleType string) (float64, float64, float64) {
+func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *ParkingRecord, lane *Lane, exitTime time.Time, vehicle *Vehicle, vehicleType string) (float64, float64, float64, error) {
 	feeResult, err := uc.billingClient.CalculateFee(ctx, record.ID.String(), lane.LotID.String(),
 		record.EntryTime.Unix(), exitTime.Unix(), vehicleType)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("[EXIT] Failed to calculate fee: %v", err)
-		return 0, 0, 0
+		return 0, 0, 0, fmt.Errorf("fee calculation failed: %w", err)
 	}
 
 	finalAmount := feeResult.FinalAmount
@@ -259,8 +266,8 @@ func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *Parkin
 	if vehicle != nil && vehicle.VehicleType == VehicleTypeMonthly {
 		if vehicle.MonthlyValidUntil != nil && vehicle.MonthlyValidUntil.After(time.Now()) {
 			finalAmount = 0
-			uc.log.WithContext(ctx).Infof("[EXIT] Monthly vehicle with valid card - PlateNumber: %s, ValidUntil: %s",
-				record.PlateNumber, vehicle.MonthlyValidUntil.Format(time.RFC3339))
+			uc.log.WithContext(ctx).Infof("[EXIT] Monthly vehicle with valid card - PlateNumber: [REDACTED], ValidUntil: %s",
+				vehicle.MonthlyValidUntil.Format(time.RFC3339))
 		} else {
 			if record.Metadata == nil {
 				record.Metadata = make(map[string]interface{})
@@ -270,11 +277,11 @@ func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *Parkin
 			if vehicle.MonthlyValidUntil != nil {
 				record.Metadata["expiredAt"] = vehicle.MonthlyValidUntil.Format(time.RFC3339)
 			}
-			uc.log.WithContext(ctx).Warnf("[EXIT] Monthly card expired, charging as temporary - PlateNumber: %s", record.PlateNumber)
+			uc.log.WithContext(ctx).Warnf("[EXIT] Monthly card expired, charging as temporary - PlateNumber: [REDACTED]")
 		}
 	}
 
-	return feeResult.BaseAmount, feeResult.DiscountAmount, finalAmount
+	return feeResult.BaseAmount, feeResult.DiscountAmount, finalAmount, nil
 }
 
 func (uc *EntryExitUseCase) buildExitResponse(record *ParkingRecord, req *v1.ExitRequest, duration int, amount, discountAmount, finalAmount float64) *v1.ExitData {
@@ -301,11 +308,13 @@ func (uc *EntryExitUseCase) buildExitResponse(record *ParkingRecord, req *v1.Exi
 }
 
 func (uc *EntryExitUseCase) logEntryStart(deviceID, plateNumber string, confidence float64) {
-	uc.log.WithContext(context.Background()).Infof("[ENTRY] Processing entry - DeviceID: %s, PlateNumber: %s, Confidence: %.2f",
-		deviceID, plateNumber, confidence)
+	// Plate number redacted for privacy
+	uc.log.WithContext(context.Background()).Infof("[ENTRY] Processing entry - DeviceID: %s, PlateNumber: [REDACTED], Confidence: %.2f",
+		deviceID, confidence)
 }
 
 func (uc *EntryExitUseCase) logExitStart(deviceID, plateNumber string, confidence float64) {
-	uc.log.WithContext(context.Background()).Infof("[EXIT] Processing exit - DeviceID: %s, PlateNumber: %s, Confidence: %.2f",
-		deviceID, plateNumber, confidence)
+	// Plate number redacted for privacy
+	uc.log.WithContext(context.Background()).Infof("[EXIT] Processing exit - DeviceID: %s, PlateNumber: [REDACTED], Confidence: %.2f",
+		deviceID, confidence)
 }

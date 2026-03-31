@@ -129,3 +129,41 @@ func (c *Client) CloseOrder(ctx context.Context, orderID string) error {
 
 	return nil
 }
+
+// Refund requests a refund for a paid order.
+func (c *Client) Refund(ctx context.Context, orderID, refundID string, amount float64) error {
+	p := alipay.TradeRefund{}
+	p.OutTradeNo = orderID
+	p.OutRequestNo = refundID
+	p.RefundAmount = fmt.Sprintf("%.2f", amount)
+	p.RefundReason = "用户申请退款"
+
+	rsp, err := c.client.TradeRefund(ctx, p)
+	if err != nil {
+		return fmt.Errorf("failed to refund: %w", err)
+	}
+
+	if rsp.Code != "10000" {
+		return fmt.Errorf("alipay refund error: %s - %s", rsp.Code, rsp.Msg)
+	}
+
+	return nil
+}
+
+// QueryRefund queries the refund status.
+func (c *Client) QueryRefund(ctx context.Context, orderID, refundID string) (string, error) {
+	p := alipay.TradeFastPayRefundQuery{}
+	p.OutTradeNo = orderID
+	p.OutRequestNo = refundID
+
+	rsp, err := c.client.TradeFastPayRefundQuery(ctx, p)
+	if err != nil {
+		return "", fmt.Errorf("failed to query refund: %w", err)
+	}
+
+	if rsp.Code != "10000" {
+		return "", fmt.Errorf("alipay query refund error: %s - %s", rsp.Code, rsp.Msg)
+	}
+
+	return rsp.RefundStatus, nil
+}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 
 	v1 "github.com/xuanyiying/smart-park/api/admin/v1"
 )
@@ -490,10 +491,10 @@ func (uc *AdminUseCase) Login(ctx context.Context, username, password string) (*
 		return nil, "", 0, err
 	}
 
-	// In production, use bcrypt.CompareHashAndPassword
-	if user.Password != password {
+	// Use bcrypt for password comparison in production
+	if err := uc.comparePassword(user.Password, password); err != nil {
 		uc.log.WithContext(ctx).Errorf("invalid password for user: %s", username)
-		return nil, "", 0, err
+		return nil, "", 0, fmt.Errorf("invalid credentials")
 	}
 
 	// Generate token (in production, use JWT)
@@ -501,6 +502,11 @@ func (uc *AdminUseCase) Login(ctx context.Context, username, password string) (*
 	expiresAt := time.Now().Add(24 * time.Hour).Unix()
 
 	return user, token, expiresAt, nil
+}
+
+// comparePassword compares password with hash using bcrypt.
+func (uc *AdminUseCase) comparePassword(hash, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
 
 // GetCurrentUser retrieves the current user from context.

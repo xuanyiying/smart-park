@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 
 	"github.com/go-kratos/kratos/v2"
@@ -24,57 +23,6 @@ import (
 	"github.com/xuanyiying/smart-park/pkg/auth"
 	"github.com/xuanyiying/smart-park/pkg/config"
 )
-
-// mockVehicleClient is a mock implementation of vehicle.Client for testing.
-type mockVehicleClient struct{}
-
-func (m *mockVehicleClient) ListParkingRecords(ctx context.Context, plateNumbers []string, page, pageSize int32) (*vehiclev1.ListParkingRecordsData, error) {
-	return &vehiclev1.ListParkingRecordsData{
-		Records: []*vehiclev1.ParkingRecordInfo{},
-		Total:   0,
-	}, nil
-}
-
-func (m *mockVehicleClient) GetParkingRecord(ctx context.Context, recordID string) (*vehiclev1.ParkingRecordInfo, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (m *mockVehicleClient) GetVehicleInfo(ctx context.Context, plateNumber string) (*vehiclev1.VehicleInfo, error) {
-	return &vehiclev1.VehicleInfo{
-		PlateNumber: plateNumber,
-		VehicleType: "temporary",
-	}, nil
-}
-
-// mockPaymentClient is a mock implementation of payment.Client for testing.
-type mockPaymentClient struct{}
-
-func (m *mockPaymentClient) CreatePayment(ctx context.Context, recordID string, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error) {
-	return &paymentv1.PaymentData{
-		OrderId: "mock_order_" + recordID,
-		Amount:  10.0,
-		PayUrl:  "https://payment.example.com/mock",
-		QrCode:  "",
-	}, nil
-}
-
-func (m *mockPaymentClient) GetPaymentStatus(ctx context.Context, orderID string) (*paymentv1.PaymentStatusData, error) {
-	return &paymentv1.PaymentStatusData{
-		OrderId:   orderID,
-		Status:    "pending",
-		PayTime:   "",
-		PayMethod: "",
-	}, nil
-}
-
-func (m *mockPaymentClient) CreateMonthlyCardPayment(ctx context.Context, plateNumber string, months int32, amount float64, payMethod string, openID string) (*paymentv1.PaymentData, error) {
-	return &paymentv1.PaymentData{
-		OrderId: "mock_monthly_" + plateNumber,
-		Amount:  amount,
-		PayUrl:  "https://payment.example.com/mock",
-		QrCode:  "",
-	}, nil
-}
 
 var (
 	flagconf string
@@ -137,35 +85,33 @@ func main() {
 		logHelper.Warn("wechat config not provided, using mock openid")
 	}
 
-	// Initialize vehicle service client
+	// Initialize vehicle service client (required)
 	var vehicleClient vehicle.Client
-	if cfg.Vehicle != nil && cfg.Vehicle.Endpoint != "" {
-		conn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(cfg.Vehicle.Endpoint))
-		if err != nil {
-			logHelper.Errorf("failed to connect to vehicle service: %v", err)
-		} else {
-			vehicleClient = vehicle.NewClient(vehiclev1.NewVehicleServiceClient(conn))
-			logHelper.Info("vehicle client initialized successfully")
-		}
-	} else {
-		logHelper.Warn("vehicle endpoint not configured")
-		vehicleClient = &mockVehicleClient{}
+	if cfg.Vehicle == nil || cfg.Vehicle.Endpoint == "" {
+		logHelper.Error("vehicle service endpoint is required")
+		os.Exit(1)
 	}
+	conn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(cfg.Vehicle.Endpoint))
+	if err != nil {
+		logHelper.Errorf("failed to connect to vehicle service: %v", err)
+		os.Exit(1)
+	}
+	vehicleClient = vehicle.NewClient(vehiclev1.NewVehicleServiceClient(conn))
+	logHelper.Info("vehicle client initialized successfully")
 
-	// Initialize payment service client
+	// Initialize payment service client (required)
 	var paymentClient payment.Client
-	if cfg.Payment != nil && cfg.Payment.Endpoint != "" {
-		conn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(cfg.Payment.Endpoint))
-		if err != nil {
-			logHelper.Errorf("failed to connect to payment service: %v", err)
-		} else {
-			paymentClient = payment.NewClient(paymentv1.NewPaymentServiceClient(conn))
-			logHelper.Info("payment client initialized successfully")
-		}
-	} else {
-		logHelper.Warn("payment endpoint not configured")
-		paymentClient = &mockPaymentClient{}
+	if cfg.Payment == nil || cfg.Payment.Endpoint == "" {
+		logHelper.Error("payment service endpoint is required")
+		os.Exit(1)
 	}
+	conn, err = grpc.DialInsecure(context.Background(), grpc.WithEndpoint(cfg.Payment.Endpoint))
+	if err != nil {
+		logHelper.Errorf("failed to connect to payment service: %v", err)
+		os.Exit(1)
+	}
+	paymentClient = payment.NewClient(paymentv1.NewPaymentServiceClient(conn))
+	logHelper.Info("payment client initialized successfully")
 
 	jwtConfig := &auth.JWTConfig{
 		PublicKeyPath:  cfg.JWT.PublicKeyPath,
