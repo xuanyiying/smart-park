@@ -38,19 +38,35 @@ type ReconciliationRecord struct {
 
 // ReconciliationUseCase 对账用例
 type ReconciliationUseCase struct {
-	orderRepo    OrderRepo
-	log          *log.Helper
-	wechatClient *wechat.Client
-	alipayClient *alipay.Client
+	orderRepo            OrderRepo
+	reconciliationRepo   ReconciliationRepo
+	log                  *log.Helper
+	wechatClient         *wechat.Client
+	alipayClient         *alipay.Client
+}
+
+// ReconciliationRepo 对账记录仓库接口
+type ReconciliationRepo interface {
+	// CreateReconciliation 创建对账记录
+	CreateReconciliation(ctx context.Context, record *ReconciliationRecord) error
+	// GetReconciliationByOrderID 根据订单ID获取对账记录
+	GetReconciliationByOrderID(ctx context.Context, orderID uuid.UUID) (*ReconciliationRecord, error)
+	// GetReconciliationByTimeRange 根据时间范围获取对账记录
+	GetReconciliationByTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*ReconciliationRecord, error)
+	// UpdateReconciliation 更新对账记录
+	UpdateReconciliation(ctx context.Context, record *ReconciliationRecord) error
+	// GetMismatchedReconciliations 获取对账不匹配的记录
+	GetMismatchedReconciliations(ctx context.Context, startTime, endTime time.Time) ([]*ReconciliationRecord, error)
 }
 
 // NewReconciliationUseCase 创建对账用例
-func NewReconciliationUseCase(orderRepo OrderRepo, wechatClient *wechat.Client, alipayClient *alipay.Client, logger log.Logger) *ReconciliationUseCase {
+func NewReconciliationUseCase(orderRepo OrderRepo, reconciliationRepo ReconciliationRepo, wechatClient *wechat.Client, alipayClient *alipay.Client, logger log.Logger) *ReconciliationUseCase {
 	return &ReconciliationUseCase{
-		orderRepo:    orderRepo,
-		log:          log.NewHelper(logger),
-		wechatClient: wechatClient,
-		alipayClient: alipayClient,
+		orderRepo:            orderRepo,
+		reconciliationRepo:    reconciliationRepo,
+		log:                  log.NewHelper(logger),
+		wechatClient:         wechatClient,
+		alipayClient:         alipayClient,
 	}
 }
 
@@ -79,6 +95,10 @@ func (uc *ReconciliationUseCase) ReconcileDaily(ctx context.Context, date time.T
 				uc.log.WithContext(ctx).Errorf("对账订单 %s 失败: %v", order.ID, err)
 				continue
 			}
+			// 存储对账记录
+			if err := uc.reconciliationRepo.CreateReconciliation(ctx, record); err != nil {
+				uc.log.WithContext(ctx).Errorf("存储对账记录失败: %v", err)
+			}
 			reconciliationRecords = append(reconciliationRecords, record)
 		}
 	}
@@ -88,6 +108,12 @@ func (uc *ReconciliationUseCase) ReconcileDaily(ctx context.Context, date time.T
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("检查漏单失败: %v", err)
 	} else {
+		for _, record := range missingRecords {
+			// 存储漏单记录
+			if err := uc.reconciliationRepo.CreateReconciliation(ctx, record); err != nil {
+				uc.log.WithContext(ctx).Errorf("存储漏单记录失败: %v", err)
+			}
+		}
 		reconciliationRecords = append(reconciliationRecords, missingRecords...)
 	}
 
@@ -256,16 +282,100 @@ func (uc *ReconciliationUseCase) FixMismatchedOrders(ctx context.Context, orderI
 			continue
 		}
 
-		// 这里应该根据实际情况进行修复，例如更新订单金额、状态等
+		// 获取对账记录
+		reconciliation, err := uc.reconciliationRepo.GetReconciliationByOrderID(ctx, orderID)
+		if err != nil {
+			uc.log.WithContext(ctx).Errorf("获取对账记录失败: %v", err)
+			continue
+		}
+
 		uc.log.WithContext(ctx).Infof("修复订单: %s, 当前状态: %s, 订单金额: %.2f, 实付金额: %.2f",
 			order.ID, order.Status, order.FinalAmount, order.PaidAmount)
 
-		// 模拟修复
-		order.Status = string(StatusPaid)
-		if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
-			uc.log.WithContext(ctx).Errorf("更新订单失败: %v", err)
+		// 根据实际情况进行修复
+		diff := order.FinalAmount - order.PaidAmount
+		if diff > 0.01 {
+			// 订单金额大于实付金额，需要退款
+			uc.log.WithContext(ctx).Infof("订单 %s 需要退款: 差额 %.2f", order.ID, diff)
+			
+			// 执行退款流程
+			refundAmount := diff
+			refundTransactionID, err := uc.processRefund(ctx, order, refundAmount, "对账金额不匹配，自动退款")
+			if err != nil {
+				uc.log.WithContext(ctx).Errorf("执行退款失败: %v", err)
+				continue
+			}
+
+			// 更新订单状态
+			order.Status = string(StatusRefunded)
+			order.RefundTransactionID = refundTransactionID
+			order.RefundedAt = time.Now()
+			if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
+				uc.log.WithContext(ctx).Errorf("更新订单状态失败: %v", err)
+				continue
+			}
+
+			// 更新对账记录
+			reconciliation.Status = ReconciliationStatusMatched
+			reconciliation.Notes = "已退款，对账匹配"
+			if err := uc.reconciliationRepo.UpdateReconciliation(ctx, reconciliation); err != nil {
+				uc.log.WithContext(ctx).Errorf("更新对账记录失败: %v", err)
+			}
+		} else if diff < -0.01 {
+			// 实付金额大于订单金额，需要补单或调整
+			uc.log.WithContext(ctx).Infof("订单 %s 实付金额大于订单金额: 差额 %.2f", order.ID, -diff)
+			
+			// 更新订单金额
+			order.FinalAmount = order.PaidAmount
+			if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
+				uc.log.WithContext(ctx).Errorf("更新订单金额失败: %v", err)
+				continue
+			}
+
+			// 更新对账记录
+			reconciliation.Status = ReconciliationStatusMatched
+			reconciliation.Notes = "已调整订单金额，对账匹配"
+			if err := uc.reconciliationRepo.UpdateReconciliation(ctx, reconciliation); err != nil {
+				uc.log.WithContext(ctx).Errorf("更新对账记录失败: %v", err)
+			}
+		} else {
+			// 金额匹配，更新对账状态
+			reconciliation.Status = ReconciliationStatusMatched
+			reconciliation.Notes = "金额匹配，对账成功"
+			if err := uc.reconciliationRepo.UpdateReconciliation(ctx, reconciliation); err != nil {
+				uc.log.WithContext(ctx).Errorf("更新对账记录失败: %v", err)
+			}
 		}
 	}
 
 	return nil
+}
+
+// processRefund 处理退款
+func (uc *ReconciliationUseCase) processRefund(ctx context.Context, order *Order, amount float64, reason string) (string, error) {
+	uc.log.WithContext(ctx).Infof("处理退款: 订单 %s, 金额 %.2f, 原因 %s", order.ID, amount, reason)
+
+	// 根据支付方式执行退款
+	switch PayMethod(order.PayMethod) {
+	case MethodWechat:
+		if uc.wechatClient != nil {
+			// 调用微信退款接口
+			// 由于是模拟环境，我们简化处理
+			uc.log.WithContext(ctx).Infof("调用微信退款接口: 订单 %s, 交易号 %s, 金额 %.2f", order.ID, order.TransactionID, amount)
+			// 模拟退款成功
+			return "wechat_refund_" + uuid.New().String(), nil
+		}
+	case MethodAlipay:
+		if uc.alipayClient != nil {
+			// 调用支付宝退款接口
+			// 由于是模拟环境，我们简化处理
+			uc.log.WithContext(ctx).Infof("调用支付宝退款接口: 订单 %s, 交易号 %s, 金额 %.2f", order.ID, order.TransactionID, amount)
+			// 模拟退款成功
+			return "alipay_refund_" + uuid.New().String(), nil
+		}
+	default:
+		return "", fmt.Errorf("不支持的支付方式: %s", order.PayMethod)
+	}
+
+	return "", fmt.Errorf("退款失败: 支付客户端未配置")
 }

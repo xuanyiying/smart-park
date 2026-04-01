@@ -13,8 +13,10 @@ require (
 	github.com/google/wire v0.7.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0
 	github.com/lib/pq v1.12.0
+	github.com/seata/seata-go v1.6.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
+	github.com/shardingsphere/shardingsphere-go v0.1.0
 	go.etcd.io/etcd/client/v3 v3.6.9
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0

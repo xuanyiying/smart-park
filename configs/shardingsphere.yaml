@@ -1,0 +1,56 @@
+# ShardingSphere 配置
+mode: Memory
+
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: org.postgresql.Driver
+    jdbcUrl: jdbc:postgresql://postgres:5432/parking
+    username: postgres
+    password: postgres
+    maxPoolSize: 50
+    minIdle: 10
+  ds_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: org.postgresql.Driver
+    jdbcUrl: jdbc:postgresql://postgres:5432/parking_1
+    username: postgres
+    password: postgres
+    maxPoolSize: 50
+    minIdle: 10
+
+rules:
+  - !SHARDING
+    tables:
+      parking_record:
+        actualDataNodes: ds_${0..1}.parking_record_${0..1}
+        tableStrategy:
+          standard:
+            shardingColumn: vehicle_id
+            shardingAlgorithmName: parking_record_table_sharding_algorithm
+        databaseStrategy:
+          standard:
+            shardingColumn: vehicle_id
+            shardingAlgorithmName: parking_record_database_sharding_algorithm
+    shardingAlgorithms:
+      parking_record_database_sharding_algorithm:
+        type: HASH_MOD
+        props:
+          shardingCount: 2
+      parking_record_table_sharding_algorithm:
+        type: HASH_MOD
+        props:
+          shardingCount: 2
+  - !ENCRYPT
+    tables:
+      user:
+        columns:
+          password:
+            plainColumn: password_plain
+            cipherColumn: password
+            encryptorName: password_encryptor
+    encryptors:
+      password_encryptor:
+        type: AES
+        props:
+          aes-key-value: 1234567890123456

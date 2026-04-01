@@ -21,6 +21,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/wechat"
 	"github.com/xuanyiying/smart-park/pkg/config"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/seata"
 	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
@@ -81,6 +82,14 @@ func main() {
 	if err := dbClient.Schema.Create(context.Background()); err != nil {
 		logHelper.Errorf("failed to migrate database: %v", err)
 		os.Exit(1)
+	}
+
+	// Initialize Seata
+	if err := seata.InitSeata("../../configs/seata.yaml"); err != nil {
+		logHelper.Errorf("failed to initialize seata: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("seata initialized successfully")
 	}
 
 	// Initialize data layer
