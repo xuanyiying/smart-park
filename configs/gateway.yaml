@@ -15,6 +15,8 @@ routes:
     target: localhost:8004
   - path: /api/v1/user
     target: localhost:8005
+  - path: /api/v1/analytics
+    target: localhost:8006
 
 # JWT 认证配置
 jwt:

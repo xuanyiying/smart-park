@@ -35,15 +35,56 @@ func (s *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Logi
 
 func (s *UserService) GetUserInfo(ctx context.Context, req *v1.GetUserInfoRequest) (*v1.GetUserInfoResponse, error) {
 	userID := middleware.GetUserIDFromContext(ctx)
-	openID := middleware.GetOpenIDFromContext(ctx)
+
+	userInfo, err := s.uc.GetUserInfo(ctx, userID)
+	if err != nil {
+		return &v1.GetUserInfoResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
 
 	return &v1.GetUserInfoResponse{
 		Code:    200,
 		Message: "success",
-		Data: &v1.UserInfo{
-			UserId: userID,
-			OpenId: openID,
-		},
+		Data:    userInfo,
+	}, nil
+}
+
+func (s *UserService) UpdateAutoPaySettings(ctx context.Context, req *v1.UpdateAutoPaySettingsRequest) (*v1.UpdateAutoPaySettingsResponse, error) {
+	userID := middleware.GetUserIDFromContext(ctx)
+
+	err := s.uc.UpdateAutoPaySettings(ctx, userID, req)
+	if err != nil {
+		return &v1.UpdateAutoPaySettingsResponse{
+			Code:    500,
+			Message: err.Error(),
+			Success: false,
+		}, nil
+	}
+
+	return &v1.UpdateAutoPaySettingsResponse{
+		Code:    200,
+		Message: "success",
+		Success: true,
+	}, nil
+}
+
+func (s *UserService) GetCreditInfo(ctx context.Context, req *v1.GetCreditInfoRequest) (*v1.GetCreditInfoResponse, error) {
+	userID := middleware.GetUserIDFromContext(ctx)
+
+	creditInfo, err := s.uc.GetCreditInfo(ctx, userID)
+	if err != nil {
+		return &v1.GetCreditInfoResponse{
+			Code:    500,
+			Message: err.Error(),
+		}, nil
+	}
+
+	return &v1.GetCreditInfoResponse{
+		Code:    200,
+		Message: "success",
+		Data:    creditInfo,
 	}, nil
 }
 

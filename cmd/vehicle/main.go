@@ -152,6 +152,16 @@ func main() {
 	vehicleQueryUseCase := biz.NewVehicleQueryUseCase(vehicleRepo, logger)
 	commandUseCase := biz.NewCommandUseCase(vehicleRepo, mqttClient, logger)
 	recordQueryUseCase := biz.NewRecordQueryUseCase(vehicleRepo)
+	// parkingSpaceUseCase := biz.NewParkingSpaceUseCase(vehicleRepo, logger)
+
+	// // Subscribe to parking space status updates
+	// if cfg.MQTT.Broker != "" {
+	// 	if err := mqttClient.Subscribe("parking/spaces/status", parkingSpaceUseCase.ParkingSpaceMessageHandler); err != nil {
+	// 		logHelper.Errorf("failed to subscribe to parking space status updates: %v", err)
+	// 		os.Exit(1)
+	// 	}
+	// 	logHelper.Info("subscribed to parking space status updates")
+	// }
 
 	// Initialize gRPC service
 	vehicleSvc := service.NewVehicleService(entryExitUseCase, deviceUseCase, vehicleQueryUseCase, commandUseCase, recordQueryUseCase, logger)

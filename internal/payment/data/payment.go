@@ -10,6 +10,8 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/predicate"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliation"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliationexception"
 )
 
 type orderRepo struct {
@@ -175,5 +177,174 @@ func toBizOrder(o *ent.Order) *biz.Order {
 		RefundTransactionID: o.RefundTransactionID,
 		CreatedAt:           o.CreatedAt,
 		UpdatedAt:           o.UpdatedAt,
+	}
+}
+
+type reconciliationRepo struct {
+	data *Data
+}
+
+func NewReconciliationRepo(data *Data) biz.ReconciliationRepo {
+	return &reconciliationRepo{data: data}
+}
+
+func (r *reconciliationRepo) CreateReconciliation(ctx context.Context, rec *biz.Reconciliation) error {
+	_, err := r.data.db.Reconciliation.Create().
+		SetID(rec.ID).
+		SetDate(rec.Date).
+		SetPayMethod(rec.PayMethod).
+		SetStatus(reconciliation.Status(rec.Status)).
+		SetTotalOrders(rec.TotalOrders).
+		SetMatchedOrders(rec.MatchedOrders).
+		SetExceptionOrders(rec.ExceptionOrders).
+		Save(ctx)
+	return err
+}
+
+func (r *reconciliationRepo) GetReconciliation(ctx context.Context, reconciliationID uuid.UUID) (*biz.Reconciliation, error) {
+	rec, err := r.data.db.Reconciliation.Get(ctx, reconciliationID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toBizReconciliation(rec), nil
+}
+
+func (r *reconciliationRepo) UpdateReconciliation(ctx context.Context, rec *biz.Reconciliation) error {
+	update := r.data.db.Reconciliation.UpdateOneID(rec.ID)
+
+	update.SetStatus(reconciliation.Status(rec.Status))
+	update.SetTotalOrders(rec.TotalOrders)
+	update.SetMatchedOrders(rec.MatchedOrders)
+	update.SetExceptionOrders(rec.ExceptionOrders)
+
+	_, err := update.Save(ctx)
+	return err
+}
+
+func (r *reconciliationRepo) ListReconciliations(ctx context.Context, startDate, endDate string, page, pageSize int) ([]*biz.Reconciliation, int64, error) {
+	predicates := []predicate.Reconciliation{}
+
+	query := r.data.db.Reconciliation.Query().Where(predicates...)
+
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * pageSize
+	reconciliations, err := query.
+		Offset(offset).
+		Limit(pageSize).
+		Order(ent.Desc(reconciliation.FieldCreatedAt)).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var result []*biz.Reconciliation
+	for _, rec := range reconciliations {
+		result = append(result, toBizReconciliation(rec))
+	}
+
+	return result, int64(total), nil
+}
+
+type reconciliationExceptionRepo struct {
+	data *Data
+}
+
+func NewReconciliationExceptionRepo(data *Data) biz.ReconciliationExceptionRepo {
+	return &reconciliationExceptionRepo{data: data}
+}
+
+func (r *reconciliationExceptionRepo) CreateReconciliationException(ctx context.Context, exception *biz.ReconciliationException) error {
+	_, err := r.data.db.ReconciliationException.Create().
+		SetID(exception.ID).
+		SetReconciliationID(exception.ReconciliationID).
+		SetOrderID(exception.OrderID).
+		SetPlatformOrderID(exception.PlatformOrderID).
+		SetSystemAmount(exception.SystemAmount).
+		SetPlatformAmount(exception.PlatformAmount).
+		SetStatus(reconciliationexception.Status(exception.Status)).
+		SetReason(exception.Reason).
+		SetAction(exception.Action).
+		SetRemark(exception.Remark).
+		Save(ctx)
+	return err
+}
+
+func (r *reconciliationExceptionRepo) GetReconciliationExceptions(ctx context.Context, reconciliationID uuid.UUID) ([]*biz.ReconciliationException, error) {
+	exceptions, err := r.data.db.ReconciliationException.Query().
+		Where(reconciliationexception.ReconciliationID(reconciliationID)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*biz.ReconciliationException
+	for _, exception := range exceptions {
+		result = append(result, toBizReconciliationException(exception))
+	}
+
+	return result, nil
+}
+
+func (r *reconciliationExceptionRepo) UpdateReconciliationException(ctx context.Context, exception *biz.ReconciliationException) error {
+	update := r.data.db.ReconciliationException.UpdateOneID(exception.ID)
+
+	update.SetStatus(reconciliationexception.Status(exception.Status))
+	update.SetAction(exception.Action)
+	update.SetRemark(exception.Remark)
+	if exception.HandledAt != nil {
+		update.SetHandledAt(*exception.HandledAt)
+	}
+
+	_, err := update.Save(ctx)
+	return err
+}
+
+func (r *reconciliationExceptionRepo) GetReconciliationException(ctx context.Context, exceptionID uuid.UUID) (*biz.ReconciliationException, error) {
+	exception, err := r.data.db.ReconciliationException.Get(ctx, exceptionID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toBizReconciliationException(exception), nil
+}
+
+func toBizReconciliation(rec *ent.Reconciliation) *biz.Reconciliation {
+	return &biz.Reconciliation{
+		ID:              rec.ID,
+		Date:            rec.Date,
+		PayMethod:       rec.PayMethod,
+		Status:          string(rec.Status),
+		TotalOrders:     rec.TotalOrders,
+		MatchedOrders:   rec.MatchedOrders,
+		ExceptionOrders: rec.ExceptionOrders,
+		CreatedAt:       rec.CreatedAt,
+		UpdatedAt:       rec.UpdatedAt,
+	}
+}
+
+func toBizReconciliationException(exception *ent.ReconciliationException) *biz.ReconciliationException {
+	return &biz.ReconciliationException{
+		ID:                exception.ID,
+		ReconciliationID:  exception.ReconciliationID,
+		OrderID:           exception.OrderID,
+		PlatformOrderID:   exception.PlatformOrderID,
+		SystemAmount:      exception.SystemAmount,
+		PlatformAmount:    exception.PlatformAmount,
+		Status:            string(exception.Status),
+		Reason:            exception.Reason,
+		Action:            exception.Action,
+		Remark:            exception.Remark,
+		HandledAt:         exception.HandledAt,
+		CreatedAt:         exception.CreatedAt,
+		UpdatedAt:         exception.UpdatedAt,
 	}
 }

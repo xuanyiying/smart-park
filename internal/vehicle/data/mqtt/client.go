@@ -39,7 +39,8 @@ type CommandResult struct {
 
 type Client interface {
 	PublishCommand(ctx context.Context, cmd *Command) error
-	Subscribe(topic string, handler func(*Command)) error
+	Subscribe(topic string, handler mqtt.MessageHandler) error
+	SubscribeCommand(topic string, handler func(*Command)) error
 	Unsubscribe(topic string) error
 	Connect() error
 	Disconnect() error
@@ -148,7 +149,20 @@ func (c *MQTTClient) PublishCommand(ctx context.Context, cmd *Command) error {
 	return nil
 }
 
-func (c *MQTTClient) Subscribe(topic string, handler func(*Command)) error {
+func (c *MQTTClient) Subscribe(topic string, handler mqtt.MessageHandler) error {
+	if !c.IsConnected() {
+		return fmt.Errorf("client not connected")
+	}
+
+	token := c.client.Subscribe(topic, 1, handler)
+	if token.Wait() && token.Error() != nil {
+		return fmt.Errorf("failed to subscribe: %w", token.Error())
+	}
+
+	return nil
+}
+
+func (c *MQTTClient) SubscribeCommand(topic string, handler func(*Command)) error {
 	if !c.IsConnected() {
 		return fmt.Errorf("client not connected")
 	}
@@ -241,7 +255,11 @@ func (c *MockMQTTClient) PublishCommand(ctx context.Context, cmd *Command) error
 	return nil
 }
 
-func (c *MockMQTTClient) Subscribe(topic string, handler func(*Command)) error {
+func (c *MockMQTTClient) Subscribe(topic string, handler mqtt.MessageHandler) error {
+	return nil
+}
+
+func (c *MockMQTTClient) SubscribeCommand(topic string, handler func(*Command)) error {
 	return nil
 }
 

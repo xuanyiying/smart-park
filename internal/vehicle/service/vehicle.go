@@ -14,12 +14,13 @@ import (
 type VehicleService struct {
 	v1.UnimplementedVehicleServiceServer
 
-	entryExitUseCase *biz.EntryExitUseCase
-	deviceUseCase    *biz.DeviceUseCase
-	vehicleUseCase   *biz.VehicleQueryUseCase
-	commandUseCase   *biz.CommandUseCase
-	recordUseCase    *biz.RecordQueryUseCase
-	log              *log.Helper
+	entryExitUseCase     *biz.EntryExitUseCase
+	deviceUseCase        *biz.DeviceUseCase
+	vehicleUseCase       *biz.VehicleQueryUseCase
+	commandUseCase       *biz.CommandUseCase
+	recordUseCase        *biz.RecordQueryUseCase
+	// parkingSpaceUseCase  *biz.ParkingSpaceUseCase
+	log                  *log.Helper
 }
 
 // NewVehicleService creates a new VehicleService.
@@ -29,15 +30,17 @@ func NewVehicleService(
 	vehicleUseCase *biz.VehicleQueryUseCase,
 	commandUseCase *biz.CommandUseCase,
 	recordUseCase *biz.RecordQueryUseCase,
+	// parkingSpaceUseCase *biz.ParkingSpaceUseCase,
 	logger log.Logger,
 ) *VehicleService {
 	return &VehicleService{
-		entryExitUseCase: entryExitUseCase,
-		deviceUseCase:    deviceUseCase,
-		vehicleUseCase:   vehicleUseCase,
-		commandUseCase:   commandUseCase,
-		recordUseCase:    recordUseCase,
-		log:              log.NewHelper(logger),
+		entryExitUseCase:     entryExitUseCase,
+		deviceUseCase:        deviceUseCase,
+		vehicleUseCase:       vehicleUseCase,
+		commandUseCase:       commandUseCase,
+		recordUseCase:        recordUseCase,
+		// parkingSpaceUseCase:  parkingSpaceUseCase,
+		log:                  log.NewHelper(logger),
 	}
 }
 
@@ -289,3 +292,49 @@ func (s *VehicleService) DeleteDevice(ctx context.Context, req *v1.DeleteDeviceR
 		Message: "success",
 	}, nil
 }
+
+// // GetParkingSpaceStatus handles get parking space status request.
+// func (s *VehicleService) GetParkingSpaceStatus(ctx context.Context, req *v1.GetParkingSpaceStatusRequest) (*v1.GetParkingSpaceStatusResponse, error) {
+// 	status, err := s.parkingSpaceUseCase.GetParkingSpaceStatus(ctx, req.SpaceId)
+// 	if err != nil {
+// 		s.log.WithContext(ctx).Errorf("GetParkingSpaceStatus failed: %v", err)
+// 		return &v1.GetParkingSpaceStatusResponse{
+// 			Code:    500,
+// 			Message: "获取车位状态失败: " + err.Error(),
+// 		}, nil
+// 	}
+// 
+// 	return &v1.GetParkingSpaceStatusResponse{
+// 		Code:    0,
+// 		Message: "success",
+// 		Data:    status,
+// 	}, nil
+// }
+// 
+// // ListParkingSpaces handles list parking spaces request.
+// func (s *VehicleService) ListParkingSpaces(ctx context.Context, req *v1.ListParkingSpacesRequest) (*v1.ListParkingSpacesResponse, error) {
+// 	page := int(req.Page)
+// 	if page <= 0 {
+// 		page = 1
+// 	}
+// 	pageSize := int(req.PageSize)
+// 	if pageSize <= 0 {
+// 		pageSize = 10
+// 	}
+// 
+// 	spaces, total, err := s.parkingSpaceUseCase.ListParkingSpaces(ctx, req.LotId, page, pageSize)
+// 	if err != nil {
+// 		s.log.WithContext(ctx).Errorf("ListParkingSpaces failed: %v", err)
+// 		return &v1.ListParkingSpacesResponse{
+// 			Code:    500,
+// 			Message: "获取车位列表失败: " + err.Error(),
+// 		}, nil
+// 	}
+// 
+// 	return &v1.ListParkingSpacesResponse{
+// 		Code:    0,
+// 		Message: "success",
+// 		Data:    spaces,
+// 		Total:   int32(total),
+// 	}, nil
+// }

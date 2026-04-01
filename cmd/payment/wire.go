@@ -4,6 +4,7 @@
 package main
 
 import (
+	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -18,7 +19,7 @@ import (
 )
 
 // initApp initializes the application with wire.
-func initApp(entClient *ent.Client, conf *conf.Config, logger log.Logger) (*app, func(), error) {
+func initApp(entClient *ent.Client, conf *conf.Config, logger log.Logger) (*kratos.App, func(), error) {
 	wire.Build(
 		// Data layer
 		data.ProviderSet,
@@ -40,9 +41,4 @@ func initApp(entClient *ent.Client, conf *conf.Config, logger log.Logger) (*app,
 		newApp,
 	)
 	return nil, nil, nil
-}
-
-type app = struct {
-	*grpc.Server
-	*http.Server
 }

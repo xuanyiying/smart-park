@@ -90,6 +90,19 @@ service VehicleService {
       delete: "/api/v1/devices/{deviceId}",
     };
   }
+
+  // Parking space operations
+  rpc GetParkingSpaceStatus(GetParkingSpaceStatusRequest) returns (GetParkingSpaceStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/parking-spaces/{spaceId}/status",
+    };
+  }
+
+  rpc ListParkingSpaces(ListParkingSpacesRequest) returns (ListParkingSpacesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/parking-spaces",
+    };
+  }
 }
 
 message EntryRequest {
@@ -319,4 +332,36 @@ message DeleteDeviceRequest {
 message DeleteDeviceResponse {
   int32  code    = 1;
   string message = 2;
+}
+
+// Parking space messages
+message GetParkingSpaceStatusRequest {
+  string spaceId = 1;
+}
+
+message GetParkingSpaceStatusResponse {
+  int32              code    = 1;
+  string             message = 2;
+  ParkingSpaceStatus data    = 3;
+}
+
+message ParkingSpaceStatus {
+  string  spaceId      = 1;
+  string  status       = 2;
+  string  lastUpdate   = 3;
+  string  vehiclePlate = 4;
+  string  deviceId     = 5;
+}
+
+message ListParkingSpacesRequest {
+  string lotId   = 1;
+  int32  page    = 2;
+  int32  pageSize = 3;
+}
+
+message ListParkingSpacesResponse {
+  int32                  code    = 1;
+  string                 message = 2;
+  repeated ParkingSpaceStatus data = 3;
+  int32                  total   = 4;
 }

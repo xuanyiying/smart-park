@@ -11,6 +11,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingspace"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/schema"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
 )
@@ -239,6 +240,52 @@ func init() {
 	parkingrecordDescID := parkingrecordFields[0].Descriptor()
 	// parkingrecord.DefaultID holds the default value on creation for the id field.
 	parkingrecord.DefaultID = parkingrecordDescID.Default.(func() uuid.UUID)
+	parkingspaceFields := schema.ParkingSpace{}.Fields()
+	_ = parkingspaceFields
+	// parkingspaceDescSpaceID is the schema descriptor for space_id field.
+	parkingspaceDescSpaceID := parkingspaceFields[1].Descriptor()
+	// parkingspace.SpaceIDValidator is a validator for the "space_id" field. It is called by the builders before save.
+	parkingspace.SpaceIDValidator = func() func(string) error {
+		validators := parkingspaceDescSpaceID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(space_id string) error {
+			for _, fn := range fns {
+				if err := fn(space_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// parkingspaceDescDeviceID is the schema descriptor for device_id field.
+	parkingspaceDescDeviceID := parkingspaceFields[3].Descriptor()
+	// parkingspace.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	parkingspace.DeviceIDValidator = parkingspaceDescDeviceID.Validators[0].(func(string) error)
+	// parkingspaceDescVehiclePlate is the schema descriptor for vehicle_plate field.
+	parkingspaceDescVehiclePlate := parkingspaceFields[5].Descriptor()
+	// parkingspace.VehiclePlateValidator is a validator for the "vehicle_plate" field. It is called by the builders before save.
+	parkingspace.VehiclePlateValidator = parkingspaceDescVehiclePlate.Validators[0].(func(string) error)
+	// parkingspaceDescLastUpdate is the schema descriptor for last_update field.
+	parkingspaceDescLastUpdate := parkingspaceFields[6].Descriptor()
+	// parkingspace.DefaultLastUpdate holds the default value on creation for the last_update field.
+	parkingspace.DefaultLastUpdate = parkingspaceDescLastUpdate.Default.(func() time.Time)
+	// parkingspaceDescCreatedAt is the schema descriptor for created_at field.
+	parkingspaceDescCreatedAt := parkingspaceFields[7].Descriptor()
+	// parkingspace.DefaultCreatedAt holds the default value on creation for the created_at field.
+	parkingspace.DefaultCreatedAt = parkingspaceDescCreatedAt.Default.(func() time.Time)
+	// parkingspaceDescUpdatedAt is the schema descriptor for updated_at field.
+	parkingspaceDescUpdatedAt := parkingspaceFields[8].Descriptor()
+	// parkingspace.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	parkingspace.DefaultUpdatedAt = parkingspaceDescUpdatedAt.Default.(func() time.Time)
+	// parkingspace.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	parkingspace.UpdateDefaultUpdatedAt = parkingspaceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// parkingspaceDescID is the schema descriptor for id field.
+	parkingspaceDescID := parkingspaceFields[0].Descriptor()
+	// parkingspace.DefaultID holds the default value on creation for the id field.
+	parkingspace.DefaultID = parkingspaceDescID.Default.(func() uuid.UUID)
 	vehicleFields := schema.Vehicle{}.Fields()
 	_ = vehicleFields
 	// vehicleDescPlateNumber is the schema descriptor for plate_number field.

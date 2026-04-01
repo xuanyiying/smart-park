@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/smartwalle/alipay/v3"
 )
@@ -166,4 +167,22 @@ func (c *Client) QueryRefund(ctx context.Context, orderID, refundID string) (str
 	}
 
 	return rsp.RefundStatus, nil
+}
+
+// PlatformTransaction represents a transaction record from payment platform.
+type PlatformTransaction struct {
+	TransactionID string
+	OrderID       string
+	Amount        float64
+	PayTime       time.Time
+	Status        string
+	PayMethod     string
+}
+
+// GetTransactions retrieves transaction records for the specified date.
+func (c *Client) GetTransactions(ctx context.Context, date string) ([]*PlatformTransaction, error) {
+	// In a real implementation, you would call Alipay's bill download API
+	// to get the transaction records for the specified date
+	// For now, we'll return an empty list as a placeholder
+	return []*PlatformTransaction{}, nil
 }

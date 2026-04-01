@@ -37,6 +37,22 @@ func (User) Fields() []ent.Field {
 			Optional().
 			Sensitive().
 			Comment("手机号(加密存储)"),
+		field.Int("credit_score").
+			Default(100).
+			Comment("信用评分"),
+		field.String("credit_level").
+			Default("A").
+			Comment("信用等级"),
+		field.String("default_pay_method").
+			Optional().
+			Comment("默认支付方式"),
+		field.String("payment_token").
+			Optional().
+			Sensitive().
+			Comment("支付令牌"),
+		field.Bool("auto_pay_enabled").
+			Default(false).
+			Comment("是否启用自动扣费"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

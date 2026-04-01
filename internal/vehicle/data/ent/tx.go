@@ -22,6 +22,8 @@ type Tx struct {
 	OfflineSyncRecord *OfflineSyncRecordClient
 	// ParkingRecord is the client for interacting with the ParkingRecord builders.
 	ParkingRecord *ParkingRecordClient
+	// ParkingSpace is the client for interacting with the ParkingSpace builders.
+	ParkingSpace *ParkingSpaceClient
 	// Vehicle is the client for interacting with the Vehicle builders.
 	Vehicle *VehicleClient
 
@@ -160,6 +162,7 @@ func (tx *Tx) init() {
 	tx.Lane = NewLaneClient(tx.config)
 	tx.OfflineSyncRecord = NewOfflineSyncRecordClient(tx.config)
 	tx.ParkingRecord = NewParkingRecordClient(tx.config)
+	tx.ParkingSpace = NewParkingSpaceClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)
 }
 

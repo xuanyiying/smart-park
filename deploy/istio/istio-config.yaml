@@ -1,0 +1,173 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: smart-park-gateway
+  namespace: smart-park
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gateway-virtual-service
+  namespace: smart-park
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - smart-park-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: gateway
+        port:
+          number: 8000
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vehicle-virtual-service
+  namespace: smart-park
+spec:
+  hosts:
+  - vehicle
+  http:
+  - route:
+    - destination:
+        host: vehicle
+        port:
+          number: 8001
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: billing-virtual-service
+  namespace: smart-park
+spec:
+  hosts:
+  - billing
+  http:
+  - route:
+    - destination:
+        host: billing
+        port:
+          number: 8002
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: payment-virtual-service
+  namespace: smart-park
+spec:
+  hosts:
+  - payment
+  http:
+  - route:
+    - destination:
+        host: payment
+        port:
+          number: 8003
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: admin-virtual-service
+  namespace: smart-park
+spec:
+  hosts:
+  - admin
+  http:
+  - route:
+    - destination:
+        host: admin
+        port:
+          number: 8004
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: vehicle-destination-rule
+  namespace: smart-park
+spec:
+  host: vehicle
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: billing-destination-rule
+  namespace: smart-park
+spec:
+  host: billing
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: payment-destination-rule
+  namespace: smart-park
+spec:
+  host: payment
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: admin-destination-rule
+  namespace: smart-park
+spec:
+  host: admin
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

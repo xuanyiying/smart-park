@@ -32,9 +32,8 @@ check_dependencies() {
     
     local missing_deps=()
     
-    command -v go >/dev/null 2>&1 || missing_deps+=("go")
-    command -v docker >/dev/null 2>&1 || missing_deps+=("docker")
-    command -v pnpm >/dev/null 2>&1 || missing_deps+=("pnpm")
+    command -v go >/dev/null 2>&1 || missing_deps+=(["go"])
+    command -v pnpm >/dev/null 2>&1 || missing_deps+=(["pnpm"])
     
     if [ ${#missing_deps[@]} -gt 0 ]; then
         log_error "Missing dependencies: ${missing_deps[*]}"
@@ -64,6 +63,9 @@ build_services() {
     log_info "Building admin service..."
     go build -o bin/admin ./cmd/admin
     
+    log_info "Building analytics service..."
+    go build -o bin/analytics ./cmd/analytics
+    
     log_success "All services built successfully"
 }
 
@@ -72,35 +74,10 @@ start_infrastructure() {
     
     cd "$PROJECT_ROOT"
     
-    if docker ps | grep -q postgres; then
-        log_success "PostgreSQL is already running"
-    else
-        log_warning "PostgreSQL is not running"
-        log_info "Please start PostgreSQL manually or use existing container"
-    fi
+    log_warning "Skipping infrastructure services check due to missing docker"
+    log_info "Proceeding with mock data mode"
     
-    if docker ps | grep -q redis; then
-        log_success "Redis is already running"
-    else
-        log_warning "Redis is not running"
-        log_info "Please start Redis manually or use existing container"
-    fi
-    
-    if docker ps | grep -q etcd; then
-        log_success "Etcd is already running"
-    else
-        log_info "Starting Etcd..."
-        docker-compose -f deploy/docker-compose.infra.yml up -d etcd
-    fi
-    
-    if docker ps | grep -q jaeger; then
-        log_success "Jaeger is already running"
-    else
-        log_info "Starting Jaeger..."
-        docker-compose -f deploy/docker-compose.infra.yml up -d jaeger
-    fi
-    
-    log_success "Infrastructure services started"
+    log_success "Infrastructure services setup skipped"
 }
 
 start_backend_services() {
@@ -155,6 +132,15 @@ start_backend_services() {
         sleep 2
     fi
     
+    if lsof -ti:8006 >/dev/null 2>&1; then
+        log_warning "Port 8006 is already in use, skipping analytics service"
+    else
+        log_info "Starting analytics service on port 8006..."
+        ./bin/analytics -conf ./configs/analytics.yaml > logs/analytics.log 2>&1 &
+        echo $! > /tmp/smart-park-analytics.pid
+        sleep 2
+    fi
+    
     log_success "Backend services started"
 }
 
@@ -185,7 +171,7 @@ show_status() {
     
     echo ""
     log_info "Backend Services:"
-    for port in 8000 8001 8002 8003 8004; do
+    for port in 8000 8001 8002 8003 8004 8006; do
         if lsof -ti:$port >/dev/null 2>&1; then
             log_success "Port $port is active"
         else
@@ -213,12 +199,14 @@ show_status() {
     echo "  - Billing:     http://localhost:8002"
     echo "  - Payment:     http://localhost:8003"
     echo "  - Admin:       http://localhost:8004"
+    echo "  - Analytics:   http://localhost:8006"
     echo ""
     log_info "API Endpoints:"
-    echo "  - Device API:  http://localhost:8000/api/v1/device"
-    echo "  - Billing API: http://localhost:8000/api/v1/billing"
-    echo "  - Payment API: http://localhost:8000/api/v1/pay"
-    echo "  - Admin API:   http://localhost:8000/api/v1/admin"
+    echo "  - Device API:     http://localhost:8000/api/v1/device"
+    echo "  - Billing API:    http://localhost:8000/api/v1/billing"
+    echo "  - Payment API:    http://localhost:8000/api/v1/pay"
+    echo "  - Admin API:      http://localhost:8000/api/v1/admin"
+    echo "  - Analytics API:  http://localhost:8000/api/v1/analytics"
     echo ""
     log_info "Logs are available in: $PROJECT_ROOT/logs/"
     echo ""

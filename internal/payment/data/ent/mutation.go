@@ -14,6 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/predicate"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliation"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliationexception"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/refundapproval"
 )
 
@@ -26,8 +28,10 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeOrder          = "Order"
-	TypeRefundApproval = "RefundApproval"
+	TypeOrder                   = "Order"
+	TypeReconciliation          = "Reconciliation"
+	TypeReconciliationException = "ReconciliationException"
+	TypeRefundApproval          = "RefundApproval"
 )
 
 // OrderMutation represents an operation that mutates the Order nodes in the graph.
@@ -1442,6 +1446,1892 @@ func (m *OrderMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *OrderMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Order edge %s", name)
+}
+
+// ReconciliationMutation represents an operation that mutates the Reconciliation nodes in the graph.
+type ReconciliationMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *uuid.UUID
+	date                *string
+	pay_method          *reconciliation.PayMethod
+	status              *reconciliation.Status
+	total_orders        *int
+	addtotal_orders     *int
+	matched_orders      *int
+	addmatched_orders   *int
+	exception_orders    *int
+	addexception_orders *int
+	created_at          *time.Time
+	updated_at          *time.Time
+	clearedFields       map[string]struct{}
+	done                bool
+	oldValue            func(context.Context) (*Reconciliation, error)
+	predicates          []predicate.Reconciliation
+}
+
+var _ ent.Mutation = (*ReconciliationMutation)(nil)
+
+// reconciliationOption allows management of the mutation configuration using functional options.
+type reconciliationOption func(*ReconciliationMutation)
+
+// newReconciliationMutation creates new mutation for the Reconciliation entity.
+func newReconciliationMutation(c config, op Op, opts ...reconciliationOption) *ReconciliationMutation {
+	m := &ReconciliationMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeReconciliation,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withReconciliationID sets the ID field of the mutation.
+func withReconciliationID(id uuid.UUID) reconciliationOption {
+	return func(m *ReconciliationMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Reconciliation
+		)
+		m.oldValue = func(ctx context.Context) (*Reconciliation, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Reconciliation.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withReconciliation sets the old Reconciliation of the mutation.
+func withReconciliation(node *Reconciliation) reconciliationOption {
+	return func(m *ReconciliationMutation) {
+		m.oldValue = func(context.Context) (*Reconciliation, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ReconciliationMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ReconciliationMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Reconciliation entities.
+func (m *ReconciliationMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ReconciliationMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ReconciliationMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Reconciliation.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetDate sets the "date" field.
+func (m *ReconciliationMutation) SetDate(s string) {
+	m.date = &s
+}
+
+// Date returns the value of the "date" field in the mutation.
+func (m *ReconciliationMutation) Date() (r string, exists bool) {
+	v := m.date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDate returns the old "date" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldDate(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
+	}
+	return oldValue.Date, nil
+}
+
+// ResetDate resets all changes to the "date" field.
+func (m *ReconciliationMutation) ResetDate() {
+	m.date = nil
+}
+
+// SetPayMethod sets the "pay_method" field.
+func (m *ReconciliationMutation) SetPayMethod(rm reconciliation.PayMethod) {
+	m.pay_method = &rm
+}
+
+// PayMethod returns the value of the "pay_method" field in the mutation.
+func (m *ReconciliationMutation) PayMethod() (r reconciliation.PayMethod, exists bool) {
+	v := m.pay_method
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPayMethod returns the old "pay_method" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldPayMethod(ctx context.Context) (v reconciliation.PayMethod, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPayMethod is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPayMethod requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPayMethod: %w", err)
+	}
+	return oldValue.PayMethod, nil
+}
+
+// ResetPayMethod resets all changes to the "pay_method" field.
+func (m *ReconciliationMutation) ResetPayMethod() {
+	m.pay_method = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ReconciliationMutation) SetStatus(r reconciliation.Status) {
+	m.status = &r
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ReconciliationMutation) Status() (r reconciliation.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldStatus(ctx context.Context) (v reconciliation.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ReconciliationMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetTotalOrders sets the "total_orders" field.
+func (m *ReconciliationMutation) SetTotalOrders(i int) {
+	m.total_orders = &i
+	m.addtotal_orders = nil
+}
+
+// TotalOrders returns the value of the "total_orders" field in the mutation.
+func (m *ReconciliationMutation) TotalOrders() (r int, exists bool) {
+	v := m.total_orders
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalOrders returns the old "total_orders" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldTotalOrders(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalOrders is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalOrders requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalOrders: %w", err)
+	}
+	return oldValue.TotalOrders, nil
+}
+
+// AddTotalOrders adds i to the "total_orders" field.
+func (m *ReconciliationMutation) AddTotalOrders(i int) {
+	if m.addtotal_orders != nil {
+		*m.addtotal_orders += i
+	} else {
+		m.addtotal_orders = &i
+	}
+}
+
+// AddedTotalOrders returns the value that was added to the "total_orders" field in this mutation.
+func (m *ReconciliationMutation) AddedTotalOrders() (r int, exists bool) {
+	v := m.addtotal_orders
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalOrders resets all changes to the "total_orders" field.
+func (m *ReconciliationMutation) ResetTotalOrders() {
+	m.total_orders = nil
+	m.addtotal_orders = nil
+}
+
+// SetMatchedOrders sets the "matched_orders" field.
+func (m *ReconciliationMutation) SetMatchedOrders(i int) {
+	m.matched_orders = &i
+	m.addmatched_orders = nil
+}
+
+// MatchedOrders returns the value of the "matched_orders" field in the mutation.
+func (m *ReconciliationMutation) MatchedOrders() (r int, exists bool) {
+	v := m.matched_orders
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMatchedOrders returns the old "matched_orders" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldMatchedOrders(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMatchedOrders is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMatchedOrders requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMatchedOrders: %w", err)
+	}
+	return oldValue.MatchedOrders, nil
+}
+
+// AddMatchedOrders adds i to the "matched_orders" field.
+func (m *ReconciliationMutation) AddMatchedOrders(i int) {
+	if m.addmatched_orders != nil {
+		*m.addmatched_orders += i
+	} else {
+		m.addmatched_orders = &i
+	}
+}
+
+// AddedMatchedOrders returns the value that was added to the "matched_orders" field in this mutation.
+func (m *ReconciliationMutation) AddedMatchedOrders() (r int, exists bool) {
+	v := m.addmatched_orders
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMatchedOrders resets all changes to the "matched_orders" field.
+func (m *ReconciliationMutation) ResetMatchedOrders() {
+	m.matched_orders = nil
+	m.addmatched_orders = nil
+}
+
+// SetExceptionOrders sets the "exception_orders" field.
+func (m *ReconciliationMutation) SetExceptionOrders(i int) {
+	m.exception_orders = &i
+	m.addexception_orders = nil
+}
+
+// ExceptionOrders returns the value of the "exception_orders" field in the mutation.
+func (m *ReconciliationMutation) ExceptionOrders() (r int, exists bool) {
+	v := m.exception_orders
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExceptionOrders returns the old "exception_orders" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldExceptionOrders(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExceptionOrders is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExceptionOrders requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExceptionOrders: %w", err)
+	}
+	return oldValue.ExceptionOrders, nil
+}
+
+// AddExceptionOrders adds i to the "exception_orders" field.
+func (m *ReconciliationMutation) AddExceptionOrders(i int) {
+	if m.addexception_orders != nil {
+		*m.addexception_orders += i
+	} else {
+		m.addexception_orders = &i
+	}
+}
+
+// AddedExceptionOrders returns the value that was added to the "exception_orders" field in this mutation.
+func (m *ReconciliationMutation) AddedExceptionOrders() (r int, exists bool) {
+	v := m.addexception_orders
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetExceptionOrders resets all changes to the "exception_orders" field.
+func (m *ReconciliationMutation) ResetExceptionOrders() {
+	m.exception_orders = nil
+	m.addexception_orders = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ReconciliationMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ReconciliationMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ReconciliationMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ReconciliationMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ReconciliationMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Reconciliation entity.
+// If the Reconciliation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ReconciliationMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ReconciliationMutation builder.
+func (m *ReconciliationMutation) Where(ps ...predicate.Reconciliation) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ReconciliationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ReconciliationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Reconciliation, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ReconciliationMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ReconciliationMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Reconciliation).
+func (m *ReconciliationMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ReconciliationMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.date != nil {
+		fields = append(fields, reconciliation.FieldDate)
+	}
+	if m.pay_method != nil {
+		fields = append(fields, reconciliation.FieldPayMethod)
+	}
+	if m.status != nil {
+		fields = append(fields, reconciliation.FieldStatus)
+	}
+	if m.total_orders != nil {
+		fields = append(fields, reconciliation.FieldTotalOrders)
+	}
+	if m.matched_orders != nil {
+		fields = append(fields, reconciliation.FieldMatchedOrders)
+	}
+	if m.exception_orders != nil {
+		fields = append(fields, reconciliation.FieldExceptionOrders)
+	}
+	if m.created_at != nil {
+		fields = append(fields, reconciliation.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, reconciliation.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ReconciliationMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case reconciliation.FieldDate:
+		return m.Date()
+	case reconciliation.FieldPayMethod:
+		return m.PayMethod()
+	case reconciliation.FieldStatus:
+		return m.Status()
+	case reconciliation.FieldTotalOrders:
+		return m.TotalOrders()
+	case reconciliation.FieldMatchedOrders:
+		return m.MatchedOrders()
+	case reconciliation.FieldExceptionOrders:
+		return m.ExceptionOrders()
+	case reconciliation.FieldCreatedAt:
+		return m.CreatedAt()
+	case reconciliation.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ReconciliationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case reconciliation.FieldDate:
+		return m.OldDate(ctx)
+	case reconciliation.FieldPayMethod:
+		return m.OldPayMethod(ctx)
+	case reconciliation.FieldStatus:
+		return m.OldStatus(ctx)
+	case reconciliation.FieldTotalOrders:
+		return m.OldTotalOrders(ctx)
+	case reconciliation.FieldMatchedOrders:
+		return m.OldMatchedOrders(ctx)
+	case reconciliation.FieldExceptionOrders:
+		return m.OldExceptionOrders(ctx)
+	case reconciliation.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case reconciliation.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Reconciliation field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReconciliationMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case reconciliation.FieldDate:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDate(v)
+		return nil
+	case reconciliation.FieldPayMethod:
+		v, ok := value.(reconciliation.PayMethod)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPayMethod(v)
+		return nil
+	case reconciliation.FieldStatus:
+		v, ok := value.(reconciliation.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case reconciliation.FieldTotalOrders:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalOrders(v)
+		return nil
+	case reconciliation.FieldMatchedOrders:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMatchedOrders(v)
+		return nil
+	case reconciliation.FieldExceptionOrders:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExceptionOrders(v)
+		return nil
+	case reconciliation.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case reconciliation.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Reconciliation field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ReconciliationMutation) AddedFields() []string {
+	var fields []string
+	if m.addtotal_orders != nil {
+		fields = append(fields, reconciliation.FieldTotalOrders)
+	}
+	if m.addmatched_orders != nil {
+		fields = append(fields, reconciliation.FieldMatchedOrders)
+	}
+	if m.addexception_orders != nil {
+		fields = append(fields, reconciliation.FieldExceptionOrders)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ReconciliationMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case reconciliation.FieldTotalOrders:
+		return m.AddedTotalOrders()
+	case reconciliation.FieldMatchedOrders:
+		return m.AddedMatchedOrders()
+	case reconciliation.FieldExceptionOrders:
+		return m.AddedExceptionOrders()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReconciliationMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case reconciliation.FieldTotalOrders:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalOrders(v)
+		return nil
+	case reconciliation.FieldMatchedOrders:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMatchedOrders(v)
+		return nil
+	case reconciliation.FieldExceptionOrders:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExceptionOrders(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Reconciliation numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ReconciliationMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ReconciliationMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ReconciliationMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Reconciliation nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ReconciliationMutation) ResetField(name string) error {
+	switch name {
+	case reconciliation.FieldDate:
+		m.ResetDate()
+		return nil
+	case reconciliation.FieldPayMethod:
+		m.ResetPayMethod()
+		return nil
+	case reconciliation.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case reconciliation.FieldTotalOrders:
+		m.ResetTotalOrders()
+		return nil
+	case reconciliation.FieldMatchedOrders:
+		m.ResetMatchedOrders()
+		return nil
+	case reconciliation.FieldExceptionOrders:
+		m.ResetExceptionOrders()
+		return nil
+	case reconciliation.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case reconciliation.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Reconciliation field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ReconciliationMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ReconciliationMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ReconciliationMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ReconciliationMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ReconciliationMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ReconciliationMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ReconciliationMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Reconciliation unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ReconciliationMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Reconciliation edge %s", name)
+}
+
+// ReconciliationExceptionMutation represents an operation that mutates the ReconciliationException nodes in the graph.
+type ReconciliationExceptionMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *uuid.UUID
+	reconciliation_id  *uuid.UUID
+	order_id           *uuid.UUID
+	platform_order_id  *string
+	system_amount      *float64
+	addsystem_amount   *float64
+	platform_amount    *float64
+	addplatform_amount *float64
+	status             *reconciliationexception.Status
+	reason             *string
+	action             *string
+	remark             *string
+	handled_at         *time.Time
+	created_at         *time.Time
+	updated_at         *time.Time
+	clearedFields      map[string]struct{}
+	done               bool
+	oldValue           func(context.Context) (*ReconciliationException, error)
+	predicates         []predicate.ReconciliationException
+}
+
+var _ ent.Mutation = (*ReconciliationExceptionMutation)(nil)
+
+// reconciliationexceptionOption allows management of the mutation configuration using functional options.
+type reconciliationexceptionOption func(*ReconciliationExceptionMutation)
+
+// newReconciliationExceptionMutation creates new mutation for the ReconciliationException entity.
+func newReconciliationExceptionMutation(c config, op Op, opts ...reconciliationexceptionOption) *ReconciliationExceptionMutation {
+	m := &ReconciliationExceptionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeReconciliationException,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withReconciliationExceptionID sets the ID field of the mutation.
+func withReconciliationExceptionID(id uuid.UUID) reconciliationexceptionOption {
+	return func(m *ReconciliationExceptionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ReconciliationException
+		)
+		m.oldValue = func(ctx context.Context) (*ReconciliationException, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ReconciliationException.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withReconciliationException sets the old ReconciliationException of the mutation.
+func withReconciliationException(node *ReconciliationException) reconciliationexceptionOption {
+	return func(m *ReconciliationExceptionMutation) {
+		m.oldValue = func(context.Context) (*ReconciliationException, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ReconciliationExceptionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ReconciliationExceptionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ReconciliationException entities.
+func (m *ReconciliationExceptionMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ReconciliationExceptionMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ReconciliationExceptionMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ReconciliationException.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetReconciliationID sets the "reconciliation_id" field.
+func (m *ReconciliationExceptionMutation) SetReconciliationID(u uuid.UUID) {
+	m.reconciliation_id = &u
+}
+
+// ReconciliationID returns the value of the "reconciliation_id" field in the mutation.
+func (m *ReconciliationExceptionMutation) ReconciliationID() (r uuid.UUID, exists bool) {
+	v := m.reconciliation_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReconciliationID returns the old "reconciliation_id" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldReconciliationID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReconciliationID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReconciliationID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReconciliationID: %w", err)
+	}
+	return oldValue.ReconciliationID, nil
+}
+
+// ResetReconciliationID resets all changes to the "reconciliation_id" field.
+func (m *ReconciliationExceptionMutation) ResetReconciliationID() {
+	m.reconciliation_id = nil
+}
+
+// SetOrderID sets the "order_id" field.
+func (m *ReconciliationExceptionMutation) SetOrderID(u uuid.UUID) {
+	m.order_id = &u
+}
+
+// OrderID returns the value of the "order_id" field in the mutation.
+func (m *ReconciliationExceptionMutation) OrderID() (r uuid.UUID, exists bool) {
+	v := m.order_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOrderID returns the old "order_id" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldOrderID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOrderID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOrderID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOrderID: %w", err)
+	}
+	return oldValue.OrderID, nil
+}
+
+// ResetOrderID resets all changes to the "order_id" field.
+func (m *ReconciliationExceptionMutation) ResetOrderID() {
+	m.order_id = nil
+}
+
+// SetPlatformOrderID sets the "platform_order_id" field.
+func (m *ReconciliationExceptionMutation) SetPlatformOrderID(s string) {
+	m.platform_order_id = &s
+}
+
+// PlatformOrderID returns the value of the "platform_order_id" field in the mutation.
+func (m *ReconciliationExceptionMutation) PlatformOrderID() (r string, exists bool) {
+	v := m.platform_order_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlatformOrderID returns the old "platform_order_id" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldPlatformOrderID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlatformOrderID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlatformOrderID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlatformOrderID: %w", err)
+	}
+	return oldValue.PlatformOrderID, nil
+}
+
+// ClearPlatformOrderID clears the value of the "platform_order_id" field.
+func (m *ReconciliationExceptionMutation) ClearPlatformOrderID() {
+	m.platform_order_id = nil
+	m.clearedFields[reconciliationexception.FieldPlatformOrderID] = struct{}{}
+}
+
+// PlatformOrderIDCleared returns if the "platform_order_id" field was cleared in this mutation.
+func (m *ReconciliationExceptionMutation) PlatformOrderIDCleared() bool {
+	_, ok := m.clearedFields[reconciliationexception.FieldPlatformOrderID]
+	return ok
+}
+
+// ResetPlatformOrderID resets all changes to the "platform_order_id" field.
+func (m *ReconciliationExceptionMutation) ResetPlatformOrderID() {
+	m.platform_order_id = nil
+	delete(m.clearedFields, reconciliationexception.FieldPlatformOrderID)
+}
+
+// SetSystemAmount sets the "system_amount" field.
+func (m *ReconciliationExceptionMutation) SetSystemAmount(f float64) {
+	m.system_amount = &f
+	m.addsystem_amount = nil
+}
+
+// SystemAmount returns the value of the "system_amount" field in the mutation.
+func (m *ReconciliationExceptionMutation) SystemAmount() (r float64, exists bool) {
+	v := m.system_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSystemAmount returns the old "system_amount" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldSystemAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSystemAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSystemAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSystemAmount: %w", err)
+	}
+	return oldValue.SystemAmount, nil
+}
+
+// AddSystemAmount adds f to the "system_amount" field.
+func (m *ReconciliationExceptionMutation) AddSystemAmount(f float64) {
+	if m.addsystem_amount != nil {
+		*m.addsystem_amount += f
+	} else {
+		m.addsystem_amount = &f
+	}
+}
+
+// AddedSystemAmount returns the value that was added to the "system_amount" field in this mutation.
+func (m *ReconciliationExceptionMutation) AddedSystemAmount() (r float64, exists bool) {
+	v := m.addsystem_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSystemAmount resets all changes to the "system_amount" field.
+func (m *ReconciliationExceptionMutation) ResetSystemAmount() {
+	m.system_amount = nil
+	m.addsystem_amount = nil
+}
+
+// SetPlatformAmount sets the "platform_amount" field.
+func (m *ReconciliationExceptionMutation) SetPlatformAmount(f float64) {
+	m.platform_amount = &f
+	m.addplatform_amount = nil
+}
+
+// PlatformAmount returns the value of the "platform_amount" field in the mutation.
+func (m *ReconciliationExceptionMutation) PlatformAmount() (r float64, exists bool) {
+	v := m.platform_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlatformAmount returns the old "platform_amount" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldPlatformAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlatformAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlatformAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlatformAmount: %w", err)
+	}
+	return oldValue.PlatformAmount, nil
+}
+
+// AddPlatformAmount adds f to the "platform_amount" field.
+func (m *ReconciliationExceptionMutation) AddPlatformAmount(f float64) {
+	if m.addplatform_amount != nil {
+		*m.addplatform_amount += f
+	} else {
+		m.addplatform_amount = &f
+	}
+}
+
+// AddedPlatformAmount returns the value that was added to the "platform_amount" field in this mutation.
+func (m *ReconciliationExceptionMutation) AddedPlatformAmount() (r float64, exists bool) {
+	v := m.addplatform_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPlatformAmount resets all changes to the "platform_amount" field.
+func (m *ReconciliationExceptionMutation) ResetPlatformAmount() {
+	m.platform_amount = nil
+	m.addplatform_amount = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ReconciliationExceptionMutation) SetStatus(r reconciliationexception.Status) {
+	m.status = &r
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ReconciliationExceptionMutation) Status() (r reconciliationexception.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldStatus(ctx context.Context) (v reconciliationexception.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ReconciliationExceptionMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetReason sets the "reason" field.
+func (m *ReconciliationExceptionMutation) SetReason(s string) {
+	m.reason = &s
+}
+
+// Reason returns the value of the "reason" field in the mutation.
+func (m *ReconciliationExceptionMutation) Reason() (r string, exists bool) {
+	v := m.reason
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReason returns the old "reason" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldReason(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReason is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReason requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReason: %w", err)
+	}
+	return oldValue.Reason, nil
+}
+
+// ResetReason resets all changes to the "reason" field.
+func (m *ReconciliationExceptionMutation) ResetReason() {
+	m.reason = nil
+}
+
+// SetAction sets the "action" field.
+func (m *ReconciliationExceptionMutation) SetAction(s string) {
+	m.action = &s
+}
+
+// Action returns the value of the "action" field in the mutation.
+func (m *ReconciliationExceptionMutation) Action() (r string, exists bool) {
+	v := m.action
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAction returns the old "action" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldAction(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAction is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAction requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAction: %w", err)
+	}
+	return oldValue.Action, nil
+}
+
+// ClearAction clears the value of the "action" field.
+func (m *ReconciliationExceptionMutation) ClearAction() {
+	m.action = nil
+	m.clearedFields[reconciliationexception.FieldAction] = struct{}{}
+}
+
+// ActionCleared returns if the "action" field was cleared in this mutation.
+func (m *ReconciliationExceptionMutation) ActionCleared() bool {
+	_, ok := m.clearedFields[reconciliationexception.FieldAction]
+	return ok
+}
+
+// ResetAction resets all changes to the "action" field.
+func (m *ReconciliationExceptionMutation) ResetAction() {
+	m.action = nil
+	delete(m.clearedFields, reconciliationexception.FieldAction)
+}
+
+// SetRemark sets the "remark" field.
+func (m *ReconciliationExceptionMutation) SetRemark(s string) {
+	m.remark = &s
+}
+
+// Remark returns the value of the "remark" field in the mutation.
+func (m *ReconciliationExceptionMutation) Remark() (r string, exists bool) {
+	v := m.remark
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemark returns the old "remark" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldRemark(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemark requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
+	}
+	return oldValue.Remark, nil
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (m *ReconciliationExceptionMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[reconciliationexception.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *ReconciliationExceptionMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[reconciliationexception.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *ReconciliationExceptionMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, reconciliationexception.FieldRemark)
+}
+
+// SetHandledAt sets the "handled_at" field.
+func (m *ReconciliationExceptionMutation) SetHandledAt(t time.Time) {
+	m.handled_at = &t
+}
+
+// HandledAt returns the value of the "handled_at" field in the mutation.
+func (m *ReconciliationExceptionMutation) HandledAt() (r time.Time, exists bool) {
+	v := m.handled_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHandledAt returns the old "handled_at" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldHandledAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHandledAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHandledAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHandledAt: %w", err)
+	}
+	return oldValue.HandledAt, nil
+}
+
+// ClearHandledAt clears the value of the "handled_at" field.
+func (m *ReconciliationExceptionMutation) ClearHandledAt() {
+	m.handled_at = nil
+	m.clearedFields[reconciliationexception.FieldHandledAt] = struct{}{}
+}
+
+// HandledAtCleared returns if the "handled_at" field was cleared in this mutation.
+func (m *ReconciliationExceptionMutation) HandledAtCleared() bool {
+	_, ok := m.clearedFields[reconciliationexception.FieldHandledAt]
+	return ok
+}
+
+// ResetHandledAt resets all changes to the "handled_at" field.
+func (m *ReconciliationExceptionMutation) ResetHandledAt() {
+	m.handled_at = nil
+	delete(m.clearedFields, reconciliationexception.FieldHandledAt)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ReconciliationExceptionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ReconciliationExceptionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ReconciliationExceptionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ReconciliationExceptionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ReconciliationExceptionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ReconciliationException entity.
+// If the ReconciliationException object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReconciliationExceptionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ReconciliationExceptionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ReconciliationExceptionMutation builder.
+func (m *ReconciliationExceptionMutation) Where(ps ...predicate.ReconciliationException) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ReconciliationExceptionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ReconciliationExceptionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ReconciliationException, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ReconciliationExceptionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ReconciliationExceptionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ReconciliationException).
+func (m *ReconciliationExceptionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ReconciliationExceptionMutation) Fields() []string {
+	fields := make([]string, 0, 12)
+	if m.reconciliation_id != nil {
+		fields = append(fields, reconciliationexception.FieldReconciliationID)
+	}
+	if m.order_id != nil {
+		fields = append(fields, reconciliationexception.FieldOrderID)
+	}
+	if m.platform_order_id != nil {
+		fields = append(fields, reconciliationexception.FieldPlatformOrderID)
+	}
+	if m.system_amount != nil {
+		fields = append(fields, reconciliationexception.FieldSystemAmount)
+	}
+	if m.platform_amount != nil {
+		fields = append(fields, reconciliationexception.FieldPlatformAmount)
+	}
+	if m.status != nil {
+		fields = append(fields, reconciliationexception.FieldStatus)
+	}
+	if m.reason != nil {
+		fields = append(fields, reconciliationexception.FieldReason)
+	}
+	if m.action != nil {
+		fields = append(fields, reconciliationexception.FieldAction)
+	}
+	if m.remark != nil {
+		fields = append(fields, reconciliationexception.FieldRemark)
+	}
+	if m.handled_at != nil {
+		fields = append(fields, reconciliationexception.FieldHandledAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, reconciliationexception.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, reconciliationexception.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ReconciliationExceptionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case reconciliationexception.FieldReconciliationID:
+		return m.ReconciliationID()
+	case reconciliationexception.FieldOrderID:
+		return m.OrderID()
+	case reconciliationexception.FieldPlatformOrderID:
+		return m.PlatformOrderID()
+	case reconciliationexception.FieldSystemAmount:
+		return m.SystemAmount()
+	case reconciliationexception.FieldPlatformAmount:
+		return m.PlatformAmount()
+	case reconciliationexception.FieldStatus:
+		return m.Status()
+	case reconciliationexception.FieldReason:
+		return m.Reason()
+	case reconciliationexception.FieldAction:
+		return m.Action()
+	case reconciliationexception.FieldRemark:
+		return m.Remark()
+	case reconciliationexception.FieldHandledAt:
+		return m.HandledAt()
+	case reconciliationexception.FieldCreatedAt:
+		return m.CreatedAt()
+	case reconciliationexception.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ReconciliationExceptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case reconciliationexception.FieldReconciliationID:
+		return m.OldReconciliationID(ctx)
+	case reconciliationexception.FieldOrderID:
+		return m.OldOrderID(ctx)
+	case reconciliationexception.FieldPlatformOrderID:
+		return m.OldPlatformOrderID(ctx)
+	case reconciliationexception.FieldSystemAmount:
+		return m.OldSystemAmount(ctx)
+	case reconciliationexception.FieldPlatformAmount:
+		return m.OldPlatformAmount(ctx)
+	case reconciliationexception.FieldStatus:
+		return m.OldStatus(ctx)
+	case reconciliationexception.FieldReason:
+		return m.OldReason(ctx)
+	case reconciliationexception.FieldAction:
+		return m.OldAction(ctx)
+	case reconciliationexception.FieldRemark:
+		return m.OldRemark(ctx)
+	case reconciliationexception.FieldHandledAt:
+		return m.OldHandledAt(ctx)
+	case reconciliationexception.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case reconciliationexception.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ReconciliationException field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReconciliationExceptionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case reconciliationexception.FieldReconciliationID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReconciliationID(v)
+		return nil
+	case reconciliationexception.FieldOrderID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOrderID(v)
+		return nil
+	case reconciliationexception.FieldPlatformOrderID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlatformOrderID(v)
+		return nil
+	case reconciliationexception.FieldSystemAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSystemAmount(v)
+		return nil
+	case reconciliationexception.FieldPlatformAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlatformAmount(v)
+		return nil
+	case reconciliationexception.FieldStatus:
+		v, ok := value.(reconciliationexception.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case reconciliationexception.FieldReason:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReason(v)
+		return nil
+	case reconciliationexception.FieldAction:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAction(v)
+		return nil
+	case reconciliationexception.FieldRemark:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemark(v)
+		return nil
+	case reconciliationexception.FieldHandledAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHandledAt(v)
+		return nil
+	case reconciliationexception.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case reconciliationexception.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReconciliationException field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ReconciliationExceptionMutation) AddedFields() []string {
+	var fields []string
+	if m.addsystem_amount != nil {
+		fields = append(fields, reconciliationexception.FieldSystemAmount)
+	}
+	if m.addplatform_amount != nil {
+		fields = append(fields, reconciliationexception.FieldPlatformAmount)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ReconciliationExceptionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case reconciliationexception.FieldSystemAmount:
+		return m.AddedSystemAmount()
+	case reconciliationexception.FieldPlatformAmount:
+		return m.AddedPlatformAmount()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReconciliationExceptionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case reconciliationexception.FieldSystemAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSystemAmount(v)
+		return nil
+	case reconciliationexception.FieldPlatformAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPlatformAmount(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReconciliationException numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ReconciliationExceptionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(reconciliationexception.FieldPlatformOrderID) {
+		fields = append(fields, reconciliationexception.FieldPlatformOrderID)
+	}
+	if m.FieldCleared(reconciliationexception.FieldAction) {
+		fields = append(fields, reconciliationexception.FieldAction)
+	}
+	if m.FieldCleared(reconciliationexception.FieldRemark) {
+		fields = append(fields, reconciliationexception.FieldRemark)
+	}
+	if m.FieldCleared(reconciliationexception.FieldHandledAt) {
+		fields = append(fields, reconciliationexception.FieldHandledAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ReconciliationExceptionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ReconciliationExceptionMutation) ClearField(name string) error {
+	switch name {
+	case reconciliationexception.FieldPlatformOrderID:
+		m.ClearPlatformOrderID()
+		return nil
+	case reconciliationexception.FieldAction:
+		m.ClearAction()
+		return nil
+	case reconciliationexception.FieldRemark:
+		m.ClearRemark()
+		return nil
+	case reconciliationexception.FieldHandledAt:
+		m.ClearHandledAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ReconciliationException nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ReconciliationExceptionMutation) ResetField(name string) error {
+	switch name {
+	case reconciliationexception.FieldReconciliationID:
+		m.ResetReconciliationID()
+		return nil
+	case reconciliationexception.FieldOrderID:
+		m.ResetOrderID()
+		return nil
+	case reconciliationexception.FieldPlatformOrderID:
+		m.ResetPlatformOrderID()
+		return nil
+	case reconciliationexception.FieldSystemAmount:
+		m.ResetSystemAmount()
+		return nil
+	case reconciliationexception.FieldPlatformAmount:
+		m.ResetPlatformAmount()
+		return nil
+	case reconciliationexception.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case reconciliationexception.FieldReason:
+		m.ResetReason()
+		return nil
+	case reconciliationexception.FieldAction:
+		m.ResetAction()
+		return nil
+	case reconciliationexception.FieldRemark:
+		m.ResetRemark()
+		return nil
+	case reconciliationexception.FieldHandledAt:
+		m.ResetHandledAt()
+		return nil
+	case reconciliationexception.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case reconciliationexception.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ReconciliationException field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ReconciliationExceptionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ReconciliationExceptionMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ReconciliationExceptionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ReconciliationExceptionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ReconciliationExceptionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ReconciliationExceptionMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ReconciliationExceptionMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ReconciliationException unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ReconciliationExceptionMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ReconciliationException edge %s", name)
 }
 
 // RefundApprovalMutation represents an operation that mutates the RefundApproval nodes in the graph.

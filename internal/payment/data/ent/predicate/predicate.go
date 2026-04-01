@@ -9,5 +9,11 @@ import (
 // Order is the predicate function for order builders.
 type Order func(*sql.Selector)
 
+// Reconciliation is the predicate function for reconciliation builders.
+type Reconciliation func(*sql.Selector)
+
+// ReconciliationException is the predicate function for reconciliationexception builders.
+type ReconciliationException func(*sql.Selector)
+
 // RefundApproval is the predicate function for refundapproval builders.
 type RefundApproval func(*sql.Selector)

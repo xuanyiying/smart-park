@@ -17,6 +17,16 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
 )
 
+// PlatformTransaction represents a transaction record from payment platform.
+type PlatformTransaction struct {
+	TransactionID string
+	OrderID       string
+	Amount        float64
+	PayTime       time.Time
+	Status        string
+	PayMethod     string
+}
+
 type Client struct {
 	client     *core.Client
 	config     *Config
@@ -176,4 +186,12 @@ func (c *Client) QueryRefund(ctx context.Context, orderID, refundID string) (str
 	}
 
 	return "", nil
+}
+
+// GetTransactions retrieves transaction records for the specified date.
+func (c *Client) GetTransactions(ctx context.Context, date string) ([]*PlatformTransaction, error) {
+	// In a real implementation, you would call WeChat's bill download API
+	// to get the transaction records for the specified date
+	// For now, we'll return an empty list as a placeholder
+	return []*PlatformTransaction{}, nil
 }

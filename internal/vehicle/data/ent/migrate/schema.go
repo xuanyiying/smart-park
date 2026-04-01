@@ -184,6 +184,51 @@ var (
 			},
 		},
 	}
+	// ParkingSpacesColumns holds the columns for the "parking_spaces" table.
+	ParkingSpacesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "space_id", Type: field.TypeString, Unique: true, Size: 64},
+		{Name: "lot_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "device_id", Type: field.TypeString, Size: 64},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"available", "occupied", "reserved", "maintenance"}, Default: "available"},
+		{Name: "vehicle_plate", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "last_update", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ParkingSpacesTable holds the schema information for the "parking_spaces" table.
+	ParkingSpacesTable = &schema.Table{
+		Name:       "parking_spaces",
+		Columns:    ParkingSpacesColumns,
+		PrimaryKey: []*schema.Column{ParkingSpacesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_space_id",
+				Unique:  true,
+				Columns: []*schema.Column{ParkingSpacesColumns[1]},
+			},
+			{
+				Name:    "idx_space_lot",
+				Unique:  false,
+				Columns: []*schema.Column{ParkingSpacesColumns[2]},
+			},
+			{
+				Name:    "idx_space_device",
+				Unique:  false,
+				Columns: []*schema.Column{ParkingSpacesColumns[3]},
+			},
+			{
+				Name:    "idx_space_status",
+				Unique:  false,
+				Columns: []*schema.Column{ParkingSpacesColumns[4]},
+			},
+			{
+				Name:    "idx_space_last_update",
+				Unique:  false,
+				Columns: []*schema.Column{ParkingSpacesColumns[6]},
+			},
+		},
+	}
 	// VehiclesColumns holds the columns for the "vehicles" table.
 	VehiclesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -225,6 +270,7 @@ var (
 		LanesTable,
 		OfflineSyncRecordsTable,
 		ParkingRecordsTable,
+		ParkingSpacesTable,
 		VehiclesTable,
 	}
 )

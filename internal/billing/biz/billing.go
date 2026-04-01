@@ -141,6 +141,9 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 	case "holiday":
 		return ctx.IsHoliday
 
+	case "membership_level":
+		return ctx.MembershipLevel == cond.Value
+
 	default:
 		return false
 	}
@@ -153,6 +156,7 @@ type BillingContext struct {
 	EntryTime   time.Time
 	ExitTime    time.Time
 	IsHoliday   bool
+	MembershipLevel string
 }
 
 // BillingRule represents a billing rule entity.
@@ -179,6 +183,7 @@ type BillingRuleRepo interface {
 	DeleteBillingRule(ctx context.Context, ruleID uuid.UUID) error
 	ListBillingRules(ctx context.Context, lotID uuid.UUID, page, pageSize int) ([]*BillingRule, int64, error)
 	SeedData(ctx context.Context) error
+	// AdjustPrice(ctx context.Context, ruleID uuid.UUID, priceAdjustment map[string]interface{}) error
 }
 
 // BillingUseCase implements billing business logic.
@@ -213,11 +218,12 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 	duration := exitTime.Sub(entryTime)
 
 	billingCtx := &BillingContext{
-		VehicleType: req.VehicleType,
-		Duration:    duration,
-		EntryTime:   entryTime,
-		ExitTime:    exitTime,
-		IsHoliday:   false,
+		VehicleType:     req.VehicleType,
+		Duration:        duration,
+		EntryTime:       entryTime,
+		ExitTime:        exitTime,
+		IsHoliday:       false,
+		MembershipLevel: "", // 暂时使用空字符串，等待 protobuf 代码生成
 	}
 
 	var baseAmount float64
@@ -455,3 +461,39 @@ func (uc *BillingUseCase) GetBillingRules(ctx context.Context, req *v1.GetBillin
 
 	return result, nil
 }
+
+// AdjustPrice adjusts the price of a billing rule dynamically.
+// func (uc *BillingUseCase) AdjustPrice(ctx context.Context, req *v1.AdjustPriceRequest) (*v1.AdjustPriceResponse, error) {
+// 	ruleID, err := uuid.Parse(req.RuleId)
+// 	if err != nil {
+// 		return &v1.AdjustPriceResponse{
+// 			Code:    400,
+// 			Message: "Invalid rule ID",
+// 			Success: false,
+// 		}, err
+// 	}
+
+// 	var priceAdjustment map[string]interface{}
+// 	if err := json.Unmarshal([]byte(req.PriceAdjustmentJson), &priceAdjustment); err != nil {
+// 		return &v1.AdjustPriceResponse{
+// 			Code:    400,
+// 			Message: "Invalid price adjustment JSON",
+// 			Success: false,
+// 		}, err
+// 	}
+
+// 	if err := uc.repo.AdjustPrice(ctx, ruleID, priceAdjustment); err != nil {
+// 		uc.log.WithContext(ctx).Errorf("failed to adjust price: %v", err)
+// 		return &v1.AdjustPriceResponse{
+// 			Code:    500,
+// 			Message: "Failed to adjust price",
+// 			Success: false,
+// 		}, err
+// 	}
+
+// 	return &v1.AdjustPriceResponse{
+// 		Code:    200,
+// 		Message: "Price adjusted successfully",
+// 		Success: true,
+// 	}, nil
+// }

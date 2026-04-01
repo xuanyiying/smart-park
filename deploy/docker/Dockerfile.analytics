@@ -1,0 +1,21 @@
+FROM golang:1.20-alpine as builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN go build -o analytics ./cmd/analytics
+
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /app/analytics /app/
+COPY configs/analytics.yaml /app/configs/
+
+EXPOSE 8006 9006
+
+CMD ["./analytics", "-conf", "./configs/analytics.yaml"]

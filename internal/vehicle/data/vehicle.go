@@ -13,6 +13,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingspace"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
 )
 
@@ -612,4 +613,108 @@ func (r *vehicleRepo) DeleteDevice(ctx context.Context, deviceID string) error {
 		Where(device.DeviceID(deviceID)).
 		Exec(ctx)
 	return err
+}
+
+// UpdateParkingSpaceStatus updates parking space status
+func (r *vehicleRepo) UpdateParkingSpaceStatus(ctx context.Context, space *biz.ParkingSpace) error {
+	// Check if parking space exists
+	_, err := r.data.db.ParkingSpace.Query().
+		Where(parkingspace.SpaceID(space.SpaceID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// Create new parking space
+			err = r.data.db.ParkingSpace.Create().
+				SetSpaceID(space.SpaceID).
+				SetDeviceID(space.DeviceID).
+				SetStatus(parkingspace.Status(space.Status)).
+				SetLastUpdate(space.LastUpdate).
+				Exec(ctx)
+			return err
+		}
+		return err
+	}
+
+	// Update existing parking space
+	update := r.data.db.ParkingSpace.Update().
+		Where(parkingspace.SpaceID(space.SpaceID)).
+		SetStatus(parkingspace.Status(space.Status)).
+		SetLastUpdate(space.LastUpdate)
+
+	if space.VehiclePlate != nil {
+		update.SetVehiclePlate(*space.VehiclePlate)
+	} else {
+		update.ClearVehiclePlate()
+	}
+
+	err = update.Exec(ctx)
+	return err
+}
+
+// GetParkingSpaceByID retrieves a parking space by ID
+func (r *vehicleRepo) GetParkingSpaceByID(ctx context.Context, spaceID string) (*biz.ParkingSpace, error) {
+	space, err := r.data.db.ParkingSpace.Query().
+		Where(parkingspace.SpaceID(spaceID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &biz.ParkingSpace{
+		ID:           space.ID,
+		SpaceID:      space.SpaceID,
+		LotID:        space.LotID,
+		DeviceID:     space.DeviceID,
+		Status:       string(space.Status),
+		VehiclePlate: space.VehiclePlate,
+		LastUpdate:   space.LastUpdate,
+		CreatedAt:    space.CreatedAt,
+		UpdatedAt:    space.UpdatedAt,
+	}, nil
+}
+
+// ListParkingSpaces lists parking spaces with pagination
+func (r *vehicleRepo) ListParkingSpaces(ctx context.Context, lotID *uuid.UUID, page, pageSize int) ([]*biz.ParkingSpace, int, error) {
+	query := r.data.db.ParkingSpace.Query()
+
+	if lotID != nil {
+		query = query.Where(parkingspace.LotID(*lotID))
+	}
+
+	// Get total count
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Apply pagination
+	offset := (page - 1) * pageSize
+	spaces, err := query.
+		Offset(offset).
+		Limit(pageSize).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Convert to biz entities
+	result := make([]*biz.ParkingSpace, len(spaces))
+	for i, space := range spaces {
+		result[i] = &biz.ParkingSpace{
+			ID:           space.ID,
+			SpaceID:      space.SpaceID,
+			LotID:        space.LotID,
+			DeviceID:     space.DeviceID,
+			Status:       string(space.Status),
+			VehiclePlate: space.VehiclePlate,
+			LastUpdate:   space.LastUpdate,
+			CreatedAt:    space.CreatedAt,
+			UpdatedAt:    space.UpdatedAt,
+		}
+	}
+
+	return result, total, nil
 }

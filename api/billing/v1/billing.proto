@@ -39,6 +39,13 @@ service BillingService {
       get: "/api/v1/admin/billing/rules"
     };
   }
+
+  rpc AdjustPrice (AdjustPriceRequest) returns (AdjustPriceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/billing/adjust-price"
+      body: "*"
+    };
+  }
 }
 
 message CalculateFeeRequest {
@@ -48,6 +55,7 @@ message CalculateFeeRequest {
   int64 entryTime = 4;
   int64 exitTime = 5;
   string vehicleType = 6;
+  string membershipLevel = 7;
 }
 
 message CalculateFeeResponse {
@@ -130,4 +138,17 @@ message BillingRule {
   int32 priority = 7;
   bool isActive = 8;
   string createdAt = 9;
+}
+
+message AdjustPriceRequest {
+  string lotId = 1;
+  string ruleId = 2;
+  string priceAdjustmentJson = 3;
+  string reason = 4;
+}
+
+message AdjustPriceResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
 }

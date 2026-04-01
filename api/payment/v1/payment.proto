@@ -40,6 +40,32 @@ service PaymentService {
       body: "*",
     };
   }
+
+  rpc Reconcile(ReconcileRequest) returns (ReconcileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/reconcile",
+      body: "*",
+    };
+  }
+
+  rpc GetReconciliationResult(GetReconciliationResultRequest) returns (GetReconciliationResultResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/pay/reconciliation/{reconciliationId}",
+    };
+  }
+
+  rpc ListReconciliationResults(ListReconciliationResultsRequest) returns (ListReconciliationResultsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/pay/reconciliation/list",
+    };
+  }
+
+  rpc HandleReconciliationException(HandleReconciliationExceptionRequest) returns (HandleReconciliationExceptionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/reconciliation/exception",
+      body: "*",
+    };
+  }
 }
 
 message CreatePaymentRequest {
@@ -125,4 +151,102 @@ message RefundResponse {
 message RefundData {
   string refundId = 1;
   string status   = 2;
+}
+
+message ReconcileRequest {
+  string date = 1; // Format: YYYY-MM-DD
+  string payMethod = 2; // Optional, specify payment method for reconciliation
+}
+
+message ReconcileResponse {
+  int32 code = 1;
+  string message = 2;
+  ReconcileData data = 3;
+}
+
+message ReconcileData {
+  string reconciliationId = 1;
+  string status = 2;
+  int32 totalOrders = 3;
+  int32 matchedOrders = 4;
+  int32 exceptionOrders = 5;
+}
+
+message GetReconciliationResultRequest {
+  string reconciliationId = 1;
+}
+
+message GetReconciliationResultResponse {
+  int32 code = 1;
+  string message = 2;
+  ReconciliationResultData data = 3;
+}
+
+message ReconciliationResultData {
+  string reconciliationId = 1;
+  string date = 2;
+  string payMethod = 3;
+  string status = 4;
+  int32 totalOrders = 5;
+  int32 matchedOrders = 6;
+  int32 exceptionOrders = 7;
+  repeated ReconciliationException exceptions = 8;
+  string createdAt = 9;
+}
+
+message ReconciliationException {
+  string orderId = 1;
+  string platformOrderId = 2;
+  double systemAmount = 3;
+  double platformAmount = 4;
+  string status = 5;
+  string reason = 6;
+}
+
+message ListReconciliationResultsRequest {
+  string startDate = 1; // Format: YYYY-MM-DD
+  string endDate = 2; // Format: YYYY-MM-DD
+  int32 page = 3;
+  int32 pageSize = 4;
+}
+
+message ListReconciliationResultsResponse {
+  int32 code = 1;
+  string message = 2;
+  ListReconciliationResultsData data = 3;
+}
+
+message ListReconciliationResultsData {
+  int32 total = 1;
+  repeated ReconciliationResultSummary items = 2;
+}
+
+message ReconciliationResultSummary {
+  string reconciliationId = 1;
+  string date = 2;
+  string payMethod = 3;
+  string status = 4;
+  int32 totalOrders = 5;
+  int32 matchedOrders = 6;
+  int32 exceptionOrders = 7;
+  string createdAt = 8;
+}
+
+message HandleReconciliationExceptionRequest {
+  string reconciliationId = 1;
+  string orderId = 2;
+  string action = 3; // Options: "confirm", "refund", "ignore"
+  string remark = 4;
+}
+
+message HandleReconciliationExceptionResponse {
+  int32 code = 1;
+  string message = 2;
+  HandleReconciliationExceptionData data = 3;
+}
+
+message HandleReconciliationExceptionData {
+  string status = 1;
+  string orderId = 2;
+  string action = 3;
 }

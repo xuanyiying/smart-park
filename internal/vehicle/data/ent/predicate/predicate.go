@@ -21,5 +21,8 @@ type OfflineSyncRecord func(*sql.Selector)
 // ParkingRecord is the predicate function for parkingrecord builders.
 type ParkingRecord func(*sql.Selector)
 
+// ParkingSpace is the predicate function for parkingspace builders.
+type ParkingSpace func(*sql.Selector)
+
 // Vehicle is the predicate function for vehicle builders.
 type Vehicle func(*sql.Selector)

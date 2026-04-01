@@ -21,17 +21,33 @@ type EntryExitUseCase struct {
 	billingClient billing.Client
 	mqttClient    mqtt.Client
 	lockRepo      lock.LockRepo
+	userClient    UserClient
+	paymentClient PaymentClient
 	config        *Config
 	log           *log.Helper
 }
 
+// UserClient defines the interface for user service client
+type UserClient interface {
+	CheckCreditEligibility(ctx context.Context, userID string) (bool, error)
+	GetUserByPlate(ctx context.Context, plateNumber string) (string, error)
+}
+
+// PaymentClient defines the interface for payment service client
+type PaymentClient interface {
+	AutoPay(ctx context.Context, orderID string, userID string) error
+	CreateOrder(ctx context.Context, recordID string, amount float64, userID string, autoPay bool) (string, error)
+}
+
 // NewEntryExitUseCase creates a new EntryExitUseCase.
-func NewEntryExitUseCase(vehicleRepo VehicleRepo, billingClient billing.Client, mqttClient mqtt.Client, lockRepo lock.LockRepo, logger log.Logger) *EntryExitUseCase {
+func NewEntryExitUseCase(vehicleRepo VehicleRepo, billingClient billing.Client, mqttClient mqtt.Client, lockRepo lock.LockRepo, userClient UserClient, paymentClient PaymentClient, logger log.Logger) *EntryExitUseCase {
 	return &EntryExitUseCase{
 		vehicleRepo:   vehicleRepo,
 		billingClient: billingClient,
 		mqttClient:    mqttClient,
 		lockRepo:      lockRepo,
+		userClient:    userClient,
+		paymentClient: paymentClient,
 		config:        DefaultConfig(),
 		log:           log.NewHelper(logger),
 	}
@@ -153,9 +169,55 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 		return nil, fmt.Errorf("failed to calculate fee: %w", err)
 	}
 
+	// Check if post-payment is eligible
+	postPaymentEligible := false
+	var userID string
+
+	if finalAmount > 0 && uc.userClient != nil {
+		// Get user ID by plate number
+		userID, err = uc.userClient.GetUserByPlate(ctx, req.PlateNumber)
+		if err == nil && userID != "" {
+			// Check credit eligibility
+			eligible, err := uc.userClient.CheckCreditEligibility(ctx, userID)
+			if err == nil && eligible {
+				postPaymentEligible = true
+			}
+		}
+	}
+
 	// Only update the record after fee calculation succeeds
 	if err := uc.updateParkingRecordForExit(ctx, record, req, device, lane, exitTime, duration); err != nil {
 		return nil, err
+	}
+
+	// Handle post-payment if eligible
+	if postPaymentEligible && uc.paymentClient != nil {
+		// Create order with auto-pay enabled
+		orderID, err := uc.paymentClient.CreateOrder(ctx, record.ID.String(), finalAmount, userID, true)
+		if err != nil {
+			uc.log.WithContext(ctx).Errorf("Failed to create order for post-payment: %v", err)
+			// Continue with normal payment process
+		} else {
+			// Process auto-pay in background
+			go func() {
+				if err := uc.paymentClient.AutoPay(context.Background(), orderID, userID); err != nil {
+					uc.log.Errorf("Failed to process auto-pay: %v", err)
+				}
+			}()
+			
+			// Allow gate open for post-payment
+			return &v1.ExitData{
+				RecordId:        record.ID.String(),
+				PlateNumber:     req.PlateNumber,
+				ParkingDuration: int32(duration),
+				Amount:          amount,
+				DiscountAmount:  discountAmount,
+				FinalAmount:     finalAmount,
+				Allowed:         true,
+				GateOpen:        true,
+				DisplayMessage:  "请稍后查看账单",
+			}, nil
+		}
 	}
 
 	return uc.buildExitResponse(record, req, duration, amount, discountAmount, finalAmount), nil

@@ -13,6 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliation"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliationexception"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/refundapproval"
 )
 
@@ -74,8 +76,10 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			order.Table:          order.ValidColumn,
-			refundapproval.Table: refundapproval.ValidColumn,
+			order.Table:                   order.ValidColumn,
+			reconciliation.Table:          reconciliation.ValidColumn,
+			reconciliationexception.Table: reconciliationexception.ValidColumn,
+			refundapproval.Table:          refundapproval.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

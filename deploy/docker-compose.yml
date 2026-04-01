@@ -51,6 +51,33 @@ services:
       - "4317:4317"
       - "4318:4318"
 
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    container_name: smart-park-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: smart-park-grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/etc/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - prometheus
+
   gateway:
     build:
       context: ../../
@@ -114,6 +141,33 @@ services:
     environment:
       - KRATOS_CONF=../../configs/admin.yaml
 
+  device:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.device
+    container_name: smart-park-device
+    ports:
+      - "8005:8005"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - KRATOS_CONF=../../configs/device.yaml
+
+  analytics:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.analytics
+    container_name: smart-park-analytics
+    ports:
+      - "8006:8006"
+    depends_on:
+      - postgres
+    environment:
+      - KRATOS_CONF=../../configs/analytics.yaml
+
 volumes:
   postgres_data:
   redis_data:
+  prometheus_data:
+  grafana_data:

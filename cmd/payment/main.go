@@ -20,6 +20,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/service"
 	"github.com/xuanyiying/smart-park/internal/payment/wechat"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/seata"
 )
 
 var (
@@ -48,6 +49,12 @@ func main() {
 	cfg, err := config.Load(flagconf)
 	if err != nil {
 		logHelper.Errorf("failed to load config: %v", err)
+		os.Exit(1)
+	}
+
+	// Initialize Seata
+	if err := seata.Init(); err != nil {
+		logHelper.Errorf("failed to initialize seata: %v", err)
 		os.Exit(1)
 	}
 

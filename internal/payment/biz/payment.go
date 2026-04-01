@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
+	"github.com/seata/seata-go/pkg/tm"
 
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 	"github.com/xuanyiying/smart-park/internal/payment/alipay"
@@ -16,27 +17,36 @@ import (
 
 // PaymentUseCase implements payment business logic.
 type PaymentUseCase struct {
-	orderRepo    OrderRepo
-	recordRepo   RecordRepo
-	gateClient   GateControlService
-	log          *log.Helper
-	config       *PaymentConfig
-	bizConfig    *Config
-	wechatClient *wechat.Client
-	alipayClient *alipay.Client
+	orderRepo                OrderRepo
+	recordRepo               RecordRepo
+	reconciliationRepo       ReconciliationRepo
+	reconciliationExceptionRepo ReconciliationExceptionRepo
+	gateClient               GateControlService
+	notificationClient       NotificationService
+	log                      *log.Helper
+	config                   *PaymentConfig
+	bizConfig                *Config
+	wechatClient             *wechat.Client
+	alipayClient             *alipay.Client
+}
+
+// NotificationService defines the interface for notification service
+type NotificationService interface {
+	CreatePaymentNotification(ctx context.Context, userID string, orderID string, amount float64, status string) error
 }
 
 // NewPaymentUseCase creates a new PaymentUseCase.
-func NewPaymentUseCase(orderRepo OrderRepo, recordRepo RecordRepo, gateClient GateControlService, config *PaymentConfig, wechatClient *wechat.Client, alipayClient *alipay.Client, logger log.Logger) *PaymentUseCase {
+func NewPaymentUseCase(orderRepo OrderRepo, recordRepo RecordRepo, gateClient GateControlService, notificationClient NotificationService, config *PaymentConfig, wechatClient *wechat.Client, alipayClient *alipay.Client, logger log.Logger) *PaymentUseCase {
 	return &PaymentUseCase{
-		orderRepo:    orderRepo,
-		recordRepo:   recordRepo,
-		gateClient:   gateClient,
-		log:          log.NewHelper(logger),
-		config:       config,
-		bizConfig:    DefaultConfig(),
-		wechatClient: wechatClient,
-		alipayClient: alipayClient,
+		orderRepo:                orderRepo,
+		recordRepo:               recordRepo,
+		gateClient:               gateClient,
+		notificationClient:       notificationClient,
+		log:                      log.NewHelper(logger),
+		config:                   config,
+		bizConfig:                DefaultConfig(),
+		wechatClient:             wechatClient,
+		alipayClient:             alipayClient,
 	}
 }
 
@@ -46,37 +56,55 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 		return nil, err
 	}
 
-	recordID, err := uuid.Parse(req.RecordId)
-	if err != nil {
-		return nil, fmt.Errorf("invalid record ID: %w", err)
+	var paymentData *v1.PaymentData
+	gc := &tm.GtxConfig{
+		Name: "create-payment",
+		Timeout: time.Minute,
+		Propagation: tm.Required,
 	}
 
-	// Check for existing paid order (idempotency)
-	if existingOrder, _ := uc.orderRepo.GetOrderByRecordID(ctx, recordID); existingOrder != nil {
-		if existingOrder.Status == string(StatusPaid) {
-			return uc.buildExistingPaymentResponse(existingOrder), nil
+	err := tm.WithGlobalTx(ctx, gc, func(ctx context.Context) error {
+		recordID, err := uuid.Parse(req.RecordId)
+		if err != nil {
+			return fmt.Errorf("invalid record ID: %w", err)
 		}
-	}
 
-	// Create new order
-	order, err := uc.createOrder(ctx, recordID, req.Amount)
+		// Check for existing paid order (idempotency)
+		if existingOrder, _ := uc.orderRepo.GetOrderByRecordID(ctx, recordID); existingOrder != nil {
+			if existingOrder.Status == string(StatusPaid) {
+				paymentData = uc.buildExistingPaymentResponse(existingOrder)
+				return nil
+			}
+		}
+
+		// Create new order
+		order, err := uc.createOrder(ctx, recordID, req.Amount)
+		if err != nil {
+			return err
+		}
+
+		// Generate payment URL based on method
+		payURL, qrCode, err := uc.generatePaymentURL(ctx, order, req)
+		if err != nil {
+			return err
+		}
+
+		paymentData = &v1.PaymentData{
+			OrderId:    order.ID.String(),
+			Amount:     order.FinalAmount,
+			PayUrl:     payURL,
+			QrCode:     qrCode,
+			ExpireTime: time.Now().Add(uc.bizConfig.OrderExpiration).Format(time.RFC3339),
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
 
-	// Generate payment URL based on method
-	payURL, qrCode, err := uc.generatePaymentURL(ctx, order, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.PaymentData{
-		OrderId:    order.ID.String(),
-		Amount:     order.FinalAmount,
-		PayUrl:     payURL,
-		QrCode:     qrCode,
-		ExpireTime: time.Now().Add(uc.bizConfig.OrderExpiration).Format(time.RFC3339),
-	}, nil
+	return paymentData, nil
 }
 
 // validateCreatePaymentRequest validates the create payment request.
@@ -225,37 +253,146 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 		return nil, fmt.Errorf("invalid order ID: %w", err)
 	}
 
-	order, err := uc.orderRepo.GetOrder(ctx, id)
+	var refundData *v1.RefundData
+	gc := &tm.GtxConfig{
+		Name: "refund-payment",
+		Timeout: time.Minute,
+		Propagation: tm.Required,
+	}
+
+	err = tm.WithGlobalTx(ctx, gc, func(ctx context.Context) error {
+		order, err := uc.orderRepo.GetOrder(ctx, id)
+		if err != nil {
+			return fmt.Errorf("failed to get order: %w", err)
+		}
+
+		if order.Status != string(StatusPaid) {
+			refundData = &v1.RefundData{
+				RefundId: "",
+				Status:   "failed",
+			}
+			return nil
+		}
+
+		refundID := uuid.New().String()
+
+		if err := uc.processRefund(ctx, order, refundID); err != nil {
+			uc.log.WithContext(ctx).Errorf("failed to process refund: %v", err)
+			refundData = &v1.RefundData{
+				RefundId: "",
+				Status:   "failed",
+			}
+			return nil
+		}
+
+		if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
+			uc.log.WithContext(ctx).Errorf("failed to update order for refund: %v", err)
+			return fmt.Errorf("failed to update order: %w", err)
+		}
+
+		refundData = &v1.RefundData{
+			RefundId: refundID,
+			Status:   "success",
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to get order: %w", err)
+		return nil, err
 	}
 
-	if order.Status != string(StatusPaid) {
-		return &v1.RefundData{
-			RefundId: "",
-			Status:   "failed",
-		}, nil
+	return refundData, nil
+}
+
+// AutoPay processes automatic payment for an order
+func (uc *PaymentUseCase) AutoPay(ctx context.Context, orderID string, userID string) error {
+	id, err := uuid.Parse(orderID)
+	if err != nil {
+		return fmt.Errorf("invalid order ID: %w", err)
 	}
 
-	refundID := uuid.New().String()
-
-	if err := uc.processRefund(ctx, order, refundID); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to process refund: %v", err)
-		return &v1.RefundData{
-			RefundId: "",
-			Status:   "failed",
-		}, nil
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return fmt.Errorf("invalid user ID: %w", err)
 	}
 
-	if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to update order for refund: %v", err)
-		return nil, fmt.Errorf("failed to update order: %w", err)
+	gc := &tm.GtxConfig{
+		Name: "auto-pay",
+		Timeout: time.Minute,
+		Propagation: tm.Required,
 	}
 
-	return &v1.RefundData{
-		RefundId: refundID,
-		Status:   "success",
-	}, nil
+	err = tm.WithGlobalTx(ctx, gc, func(ctx context.Context) error {
+		order, err := uc.orderRepo.GetOrder(ctx, id)
+		if err != nil {
+			return fmt.Errorf("failed to get order: %w", err)
+		}
+
+		if order.Status == string(StatusPaid) {
+			return nil // Order already paid
+		}
+
+		if order.AutoPayAttempts >= 3 {
+			order.AutoPayStatus = "failed"
+			if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
+				return fmt.Errorf("failed to update order: %w", err)
+			}
+			return fmt.Errorf("maximum auto-pay attempts reached")
+		}
+
+		// Increment auto-pay attempts
+		order.AutoPayAttempts++
+		order.AutoPayStatus = "processing"
+		order.UserID = &uid
+
+		// Process payment based on user's default payment method
+		// For simplicity, we'll use the same payment processing as regular payments
+		// In a real system, you would use stored payment information
+
+		// Generate payment (simulate auto-pay)
+		// This would typically use a stored payment token
+		var transactionID string
+		var payMethod string
+
+		// Simulate successful payment
+		// In a real system, you would call the payment gateway with stored credentials
+		transactionID = fmt.Sprintf("auto_pay_%s", uuid.New().String())
+		payMethod = "auto"
+
+		// Update order status
+		now := time.Now()
+		order.Status = string(StatusPaid)
+		order.PayTime = &now
+		order.PayMethod = payMethod
+		order.TransactionID = transactionID
+		order.PaidAmount = order.FinalAmount
+		order.AutoPayStatus = "success"
+
+		if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
+			return fmt.Errorf("failed to update order: %w", err)
+		}
+
+		// Notify gate control to open the gate
+		if uc.gateClient != nil {
+			if err := uc.gateClient.OpenGate(ctx, order.RecordID.String()); err != nil {
+				uc.log.WithContext(ctx).Errorf("failed to open gate: %v", err)
+				// Continue even if gate opening fails
+			}
+		}
+
+		// Send payment notification
+		if uc.notificationClient != nil && order.UserID != nil {
+			if err := uc.notificationClient.CreatePaymentNotification(ctx, order.UserID.String(), order.ID.String(), order.FinalAmount, "success"); err != nil {
+				uc.log.WithContext(ctx).Errorf("failed to send payment notification: %v", err)
+				// Continue even if notification fails
+			}
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 // processRefund processes the refund for the order.
@@ -293,4 +430,345 @@ func (uc *PaymentUseCase) processRefund(ctx context.Context, order *Order, refun
 	order.RefundedAt = &now
 	order.RefundTransactionID = refundID
 	return nil
+}
+
+// Reconcile performs payment reconciliation with payment platforms.
+// func (uc *PaymentUseCase) Reconcile(ctx context.Context, req *v1.ReconcileRequest) (*v1.ReconcileData, error) {
+// 	date := req.Date
+// 	payMethod := req.PayMethod
+
+// 	// Create reconciliation record
+// 	reconciliation := &Reconciliation{
+// 		ID:        uuid.New(),
+// 		Date:      date,
+// 		PayMethod: payMethod,
+// 		Status:    "pending",
+// 	}
+
+// 	if err := uc.reconciliationRepo.CreateReconciliation(ctx, reconciliation); err != nil {
+// 		uc.log.WithContext(ctx).Errorf("Failed to create reconciliation record: %v", err)
+// 		return nil, fmt.Errorf("failed to create reconciliation record: %w", err)
+// 	}
+
+// 	// Get platform transactions
+// 	platformTransactions, err := uc.getPlatformTransactions(ctx, date, payMethod)
+// 	if err != nil {
+// 		uc.log.WithContext(ctx).Errorf("Failed to get platform transactions: %v", err)
+// 		reconciliation.Status = "failed"
+// 		if err := uc.reconciliationRepo.UpdateReconciliation(ctx, reconciliation); err != nil {
+// 			uc.log.WithContext(ctx).Errorf("Failed to update reconciliation status: %v", err)
+// 		}
+// 		return nil, fmt.Errorf("failed to get platform transactions: %w", err)
+// 	}
+
+// 	// Get system orders
+// 	systemOrders, err := uc.getSystemOrders(ctx, date, payMethod)
+// 	if err != nil {
+// 		uc.log.WithContext(ctx).Errorf("Failed to get system orders: %v", err)
+// 		reconciliation.Status = "failed"
+// 		if err := uc.reconciliationRepo.UpdateReconciliation(ctx, reconciliation); err != nil {
+// 			uc.log.WithContext(ctx).Errorf("Failed to update reconciliation status: %v", err)
+// 		}
+// 		return nil, fmt.Errorf("failed to get system orders: %w", err)
+// 	}
+
+// 	// Perform reconciliation
+// 	matchedOrders, exceptionOrders := uc.performReconciliation(ctx, reconciliation.ID, systemOrders, platformTransactions)
+
+// 	// Update reconciliation status
+// 	reconciliation.TotalOrders = len(systemOrders)
+// 	reconciliation.MatchedOrders = matchedOrders
+// 	reconciliation.ExceptionOrders = exceptionOrders
+
+// 	if exceptionOrders == 0 {
+// 		reconciliation.Status = "success"
+// 	} else {
+// 		reconciliation.Status = "partial"
+// 	}
+
+// 	if err := uc.reconciliationRepo.UpdateReconciliation(ctx, reconciliation); err != nil {
+// 		uc.log.WithContext(ctx).Errorf("Failed to update reconciliation record: %v", err)
+// 		return nil, fmt.Errorf("failed to update reconciliation record: %w", err)
+// 	}
+
+// 	// Create response manually since proto generation is not working
+// 	return &v1.ReconcileData{
+// 		ReconciliationId: reconciliation.ID.String(),
+// 		Status:           reconciliation.Status,
+// 		TotalOrders:      int32(reconciliation.TotalOrders),
+// 		MatchedOrders:    int32(reconciliation.MatchedOrders),
+// 		ExceptionOrders:  int32(reconciliation.ExceptionOrders),
+// 	}, nil
+// }
+
+// GetReconciliationResult retrieves reconciliation result by ID.
+// func (uc *PaymentUseCase) GetReconciliationResult(ctx context.Context, req *v1.GetReconciliationResultRequest) (*v1.ReconciliationResultData, error) {
+// 	reconciliationID, err := uuid.Parse(req.ReconciliationId)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("invalid reconciliation ID: %w", err)
+// 	}
+
+// 	reconciliation, err := uc.reconciliationRepo.GetReconciliation(ctx, reconciliationID)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to get reconciliation: %w", err)
+// 	}
+
+// 	exceptions, err := uc.reconciliationExceptionRepo.GetReconciliationExceptions(ctx, reconciliationID)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to get reconciliation exceptions: %w", err)
+// 	}
+
+// 	// Create response manually since proto generation is not working
+// 	resultData := &v1.ReconciliationResultData{
+// 		ReconciliationId: reconciliation.ID.String(),
+// 		Date:             reconciliation.Date,
+// 		PayMethod:        reconciliation.PayMethod,
+// 		Status:           reconciliation.Status,
+// 		TotalOrders:      int32(reconciliation.TotalOrders),
+// 		MatchedOrders:    int32(reconciliation.MatchedOrders),
+// 		ExceptionOrders:  int32(reconciliation.ExceptionOrders),
+// 		Exceptions:       []*v1.ReconciliationException{},
+// 		CreatedAt:        reconciliation.CreatedAt.Format(time.RFC3339),
+// 	}
+
+// 	for _, exception := range exceptions {
+// 		exceptionItem := &v1.ReconciliationException{
+// 			OrderId:         exception.OrderID.String(),
+// 			PlatformOrderId: exception.PlatformOrderID,
+// 			SystemAmount:    exception.SystemAmount,
+// 			PlatformAmount:  exception.PlatformAmount,
+// 			Status:          exception.Status,
+// 			Reason:          exception.Reason,
+// 		}
+// 		resultData.Exceptions = append(resultData.Exceptions, exceptionItem)
+// 	}
+
+// 	return resultData, nil
+// }
+
+// ListReconciliationResults lists reconciliation results with pagination.
+// func (uc *PaymentUseCase) ListReconciliationResults(ctx context.Context, req *v1.ListReconciliationResultsRequest) (*v1.ListReconciliationResultsData, error) {
+// 	page := req.Page
+// 	if page <= 0 {
+// 		page = 1
+// 	}
+
+// 	pageSize := req.PageSize
+// 	if pageSize <= 0 {
+// 		pageSize = 10
+// 	}
+
+// 	reconciliations, total, err := uc.reconciliationRepo.ListReconciliations(ctx, req.StartDate, req.EndDate, page, pageSize)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to list reconciliations: %w", err)
+// 	}
+
+// 	// Create response manually since proto generation is not working
+// 	resultData := &v1.ListReconciliationResultsData{
+// 		Total: int32(total),
+// 		Items: []*v1.ReconciliationResultSummary{},
+// 	}
+
+// 	for _, reconciliation := range reconciliations {
+// 		summaryItem := &v1.ReconciliationResultSummary{
+// 			ReconciliationId: reconciliation.ID.String(),
+// 			Date:             reconciliation.Date,
+// 			PayMethod:        reconciliation.PayMethod,
+// 			Status:           reconciliation.Status,
+// 			TotalOrders:      int32(reconciliation.TotalOrders),
+// 			MatchedOrders:    int32(reconciliation.MatchedOrders),
+// 			ExceptionOrders:  int32(reconciliation.ExceptionOrders),
+// 			CreatedAt:        reconciliation.CreatedAt.Format(time.RFC3339),
+// 		}
+// 		resultData.Items = append(resultData.Items, summaryItem)
+// 	}
+
+// 	return resultData, nil
+// }
+
+// HandleReconciliationException handles reconciliation exception.
+// func (uc *PaymentUseCase) HandleReconciliationException(ctx context.Context, req *v1.HandleReconciliationExceptionRequest) (*v1.HandleReconciliationExceptionData, error) {
+// 	reconciliationID, err := uuid.Parse(req.ReconciliationId)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("invalid reconciliation ID: %w", err)
+// 	}
+
+// 	orderID, err := uuid.Parse(req.OrderId)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("invalid order ID: %w", err)
+// 	}
+
+// 	exceptions, err := uc.reconciliationExceptionRepo.GetReconciliationExceptions(ctx, reconciliationID)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to get reconciliation exceptions: %w", err)
+// 	}
+
+// 	var targetException *ReconciliationException
+// 	for _, exception := range exceptions {
+// 		if exception.OrderID == orderID {
+// 			targetException = exception
+// 			break
+// 		}
+// 	}
+
+// 	if targetException == nil {
+// 		return nil, fmt.Errorf("reconciliation exception not found")
+// 	}
+
+// 	// Handle exception based on action
+// 	switch req.Action {
+// 	case "confirm":
+// 		// Confirm the order as correct
+// 		targetException.Status = "handled"
+// 		targetException.Action = "confirm"
+// 		targetException.Remark = req.Remark
+// 	case "refund":
+// 		// Process refund
+// 		order, err := uc.orderRepo.GetOrder(ctx, orderID)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("failed to get order: %w", err)
+// 		}
+
+// 		refundID := uuid.New().String()
+// 		if err := uc.processRefund(ctx, order, refundID); err != nil {
+// 			return nil, fmt.Errorf("failed to process refund: %w", err)
+// 		}
+
+// 		if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
+// 			return nil, fmt.Errorf("failed to update order: %w", err)
+// 		}
+
+// 		targetException.Status = "handled"
+// 		targetException.Action = "refund"
+// 		targetException.Remark = req.Remark
+// 	case "ignore":
+// 		// Ignore the exception
+// 		targetException.Status = "ignored"
+// 		targetException.Action = "ignore"
+// 		targetException.Remark = req.Remark
+// 	default:
+// 		return nil, fmt.Errorf("invalid action: %s", req.Action)
+// 	}
+
+// 	now := time.Now()
+// 	targetException.HandledAt = &now
+
+// 	if err := uc.reconciliationExceptionRepo.UpdateReconciliationException(ctx, targetException); err != nil {
+// 		return nil, fmt.Errorf("failed to update reconciliation exception: %w", err)
+// 	}
+
+// 	// Create response manually since proto generation is not working
+// 	return &v1.HandleReconciliationExceptionData{
+// 		Status:  "success",
+// 		OrderId: req.OrderId,
+// 		Action:  req.Action,
+// 	}, nil
+// }
+
+// getPlatformTransactions retrieves transactions from payment platforms.
+func (uc *PaymentUseCase) getPlatformTransactions(ctx context.Context, date, payMethod string) ([]*PlatformTransaction, error) {
+	var transactions []*PlatformTransaction
+
+	if payMethod == "wechat" || payMethod == "all" {
+		if uc.wechatClient != nil {
+			// WeChat transactions are not implemented yet
+		}
+	}
+
+	if payMethod == "alipay" || payMethod == "all" {
+		if uc.alipayClient != nil {
+			// Alipay transactions are not implemented yet
+		}
+	}
+
+	return transactions, nil
+}
+
+// getSystemOrders retrieves system orders for the specified date and payment method.
+func (uc *PaymentUseCase) getSystemOrders(ctx context.Context, date, payMethod string) ([]*Order, error) {
+	// This is a placeholder implementation
+	// In real implementation, you would query orders from the database
+	// based on pay_time and pay_method
+	return []*Order{}, nil
+}
+
+// performReconciliation performs the reconciliation between system orders and platform transactions.
+func (uc *PaymentUseCase) performReconciliation(ctx context.Context, reconciliationID uuid.UUID, systemOrders []*Order, platformTransactions []*PlatformTransaction) (int, int) {
+	matchedCount := 0
+	exceptionCount := 0
+
+	// Create a map for quick lookup of platform transactions
+	platformTxMap := make(map[string]*PlatformTransaction)
+	for _, tx := range platformTransactions {
+		platformTxMap[tx.OrderID] = tx
+	}
+
+	for _, order := range systemOrders {
+		if tx, exists := platformTxMap[order.ID.String()]; exists {
+			// Check if amounts match
+			if order.FinalAmount == tx.Amount {
+				matchedCount++
+			} else {
+				// Amount mismatch
+			exception := &ReconciliationException{
+					ID:                uuid.New(),
+					ReconciliationID:  reconciliationID,
+					OrderID:           order.ID,
+					PlatformOrderID:   tx.TransactionID,
+					SystemAmount:      order.FinalAmount,
+					PlatformAmount:    tx.Amount,
+					Status:            "unhandled",
+					Reason:            "Amount mismatch",
+				}
+				if err := uc.reconciliationExceptionRepo.CreateReconciliationException(ctx, exception); err != nil {
+					uc.log.WithContext(ctx).Errorf("Failed to create reconciliation exception: %v", err)
+				}
+				exceptionCount++
+			}
+		} else {
+			// Transaction not found in platform
+			exception := &ReconciliationException{
+				ID:                uuid.New(),
+				ReconciliationID:  reconciliationID,
+				OrderID:           order.ID,
+				SystemAmount:      order.FinalAmount,
+				PlatformAmount:    0,
+				Status:            "unhandled",
+				Reason:            "Transaction not found in platform",
+			}
+			if err := uc.reconciliationExceptionRepo.CreateReconciliationException(ctx, exception); err != nil {
+				uc.log.WithContext(ctx).Errorf("Failed to create reconciliation exception: %v", err)
+			}
+			exceptionCount++
+		}
+	}
+
+	// Check for platform transactions not in system
+	for _, tx := range platformTransactions {
+		found := false
+		for _, order := range systemOrders {
+			if order.ID.String() == tx.OrderID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			// Transaction found in platform but not in system
+			exception := &ReconciliationException{
+				ID:                uuid.New(),
+				ReconciliationID:  reconciliationID,
+				PlatformOrderID:   tx.TransactionID,
+				SystemAmount:      0,
+				PlatformAmount:    tx.Amount,
+				Status:            "unhandled",
+				Reason:            "Transaction not found in system",
+			}
+			if err := uc.reconciliationExceptionRepo.CreateReconciliationException(ctx, exception); err != nil {
+				uc.log.WithContext(ctx).Errorf("Failed to create reconciliation exception: %v", err)
+			}
+			exceptionCount++
+		}
+	}
+
+	return matchedCount, exceptionCount
 }

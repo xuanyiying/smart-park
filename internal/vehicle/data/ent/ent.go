@@ -17,6 +17,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingspace"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
 )
 
@@ -83,6 +84,7 @@ func checkColumn(t, c string) error {
 			lane.Table:              lane.ValidColumn,
 			offlinesyncrecord.Table: offlinesyncrecord.ValidColumn,
 			parkingrecord.Table:     parkingrecord.ValidColumn,
+			parkingspace.Table:      parkingspace.ValidColumn,
 			vehicle.Table:           vehicle.ValidColumn,
 		})
 	})

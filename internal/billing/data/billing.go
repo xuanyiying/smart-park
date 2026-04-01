@@ -155,3 +155,59 @@ func toBizBillingRule(rule *ent.BillingRule) *biz.BillingRule {
 		UpdatedAt:  rule.UpdatedAt,
 	}
 }
+
+// AdjustPrice adjusts the price of a billing rule dynamically.
+// func (r *billingRuleRepo) AdjustPrice(ctx context.Context, ruleID uuid.UUID, priceAdjustment map[string]interface{}) error {
+// 	// Get the rule from database
+// 	rule, err := r.data.db.BillingRule.Get(ctx, ruleID)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Parse existing actions
+// 	var actions []map[string]interface{}
+// 	if err := json.Unmarshal([]byte(rule.ActionsJSON), &actions); err != nil {
+// 		return err
+// 	}
+
+// 	// Apply price adjustments
+// 	for i, action := range actions {
+// 		if actionType, ok := action["type"].(string); ok {
+// 			switch actionType {
+// 			case "fixed", "per_hour", "per_minute":
+// 				if amount, ok := priceAdjustment["amount"].(float64); ok {
+// 					actions[i]["amount"] = amount
+// 				}
+// 			case "percentage":
+// 				if percent, ok := priceAdjustment["percent"].(float64); ok {
+// 					actions[i]["percent"] = percent
+// 				}
+// 			case "cap":
+// 				if cap, ok := priceAdjustment["cap"].(float64); ok {
+// 					actions[i]["cap"] = cap
+// 				}
+// 			case "max_daily":
+// 				if amount, ok := priceAdjustment["amount"].(float64); ok {
+// 					actions[i]["amount"] = amount
+// 				}
+// 			case "min_charge":
+// 				if amount, ok := priceAdjustment["amount"].(float64); ok {
+// 					actions[i]["amount"] = amount
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	// Serialize updated actions back to JSON
+// 	updatedActionsJSON, err := json.Marshal(actions)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Update the rule in database
+// 	_, err = r.data.db.BillingRule.UpdateOneID(ruleID).
+// 		SetActionsJSON(string(updatedActionsJSON)).
+// 		Save(ctx)
+
+// 	return err
+// }

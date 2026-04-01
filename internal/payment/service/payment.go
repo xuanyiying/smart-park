@@ -89,3 +89,75 @@ func (s *PaymentService) Refund(ctx context.Context, req *v1.RefundRequest) (*v1
 		Data:    data,
 	}, nil
 }
+
+// Reconcile handles reconciliation request.
+func (s *PaymentService) Reconcile(ctx context.Context, req *v1.ReconcileRequest) (*v1.ReconcileResponse, error) {
+	data, err := s.uc.Reconcile(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("Reconcile failed: %v", err)
+		return &v1.ReconcileResponse{
+			Code:    500,
+			Message: "对账失败",
+		}, nil
+	}
+
+	return &v1.ReconcileResponse{
+		Code:    0,
+		Message: "success",
+		Data:    data,
+	}, nil
+}
+
+// GetReconciliationResult handles get reconciliation result request.
+func (s *PaymentService) GetReconciliationResult(ctx context.Context, req *v1.GetReconciliationResultRequest) (*v1.GetReconciliationResultResponse, error) {
+	data, err := s.uc.GetReconciliationResult(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetReconciliationResult failed: %v", err)
+		return &v1.GetReconciliationResultResponse{
+			Code:    500,
+			Message: "获取对账结果失败",
+		}, nil
+	}
+
+	return &v1.GetReconciliationResultResponse{
+		Code:    0,
+		Message: "success",
+		Data:    data,
+	}, nil
+}
+
+// ListReconciliationResults handles list reconciliation results request.
+func (s *PaymentService) ListReconciliationResults(ctx context.Context, req *v1.ListReconciliationResultsRequest) (*v1.ListReconciliationResultsResponse, error) {
+	data, err := s.uc.ListReconciliationResults(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListReconciliationResults failed: %v", err)
+		return &v1.ListReconciliationResultsResponse{
+			Code:    500,
+			Message: "获取对账结果列表失败",
+		}, nil
+	}
+
+	return &v1.ListReconciliationResultsResponse{
+		Code:    0,
+		Message: "success",
+		Data:    data,
+	}, nil
+}
+
+// HandleReconciliationException handles reconciliation exception request.
+func (s *PaymentService) HandleReconciliationException(ctx context.Context, req *v1.HandleReconciliationExceptionRequest) (*v1.HandleReconciliationExceptionResponse, error) {
+	data, err := s.uc.HandleReconciliationException(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("HandleReconciliationException failed: %v", err)
+		return &v1.HandleReconciliationExceptionResponse{
+			Code:    500,
+			Message: "处理对账异常失败",
+		}, nil
+	}
+
+	return &v1.HandleReconciliationExceptionResponse{
+		Code:    0,
+		Message: "success",
+		Data:    data,
+	}, nil
+}

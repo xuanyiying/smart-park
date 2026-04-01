@@ -16,13 +16,18 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID
-	OpenID    string
-	Nickname  string
-	Avatar    string
-	Phone     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID              uuid.UUID
+	OpenID          string
+	Nickname        string
+	Avatar          string
+	Phone           string
+	CreditScore     int
+	CreditLevel     string
+	DefaultPayMethod string
+	PaymentToken    string
+	AutoPayEnabled  bool
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type UserVehicle struct {
@@ -34,13 +39,24 @@ type UserVehicle struct {
 	CreatedAt   time.Time
 }
 
+type PaymentRecord struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Amount    float64
+	IsLate    bool
+	PayTime   time.Time
+	CreatedAt time.Time
+}
+
 type UserRepo interface {
 	GetUserByOpenID(ctx context.Context, openID string) (*User, error)
 	CreateUser(ctx context.Context, user *User) error
-	GetUserByID(ctx context.Context, userID uuid.UUID) (*User, error)
+	GetUserByID(ctx context.Context, userID string) (*User, error)
+	UpdateUser(ctx context.Context, user *User) error
 	BindVehicle(ctx context.Context, userVehicle *UserVehicle) error
 	UnbindVehicle(ctx context.Context, userID uuid.UUID, plateNumber string) error
 	ListUserVehicles(ctx context.Context, userID uuid.UUID, page, pageSize int) ([]*UserVehicle, int64, error)
+	GetUserPaymentRecords(ctx context.Context, userID string) ([]*PaymentRecord, error)
 }
 
 type UserUseCase struct {
@@ -389,5 +405,66 @@ func (uc *UserUseCase) PurchaseMonthlyCard(ctx context.Context, userID string, r
 		Amount:  payData.Amount,
 		PayUrl:  payData.PayUrl,
 		QrCode:  payData.QrCode,
+	}, nil
+}
+
+func (uc *UserUseCase) UpdateAutoPaySettings(ctx context.Context, userID string, req *v1.UpdateAutoPaySettingsRequest) error {
+	user, err := uc.userRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	user.AutoPayEnabled = req.AutoPayEnabled
+	if req.DefaultPayMethod != "" {
+		user.DefaultPayMethod = req.DefaultPayMethod
+	}
+	user.UpdatedAt = time.Now()
+
+	return uc.userRepo.UpdateUser(ctx, user)
+}
+
+func (uc *UserUseCase) GetCreditInfo(ctx context.Context, userID string) (*v1.CreditInfo, error) {
+	user, err := uc.userRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	eligible := "否"
+	if user.CreditScore >= 60 {
+		eligible = "是"
+	}
+
+	creditStatus := "正常"
+	if user.CreditScore < 50 {
+		creditStatus = "需关注"
+	} else if user.CreditScore < 30 {
+		creditStatus = "异常"
+	}
+
+	return &v1.CreditInfo{
+		CreditScore:        user.CreditScore,
+		CreditLevel:        user.CreditLevel,
+		CreditStatus:       creditStatus,
+		EligibleForPostPayment: eligible,
+	}, nil
+}
+
+func (uc *UserUseCase) GetUserInfo(ctx context.Context, userID string) (*v1.UserInfo, error) {
+	user, err := uc.userRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.UserInfo{
+		UserId:          user.ID.String(),
+		OpenId:          user.OpenID,
+		Nickname:        user.Nickname,
+		Avatar:          user.Avatar,
+		Phone:           user.Phone,
+		CreditScore:     user.CreditScore,
+		CreditLevel:     user.CreditLevel,
+		DefaultPayMethod: user.DefaultPayMethod,
+		AutoPayEnabled:  user.AutoPayEnabled,
+		CreatedAt:       user.CreatedAt.Unix(),
 	}, nil
 }

@@ -8,6 +8,19 @@ import (
 	"github.com/google/uuid"
 )
 
+// ParkingSpace represents a parking space entity
+type ParkingSpace struct {
+	ID           uuid.UUID  `json:"id"`
+	SpaceID      string     `json:"space_id"`
+	LotID        *uuid.UUID `json:"lot_id"`
+	DeviceID     string     `json:"device_id"`
+	Status       string     `json:"status"` // available, occupied, reserved, maintenance
+	LastUpdate   time.Time  `json:"last_update"`
+	VehiclePlate *string    `json:"vehicle_plate,omitempty"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+}
+
 // Constants for vehicle service.
 const (
 	LockTypeEntry = "entry"
@@ -128,4 +141,8 @@ type VehicleRepo interface {
 	GetPendingSyncRecords(ctx context.Context, limit int) ([]*OfflineSyncRecord, error)
 	UpdateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error
 	SeedData(ctx context.Context) error
+	// Parking space operations
+	UpdateParkingSpaceStatus(ctx context.Context, space *ParkingSpace) error
+	GetParkingSpaceByID(ctx context.Context, spaceID string) (*ParkingSpace, error)
+	ListParkingSpaces(ctx context.Context, lotID *uuid.UUID, page, pageSize int) ([]*ParkingSpace, int, error)
 }

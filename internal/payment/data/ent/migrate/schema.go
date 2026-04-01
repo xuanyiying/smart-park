@@ -56,6 +56,80 @@ var (
 			},
 		},
 	}
+	// ReconciliationsColumns holds the columns for the "reconciliations" table.
+	ReconciliationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "date", Type: field.TypeString},
+		{Name: "pay_method", Type: field.TypeEnum, Enums: []string{"wechat", "alipay", "all"}, Default: "all"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "success", "failed", "partial"}, Default: "pending"},
+		{Name: "total_orders", Type: field.TypeInt, Default: 0},
+		{Name: "matched_orders", Type: field.TypeInt, Default: 0},
+		{Name: "exception_orders", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ReconciliationsTable holds the schema information for the "reconciliations" table.
+	ReconciliationsTable = &schema.Table{
+		Name:       "reconciliations",
+		Columns:    ReconciliationsColumns,
+		PrimaryKey: []*schema.Column{ReconciliationsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_reconciliation_date",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[1]},
+			},
+			{
+				Name:    "idx_reconciliation_pay_method",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[2]},
+			},
+			{
+				Name:    "idx_reconciliation_status",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[3]},
+			},
+		},
+	}
+	// ReconciliationExceptionsColumns holds the columns for the "reconciliation_exceptions" table.
+	ReconciliationExceptionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "reconciliation_id", Type: field.TypeUUID},
+		{Name: "order_id", Type: field.TypeUUID},
+		{Name: "platform_order_id", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "system_amount", Type: field.TypeFloat64},
+		{Name: "platform_amount", Type: field.TypeFloat64},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"unhandled", "handled", "ignored"}, Default: "unhandled"},
+		{Name: "reason", Type: field.TypeString, Size: 255},
+		{Name: "action", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "handled_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ReconciliationExceptionsTable holds the schema information for the "reconciliation_exceptions" table.
+	ReconciliationExceptionsTable = &schema.Table{
+		Name:       "reconciliation_exceptions",
+		Columns:    ReconciliationExceptionsColumns,
+		PrimaryKey: []*schema.Column{ReconciliationExceptionsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_reconciliation_exception_reconciliation",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationExceptionsColumns[1]},
+			},
+			{
+				Name:    "idx_reconciliation_exception_order",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationExceptionsColumns[2]},
+			},
+			{
+				Name:    "idx_reconciliation_exception_status",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationExceptionsColumns[6]},
+			},
+		},
+	}
 	// RefundApprovalsColumns holds the columns for the "refund_approvals" table.
 	RefundApprovalsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -96,6 +170,8 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		OrdersTable,
+		ReconciliationsTable,
+		ReconciliationExceptionsTable,
 		RefundApprovalsTable,
 	}
 )

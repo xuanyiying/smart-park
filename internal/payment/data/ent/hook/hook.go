@@ -21,6 +21,30 @@ func (f OrderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderMutation", m)
 }
 
+// The ReconciliationFunc type is an adapter to allow the use of ordinary
+// function as Reconciliation mutator.
+type ReconciliationFunc func(context.Context, *ent.ReconciliationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ReconciliationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReconciliationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReconciliationMutation", m)
+}
+
+// The ReconciliationExceptionFunc type is an adapter to allow the use of ordinary
+// function as ReconciliationException mutator.
+type ReconciliationExceptionFunc func(context.Context, *ent.ReconciliationExceptionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ReconciliationExceptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReconciliationExceptionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReconciliationExceptionMutation", m)
+}
+
 // The RefundApprovalFunc type is an adapter to allow the use of ordinary
 // function as RefundApproval mutator.
 type RefundApprovalFunc func(context.Context, *ent.RefundApprovalMutation) (ent.Value, error)

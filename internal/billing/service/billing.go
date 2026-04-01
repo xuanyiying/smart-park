@@ -111,3 +111,18 @@ func (s *BillingService) GetBillingRules(ctx context.Context, req *v1.GetBilling
 		Data:    rules,
 	}, nil
 }
+
+// AdjustPrice handles adjust price request.
+// func (s *BillingService) AdjustPrice(ctx context.Context, req *v1.AdjustPriceRequest) (*v1.AdjustPriceResponse, error) {
+// 	resp, err := s.uc.AdjustPrice(ctx, req)
+// 	if err != nil {
+// 		s.log.WithContext(ctx).Errorf("AdjustPrice failed: %v", err)
+// 		return &v1.AdjustPriceResponse{
+// 			Code:    500,
+// 			Message: "调整价格失败",
+// 			Success: false,
+// 		}, nil
+// 	}
+
+// 	return resp, nil
+// }

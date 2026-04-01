@@ -70,6 +70,45 @@ service UserService {
       body: "*"
     };
   }
+
+  rpc UpdateAutoPaySettings (UpdateAutoPaySettingsRequest) returns (UpdateAutoPaySettingsResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/user/auto-pay"
+      body: "*"
+    };
+  }
+
+  rpc GetCreditInfo (GetCreditInfoRequest) returns (GetCreditInfoResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/credit"
+    };
+  }
+}
+
+message UpdateAutoPaySettingsRequest {
+  bool autoPayEnabled = 1;
+  string defaultPayMethod = 2;
+}
+
+message UpdateAutoPaySettingsResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+}
+
+message GetCreditInfoRequest {}
+
+message GetCreditInfoResponse {
+  int32 code = 1;
+  string message = 2;
+  CreditInfo data = 3;
+}
+
+message CreditInfo {
+  int32 creditScore = 1;
+  string creditLevel = 2;
+  string creditStatus = 3;
+  string eligibleForPostPayment = 4;
 }
 
 message LoginRequest {
@@ -102,7 +141,11 @@ message UserInfo {
   string nickname = 3;
   string avatar = 4;
   string phone = 5;
-  int64 createdAt = 6;
+  int32 creditScore = 6;
+  string creditLevel = 7;
+  string defaultPayMethod = 8;
+  bool autoPayEnabled = 9;
+  int64 createdAt = 10;
 }
 
 message BindPlateRequest {

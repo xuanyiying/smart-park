@@ -1,0 +1,394 @@
+syntax = "proto3";
+
+package api.device.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/xuanyiying/smart-park/api/device/v1;v1";
+
+service DeviceService {
+  // 设备管理
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices",
+    };
+  }
+  
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/{deviceId}",
+    };
+  }
+  
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/devices",
+      body: "*",
+    };
+  }
+  
+  rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/devices/{deviceId}",
+      body: "*",
+    };
+  }
+  
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/devices/{deviceId}",
+    };
+  }
+  
+  // 设备监控
+  rpc GetDeviceStatus(GetDeviceStatusRequest) returns (GetDeviceStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/{deviceId}/status",
+    };
+  }
+  
+  rpc ListDeviceStatus(ListDeviceStatusRequest) returns (ListDeviceStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/status",
+    };
+  }
+  
+  // 远程升级
+  rpc ListFirmwareVersions(ListFirmwareVersionsRequest) returns (ListFirmwareVersionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/firmware/versions",
+    };
+  }
+  
+  rpc CreateFirmwareVersion(CreateFirmwareVersionRequest) returns (CreateFirmwareVersionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/firmware/versions",
+      body: "*",
+    };
+  }
+  
+  rpc UpdateDeviceFirmware(UpdateDeviceFirmwareRequest) returns (UpdateDeviceFirmwareResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/devices/{deviceId}/firmware/update",
+      body: "*",
+    };
+  }
+  
+  rpc GetFirmwareUpdateStatus(GetFirmwareUpdateStatusRequest) returns (GetFirmwareUpdateStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/{deviceId}/firmware/status",
+    };
+  }
+  
+  // 故障诊断
+  rpc ListDeviceAlerts(ListDeviceAlertsRequest) returns (ListDeviceAlertsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/alerts",
+    };
+  }
+  
+  rpc GetDeviceAlert(GetDeviceAlertRequest) returns (GetDeviceAlertResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/devices/alerts/{alertId}",
+    };
+  }
+  
+  rpc AcknowledgeAlert(AcknowledgeAlertRequest) returns (AcknowledgeAlertResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/devices/alerts/{alertId}/acknowledge",
+      body: "*",
+    };
+  }
+  
+  // 设备命令
+  rpc SendCommand(SendCommandRequest) returns (SendCommandResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/devices/{deviceId}/command",
+      body: "*",
+    };
+  }
+  
+  // 设备心跳
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/devices/heartbeat",
+      body: "*",
+    };
+  }
+}
+
+// 设备管理消息
+message ListDevicesRequest {
+  int32 page     = 1;
+  int32 pageSize = 2;
+  string deviceType = 3;
+  string status   = 4;
+}
+
+message ListDevicesResponse {
+  int32               code    = 1;
+  string              message = 2;
+  repeated DeviceInfo data    = 3;
+  int32               total   = 4;
+}
+
+message GetDeviceRequest {
+  string deviceId = 1;
+}
+
+message GetDeviceResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
+}
+
+message CreateDeviceRequest {
+  string deviceId   = 1;
+  string deviceType = 2;
+  string lotId      = 3;
+  string laneId     = 4;
+  string status     = 5;
+  string protocol   = 6;
+  map<string, string> config = 7;
+}
+
+message CreateDeviceResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
+}
+
+message UpdateDeviceRequest {
+  string deviceId   = 1;
+  string deviceType = 2;
+  string lotId      = 3;
+  string laneId     = 4;
+  string status     = 5;
+  map<string, string> config = 6;
+}
+
+message UpdateDeviceResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
+}
+
+message DeleteDeviceRequest {
+  string deviceId = 1;
+}
+
+message DeleteDeviceResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message DeviceInfo {
+  string deviceId      = 1;
+  string deviceType    = 2;
+  string status        = 3;
+  bool   online        = 4;
+  string lastHeartbeat = 5;
+  string lotId         = 6;
+  string laneId        = 7;
+  string protocol      = 8;
+  map<string, string> config = 9;
+  string firmwareVersion = 10;
+  string createdAt     = 11;
+  string updatedAt     = 12;
+}
+
+// 设备状态消息
+message GetDeviceStatusRequest {
+  string deviceId = 1;
+}
+
+message GetDeviceStatusResponse {
+  int32        code    = 1;
+  string       message = 2;
+  DeviceStatus data    = 3;
+}
+
+message ListDeviceStatusRequest {
+  int32 page     = 1;
+  int32 pageSize = 2;
+  bool  onlineOnly = 3;
+}
+
+message ListDeviceStatusResponse {
+  int32               code    = 1;
+  string              message = 2;
+  repeated DeviceStatus data    = 3;
+  int32               total   = 4;
+}
+
+message DeviceStatus {
+  string deviceId      = 1;
+  bool   online        = 2;
+  string status        = 3;
+  string lastHeartbeat = 4;
+  string firmwareVersion = 5;
+  map<string, string> metrics = 6;
+}
+
+// 固件管理消息
+message ListFirmwareVersionsRequest {
+  int32 page     = 1;
+  int32 pageSize = 2;
+  string deviceType = 3;
+}
+
+message ListFirmwareVersionsResponse {
+  int32                   code    = 1;
+  string                  message = 2;
+  repeated FirmwareVersion data    = 3;
+  int32                   total   = 4;
+}
+
+message CreateFirmwareVersionRequest {
+  string deviceType = 1;
+  string version    = 2;
+  string url        = 3;
+  string checksum   = 4;
+  string description = 5;
+  bool   isActive   = 6;
+}
+
+message CreateFirmwareVersionResponse {
+  int32            code    = 1;
+  string           message = 2;
+  FirmwareVersion data    = 3;
+}
+
+message UpdateDeviceFirmwareRequest {
+  string deviceId      = 1;
+  string firmwareVersion = 2;
+  bool   force         = 3;
+}
+
+message UpdateDeviceFirmwareResponse {
+  int32               code    = 1;
+  string              message = 2;
+  FirmwareUpdateInfo data    = 3;
+}
+
+message GetFirmwareUpdateStatusRequest {
+  string deviceId = 1;
+  string updateId = 2;
+}
+
+message GetFirmwareUpdateStatusResponse {
+  int32               code    = 1;
+  string              message = 2;
+  FirmwareUpdateInfo data    = 3;
+}
+
+message FirmwareVersion {
+  string id          = 1;
+  string deviceType  = 2;
+  string version     = 3;
+  string url         = 4;
+  string checksum    = 5;
+  string description = 6;
+  bool   isActive    = 7;
+  string createdAt   = 8;
+}
+
+message FirmwareUpdateInfo {
+  string updateId       = 1;
+  string deviceId       = 2;
+  string firmwareVersion = 3;
+  string status         = 4;
+  string progress       = 5;
+  string errorMessage   = 6;
+  string startedAt      = 7;
+  string completedAt    = 8;
+}
+
+// 告警管理消息
+message ListDeviceAlertsRequest {
+  int32 page     = 1;
+  int32 pageSize = 2;
+  string deviceId = 3;
+  string severity = 4;
+  string status   = 5;
+}
+
+message ListDeviceAlertsResponse {
+  int32             code    = 1;
+  string            message = 2;
+  repeated DeviceAlert data    = 3;
+  int32             total   = 4;
+}
+
+message GetDeviceAlertRequest {
+  string alertId = 1;
+}
+
+message GetDeviceAlertResponse {
+  int32        code    = 1;
+  string       message = 2;
+  DeviceAlert data    = 3;
+}
+
+message AcknowledgeAlertRequest {
+  string alertId = 1;
+  string notes   = 2;
+}
+
+message AcknowledgeAlertResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message DeviceAlert {
+  string alertId    = 1;
+  string deviceId   = 2;
+  string type       = 3;
+  string severity   = 4;
+  string message    = 5;
+  string status     = 6;
+  string createdAt  = 7;
+  string acknowledgedAt = 8;
+  string acknowledgedBy = 9;
+  string notes      = 10;
+  map<string, string> metadata = 11;
+}
+
+// 命令消息
+message SendCommandRequest {
+  string deviceId = 1;
+  string command  = 2;
+  map<string, string> params = 3;
+}
+
+message SendCommandResponse {
+  int32       code    = 1;
+  string      message = 2;
+  CommandInfo data    = 3;
+}
+
+message CommandInfo {
+  string commandId = 1;
+  string status    = 2;
+  string deviceId  = 3;
+  string command   = 4;
+  string createdAt = 5;
+  string executedAt = 6;
+  string result    = 7;
+}
+
+// 心跳消息
+message HeartbeatRequest {
+  string deviceId      = 1;
+  string status        = 2;
+  string timestamp     = 3;
+  string firmwareVersion = 4;
+  map<string, string> metrics = 5;
+}
+
+message HeartbeatResponse {
+  int32  code    = 1;
+  string message = 2;
+  bool   needsUpdate = 3;
+  string newFirmwareVersion = 4;
+}

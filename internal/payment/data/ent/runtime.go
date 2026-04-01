@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliation"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliationexception"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/refundapproval"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/schema"
 )
@@ -75,6 +77,74 @@ func init() {
 	orderDescID := orderFields[0].Descriptor()
 	// order.DefaultID holds the default value on creation for the id field.
 	order.DefaultID = orderDescID.Default.(func() uuid.UUID)
+	reconciliationFields := schema.Reconciliation{}.Fields()
+	_ = reconciliationFields
+	// reconciliationDescTotalOrders is the schema descriptor for total_orders field.
+	reconciliationDescTotalOrders := reconciliationFields[4].Descriptor()
+	// reconciliation.DefaultTotalOrders holds the default value on creation for the total_orders field.
+	reconciliation.DefaultTotalOrders = reconciliationDescTotalOrders.Default.(int)
+	// reconciliationDescMatchedOrders is the schema descriptor for matched_orders field.
+	reconciliationDescMatchedOrders := reconciliationFields[5].Descriptor()
+	// reconciliation.DefaultMatchedOrders holds the default value on creation for the matched_orders field.
+	reconciliation.DefaultMatchedOrders = reconciliationDescMatchedOrders.Default.(int)
+	// reconciliationDescExceptionOrders is the schema descriptor for exception_orders field.
+	reconciliationDescExceptionOrders := reconciliationFields[6].Descriptor()
+	// reconciliation.DefaultExceptionOrders holds the default value on creation for the exception_orders field.
+	reconciliation.DefaultExceptionOrders = reconciliationDescExceptionOrders.Default.(int)
+	// reconciliationDescCreatedAt is the schema descriptor for created_at field.
+	reconciliationDescCreatedAt := reconciliationFields[7].Descriptor()
+	// reconciliation.DefaultCreatedAt holds the default value on creation for the created_at field.
+	reconciliation.DefaultCreatedAt = reconciliationDescCreatedAt.Default.(func() time.Time)
+	// reconciliationDescUpdatedAt is the schema descriptor for updated_at field.
+	reconciliationDescUpdatedAt := reconciliationFields[8].Descriptor()
+	// reconciliation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	reconciliation.DefaultUpdatedAt = reconciliationDescUpdatedAt.Default.(func() time.Time)
+	// reconciliation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	reconciliation.UpdateDefaultUpdatedAt = reconciliationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// reconciliationDescID is the schema descriptor for id field.
+	reconciliationDescID := reconciliationFields[0].Descriptor()
+	// reconciliation.DefaultID holds the default value on creation for the id field.
+	reconciliation.DefaultID = reconciliationDescID.Default.(func() uuid.UUID)
+	reconciliationexceptionFields := schema.ReconciliationException{}.Fields()
+	_ = reconciliationexceptionFields
+	// reconciliationexceptionDescPlatformOrderID is the schema descriptor for platform_order_id field.
+	reconciliationexceptionDescPlatformOrderID := reconciliationexceptionFields[3].Descriptor()
+	// reconciliationexception.PlatformOrderIDValidator is a validator for the "platform_order_id" field. It is called by the builders before save.
+	reconciliationexception.PlatformOrderIDValidator = reconciliationexceptionDescPlatformOrderID.Validators[0].(func(string) error)
+	// reconciliationexceptionDescSystemAmount is the schema descriptor for system_amount field.
+	reconciliationexceptionDescSystemAmount := reconciliationexceptionFields[4].Descriptor()
+	// reconciliationexception.SystemAmountValidator is a validator for the "system_amount" field. It is called by the builders before save.
+	reconciliationexception.SystemAmountValidator = reconciliationexceptionDescSystemAmount.Validators[0].(func(float64) error)
+	// reconciliationexceptionDescPlatformAmount is the schema descriptor for platform_amount field.
+	reconciliationexceptionDescPlatformAmount := reconciliationexceptionFields[5].Descriptor()
+	// reconciliationexception.PlatformAmountValidator is a validator for the "platform_amount" field. It is called by the builders before save.
+	reconciliationexception.PlatformAmountValidator = reconciliationexceptionDescPlatformAmount.Validators[0].(func(float64) error)
+	// reconciliationexceptionDescReason is the schema descriptor for reason field.
+	reconciliationexceptionDescReason := reconciliationexceptionFields[7].Descriptor()
+	// reconciliationexception.ReasonValidator is a validator for the "reason" field. It is called by the builders before save.
+	reconciliationexception.ReasonValidator = reconciliationexceptionDescReason.Validators[0].(func(string) error)
+	// reconciliationexceptionDescAction is the schema descriptor for action field.
+	reconciliationexceptionDescAction := reconciliationexceptionFields[8].Descriptor()
+	// reconciliationexception.ActionValidator is a validator for the "action" field. It is called by the builders before save.
+	reconciliationexception.ActionValidator = reconciliationexceptionDescAction.Validators[0].(func(string) error)
+	// reconciliationexceptionDescRemark is the schema descriptor for remark field.
+	reconciliationexceptionDescRemark := reconciliationexceptionFields[9].Descriptor()
+	// reconciliationexception.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	reconciliationexception.RemarkValidator = reconciliationexceptionDescRemark.Validators[0].(func(string) error)
+	// reconciliationexceptionDescCreatedAt is the schema descriptor for created_at field.
+	reconciliationexceptionDescCreatedAt := reconciliationexceptionFields[11].Descriptor()
+	// reconciliationexception.DefaultCreatedAt holds the default value on creation for the created_at field.
+	reconciliationexception.DefaultCreatedAt = reconciliationexceptionDescCreatedAt.Default.(func() time.Time)
+	// reconciliationexceptionDescUpdatedAt is the schema descriptor for updated_at field.
+	reconciliationexceptionDescUpdatedAt := reconciliationexceptionFields[12].Descriptor()
+	// reconciliationexception.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	reconciliationexception.DefaultUpdatedAt = reconciliationexceptionDescUpdatedAt.Default.(func() time.Time)
+	// reconciliationexception.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	reconciliationexception.UpdateDefaultUpdatedAt = reconciliationexceptionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// reconciliationexceptionDescID is the schema descriptor for id field.
+	reconciliationexceptionDescID := reconciliationexceptionFields[0].Descriptor()
+	// reconciliationexception.DefaultID holds the default value on creation for the id field.
+	reconciliationexception.DefaultID = reconciliationexceptionDescID.Default.(func() uuid.UUID)
 	refundapprovalFields := schema.RefundApproval{}.Fields()
 	_ = refundapprovalFields
 	// refundapprovalDescApplicant is the schema descriptor for applicant field.

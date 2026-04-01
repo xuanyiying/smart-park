@@ -1,0 +1,30 @@
+server:
+  port: 8006
+  timeout: 60
+
+database:
+  driver: postgres
+  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+mq:
+  type: "redis"
+  redis:
+    addr: "localhost:6379"
+    password: ""
+    db: 0
+    stream: "analytics"
+
+log:
+  level: info
+  format: json
+
+telemetry:
+  enabled: true
+  endpoint: "localhost:4317"
+  serviceName: "analytics-svc"
+  sampleRate: 1.0

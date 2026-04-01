@@ -30,7 +30,7 @@ log_error() {
 stop_backend_services() {
     log_info "Stopping backend services..."
     
-    for service in vehicle billing payment admin gateway frontend; do
+    for service in vehicle billing payment admin gateway analytics frontend; do
         pid_file="/tmp/smart-park-${service}.pid"
         if [ -f "$pid_file" ]; then
             pid=$(cat "$pid_file")
@@ -46,7 +46,7 @@ stop_backend_services() {
         fi
     done
     
-    for port in 8000 8001 8002 8003 8004 3000; do
+    for port in 8000 8001 8002 8003 8004 8006 3000; do
         if lsof -ti:$port >/dev/null 2>&1; then
             log_info "Killing process on port $port..."
             lsof -ti:$port | xargs kill -9 2>/dev/null || log_warning "Failed to kill process on port $port"
@@ -80,7 +80,7 @@ show_status() {
     echo ""
     
     log_info "Backend Services:"
-    for port in 8000 8001 8002 8003 8004 3000; do
+    for port in 8000 8001 8002 8003 8004 8006 3000; do
         if lsof -ti:$port >/dev/null 2>&1; then
             log_error "Port $port is still active"
         else
