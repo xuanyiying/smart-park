@@ -13,6 +13,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/conf"
 	"github.com/xuanyiying/smart-park/internal/gateway/biz"
 	"github.com/xuanyiying/smart-park/internal/gateway/service"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
 )
 
 var (
@@ -65,6 +66,7 @@ func main() {
 			fmt.Fprintf(w, "%s -> %s\n", route.Path, route.Target)
 		}
 	})
+	hs.HandlePrefix("/metrics", metrics.NewHandler())
 
 	app := newApp(logger, hs)
 	logHelper.Infof("gateway service starting on port %d", cfg.Server.Port)

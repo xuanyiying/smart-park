@@ -20,6 +20,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/service"
 	"github.com/xuanyiying/smart-park/internal/payment/wechat"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
 )
 
 var (
@@ -158,6 +159,9 @@ func main() {
 	// Register services
 	v1.RegisterPaymentServiceServer(gs, paymentSvc)
 	v1.RegisterPaymentServiceHTTPServer(hs, paymentSvc)
+
+	// Register Prometheus metrics endpoint
+	hs.HandlePrefix("/metrics", metrics.NewHandler())
 
 	// Start application
 	app := newApp(logger, gs, hs)

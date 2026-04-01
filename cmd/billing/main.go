@@ -17,6 +17,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/billing/data/ent"
 	"github.com/xuanyiying/smart-park/internal/billing/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
 )
 
 var (
@@ -98,6 +99,9 @@ func main() {
 	// Register services
 	v1.RegisterBillingServiceServer(gs, billingSvc)
 	v1.RegisterBillingServiceHTTPServer(hs, billingSvc)
+
+	// Register Prometheus metrics endpoint
+	hs.HandlePrefix("/metrics", metrics.NewHandler())
 
 	// Start application
 	app := newApp(logger, gs, hs)
