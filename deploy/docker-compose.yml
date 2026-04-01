@@ -18,23 +18,6 @@ services:
       timeout: 5s
       retries: 5
 
-  postgres_1:
-    image: postgres:15-alpine
-    container_name: smart-park-postgres-1
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-parking_1}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data_1:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: redis:7-alpine
     container_name: smart-park-redis
@@ -212,7 +195,6 @@ services:
 
 volumes:
   postgres_data:
-  postgres_data_1:
   redis_data:
   seata_data:
   prometheus_data:

@@ -9,7 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	_ "github.com/lib/pq"
+	"github.com/xuanyiying/smart-park/pkg/database"
 
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 	vehiclev1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
@@ -70,8 +70,28 @@ func main() {
 		defer tracerProvider.Shutdown(context.Background())
 	}
 
-	// Connect to database
-	dbClient, err := ent.Open("postgres", cfg.Database.Source)
+	// Connect to database with read-write separation
+	dbCfg := &database.Config{
+		Primary: struct {
+			Source string
+		}{
+			Source: cfg.Database.Primary.Source,
+		},
+		Replica: struct {
+			Source string
+		}{
+			Source: cfg.Database.Replica.Source,
+		},
+	}
+	dbManager, err := database.NewDBManager(dbCfg)
+	if err != nil {
+		logHelper.Errorf("failed to connect database: %v", err)
+		os.Exit(1)
+	}
+	defer dbManager.Close()
+
+	// Connect to database using ent
+	dbClient, err := ent.Open("postgres", dbManager.Primary())
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
