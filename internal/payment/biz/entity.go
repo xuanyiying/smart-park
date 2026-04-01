@@ -33,6 +33,7 @@ type OrderRepo interface {
 	GetOrder(ctx context.Context, orderID uuid.UUID) (*Order, error)
 	GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) (*Order, error)
 	GetOrderByTransactionID(ctx context.Context, transactionID string) (*Order, error)
+	GetOrdersByTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*Order, error)
 	CreateOrder(ctx context.Context, order *Order) error
 	UpdateOrder(ctx context.Context, order *Order) error
 	ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*Order, int64, error)

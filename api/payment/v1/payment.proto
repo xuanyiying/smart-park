@@ -40,6 +40,26 @@ service PaymentService {
       body: "*",
     };
   }
+
+  rpc ReconcileDaily(ReconcileDailyRequest) returns (ReconcileDailyResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/reconcile/daily",
+      body: "*",
+    };
+  }
+
+  rpc GetReconciliationReport(GetReconciliationReportRequest) returns (GetReconciliationReportResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/pay/reconcile/report",
+    };
+  }
+
+  rpc FixMismatchedOrders(FixMismatchedOrdersRequest) returns (FixMismatchedOrdersResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pay/reconcile/fix",
+      body: "*",
+    };
+  }
 }
 
 message CreatePaymentRequest {
@@ -125,4 +145,46 @@ message RefundResponse {
 message RefundData {
   string refundId = 1;
   string status   = 2;
+}
+
+message ReconcileDailyRequest {
+  string date = 1; // 格式：2006-01-02
+}
+
+message ReconcileDailyResponse {
+  int32                   code    = 1;
+  string                  message = 2;
+  repeated ReconciliationRecord data    = 3;
+}
+
+message ReconciliationRecord {
+  string id                = 1;
+  string orderId           = 2;
+  string paymentMethod     = 3;
+  double orderAmount       = 4;
+  double paidAmount        = 5;
+  string transactionId     = 6;
+  string reconciliationTime = 7;
+  string status            = 8;
+  string notes             = 9;
+}
+
+message GetReconciliationReportRequest {
+  string startDate = 1; // 格式：2006-01-02
+  string endDate   = 2; // 格式：2006-01-02
+}
+
+message GetReconciliationReportResponse {
+  int32  code    = 1;
+  string message = 2;
+  map<string, string> data    = 3;
+}
+
+message FixMismatchedOrdersRequest {
+  repeated string orderIds = 1;
+}
+
+message FixMismatchedOrdersResponse {
+  int32  code    = 1;
+  string message = 2;
 }

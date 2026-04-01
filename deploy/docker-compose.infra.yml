@@ -45,7 +45,32 @@ services:
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: smart-park-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml
+      - loki_data:/loki
+    command:
+      - "-config.file=/etc/loki/config.yml"
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: smart-park-promtail
+    volumes:
+      - ./promtail/config.yml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - "-config.file=/etc/promtail/config.yml"
+    depends_on:
+      - loki
 
 volumes:
   prometheus_data:
   grafana_data:
+  loki_data:

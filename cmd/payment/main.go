@@ -21,6 +21,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/wechat"
 	"github.com/xuanyiying/smart-park/pkg/config"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
 var (
@@ -50,6 +51,22 @@ func main() {
 	if err != nil {
 		logHelper.Errorf("failed to load config: %v", err)
 		os.Exit(1)
+	}
+
+	// Initialize tracing
+	traceCfg := &trace.Config{
+		Enabled:     true,
+		ServiceName: cfg.Otel.ServiceName,
+		Endpoint:    cfg.Otel.Endpoint,
+		SampleRate:  1.0,
+	}
+	tracerProvider, err := trace.NewTracerProvider(traceCfg)
+	if err != nil {
+		logHelper.Errorf("failed to initialize tracer: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("tracing initialized successfully")
+		defer tracerProvider.Shutdown(context.Background())
 	}
 
 	// Connect to database
@@ -142,9 +159,10 @@ func main() {
 
 	// Initialize business logic
 	paymentUseCase := biz.NewPaymentUseCase(orderRepo, recordRepo, gateClient, paymentConfig, wechatClient, alipayClient, logger)
+	reconciliationUseCase := biz.NewReconciliationUseCase(orderRepo, wechatClient, alipayClient, logger)
 
 	// Initialize gRPC service
-	paymentSvc := service.NewPaymentService(paymentUseCase, logger)
+	paymentSvc := service.NewPaymentService(paymentUseCase, reconciliationUseCase, logger)
 
 	// Create gRPC server
 	gs := grpc.NewServer(

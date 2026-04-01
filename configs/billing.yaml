@@ -22,3 +22,9 @@ mq:
 log:
   level: info
   format: json
+
+telemetry:
+  enabled: true
+  endpoint: "localhost:4317"
+  serviceName: "billing-svc"
+  sampleRate: 1.0

@@ -18,6 +18,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/billing/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
 var (
@@ -47,6 +48,22 @@ func main() {
 	if err != nil {
 		logHelper.Errorf("failed to load config: %v", err)
 		os.Exit(1)
+	}
+
+	// Initialize tracing
+	traceCfg := &trace.Config{
+		Enabled:     cfg.Telemetry.Enabled,
+		ServiceName: cfg.Telemetry.ServiceName,
+		Endpoint:    cfg.Telemetry.Endpoint,
+		SampleRate:  cfg.Telemetry.SampleRate,
+	}
+	tracerProvider, err := trace.NewTracerProvider(traceCfg)
+	if err != nil {
+		logHelper.Errorf("failed to initialize tracer: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("tracing initialized successfully")
+		defer tracerProvider.Shutdown(context.Background())
 	}
 
 	// Connect to database
