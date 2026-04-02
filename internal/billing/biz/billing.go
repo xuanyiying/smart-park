@@ -83,8 +83,26 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 		}
 		return false
 
+	case "not":
+		if len(cond.Conditions) > 0 {
+			return !EvaluateCondition(cond.Conditions[0], ctx)
+		}
+		return false
+
 	case "vehicle_type":
 		return ctx.VehicleType == cond.Value
+
+	case "vehicle_type_in":
+		types, ok := cond.Value.([]interface{})
+		if !ok {
+			return false
+		}
+		for _, v := range types {
+			if ctx.VehicleType == v {
+				return true
+			}
+		}
+		return false
 
 	case "duration_min":
 		minutes := ctx.Duration.Minutes()
@@ -112,6 +130,32 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 		}
 		return false
 
+	case "duration_hour":
+		hours := ctx.Duration.Hours()
+		switch cond.Operator {
+		case "gte":
+			if val, ok := cond.Value.(float64); ok {
+				return hours >= val
+			}
+		case "lte":
+			if val, ok := cond.Value.(float64); ok {
+				return hours <= val
+			}
+		case "gt":
+			if val, ok := cond.Value.(float64); ok {
+				return hours > val
+			}
+		case "lt":
+			if val, ok := cond.Value.(float64); ok {
+				return hours < val
+			}
+		case "eq":
+			if val, ok := cond.Value.(float64); ok {
+				return hours == val
+			}
+		}
+		return false
+
 	case "time_range":
 		valueMap, ok := cond.Value.(map[string]interface{})
 		if !ok {
@@ -123,6 +167,19 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 			return false
 		}
 		hour := float64(ctx.ExitTime.Hour()) + float64(ctx.ExitTime.Minute())/60.0
+		return hour >= start && hour <= end
+
+	case "entry_time_range":
+		valueMap, ok := cond.Value.(map[string]interface{})
+		if !ok {
+			return false
+		}
+		start, ok1 := valueMap["start"].(float64)
+		end, ok2 := valueMap["end"].(float64)
+		if !ok1 || !ok2 {
+			return false
+		}
+		hour := float64(ctx.EntryTime.Hour()) + float64(ctx.EntryTime.Minute())/60.0
 		return hour >= start && hour <= end
 
 	case "day_of_week":
@@ -138,8 +195,42 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 		}
 		return false
 
+	case "day_of_month":
+		days, ok := cond.Value.([]interface{})
+		if !ok {
+			return false
+		}
+		dayOfMonth := ctx.ExitTime.Day()
+		for _, day := range days {
+			if dayNum, ok := day.(float64); ok && int(dayNum) == dayOfMonth {
+				return true
+			}
+		}
+		return false
+
+	case "month":
+		months, ok := cond.Value.([]interface{})
+		if !ok {
+			return false
+		}
+		month := int(ctx.ExitTime.Month())
+		for _, m := range months {
+			if monthNum, ok := m.(float64); ok && int(monthNum) == month {
+				return true
+			}
+		}
+		return false
+
 	case "holiday":
 		return ctx.IsHoliday
+
+	case "weekend":
+		weekday := int(ctx.ExitTime.Weekday())
+		return weekday == 0 || weekday == 6
+
+	case "workday":
+		weekday := int(ctx.ExitTime.Weekday())
+		return weekday >= 1 && weekday <= 5
 
 	default:
 		return false
@@ -208,6 +299,9 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 		return nil, err
 	}
 
+	// 按优先级排序规则
+	sortRulesByPriority(rules)
+
 	entryTime := time.Unix(req.EntryTime, 0)
 	exitTime := time.Unix(req.ExitTime, 0)
 	duration := exitTime.Sub(entryTime)
@@ -223,6 +317,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 	var baseAmount float64
 	var discountAmount float64
 	var appliedRules []*v1.AppliedRule
+	var appliedRuleSet = make(map[string]bool)
 
 	for _, rule := range rules {
 		if !rule.IsActive {
@@ -246,12 +341,13 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 		}
 
 		ruleAmount := applyActions(actions, duration, exitTime)
-		if ruleAmount != 0 {
+		if ruleAmount != 0 && !appliedRuleSet[rule.ID.String()] {
 			appliedRules = append(appliedRules, &v1.AppliedRule{
 				RuleId:   rule.ID.String(),
 				RuleName: rule.RuleName,
 				Amount:   ruleAmount,
 			})
+			appliedRuleSet[rule.ID.String()] = true
 		}
 
 		switch rule.RuleType {
@@ -265,6 +361,10 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 			if req.VehicleType == "monthly" {
 				discountAmount = baseAmount
 			}
+		case "override":
+			// 覆盖规则，直接使用该规则的金额
+			baseAmount = ruleAmount
+			discountAmount = 0
 		}
 	}
 
@@ -285,6 +385,68 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 		FinalAmount:    finalAmount,
 		AppliedRules:   appliedRules,
 	}, nil
+}
+
+// TestBillingRule tests a billing rule with given context.
+func (uc *BillingUseCase) TestBillingRule(ctx context.Context, req *v1.TestBillingRuleRequest) (*v1.TestBillingRuleResponse, error) {
+	entryTime := time.Unix(req.EntryTime, 0)
+	exitTime := time.Unix(req.ExitTime, 0)
+	duration := exitTime.Sub(entryTime)
+
+	billingCtx := &BillingContext{
+		VehicleType: req.VehicleType,
+		Duration:    duration,
+		EntryTime:   entryTime,
+		ExitTime:    exitTime,
+		IsHoliday:   req.IsHoliday,
+	}
+
+	// 解析条件
+	cond, err := ParseConditions(req.ConditionsJson)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse conditions: %w", err)
+	}
+
+	// 评估条件
+	conditionMet := EvaluateCondition(cond, billingCtx)
+
+	var ruleAmount float64
+	var appliedActions []string
+
+	if conditionMet {
+		// 解析动作
+		actions, err := ParseActions(req.ActionsJson)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse actions: %w", err)
+		}
+
+		// 应用动作
+		ruleAmount = applyActions(actions, duration, exitTime)
+
+		// 记录应用的动作
+		for _, action := range actions {
+			appliedActions = append(appliedActions, action.Type)
+		}
+	}
+
+	return &v1.TestBillingRuleResponse{
+		ConditionMet:  conditionMet,
+		CalculatedFee: ruleAmount,
+		AppliedActions: appliedActions,
+		Duration:      duration.Seconds(),
+	}, nil
+}
+
+// sortRulesByPriority sorts rules by priority in descending order.
+func sortRulesByPriority(rules []*BillingRule) {
+	// 冒泡排序，按优先级降序排列
+	for i := 0; i < len(rules)-1; i++ {
+		for j := 0; j < len(rules)-i-1; j++ {
+			if rules[j].Priority < rules[j+1].Priority {
+				rules[j], rules[j+1] = rules[j+1], rules[j]
+			}
+		}
+	}
 }
 
 // applyActions applies billing actions and returns the calculated amount.
@@ -323,9 +485,13 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 				amount = a.Amount
 			}
 		case "free_duration":
-			freeMinutes := a.Value / 60
-			if duration.Minutes() <= float64(freeMinutes) {
+			freeMinutes := a.Value
+			if duration.Minutes() <= freeMinutes {
 				amount = 0
+			} else {
+				// 扣除免费时长后计算费用
+				remainingMinutes := duration.Minutes() - freeMinutes
+				amount = (remainingMinutes / 60) * a.Amount
 			}
 		case "night_discount":
 			hour := exitTime.Hour()
@@ -335,7 +501,85 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 		case "first_hour_free":
 			if hours <= 1 {
 				amount = 0
+			} else {
+				// 第一小时免费，超过部分计费
+				remainingHours := hours - 1
+				amount = remainingHours * a.Amount
 			}
+		case "tiered":
+			// 阶梯计费
+			tiers, ok := a.Value.([]interface{})
+			if ok {
+				remainingHours := hours
+				for _, tier := range tiers {
+					tierMap, ok := tier.(map[string]interface{})
+					if !ok {
+						continue
+					}
+					tierHours, ok1 := tierMap["hours"].(float64)
+					tierRate, ok2 := tierMap["rate"].(float64)
+					if !ok1 || !ok2 {
+						continue
+					}
+					if remainingHours <= 0 {
+						break
+					}
+					billableHours := math.Min(remainingHours, tierHours)
+					amount += billableHours * tierRate
+					remainingHours -= billableHours
+				}
+				// 超出阶梯部分按照最高阶梯计费
+				if remainingHours > 0 {
+					if len(tiers) > 0 {
+						lastTier, ok := tiers[len(tiers)-1].(map[string]interface{})
+						if ok {
+							tierRate, ok := lastTier["rate"].(float64)
+							if ok {
+								amount += remainingHours * tierRate
+							}
+						}
+					}
+				}
+			}
+		case "time_segment":
+			// 时间段计费
+			segments, ok := a.Value.([]interface{})
+			if ok {
+				hour := float64(exitTime.Hour()) + float64(exitTime.Minute())/60.0
+				for _, segment := range segments {
+					segmentMap, ok := segment.(map[string]interface{})
+					if !ok {
+						continue
+					}
+					start, ok1 := segmentMap["start"].(float64)
+					end, ok2 := segmentMap["end"].(float64)
+					rate, ok3 := segmentMap["rate"].(float64)
+					if !ok1 || !ok2 || !ok3 {
+						continue
+					}
+					if hour >= start && hour <= end {
+						amount += hours * rate
+						break
+					}
+				}
+			}
+		case "member_discount":
+			// 会员折扣
+			amount = amount * (1 - a.Percent/100)
+		case "promotion_discount":
+			// 促销折扣
+			amount = amount * (1 - a.Percent/100)
+		case "seasonal_discount":
+			// 季节性折扣
+			amount = amount * (1 - a.Percent/100)
+		case "long_term_discount":
+			// 长期停车折扣
+			if hours >= a.Value {
+				amount = amount * (1 - a.Percent/100)
+			}
+		case "flat_rate":
+			// 固定费率（不管时长）
+			amount = a.Amount
 		}
 	}
 

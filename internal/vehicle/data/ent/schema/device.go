@@ -18,6 +18,8 @@ func (Device) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.String("device_id").
 			MaxLen(64).
 			Unique().
@@ -61,7 +63,7 @@ func (Device) Fields() []ent.Field {
 			Default(true).
 			Comment("是否启用(维修时可禁用)"),
 		field.Enum("status").
-			Values("active", "offline", "disabled").
+			Values("active", "offline", "disabled", "upgrading", "fault").
 			Default("active").
 			Comment("设备状态"),
 		field.Time("last_heartbeat").
@@ -82,6 +84,48 @@ func (Device) Fields() []ent.Field {
 		field.Int("offline_count").
 			Default(0).
 			Comment("离线次数"),
+		field.String("firmware_version").
+			MaxLen(32).
+			Optional().
+			Comment("设备固件版本"),
+		field.String("hardware_version").
+			MaxLen(32).
+			Optional().
+			Comment("设备硬件版本"),
+		field.JSON("device_config", map[string]interface{}{}).
+			Optional().
+			Comment("设备配置信息"),
+		field.JSON("device_stats", map[string]interface{}{}).
+			Optional().
+			Comment("设备统计信息"),
+		field.String("fault_code").
+			MaxLen(32).
+			Optional().
+			Comment("故障代码"),
+		field.String("fault_message").
+			MaxLen(256).
+			Optional().
+			Comment("故障信息"),
+		field.Time("last_fault_time").
+			Optional().
+			Nillable().
+			Comment("最后故障时间"),
+		field.Time("last_upgrade_time").
+			Optional().
+			Nillable().
+			Comment("最后升级时间"),
+		field.String("location").
+			MaxLen(256).
+			Optional().
+			Comment("设备位置"),
+		field.String("manufacturer").
+			MaxLen(128).
+			Optional().
+			Comment("设备厂商"),
+		field.String("model").
+			MaxLen(128).
+			Optional().
+			Comment("设备型号"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),
@@ -93,6 +137,7 @@ func (Device) Fields() []ent.Field {
 
 func (Device) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("device_id").Unique().StorageKey("idx_device_id"),
 		index.Fields("lot_id").StorageKey("idx_device_lot"),
 		index.Fields("lane_id"),

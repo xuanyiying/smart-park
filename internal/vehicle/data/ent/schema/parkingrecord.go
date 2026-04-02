@@ -18,6 +18,8 @@ func (ParkingRecord) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("lot_id", uuid.UUID{}).
 			Comment("停车场ID"),
 		field.UUID("entry_lane_id", uuid.UUID{}).
@@ -86,6 +88,7 @@ func (ParkingRecord) Fields() []ent.Field {
 
 func (ParkingRecord) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("plate_number", "entry_time").StorageKey("idx_parking_records_plate_entry"),
 		index.Fields("lot_id", "record_status").StorageKey("idx_parking_records_lot_status"),
 		index.Fields("exit_time").StorageKey("idx_parking_records_exit"),
