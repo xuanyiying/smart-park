@@ -83,16 +83,24 @@ type ParkingRecord struct {
 
 // Device represents a device entity in business logic.
 type Device struct {
-	ID            uuid.UUID
-	DeviceID      string
-	LotID         *uuid.UUID
-	LaneID        *uuid.UUID
-	DeviceType    string
-	DeviceSecret  string
-	GateID        string
-	Enabled       bool
-	Status        string
-	LastHeartbeat *time.Time
+	ID                  uuid.UUID
+	DeviceID            string
+	LotID               *uuid.UUID
+	LaneID              *uuid.UUID
+	DeviceType          string
+	DeviceSecret        string
+	Manufacturer        string
+	Model               string
+	FirmwareVersion     string
+	VendorSpecificConfig map[string]interface{}
+	GateID              string
+	Enabled             bool
+	Status              string
+	LastHeartbeat       *time.Time
+	LastOnline          *time.Time
+	FaultInfo           string
+	HeartbeatCount      int
+	OfflineCount        int
 }
 
 // Lane represents a lane entity in business logic.
@@ -103,6 +111,64 @@ type Lane struct {
 	Direction    string
 	Status       string
 	DeviceConfig map[string]interface{}
+}
+
+// Manufacturer represents a manufacturer entity in business logic.
+type Manufacturer struct {
+	ID          uuid.UUID
+	Name        string
+	Website     string
+	ContactInfo string
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+// Firmware represents a firmware entity in business logic.
+type Firmware struct {
+	ID          uuid.UUID
+	FirmwareID  string
+	Manufacturer string
+	Model       string
+	Version     string
+	URL         string
+	Size        int64
+	MD5         string
+	Description string
+	Status      string
+	ReleaseDate time.Time
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+// DevicePerformance represents device performance metrics.
+type DevicePerformance struct {
+	ID           uuid.UUID
+	DeviceID     string
+	CPUUsage     float64
+	MemoryUsage  float64
+	StorageUsage float64
+	NetworkIn    int64
+	NetworkOut   int64
+	Temperature  float64
+	Timestamp    time.Time
+	CreatedAt    time.Time
+}
+
+// DeviceFault represents a device fault record.
+type DeviceFault struct {
+	ID          uuid.UUID
+	DeviceID    string
+	FaultType   string
+	FaultCode   string
+	Description string
+	Severity    string
+	Status      string
+	Suggestion  string
+	DetectedAt  time.Time
+	ResolvedAt  *time.Time
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 // VehicleRepo defines the repository interface for vehicle operations.
@@ -128,4 +194,32 @@ type VehicleRepo interface {
 	GetPendingSyncRecords(ctx context.Context, limit int) ([]*OfflineSyncRecord, error)
 	UpdateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error
 	SeedData(ctx context.Context) error
+	// Manufacturer management
+	CreateManufacturer(ctx context.Context, manufacturer *Manufacturer) error
+	GetManufacturer(ctx context.Context, id uuid.UUID) (*Manufacturer, error)
+	UpdateManufacturer(ctx context.Context, manufacturer *Manufacturer) error
+	DeleteManufacturer(ctx context.Context, id uuid.UUID) error
+	ListManufacturers(ctx context.Context, page, pageSize int) ([]*Manufacturer, int, error)
+	// Firmware management
+	CreateFirmware(ctx context.Context, firmware *Firmware) error
+	GetFirmware(ctx context.Context, id uuid.UUID) (*Firmware, error)
+	GetFirmwareByID(ctx context.Context, firmwareID string) (*Firmware, error)
+	UpdateFirmware(ctx context.Context, firmware *Firmware) error
+	DeleteFirmware(ctx context.Context, id uuid.UUID) error
+	ListFirmwares(ctx context.Context, manufacturer, model string, page, pageSize int) ([]*Firmware, int, error)
+	GetLatestFirmware(ctx context.Context, manufacturer, model string) (*Firmware, error)
+	// Device performance monitoring
+	CreateDevicePerformance(ctx context.Context, performance *DevicePerformance) error
+	GetDevicePerformance(ctx context.Context, deviceID string, startTime, endTime time.Time) ([]*DevicePerformance, error)
+	GetDevicePerformanceLatest(ctx context.Context, deviceID string) (*DevicePerformance, error)
+	// Device fault diagnosis
+	CreateDeviceFault(ctx context.Context, fault *DeviceFault) error
+	GetDeviceFault(ctx context.Context, id uuid.UUID) (*DeviceFault, error)
+	UpdateDeviceFault(ctx context.Context, fault *DeviceFault) error
+	ListDeviceFaults(ctx context.Context, deviceID string, status string, page, pageSize int) ([]*DeviceFault, int, error)
+	ResolveDeviceFault(ctx context.Context, id uuid.UUID) error
+	// Device statistics
+	GetDeviceUsageStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error)
+	GetDeviceFaultStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error)
+	GetDeviceStatsSummary(ctx context.Context, deviceID string) (map[string]interface{}, error)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/vehicle/client/billing"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/mqtt"
+	"github.com/xuanyiying/smart-park/internal/vehicle/device"
 	"github.com/xuanyiying/smart-park/pkg/lock"
 
 	v1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
@@ -46,23 +47,25 @@ func (e *EntryExitError) Unwrap() error {
 
 // EntryExitUseCase handles vehicle entry and exit business logic.
 type EntryExitUseCase struct {
-	vehicleRepo   VehicleRepo
-	billingClient billing.Client
-	mqttClient    mqtt.Client
-	lockRepo      lock.LockRepo
-	config        *Config
-	log           *log.Helper
+	vehicleRepo    VehicleRepo
+	billingClient  billing.Client
+	mqttClient     mqtt.Client
+	lockRepo       lock.LockRepo
+	adapterFactory *device.AdapterFactory
+	config         *Config
+	log            *log.Helper
 }
 
 // NewEntryExitUseCase creates a new EntryExitUseCase.
-func NewEntryExitUseCase(vehicleRepo VehicleRepo, billingClient billing.Client, mqttClient mqtt.Client, lockRepo lock.LockRepo, logger log.Logger) *EntryExitUseCase {
+func NewEntryExitUseCase(vehicleRepo VehicleRepo, billingClient billing.Client, mqttClient mqtt.Client, lockRepo lock.LockRepo, adapterFactory *device.AdapterFactory, logger log.Logger) *EntryExitUseCase {
 	return &EntryExitUseCase{
-		vehicleRepo:   vehicleRepo,
-		billingClient: billingClient,
-		mqttClient:    mqttClient,
-		lockRepo:      lockRepo,
-		config:        DefaultConfig(),
-		log:           log.NewHelper(logger),
+		vehicleRepo:    vehicleRepo,
+		billingClient:  billingClient,
+		mqttClient:     mqttClient,
+		lockRepo:       lockRepo,
+		adapterFactory: adapterFactory,
+		config:         DefaultConfig(),
+		log:            log.NewHelper(logger),
 	}
 }
 
