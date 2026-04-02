@@ -65,6 +65,10 @@ func (m *MockOrderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status 
 	return result, int64(len(result)), nil
 }
 
+func (m *MockOrderRepo) GetOrdersByTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*Order, error) {
+	return []*Order{}, nil
+}
+
 type MockRecordRepo struct{}
 
 func NewMockRecordRepo() *MockRecordRepo {

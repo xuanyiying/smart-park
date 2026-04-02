@@ -9,14 +9,15 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	_ "github.com/lib/pq"
+	"github.com/xuanyiying/smart-park/pkg/database"
 
 	v1 "github.com/xuanyiying/smart-park/api/billing/v1"
 	"github.com/xuanyiying/smart-park/internal/billing/biz"
-	"github.com/xuanyiying/smart-park/internal/billing/data"
 	"github.com/xuanyiying/smart-park/internal/billing/data/ent"
 	"github.com/xuanyiying/smart-park/internal/billing/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
 var (
@@ -48,8 +49,44 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Connect to database
-	dbClient, err := ent.Open("postgres", cfg.Database.Source)
+	// Initialize tracing
+	traceCfg := &trace.Config{
+		Enabled:     cfg.Telemetry.Enabled,
+		ServiceName: cfg.Telemetry.ServiceName,
+		Endpoint:    cfg.Telemetry.Endpoint,
+		SampleRate:  cfg.Telemetry.SampleRate,
+	}
+	tracerProvider, err := trace.NewTracerProvider(traceCfg)
+	if err != nil {
+		logHelper.Errorf("failed to initialize tracer: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("tracing initialized successfully")
+		defer tracerProvider.Shutdown(context.Background())
+	}
+
+	// Connect to database with read-write separation
+	dbCfg := &database.Config{
+		Primary: struct {
+			Source string
+		}{
+			Source: cfg.Database.Primary.Source,
+		},
+		Replica: struct {
+			Source string
+		}{
+			Source: cfg.Database.Replica.Source,
+		},
+	}
+	dbManager, err := database.NewDBManager(dbCfg)
+	if err != nil {
+		logHelper.Errorf("failed to connect database: %v", err)
+		os.Exit(1)
+	}
+	defer dbManager.Close()
+
+	// Connect to database using ent
+	dbClient, err := ent.Open("postgres", dbManager.Primary())
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
@@ -98,6 +135,9 @@ func main() {
 	// Register services
 	v1.RegisterBillingServiceServer(gs, billingSvc)
 	v1.RegisterBillingServiceHTTPServer(hs, billingSvc)
+
+	// Register Prometheus metrics endpoint
+	hs.HandlePrefix("/metrics", metrics.NewHandler())
 
 	// Start application
 	app := newApp(logger, gs, hs)

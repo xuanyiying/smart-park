@@ -9,7 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	_ "github.com/lib/pq"
+	"github.com/xuanyiying/smart-park/pkg/database"
 
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 	vehiclev1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
@@ -20,6 +20,9 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/service"
 	"github.com/xuanyiying/smart-park/internal/payment/wechat"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/seata"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
 var (
@@ -51,8 +54,44 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Connect to database
-	dbClient, err := ent.Open("postgres", cfg.Database.Source)
+	// Initialize tracing
+	traceCfg := &trace.Config{
+		Enabled:     true,
+		ServiceName: cfg.Otel.ServiceName,
+		Endpoint:    cfg.Otel.Endpoint,
+		SampleRate:  1.0,
+	}
+	tracerProvider, err := trace.NewTracerProvider(traceCfg)
+	if err != nil {
+		logHelper.Errorf("failed to initialize tracer: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("tracing initialized successfully")
+		defer tracerProvider.Shutdown(context.Background())
+	}
+
+	// Connect to database with read-write separation
+	dbCfg := &database.Config{
+		Primary: struct {
+			Source string
+		}{
+			Source: cfg.Database.Primary.Source,
+		},
+		Replica: struct {
+			Source string
+		}{
+			Source: cfg.Database.Replica.Source,
+		},
+	}
+	dbManager, err := database.NewDBManager(dbCfg)
+	if err != nil {
+		logHelper.Errorf("failed to connect database: %v", err)
+		os.Exit(1)
+	}
+	defer dbManager.Close()
+
+	// Connect to database using ent
+	dbClient, err := ent.Open("postgres", dbManager.Primary())
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
@@ -63,6 +102,14 @@ func main() {
 	if err := dbClient.Schema.Create(context.Background()); err != nil {
 		logHelper.Errorf("failed to migrate database: %v", err)
 		os.Exit(1)
+	}
+
+	// Initialize Seata
+	if err := seata.InitSeata("../../configs/seata.yaml"); err != nil {
+		logHelper.Errorf("failed to initialize seata: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("seata initialized successfully")
 	}
 
 	// Initialize data layer
@@ -141,9 +188,10 @@ func main() {
 
 	// Initialize business logic
 	paymentUseCase := biz.NewPaymentUseCase(orderRepo, recordRepo, gateClient, paymentConfig, wechatClient, alipayClient, logger)
+	reconciliationUseCase := biz.NewReconciliationUseCase(orderRepo, wechatClient, alipayClient, logger)
 
 	// Initialize gRPC service
-	paymentSvc := service.NewPaymentService(paymentUseCase, logger)
+	paymentSvc := service.NewPaymentService(paymentUseCase, reconciliationUseCase, logger)
 
 	// Create gRPC server
 	gs := grpc.NewServer(
@@ -158,6 +206,9 @@ func main() {
 	// Register services
 	v1.RegisterPaymentServiceServer(gs, paymentSvc)
 	v1.RegisterPaymentServiceHTTPServer(hs, paymentSvc)
+
+	// Register Prometheus metrics endpoint
+	hs.HandlePrefix("/metrics", metrics.NewHandler())
 
 	// Start application
 	app := newApp(logger, gs, hs)

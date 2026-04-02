@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
@@ -13,6 +14,8 @@ import (
 	"github.com/xuanyiying/smart-park/internal/conf"
 	"github.com/xuanyiying/smart-park/internal/gateway/biz"
 	"github.com/xuanyiying/smart-park/internal/gateway/service"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
 var (
@@ -43,6 +46,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Initialize tracing
+	traceCfg := &trace.Config{
+		Enabled:     true,
+		ServiceName: "gateway-svc",
+		Endpoint:    cfg.Otel.Endpoint,
+		SampleRate:  1.0,
+	}
+	tracerProvider, err := trace.NewTracerProvider(traceCfg)
+	if err != nil {
+		logHelper.Errorf("failed to initialize tracer: %v", err)
+		// Don't exit, just log the error
+	} else {
+		logHelper.Info("tracing initialized successfully")
+		defer tracerProvider.Shutdown(context.Background())
+	}
+
 	routes := parseRoutes(cfg)
 	logHelper.Infof("loaded %d routes", len(routes))
 
@@ -65,6 +84,7 @@ func main() {
 			fmt.Fprintf(w, "%s -> %s\n", route.Path, route.Target)
 		}
 	})
+	hs.HandlePrefix("/metrics", metrics.NewHandler())
 
 	app := newApp(logger, hs)
 	logHelper.Infof("gateway service starting on port %d", cfg.Server.Port)

@@ -3,6 +3,7 @@ package data
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -154,6 +155,25 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 	}
 
 	return result, int64(total), nil
+}
+
+func (r *orderRepo) GetOrdersByTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*biz.Order, error) {
+	orders, err := r.data.db.Order.Query().
+		Where(
+			order.PayTimeGTE(startTime),
+			order.PayTimeLT(endTime),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*biz.Order
+	for _, o := range orders {
+		result = append(result, toBizOrder(o))
+	}
+
+	return result, nil
 }
 
 func toBizOrder(o *ent.Order) *biz.Order {

@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'vehicle-service'
+    static_configs:
+      - targets: ['vehicle:8001']
+
+  - job_name: 'billing-service'
+    static_configs:
+      - targets: ['billing:8002']
+
+  - job_name: 'payment-service'
+    static_configs:
+      - targets: ['payment:8003']
+
+  - job_name: 'admin-service'
+    static_configs:
+      - targets: ['admin:8004']
+
+  - job_name: 'gateway-service'
+    static_configs:
+      - targets: ['gateway:8000']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']

@@ -51,6 +51,85 @@ services:
       - "4317:4317"
       - "4318:4318"
 
+  prometheus:
+    image: prom/prometheus:v2.49.0
+    container_name: smart-park-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: smart-park-grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: always
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: smart-park-loki
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+    restart: always
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: smart-park-promtail
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail/promtail.yml
+      - /var/log:/var/log
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+    container_name: smart-park-node-exporter
+    ports:
+      - "9100:9100"
+    restart: always
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.48.0
+    container_name: smart-park-redis-exporter
+    environment:
+      - REDIS_ADDR=redis:6379
+    ports:
+      - "9121:9121"
+    restart: always
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.14.0
+    container_name: smart-park-postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=postgresql://postgres:postgres@postgres:5432/parking?sslmode=disable
+    ports:
+      - "9187:9187"
+    restart: always
+
+  seata-server:
+    image: seataio/seata-server:1.6.1
+    container_name: smart-park-seata
+    environment:
+      - SEATA_IP=seata-server
+      - SEATA_PORT=8091
+      - STORE_MODE=file
+    ports:
+      - "8091:8091"
+      - "7091:7091"
+    volumes:
+      - seata_data:/seata-server/data
+
   gateway:
     build:
       context: ../../
@@ -117,3 +196,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  seata_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:

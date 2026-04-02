@@ -46,13 +46,55 @@ func (Device) Fields() []ent.Field {
 			Default(true).
 			Comment("是否启用(维修时可禁用)"),
 		field.Enum("status").
-			Values("active", "offline", "disabled").
+			Values("active", "offline", "disabled", "upgrading", "fault").
 			Default("active").
 			Comment("设备状态"),
 		field.Time("last_heartbeat").
 			Optional().
 			Nillable().
 			Comment("最后心跳时间"),
+		field.String("firmware_version").
+			MaxLen(32).
+			Optional().
+			Comment("设备固件版本"),
+		field.String("hardware_version").
+			MaxLen(32).
+			Optional().
+			Comment("设备硬件版本"),
+		field.JSON("device_config", map[string]interface{}{}).
+			Optional().
+			Comment("设备配置信息"),
+		field.JSON("device_stats", map[string]interface{}{}).
+			Optional().
+			Comment("设备统计信息"),
+		field.String("fault_code").
+			MaxLen(32).
+			Optional().
+			Comment("故障代码"),
+		field.String("fault_message").
+			MaxLen(256).
+			Optional().
+			Comment("故障信息"),
+		field.Time("last_fault_time").
+			Optional().
+			Nillable().
+			Comment("最后故障时间"),
+		field.Time("last_upgrade_time").
+			Optional().
+			Nillable().
+			Comment("最后升级时间"),
+		field.String("location").
+			MaxLen(256).
+			Optional().
+			Comment("设备位置"),
+		field.String("manufacturer").
+			MaxLen(128).
+			Optional().
+			Comment("设备厂商"),
+		field.String("model").
+			MaxLen(128).
+			Optional().
+			Comment("设备型号"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),
