@@ -18,6 +18,8 @@ func (ParkingRecord) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("lot_id", uuid.UUID{}).
 			Comment("停车场ID"),
 		field.UUID("entry_lane_id", uuid.UUID{}).

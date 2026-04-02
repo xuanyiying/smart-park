@@ -14,6 +14,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
+	"github.com/xuanyiying/smart-park/pkg/multitenancy"
 )
 
 // NewData creates a new Data instance.
@@ -22,6 +23,8 @@ func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
 		db:  db,
 		log: log.NewHelper(logger),
 	}
+
+	RegisterTenantHooks(db)
 
 	cleanup := func() {
 		if err := d.db.Close(); err != nil {
@@ -44,9 +47,14 @@ func NewVehicleRepo(data *Data) biz.VehicleRepo {
 
 // GetVehicleByPlate retrieves a vehicle by plate number.
 func (r *vehicleRepo) GetVehicleByPlate(ctx context.Context, plateNumber string) (*biz.Vehicle, error) {
-	v, err := r.clientFromCtx(ctx).Vehicle.Query().
-		Where(vehicle.PlateNumber(plateNumber)).
-		Only(ctx)
+	query := r.clientFromCtx(ctx).Vehicle.Query().
+		Where(vehicle.PlateNumber(plateNumber))
+	
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(vehicle.TenantID(*tenantID))
+	}
+	
+	v, err := query.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -82,6 +90,10 @@ func (r *vehicleRepo) CreateVehicle(ctx context.Context, v *biz.Vehicle) error {
 		SetOwnerName(v.OwnerName).
 		SetOwnerPhone(v.OwnerPhone)
 
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		create.SetTenantID(*tenantID)
+	}
+
 	if v.MonthlyValidUntil != nil {
 		create.SetMonthlyValidUntil(*v.MonthlyValidUntil)
 	}
@@ -115,12 +127,17 @@ func (r *vehicleRepo) UpdateVehicle(ctx context.Context, v *biz.Vehicle) error {
 
 // GetEntryRecord retrieves an active entry record by plate number.
 func (r *vehicleRepo) GetEntryRecord(ctx context.Context, plateNumber string) (*biz.ParkingRecord, error) {
-	record, err := r.clientFromCtx(ctx).ParkingRecord.Query().
+	query := r.clientFromCtx(ctx).ParkingRecord.Query().
 		Where(
 			parkingrecord.PlateNumber(plateNumber),
 			parkingrecord.RecordStatusIn(parkingrecord.RecordStatusEntry, parkingrecord.RecordStatusExiting),
-		).
-		Only(ctx)
+		)
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(parkingrecord.TenantID(*tenantID))
+	}
+
+	record, err := query.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -141,6 +158,10 @@ func (r *vehicleRepo) CreateParkingRecord(ctx context.Context, rec *biz.ParkingR
 		SetEntryImageURL(rec.EntryImageURL).
 		SetRecordStatus(parkingrecord.RecordStatusEntry).
 		SetExitStatus(parkingrecord.ExitStatusUnpaid)
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		create.SetTenantID(*tenantID)
+	}
 
 	if rec.VehicleID != nil {
 		create.SetVehicleID(*rec.VehicleID)
@@ -201,7 +222,14 @@ func (r *vehicleRepo) UpdateParkingRecord(ctx context.Context, rec *biz.ParkingR
 
 // GetParkingRecord retrieves a parking record by ID.
 func (r *vehicleRepo) GetParkingRecord(ctx context.Context, recordID uuid.UUID) (*biz.ParkingRecord, error) {
-	record, err := r.data.db.ParkingRecord.Get(ctx, recordID)
+	query := r.data.db.ParkingRecord.Query().
+		Where(parkingrecord.ID(recordID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(parkingrecord.TenantID(*tenantID))
+	}
+
+	record, err := query.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -221,6 +249,10 @@ func (r *vehicleRepo) ListParkingRecordsByPlates(ctx context.Context, plateNumbe
 	// Build query
 	query := r.data.db.ParkingRecord.Query().
 		Where(parkingrecord.PlateNumberIn(plateNumbers...))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(parkingrecord.TenantID(*tenantID))
+	}
 
 	// Get total count
 	total, err := query.Count(ctx)
@@ -250,9 +282,14 @@ func (r *vehicleRepo) ListParkingRecordsByPlates(ctx context.Context, plateNumbe
 
 // GetDeviceByCode retrieves a device by device code.
 func (r *vehicleRepo) GetDeviceByCode(ctx context.Context, deviceCode string) (*biz.Device, error) {
-	d, err := r.data.db.Device.Query().
-		Where(device.DeviceID(deviceCode)).
-		Only(ctx)
+	query := r.data.db.Device.Query().
+		Where(device.DeviceID(deviceCode))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(device.TenantID(*tenantID))
+	}
+
+	d, err := query.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -276,8 +313,14 @@ func (r *vehicleRepo) GetDeviceByCode(ctx context.Context, deviceCode string) (*
 
 // UpdateDeviceHeartbeat updates device heartbeat.
 func (r *vehicleRepo) UpdateDeviceHeartbeat(ctx context.Context, deviceCode string) error {
-	return r.data.db.Device.Update().
-		Where(device.DeviceID(deviceCode)).
+	update := r.data.db.Device.Update().
+		Where(device.DeviceID(deviceCode))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(device.TenantID(*tenantID))
+	}
+
+	return update.
 		SetLastHeartbeat(time.Now()).
 		SetStatus(device.StatusActive).
 		Exec(ctx)
@@ -286,6 +329,10 @@ func (r *vehicleRepo) UpdateDeviceHeartbeat(ctx context.Context, deviceCode stri
 // ListDevices retrieves all devices with pagination.
 func (r *vehicleRepo) ListDevices(ctx context.Context, page, pageSize int) ([]*biz.Device, int, error) {
 	query := r.data.db.Device.Query()
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(device.TenantID(*tenantID))
+	}
 
 	// Get total count
 	total, err := query.Count(ctx)
@@ -326,9 +373,14 @@ func (r *vehicleRepo) ListDevices(ctx context.Context, page, pageSize int) ([]*b
 // GetLaneByDeviceCode retrieves a lane by device code.
 func (r *vehicleRepo) GetLaneByDeviceCode(ctx context.Context, deviceCode string) (*biz.Lane, error) {
 	// First get the device
-	d, err := r.data.db.Device.Query().
-		Where(device.DeviceID(deviceCode)).
-		Only(ctx)
+	query := r.data.db.Device.Query().
+		Where(device.DeviceID(deviceCode))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(device.TenantID(*tenantID))
+	}
+
+	d, err := query.Only(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -419,9 +471,14 @@ func (r *vehicleRepo) clientFromCtx(ctx context.Context) *ent.Client {
 	return r.data.db
 }
 
+// getTenantID gets tenant ID from context
+func (r *vehicleRepo) getTenantID(ctx context.Context) *uuid.UUID {
+	return multitenancy.GetTenantID(ctx)
+}
+
 // CreateOfflineSyncRecord creates an offline sync record.
 func (r *vehicleRepo) CreateOfflineSyncRecord(ctx context.Context, record *biz.OfflineSyncRecord) error {
-	_, err := r.data.db.OfflineSyncRecord.Create().
+	create := r.data.db.OfflineSyncRecord.Create().
 		SetOfflineID(record.OfflineID).
 		SetRecordID(record.RecordID).
 		SetLotID(record.LotID).
@@ -430,17 +487,28 @@ func (r *vehicleRepo) CreateOfflineSyncRecord(ctx context.Context, record *biz.O
 		SetOpenTime(record.OpenTime).
 		SetSyncAmount(record.SyncAmount).
 		SetSyncStatus(offlinesyncrecord.SyncStatusPendingSync).
-		SetRetryCount(0).
-		Save(ctx)
+		SetRetryCount(0)
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		create.SetTenantID(*tenantID)
+	}
+
+	_, err := create.Save(ctx)
 
 	return err
 }
 
 // GetPendingSyncRecords retrieves pending sync records.
 func (r *vehicleRepo) GetPendingSyncRecords(ctx context.Context, limit int) ([]*biz.OfflineSyncRecord, error) {
-	records, err := r.data.db.OfflineSyncRecord.Query().
+	query := r.data.db.OfflineSyncRecord.Query().
 		Where(offlinesyncrecord.SyncStatusEQ(offlinesyncrecord.SyncStatusPendingSync)).
-		Where(offlinesyncrecord.RetryCountLT(5)).
+		Where(offlinesyncrecord.RetryCountLT(5))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(offlinesyncrecord.TenantID(*tenantID))
+	}
+
+	records, err := query.
 		Limit(limit).
 		All(ctx)
 	if err != nil {
@@ -457,7 +525,13 @@ func (r *vehicleRepo) GetPendingSyncRecords(ctx context.Context, limit int) ([]*
 // UpdateOfflineSyncRecord updates an offline sync record.
 func (r *vehicleRepo) UpdateOfflineSyncRecord(ctx context.Context, record *biz.OfflineSyncRecord) error {
 	update := r.data.db.OfflineSyncRecord.Update().
-		Where(offlinesyncrecord.OfflineID(record.OfflineID)).
+		Where(offlinesyncrecord.OfflineID(record.OfflineID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(offlinesyncrecord.TenantID(*tenantID))
+	}
+
+	update = update.
 		SetSyncStatus(offlinesyncrecord.SyncStatus(record.SyncStatus)).
 		SetSyncError(record.SyncError).
 		SetRetryCount(record.RetryCount)
@@ -495,9 +569,14 @@ func toBizOfflineSyncRecord(record *ent.OfflineSyncRecord) *biz.OfflineSyncRecor
 
 // GetDeviceByID retrieves a device by device ID.
 func (r *vehicleRepo) GetDeviceByID(ctx context.Context, deviceID string) (*biz.Device, error) {
-	d, err := r.data.db.Device.Query().
-		Where(device.DeviceID(deviceID)).
-		Only(ctx)
+	query := r.data.db.Device.Query().
+		Where(device.DeviceID(deviceID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(device.TenantID(*tenantID))
+	}
+
+	d, err := query.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -553,6 +632,10 @@ func (r *vehicleRepo) CreateDevice(ctx context.Context, d *biz.Device) error {
 		SetDeviceType(deviceType).
 		SetStatus(status)
 
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		create.SetTenantID(*tenantID)
+	}
+
 	if d.LotID != nil {
 		create.SetLotID(*d.LotID)
 	}
@@ -587,7 +670,13 @@ func (r *vehicleRepo) UpdateDevice(ctx context.Context, d *biz.Device) error {
 	}
 
 	update := r.data.db.Device.Update().
-		Where(device.DeviceID(d.DeviceID)).
+		Where(device.DeviceID(d.DeviceID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(device.TenantID(*tenantID))
+	}
+
+	update = update.
 		SetDeviceType(deviceType).
 		SetStatus(status)
 
@@ -608,8 +697,13 @@ func (r *vehicleRepo) UpdateDevice(ctx context.Context, d *biz.Device) error {
 
 // DeleteDevice deletes a device by device ID.
 func (r *vehicleRepo) DeleteDevice(ctx context.Context, deviceID string) error {
-	_, err := r.data.db.Device.Delete().
-		Where(device.DeviceID(deviceID)).
-		Exec(ctx)
+	delete := r.data.db.Device.Delete().
+		Where(device.DeviceID(deviceID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		delete = delete.Where(device.TenantID(*tenantID))
+	}
+
+	_, err := delete.Exec(ctx)
 	return err
 }
