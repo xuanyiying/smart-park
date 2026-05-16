@@ -1,4 +1,3 @@
-// Package data provides data access layer for the payment service.
 package data
 
 import (
@@ -10,6 +9,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/predicate"
+	"github.com/xuanyiying/smart-park/pkg/database"
 )
 
 type orderRepo struct {
@@ -21,7 +21,7 @@ func NewOrderRepo(data *Data) biz.OrderRepo {
 }
 
 func (r *orderRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order, error) {
-	o, err := r.data.db.Order.Get(ctx, orderID)
+	o, err := r.clientFromCtx(ctx).Order.Get(ctx, orderID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -32,7 +32,7 @@ func (r *orderRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order
 }
 
 func (r *orderRepo) GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) (*biz.Order, error) {
-	o, err := r.data.db.Order.Query().
+	o, err := r.clientFromCtx(ctx).Order.Query().
 		Where(order.RecordID(recordID)).
 		Only(ctx)
 	if err != nil {
@@ -45,7 +45,7 @@ func (r *orderRepo) GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) 
 }
 
 func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID string) (*biz.Order, error) {
-	o, err := r.data.db.Order.Query().
+	o, err := r.clientFromCtx(ctx).Order.Query().
 		Where(order.TransactionID(transactionID)).
 		Only(ctx)
 	if err != nil {
@@ -58,7 +58,7 @@ func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID s
 }
 
 func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
-	_, err := r.data.db.Order.Create().
+	_, err := r.clientFromCtx(ctx).Order.Create().
 		SetID(o.ID).
 		SetRecordID(o.RecordID).
 		SetLotID(o.LotID).
@@ -72,7 +72,7 @@ func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
 }
 
 func (r *orderRepo) UpdateOrder(ctx context.Context, o *biz.Order) error {
-	update := r.data.db.Order.UpdateOneID(o.ID)
+	update := r.clientFromCtx(ctx).Order.UpdateOneID(o.ID)
 
 	switch o.Status {
 	case "pending":
@@ -132,7 +132,7 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 		predicates = append(predicates, order.StatusEQ(orderStatus))
 	}
 
-	query := r.data.db.Order.Query().Where(predicates...)
+	query := r.clientFromCtx(ctx).Order.Query().Where(predicates...)
 
 	total, err := query.Count(ctx)
 	if err != nil {
@@ -154,6 +154,17 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 	}
 
 	return result, int64(total), nil
+}
+
+func (r *orderRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return r.data.txm.WithTx(ctx, fn)
+}
+
+func (r *orderRepo) clientFromCtx(ctx context.Context) *ent.Client {
+	if tx, ok := database.TxFromCtx(ctx).(*ent.Tx); ok {
+		return tx.Client()
+	}
+	return r.data.db
 }
 
 func toBizOrder(o *ent.Order) *biz.Order {

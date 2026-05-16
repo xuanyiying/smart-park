@@ -1,0 +1,7 @@
+server:
+  port: 8006
+  timeout: 60
+
+log:
+  level: info
+  format: json

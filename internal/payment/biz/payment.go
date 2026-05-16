@@ -46,25 +46,33 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 		return nil, err
 	}
 
-	recordID, err := uuid.Parse(req.RecordId)
-	if err != nil {
-		return nil, fmt.Errorf("invalid record ID: %w", err)
+	var recordID uuid.UUID
+	var err error
+
+	if req.OrderType == "charging" && req.SessionId != "" {
+		sessionID, parseErr := uuid.Parse(req.SessionId)
+		if parseErr != nil {
+			return nil, fmt.Errorf("invalid session ID: %w", parseErr)
+		}
+		recordID = sessionID
+	} else {
+		recordID, err = uuid.Parse(req.RecordId)
+		if err != nil {
+			return nil, fmt.Errorf("invalid record ID: %w", err)
+		}
 	}
 
-	// Check for existing paid order (idempotency)
 	if existingOrder, _ := uc.orderRepo.GetOrderByRecordID(ctx, recordID); existingOrder != nil {
 		if existingOrder.Status == string(StatusPaid) {
 			return uc.buildExistingPaymentResponse(existingOrder), nil
 		}
 	}
 
-	// Create new order
 	order, err := uc.createOrder(ctx, recordID, req.Amount)
 	if err != nil {
 		return nil, err
 	}
 
-	// Generate payment URL based on method
 	payURL, qrCode, err := uc.generatePaymentURL(ctx, order, req)
 	if err != nil {
 		return nil, err

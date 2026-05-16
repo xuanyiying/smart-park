@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Park 智慧停车管理系统 - 功能预览</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3B82F6; --primary-dark: #2563EB; --success: #10B981; --warning: #F59E0B; --danger: #EF4444;
+            --bg-primary: #0F172A; --bg-secondary: #1E293B; --bg-card: #334155; --bg-hover: #475569;
+            --text-primary: #F8FAFC; --text-secondary: #94A3B8; --text-muted: #64748B; --border: #475569;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans SC', 'Inter', sans-serif; background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
+        .particle { position: absolute; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; opacity: 0.3; animation: float 15s infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; } 25% { transform: translateY(-100px) translateX(50px); opacity: 0.6; } 50% { transform: translateY(-200px) translateX(-30px); opacity: 0.3; } 75% { transform: translateY(-100px) translateX(-50px); opacity: 0.6; } }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
+        .header { text-align: center; margin-bottom: 60px; animation: fadeInDown 0.8s ease-out; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        .logo-badge { display: inline-flex; align-items: center; gap: 10px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 20px; border-radius: 50px; margin-bottom: 24px; font-size: 14px; color: var(--primary); }
+        .logo-badge svg { width: 20px; height: 20px; }
+        .header h1 { font-size: 48px; font-weight: 700; background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 50%, #1D4ED8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; letter-spacing: -1px; }
+        .header p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+        .nav-tabs { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; animation: fadeInUp 0.8s ease-out 0.2s both; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-tab { padding: 12px 24px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .nav-tab:hover { background: var(--bg-hover); color: var(--text-primary); transform: translateY(-2px); }
+        .nav-tab.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .nav-tab svg { width: 18px; height: 18px; }
+        .dashboard-wrapper { background: var(--bg-secondary); border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid var(--border); animation: fadeInUp 0.8s ease-out 0.4s both; }
+        .browser-bar { background: linear-gradient(180deg, #374151 0%, #1F2937 100%); padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+        .browser-dots { display: flex; gap: 8px; }
+        .browser-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .browser-dot.red { background: #EF4444; } .browser-dot.yellow { background: #F59E0B; } .browser-dot.green { background: #10B981; }
+        .browser-url { flex: 1; background: var(--bg-primary); border-radius: 8px; padding: 8px 16px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .browser-url svg { width: 14px; height: 14px; color: var(--success); }
+        .dashboard-layout { display: flex; min-height: 700px; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, var(--bg-primary) 0%, #0D1321 100%); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; }
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; padding: 0 12px 24px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .sidebar-logo svg { width: 36px; height: 36px; color: var(--primary); }
+        .sidebar-logo span { font-size: 18px; font-weight: 600; background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; font-size: 14px; font-weight: 500; }
+        .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-item.active { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%); color: var(--primary); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .sidebar-item svg { width: 20px; height: 20px; }
+        .main-content { flex: 1; padding: 28px; background: var(--bg-secondary); overflow-y: auto; }
+        .page-section { display: none; animation: fadeIn 0.4s ease-out; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+        .page-title h2 { font-size: 24px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .page-title p { font-size: 14px; color: var(--text-muted); }
+        .page-actions { display: flex; gap: 12px; }
+        .btn { padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; border: none; }
+        .btn svg { width: 18px; height: 18px; }
+        .btn-primary { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
+        @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid var(--border); transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); border-color: var(--primary); }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .stat-label { font-size: 13px; color: var(--text-muted); }
+        .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .stat-icon.purple { background: rgba(139, 92, 246, 0.2); color: #A78BFA; }
+        .stat-icon svg { width: 20px; height: 20px; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .stat-change { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+        .stat-change.up { color: var(--success); } .stat-change.down { color: var(--danger); }
+        .stat-change svg { width: 14px; height: 14px; }
+        .card { background: var(--bg-card); border-radius: 16px; padding: 24px; border: 1px solid var(--border); margin-bottom: 24px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .chart-container { height: 200px; display: flex; align-items: flex-end; justify-content: space-around; padding-top: 20px; }
+        .chart-bar { width: 60px; background: linear-gradient(180deg, #3B82F6 0%, #1D4ED8 100%); border-radius: 8px 8px 0 0; position: relative; transition: all 0.3s ease; }
+        .chart-bar:hover { background: linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%); transform: scaleY(1.05); transform-origin: bottom; }
+        .chart-bar span { position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--text-muted); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { text-align: left; padding: 14px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: var(--bg-primary); border-bottom: 1px solid var(--border); }
+        .data-table td { padding: 16px; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+        .data-table tr:hover td { background: rgba(59, 130, 246, 0.05); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-info { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .parking-lot-card { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; transition: all 0.3s ease; }
+        .parking-lot-card:hover { border-color: var(--primary); transform: translateX(8px); }
+        .parking-lot-info { display: flex; align-items: center; gap: 16px; }
+        .parking-lot-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%); display: flex; align-items: center; justify-content: center; color: #60A5FA; }
+        .parking-lot-icon svg { width: 26px; height: 26px; }
+        .parking-lot-details h4 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .parking-lot-details p { font-size: 13px; color: var(--text-muted); }
+        .parking-lot-stats { text-align: right; }
+        .parking-lot-stats .capacity { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+        .parking-lot-stats .usage { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .usage-bar { width: 100px; height: 6px; background: var(--bg-primary); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+        .usage-bar-fill { height: 100%; background: linear-gradient(90deg, #3B82F6 0%, #60A5FA 100%); border-radius: 3px; transition: width 1s ease-out; }
+        .device-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .device-card { background: var(--bg-card); border-radius: 14px; padding: 20px; border: 1px solid var(--border); transition: all 0.3s ease; }
+        .device-card:hover { border-color: var(--primary); }
+        .device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .device-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .device-status { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-dot.offline { background: var(--danger); }
+        .device-info { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+        .device-actions { display: flex; gap: 8px; }
+        .device-btn { flex: 1; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); }
+        .device-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .device-btn.active { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #34D399; }
+        .reports-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .report-stat { background: var(--bg-card); border-radius: 14px; padding: 24px; text-align: center; border: 1px solid var(--border); }
+        .report-stat-value { font-size: 32px; font-weight: 700; background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+        .report-stat-label { font-size: 14px; color: var(--text-muted); }
+        .footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+        .footer a { color: var(--primary); text-decoration: none; }
+        .search-box { position: relative; }
+        .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-muted); }
+        .search-box input { padding-left: 44px; }
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 24px; }
+        .quick-action { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: all 0.3s ease; }
+        .quick-action:hover { border-color: var(--primary); transform: translateY(-4px); }
+        .quick-action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        .quick-action-icon svg { width: 20px; height: 20px; }
+        .quick-action span { font-size: 12px; color: var(--text-secondary); }
+        .billing-rule-card { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; transition: all 0.3s ease; }
+        .billing-rule-card:hover { border-color: var(--primary); }
+        .billing-rule-info { display: flex; align-items: center; gap: 16px; }
+        .billing-rule-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%); display: flex; align-items: center; justify-content: center; color: #A78BFA; }
+        .billing-rule-icon svg { width: 24px; height: 24px; }
+        .billing-rule-details h4 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .billing-rule-details p { font-size: 13px; color: var(--text-muted); }
+        .form-input { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); font-size: 14px; transition: all 0.2s ease; }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .form-input::placeholder { color: var(--text-muted); }
+        .user-card { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px; }
+        .user-info { display: flex; align-items: center; gap: 14px; }
+        .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; color: white; font-size: 16px; }
+        .user-details h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .user-details p { font-size: 12px; color: var(--text-muted); }
+        .recent-activity { margin-top: 24px; }
+        .activity-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .activity-icon.entry { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+        .activity-icon.exit { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+        .activity-icon.payment { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+        .activity-icon svg { width: 18px; height: 18px; }
+        .activity-content { flex: 1; }
+        .activity-content h5 { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+        .activity-content p { font-size: 12px; color: var(--text-muted); }
+        .activity-time { font-size: 12px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 2.5s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 4.5s;"></div>
+    </div>
+    <div class="container">
+        <header class="header">
+            <div class="logo-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Smart Park 智慧停车管理系统
+            </div>
+            <h1>系统功能演示</h1>
+            <p>基于 Go + Kratos 微服务架构的现代化智慧停车管理系统，包含车辆管理、智能计费、支付系统、设备控制等完整功能模块</p>
+        </header>
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>数据概览</button>
+            <button class="nav-tab" data-page="parking-lots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>停车场</button>
+            <button class="nav-tab" data-page="vehicles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-3-5H9L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>车辆管理</button>
+            <button class="nav-tab" data-page="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>订单管理</button>
+            <button class="nav-tab" data-page="billing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>计费规则</button>
+            <button class="nav-tab" data-page="devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>设备控制</button>
+            <button class="nav-tab" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户权限</button>
+            <button class="nav-tab" data-page="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>报表统计</button>
+        </nav>
+        <div class="dashboard-wrapper">
+            <div class="browser-bar">
+                <div class="browser-dots"><div class="browser-dot red"></div><div class="browser-dot yellow"></div><div class="browser-dot green"></div></div>
+                <div class="browser-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>smartpark-admin.com / dashboard</div>
+            </div>
+            <div class="dashboard-layout">
+                <aside class="sidebar">
+                    <div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Smart Park</span></div>
+                    <nav class="sidebar-nav">
+                        <div class="sidebar-item active" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>数据概览</div>
+                        <div class="sidebar-item" data-page="parking-lots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>停车场</div>
+                        <div class="sidebar-item" data-page="vehicles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-3-5H9L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/></svg>车辆管理</div>
+                        <div class="sidebar-item" data-page="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>订单管理</div>
+                        <div class="sidebar-item" data-page="billing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>计费规则</div>
+                        <div class="sidebar-item" data-page="devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>设备控制</div>
+                        <div class="sidebar-item" data-page="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>用户权限</div>
+                        <div class="sidebar-item" data-page="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>报表统计</div>
+                    </nav>
+                </aside>
+                <main class="main-content">
+                    <section id="dashboard" class="page-section active">
+                        <div class="page-header">
+                            <div class="page-title"><h2>数据概览</h2><p>实时掌握停车场运营情况</p></div>
+                            <div class="page-actions"><div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="form-input" placeholder="搜索..."></div></div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card"><div class="stat-header"><span class="stat-label">今日收入</span><div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div><div class="stat-value">¥12,580</div><div class="stat-change up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>+12% 较昨日</div></div>
+                            <div class="stat-card"><div class="stat-header"><span class="stat-label">今日入场</span><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div><div class="stat-value">1,234</div><div class="stat-change up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>+5% 较昨日</div></div>
+                            <div class="stat-card"><div class="stat-header"><span class="stat-label">今日出场</span><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div></div><div class="stat-value">1,189</div><div class="stat-change down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>-2% 较昨日</div></div>
+                            <div class="stat-card"><div class="stat-header"><span class="stat-label">在线设备</span><div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div></div><div class="stat-value">48</div><div class="stat-change up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>100% 在线</div></div>
+                        </div>
+                        <div class="card"><div class="card-header"><h3 class="card-title">收入趋势</h3><select class="form-input" style="width: auto; padding: 6px 12px;"><option>近7天</option><option>近30天</option></select></div><div class="chart-container"><div class="chart-bar" style="height: 45%;"><span>周一</span></div><div class="chart-bar" style="height: 65%;"><span>周二</span></div><div class="chart-bar" style="height: 55%;"><span>周三</span></div><div class="chart-bar" style="height: 80%;"><span>周四</span></div><div class="chart-bar" style="height: 70%;"><span>周五</span></div><div class="chart-bar" style="height: 90%;"><span>周六</span></div><div class="chart-bar" style="height: 75%;"><span>周日</span></div></div></div>
+                        <div class="card"><div class="card-header"><h3 class="card-title">实时动态</h3></div><div class="recent-activity"><div class="activity-item"><div class="activity-icon entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></div><div class="activity-content"><h5>车辆入场</h5><p>车牌 京A12345 识别成功，停放于万达广场 A入口</p></div><div class="activity-time">刚刚</div></div><div class="activity-item"><div class="activity-icon payment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="activity-content"><h5>支付成功</h5><p>订单 ORD003 已完成支付，金额 ¥45.00</p></div><div class="activity-time">2分钟前</div></div><div class="activity-item"><div class="activity-icon exit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg></div><div class="activity-content"><h5>车辆出场</h5><p>车牌 沪B67890 已离场，停放时长 2小时30分钟</p></div><div class="activity-time">5分钟前</div></div></div></div>
+                        <div class="quick-actions"><div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span>远程开闸</span></div><div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><span>导出报表</span></div><div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><span>添加设备</span></div><div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><span>编辑规则</span></div></div>
+                    </section>
+                    <section id="parking-lots" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>停车场管理</h2><p>管理所有停车场信息及车位状态</p></div><div class="page-actions"><button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>添加停车场</button></div></div>
+                        <div class="parking-lot-card"><div class="parking-lot-info"><div class="parking-lot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></div><div class="parking-lot-details"><h4>万达广场停车场</h4><p>北京市朝阳区建国路93号</p></div></div><div class="parking-lot-stats"><div class="capacity">423/500</div><div class="usage">使用率 85%</div><div class="usage-bar"><div class="usage-bar-fill" style="width: 85%;"></div></div></div></div>
+                        <div class="parking-lot-card"><div class="parking-lot-info"><div class="parking-lot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></div><div class="parking-lot-details"><h4>万科城市之光</h4><p>上海市浦东新区张江路</p></div></div><div class="parking-lot-stats"><div class="capacity">654/800</div><div class="usage">使用率 82%</div><div class="usage-bar"><div class="usage-bar-fill" style="width: 82%;"></div></div></div></div>
+                        <div class="parking-lot-card"><div class="parking-lot-info"><div class="parking-lot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></div><div class="parking-lot-details"><h4>首都机场T3航站楼</h4><p>北京市顺义区首都机场路</p></div></div><div class="parking-lot-stats"><div class="capacity">1856/2000</div><div class="usage">使用率 93%</div><div class="usage-bar"><div class="usage-bar-fill" style="width: 93%;"></div></div></div></div>
+                    </section>
+                    <section id="vehicles" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>车辆管理</h2><p>管理所有车辆信息及状态</p></div><div class="page-actions"><div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="form-input" placeholder="搜索车牌号..."></div><button class="btn btn-primary">查询</button></div></div>
+                        <div class="card"><table class="data-table"><thead><tr><th>车牌号</th><th>类型</th><th>入场时间</th><th>停车场</th><th>状态</th></tr></thead><tbody><tr><td style="font-weight: 600; color: var(--text-primary);">京A12345</td><td>临时车</td><td>10:23</td><td>万达广场</td><td><span class="badge badge-success">在场</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">沪B67890</td><td>月卡车</td><td>08:15</td><td>万科城市之光</td><td><span class="badge badge-success">在场</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">京C24680</td><td>临时车</td><td>14:30</td><td>首都机场T3</td><td><span class="badge badge-warning">已离场</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">粤D55555</td><td>VIP</td><td>09:00</td><td>万达广场</td><td><span class="badge badge-success">在场</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">津E78901</td><td>临时车</td><td>11:45</td><td>万科城市之光</td><td><span class="badge badge-warning">已离场</span></td></tr></tbody></table></div>
+                    </section>
+                    <section id="orders" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>订单管理</h2><p>查看和管理所有停车订单</p></div><div class="page-actions"><button class="btn btn-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出报表</button></div></div>
+                        <div class="card"><table class="data-table"><thead><tr><th>订单号</th><th>车牌号</th><th>金额</th><th>支付方式</th><th>状态</th></tr></thead><tbody><tr><td style="font-weight: 600; color: var(--text-primary);">ORD001</td><td>京A12345</td><td style="font-weight: 600; color: var(--text-primary);">¥15.00</td><td>微信支付</td><td><span class="badge badge-success">已完成</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">ORD002</td><td>沪B67890</td><td style="font-weight: 600; color: var(--text-primary);">¥8.00</td><td>支付宝</td><td><span class="badge badge-success">已完成</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">ORD003</td><td>京C24680</td><td style="font-weight: 600; color: var(--text-primary);">¥45.00</td><td>微信支付</td><td><span class="badge badge-success">已完成</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">ORD004</td><td>粤D55555</td><td style="font-weight: 600; color: var(--text-primary);">¥0.00</td><td>月卡</td><td><span class="badge badge-info">已抵扣</span></td></tr><tr><td style="font-weight: 600; color: var(--text-primary);">ORD005</td><td>津E78901</td><td style="font-weight: 600; color: var(--text-primary);">¥22.00</td><td>支付宝</td><td><span class="badge badge-success">已完成</span></td></tr></tbody></table></div>
+                    </section>
+                    <section id="billing" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>计费规则</h2><p>配置和管理停车计费规则</p></div><div class="page-actions"><button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>添加规则</button></div></div>
+                        <div class="billing-rule-card"><div class="billing-rule-info"><div class="billing-rule-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="billing-rule-details"><h4>临时车计费</h4><p>首小时5元，之后每小时3元</p></div></div><span class="badge badge-success">启用</span></div>
+                        <div class="billing-rule-card"><div class="billing-rule-info"><div class="billing-rule-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="billing-rule-details"><h4>月卡计费</h4><p>每月300元，不限次数</p></div></div><span class="badge badge-success">启用</span></div>
+                        <div class="billing-rule-card"><div class="billing-rule-info"><div class="billing-rule-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="billing-rule-details"><h4>VIP会员</h4><p>临时车8折优惠</p></div></div><span class="badge badge-success">启用</span></div>
+                    </section>
+                    <section id="devices" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>设备控制</h2><p>监控和管理所有设备</p></div><div class="page-actions"><button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>添加设备</button></div></div>
+                        <div class="device-grid">
+                            <div class="device-card"><div class="device-header"><span class="device-name">入口道闸 #1</span><div class="device-status"><span class="status-dot online"></span>在线</div></div><div class="device-info">类型: 道闸 | 位置: 万达广场 A入口</div><div class="device-actions"><button class="device-btn active">开闸</button><button class="device-btn">关闸</button></div></div>
+                            <div class="device-card"><div class="device-header"><span class="device-name">出口道闸 #1</span><div class="device-status"><span class="status-dot online"></span>在线</div></div><div class="device-info">类型: 道闸 | 位置: 万达广场 A出口</div><div class="device-actions"><button class="device-btn">开闸</button><button class="device-btn active">关闸</button></div></div>
+                            <div class="device-card"><div class="device-header"><span class="device-name">车牌识别相机 #1</span><div class="device-status"><span class="status-dot online"></span>在线</div></div><div class="device-info">类型: 相机 | 位置: 万达广场 A入口</div><div class="device-actions"><button class="device-btn active">重启</button><button class="device-btn">详情</button></div></div>
+                            <div class="device-card"><div class="device-header"><span class="device-name">车牌识别相机 #2</span><div class="device-status"><span class="status-dot offline"></span>离线</div></div><div class="device-info">类型: 相机 | 位置: 万达广场 B入口</div><div class="device-actions"><button class="device-btn">重启</button><button class="device-btn">详情</button></div></div>
+                        </div>
+                    </section>
+                    <section id="users" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>用户权限</h2><p>管理系统用户和权限</p></div><div class="page-actions"><button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>添加用户</button></div></div>
+                        <div class="user-card"><div class="user-info"><div class="user-avatar">张</div><div class="user-details"><h4>张三</h4><p>管理员</p></div></div><span class="badge badge-success">正常</span></div>
+                        <div class="user-card"><div class="user-info"><div class="user-avatar">李</div><div class="user-details"><h4>李四</h4><p>运营人员</p></div></div><span class="badge badge-success">正常</span></div>
+                        <div class="user-card"><div class="user-info"><div class="user-avatar">王</div><div class="user-details"><h4>王五</h4><p>财务人员</p></div></div><span class="badge badge-success">正常</span></div>
+                    </section>
+                    <section id="reports" class="page-section">
+                        <div class="page-header"><div class="page-title"><h2>报表统计</h2><p>查看运营数据报表</p></div><div class="page-actions"><select class="form-input" style="width: auto;"><option>本月</option><option>上月</option><option>近三月</option></select><button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>导出</button></div></div>
+                        <div class="reports-grid">
+                            <div class="report-stat"><div class="report-stat-value">¥358,420</div><div class="report-stat-label">本月总收入</div></div>
+                            <div class="report-stat"><div class="report-stat-value">28,456</div><div class="report-stat-label">本月停车次数</div></div>
+                            <div class="report-stat"><div class="report-stat-value">86%</div><div class="report-stat-label">平均车位利用率</div></div>
+                        </div>
+                        <div class="card"><div class="card-header"><h3 class="card-title">月度趋势</h3></div><div class="chart-container"><div class="chart-bar" style="height: 60%;"><span>1月</span></div><div class="chart-bar" style="height: 75%;"><span>2月</span></div><div class="chart-bar" style="height: 65%;"><span>3月</span></div><div class="chart-bar" style="height: 85%;"><span>4月</span></div><div class="chart-bar" style="height: 70%;"><span>5月</span></div><div class="chart-bar" style="height: 90%;"><span>6月</span></div></div></div>
+                    </section>
+                </main>
+            </div>
+        </div>
+        <footer class="footer"><p>查看更多: <a href="https://github.com/xuanyiying/smart-park">GitHub</a> | <a href="./docs/smart-park-web-design.md">设计文档</a></p></footer>
+    </div>
+    <script>
+        document.querySelectorAll('.nav-tab, .sidebar-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const page = tab.dataset.page;
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.sidebar-item').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelector(`.nav-tab[data-page="${page}"]`)?.classList.add('active');
+                document.querySelector(`.sidebar-item[data-page="${page}"]`)?.classList.add('active');
+                document.getElementById(page)?.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

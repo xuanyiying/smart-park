@@ -28,13 +28,13 @@ func (_c *VehicleCreate) SetPlateNumber(v string) *VehicleCreate {
 }
 
 // SetVehicleType sets the "vehicle_type" field.
-func (_c *VehicleCreate) SetVehicleType(v vehicle.VehicleType) *VehicleCreate {
+func (_c *VehicleCreate) SetVehicleType(v string) *VehicleCreate {
 	_c.mutation.SetVehicleType(v)
 	return _c
 }
 
 // SetNillableVehicleType sets the "vehicle_type" field if the given value is not nil.
-func (_c *VehicleCreate) SetNillableVehicleType(v *vehicle.VehicleType) *VehicleCreate {
+func (_c *VehicleCreate) SetNillableVehicleType(v *string) *VehicleCreate {
 	if v != nil {
 		_c.SetVehicleType(*v)
 	}
@@ -191,11 +191,6 @@ func (_c *VehicleCreate) check() error {
 	if _, ok := _c.mutation.VehicleType(); !ok {
 		return &ValidationError{Name: "vehicle_type", err: errors.New(`ent: missing required field "Vehicle.vehicle_type"`)}
 	}
-	if v, ok := _c.mutation.VehicleType(); ok {
-		if err := vehicle.VehicleTypeValidator(v); err != nil {
-			return &ValidationError{Name: "vehicle_type", err: fmt.Errorf(`ent: validator failed for field "Vehicle.vehicle_type": %w`, err)}
-		}
-	}
 	if v, ok := _c.mutation.OwnerName(); ok {
 		if err := vehicle.OwnerNameValidator(v); err != nil {
 			return &ValidationError{Name: "owner_name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.owner_name": %w`, err)}
@@ -252,7 +247,7 @@ func (_c *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		_node.PlateNumber = value
 	}
 	if value, ok := _c.mutation.VehicleType(); ok {
-		_spec.SetField(vehicle.FieldVehicleType, field.TypeEnum, value)
+		_spec.SetField(vehicle.FieldVehicleType, field.TypeString, value)
 		_node.VehicleType = value
 	}
 	if value, ok := _c.mutation.OwnerName(); ok {

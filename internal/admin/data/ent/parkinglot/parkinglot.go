@@ -3,7 +3,6 @@
 package parkinglot
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -61,6 +60,8 @@ var (
 	DefaultLanes int
 	// LanesValidator is a validator for the "lanes" field. It is called by the builders before save.
 	LanesValidator func(int) error
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -70,33 +71,6 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// StatusActive is the default value of the Status enum.
-const DefaultStatus = StatusActive
-
-// Status values.
-const (
-	StatusActive      Status = "active"
-	StatusInactive    Status = "inactive"
-	StatusMaintenance Status = "maintenance"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusActive, StatusInactive, StatusMaintenance:
-		return nil
-	default:
-		return fmt.Errorf("parkinglot: invalid enum value for status field: %q", s)
-	}
-}
 
 // OrderOption defines the ordering options for the ParkingLot queries.
 type OrderOption func(*sql.Selector)

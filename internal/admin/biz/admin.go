@@ -111,15 +111,14 @@ type AdminRepo interface {
 	GetOrder(ctx context.Context, orderID uuid.UUID) (*Order, error)
 	GetDailyReport(ctx context.Context, lotID uuid.UUID, date string) (*DailyReport, error)
 	GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year, month int) (*MonthlyReport, error)
-	// User related methods
 	GetUserByUsername(ctx context.Context, username string) (*User, error)
 	GetUserByID(ctx context.Context, userID uuid.UUID) (*User, error)
 	ListUsers(ctx context.Context, page, pageSize int) ([]*User, int64, error)
 	CreateUser(ctx context.Context, user *User) error
 	UpdateUser(ctx context.Context, user *User) error
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
-	// SeedData creates initial seed data for development
 	SeedData(ctx context.Context) error
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 // AdminUseCase implements admin business logic.

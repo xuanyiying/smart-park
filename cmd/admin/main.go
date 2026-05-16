@@ -16,7 +16,10 @@ import (
 	"github.com/xuanyiying/smart-park/internal/admin/data"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent"
 	"github.com/xuanyiying/smart-park/internal/admin/service"
+	multentdata "github.com/xuanyiying/smart-park/internal/multitenancy/data"
+	multent "github.com/xuanyiying/smart-park/internal/multitenancy/data/ent"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	tenantpkg "github.com/xuanyiying/smart-park/pkg/tenant"
 )
 
 var (
@@ -85,17 +88,37 @@ func main() {
 	// Initialize business logic
 	adminUseCase := biz.NewAdminUseCase(adminRepo, logger)
 
+	multentClient, err := multent.Open("postgres", cfg.Database.Source)
+	if err != nil {
+		logHelper.Errorf("failed to connect multitenancy database: %v", err)
+		os.Exit(1)
+	}
+	defer multentClient.Close()
+
+	multentDataLayer, multentCleanup, err := multentdata.NewData(multentClient, logger)
+	if err != nil {
+		logHelper.Errorf("failed to initialize multitenancy data layer: %v", err)
+		os.Exit(1)
+	}
+	defer multentCleanup()
+
+	tenantRepo := multentdata.NewTenantRepo(multentDataLayer)
+	tenantExtractor := tenantpkg.NewHeaderExtractor("X-Tenant-ID")
+	tenantMW := tenantpkg.TenantMiddleware(tenantRepo, tenantExtractor, logger)
+
 	// Initialize gRPC service
 	adminSvc := service.NewAdminService(adminUseCase, logger)
 
 	// Create gRPC server
 	gs := grpc.NewServer(
 		grpc.Address(":9004"),
+		grpc.Middleware(tenantMW),
 	)
 
 	// Create HTTP server
 	hs := http.NewServer(
 		http.Address(":8004"),
+		http.Middleware(tenantMW),
 	)
 
 	// Register services

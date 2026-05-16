@@ -36,6 +36,7 @@ type OrderRepo interface {
 	CreateOrder(ctx context.Context, order *Order) error
 	UpdateOrder(ctx context.Context, order *Order) error
 	ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*Order, int64, error)
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 // PaymentConfig holds payment gateway configuration for signature verification.

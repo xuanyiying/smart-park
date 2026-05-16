@@ -13,6 +13,8 @@ routes:
     target: localhost:8002
   - path: /api/v1/admin
     target: localhost:8004
+  - path: /api/v1/charging
+    target: localhost:8005
   - path: /api/v1/user
     target: localhost:8005
 

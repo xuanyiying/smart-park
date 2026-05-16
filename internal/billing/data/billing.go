@@ -1,4 +1,3 @@
-// Package data provides data access layer for the billing service.
 package data
 
 import (
@@ -9,21 +8,19 @@ import (
 	"github.com/xuanyiying/smart-park/internal/billing/biz"
 	"github.com/xuanyiying/smart-park/internal/billing/data/ent"
 	"github.com/xuanyiying/smart-park/internal/billing/data/ent/billingrule"
+	"github.com/xuanyiying/smart-park/pkg/database"
 )
 
-// billingRuleRepo implements biz.BillingRuleRepo.
 type billingRuleRepo struct {
 	data *Data
 }
 
-// NewBillingRuleRepo creates a new BillingRuleRepo.
 func NewBillingRuleRepo(data *Data) biz.BillingRuleRepo {
 	return &billingRuleRepo{data: data}
 }
 
-// GetRulesByLotID retrieves billing rules by lot ID.
 func (r *billingRuleRepo) GetRulesByLotID(ctx context.Context, lotID uuid.UUID) ([]*biz.BillingRule, error) {
-	rules, err := r.data.db.BillingRule.Query().
+	rules, err := r.clientFromCtx(ctx).BillingRule.Query().
 		Where(billingrule.LotID(lotID)).
 		Order(ent.Desc(billingrule.FieldPriority)).
 		All(ctx)
@@ -39,9 +36,8 @@ func (r *billingRuleRepo) GetRulesByLotID(ctx context.Context, lotID uuid.UUID) 
 	return result, nil
 }
 
-// GetBillingRule retrieves a billing rule by ID.
 func (r *billingRuleRepo) GetBillingRule(ctx context.Context, ruleID uuid.UUID) (*biz.BillingRule, error) {
-	rule, err := r.data.db.BillingRule.Get(ctx, ruleID)
+	rule, err := r.clientFromCtx(ctx).BillingRule.Get(ctx, ruleID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -52,7 +48,6 @@ func (r *billingRuleRepo) GetBillingRule(ctx context.Context, ruleID uuid.UUID) 
 	return toBizBillingRule(rule), nil
 }
 
-// CreateBillingRule creates a new billing rule.
 func (r *billingRuleRepo) CreateBillingRule(ctx context.Context, rule *biz.BillingRule) error {
 	ruleType := billingrule.RuleTypeTime
 	switch rule.RuleType {
@@ -66,7 +61,7 @@ func (r *billingRuleRepo) CreateBillingRule(ctx context.Context, rule *biz.Billi
 		ruleType = billingrule.RuleTypeVip
 	}
 
-	_, err := r.data.db.BillingRule.Create().
+	_, err := r.clientFromCtx(ctx).BillingRule.Create().
 		SetID(rule.ID).
 		SetLotID(rule.LotID).
 		SetRuleName(rule.RuleName).
@@ -80,7 +75,6 @@ func (r *billingRuleRepo) CreateBillingRule(ctx context.Context, rule *biz.Billi
 	return err
 }
 
-// UpdateBillingRule updates a billing rule.
 func (r *billingRuleRepo) UpdateBillingRule(ctx context.Context, rule *biz.BillingRule) error {
 	ruleType := billingrule.RuleTypeTime
 	switch rule.RuleType {
@@ -94,7 +88,7 @@ func (r *billingRuleRepo) UpdateBillingRule(ctx context.Context, rule *biz.Billi
 		ruleType = billingrule.RuleTypeVip
 	}
 
-	_, err := r.data.db.BillingRule.UpdateOneID(rule.ID).
+	_, err := r.clientFromCtx(ctx).BillingRule.UpdateOneID(rule.ID).
 		SetRuleName(rule.RuleName).
 		SetRuleType(ruleType).
 		SetConditionsJSON(rule.Conditions).
@@ -106,14 +100,12 @@ func (r *billingRuleRepo) UpdateBillingRule(ctx context.Context, rule *biz.Billi
 	return err
 }
 
-// DeleteBillingRule deletes a billing rule.
 func (r *billingRuleRepo) DeleteBillingRule(ctx context.Context, ruleID uuid.UUID) error {
-	return r.data.db.BillingRule.DeleteOneID(ruleID).Exec(ctx)
+	return r.clientFromCtx(ctx).BillingRule.DeleteOneID(ruleID).Exec(ctx)
 }
 
-// ListBillingRules lists billing rules with pagination.
 func (r *billingRuleRepo) ListBillingRules(ctx context.Context, lotID uuid.UUID, page, pageSize int) ([]*biz.BillingRule, int64, error) {
-	query := r.data.db.BillingRule.Query().
+	query := r.clientFromCtx(ctx).BillingRule.Query().
 		Where(billingrule.LotID(lotID))
 
 	total, err := query.Count(ctx)
@@ -139,7 +131,17 @@ func (r *billingRuleRepo) ListBillingRules(ctx context.Context, lotID uuid.UUID,
 	return result, int64(total), nil
 }
 
-// Helper function to convert ent BillingRule to biz BillingRule.
+func (r *billingRuleRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return r.data.txm.WithTx(ctx, fn)
+}
+
+func (r *billingRuleRepo) clientFromCtx(ctx context.Context) *ent.Client {
+	if tx, ok := database.TxFromCtx(ctx).(*ent.Tx); ok {
+		return tx.Client()
+	}
+	return r.data.db
+}
+
 func toBizBillingRule(rule *ent.BillingRule) *biz.BillingRule {
 	return &biz.BillingRule{
 		ID:         rule.ID,

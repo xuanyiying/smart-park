@@ -29,6 +29,8 @@ type CreatePaymentRequest struct {
 	PayMethod     string                 `protobuf:"bytes,3,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
 	OpenId        string                 `protobuf:"bytes,4,opt,name=openId,proto3" json:"openId,omitempty"`
 	NotifyUrl     string                 `protobuf:"bytes,5,opt,name=notifyUrl,proto3" json:"notifyUrl,omitempty"`
+	OrderType     string                 `protobuf:"bytes,6,opt,name=orderType,proto3" json:"orderType,omitempty"`
+	SessionId     string                 `protobuf:"bytes,7,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,6 +96,20 @@ func (x *CreatePaymentRequest) GetOpenId() string {
 func (x *CreatePaymentRequest) GetNotifyUrl() string {
 	if x != nil {
 		return x.NotifyUrl
+	}
+	return ""
+}
+
+func (x *CreatePaymentRequest) GetOrderType() string {
+	if x != nil {
+		return x.OrderType
+	}
+	return ""
+}
+
+func (x *CreatePaymentRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
 	}
 	return ""
 }
@@ -862,13 +878,15 @@ var File_api_payment_v1_payment_proto protoreflect.FileDescriptor
 
 const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\n" +
-	"\x1capi/payment/v1/payment.proto\x12\x0eapi.payment.v1\x1a\x1cgoogle/api/annotations.proto\"\x9e\x01\n" +
+	"\x1capi/payment/v1/payment.proto\x12\x0eapi.payment.v1\x1a\x1cgoogle/api/annotations.proto\"\xda\x01\n" +
 	"\x14CreatePaymentRequest\x12\x1a\n" +
 	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x1c\n" +
 	"\tpayMethod\x18\x03 \x01(\tR\tpayMethod\x12\x16\n" +
 	"\x06openId\x18\x04 \x01(\tR\x06openId\x12\x1c\n" +
-	"\tnotifyUrl\x18\x05 \x01(\tR\tnotifyUrl\"v\n" +
+	"\tnotifyUrl\x18\x05 \x01(\tR\tnotifyUrl\x12\x1c\n" +
+	"\torderType\x18\x06 \x01(\tR\torderType\x12\x1c\n" +
+	"\tsessionId\x18\a \x01(\tR\tsessionId\"v\n" +
 	"\x15CreatePaymentResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +

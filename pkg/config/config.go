@@ -1,8 +1,13 @@
 package config
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -177,14 +182,16 @@ func NewLoader(path string) (*ConfigLoader, error) {
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 
-	if err := v.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("failed to read config: %w", err)
-	}
-
 	cl := &ConfigLoader{
 		v:      v,
 		cfg:    &Config{},
 		stopCh: make(chan struct{}),
+	}
+
+	cl.bindEnvVars()
+
+	if err := v.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("failed to read config: %w", err)
 	}
 
 	if err := v.Unmarshal(cl.cfg); err != nil {
@@ -328,6 +335,265 @@ func DefaultConfig() *Config {
 		Wechat: WechatConfig{},
 		Alipay: AlipayConfig{},
 	}
+}
+
+var envBindings = map[string]string{
+	"database.source":         "SP_DATABASE_SOURCE",
+	"redis.password":          "SP_REDIS_PASSWORD",
+	"redis.addr":              "SP_REDIS_ADDR",
+	"mq.redis.password":       "SP_MQ_REDIS_PASSWORD",
+	"mq.nats.password":        "SP_MQ_NATS_PASSWORD",
+	"mq.rocketmq.accessKey":   "SP_MQ_ROCKETMQ_ACCESS_KEY",
+	"mq.rocketmq.secretKey":   "SP_MQ_ROCKETMQ_SECRET_KEY",
+	"wechat.app_id":           "SP_WECHAT_APP_ID",
+	"wechat.mch_id":           "SP_WECHAT_MCH_ID",
+	"wechat.api_key":          "SP_WECHAT_API_KEY",
+	"wechat.cert_serial_no":   "SP_WECHAT_CERT_SERIAL_NO",
+	"wechat.private_key_path": "SP_WECHAT_PRIVATE_KEY_PATH",
+	"wechat.public_key_path":  "SP_WECHAT_PUBLIC_KEY_PATH",
+	"wechat.notify_url":       "SP_WECHAT_NOTIFY_URL",
+	"alipay.app_id":           "SP_ALIPAY_APP_ID",
+	"alipay.private_key":      "SP_ALIPAY_PRIVATE_KEY",
+	"alipay.public_key":       "SP_ALIPAY_PUBLIC_KEY",
+	"alipay.notify_url":       "SP_ALIPAY_NOTIFY_URL",
+	"mqtt.password":           "SP_MQTT_PASSWORD",
+	"jwt.secret":              "SP_JWT_SECRET",
+	"jwt.public_key_path":     "SP_JWT_PUBLIC_KEY_PATH",
+	"jwt.private_key_path":    "SP_JWT_PRIVATE_KEY_PATH",
+}
+
+var requiredProductionEnvVars = []string{
+	"SP_DATABASE_SOURCE",
+	"SP_REDIS_PASSWORD",
+	"SP_WECHAT_API_KEY",
+	"SP_ALIPAY_PRIVATE_KEY",
+	"SP_JWT_SECRET",
+}
+
+func (cl *ConfigLoader) bindEnvVars() {
+	for key, env := range envBindings {
+		cl.v.BindEnv(key, env)
+	}
+}
+
+func (c *Config) ValidateForProduction() error {
+	var missing []string
+	for _, env := range requiredProductionEnvVars {
+		if os.Getenv(env) == "" {
+			missing = append(missing, env)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("required production environment variables not set: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+func decryptValue(value string) (string, error) {
+	if !strings.HasPrefix(value, "ENC(") || !strings.HasSuffix(value, ")") {
+		return value, nil
+	}
+	encKey := os.Getenv("SP_CONFIG_ENCRYPTION_KEY")
+	if encKey == "" {
+		return "", fmt.Errorf("SP_CONFIG_ENCRYPTION_KEY environment variable not set")
+	}
+
+	key, err := hex.DecodeString(encKey)
+	if err != nil {
+		return "", fmt.Errorf("invalid encryption key format: %w", err)
+	}
+	if len(key) != 32 {
+		return "", fmt.Errorf("encryption key must be 32 bytes (64 hex chars), got %d bytes", len(key))
+	}
+
+	encoded := value[4 : len(value)-1]
+	ciphertext, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode base64 ciphertext: %w", err)
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", fmt.Errorf("failed to create AES cipher: %w", err)
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", fmt.Errorf("failed to create GCM: %w", err)
+	}
+
+	nonceSize := aesGCM.NonceSize()
+	if len(ciphertext) < nonceSize {
+		return "", fmt.Errorf("ciphertext too short")
+	}
+
+	nonce, ciphertextBody := ciphertext[:nonceSize], ciphertext[nonceSize:]
+	plaintext, err := aesGCM.Open(nil, nonce, ciphertextBody, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to decrypt: %w", err)
+	}
+
+	return string(plaintext), nil
+}
+
+func EncryptValue(plaintext string, hexKey string) (string, error) {
+	key, err := hex.DecodeString(hexKey)
+	if err != nil {
+		return "", fmt.Errorf("invalid encryption key format: %w", err)
+	}
+	if len(key) != 32 {
+		return "", fmt.Errorf("encryption key must be 32 bytes (64 hex chars), got %d bytes", len(key))
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", fmt.Errorf("failed to create AES cipher: %w", err)
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", fmt.Errorf("failed to create GCM: %w", err)
+	}
+
+	nonce := make([]byte, aesGCM.NonceSize())
+	for i := range nonce {
+		nonce[i] = byte(i)
+	}
+
+	ciphertext := aesGCM.Seal(nonce, nonce, []byte(plaintext), nil)
+	encoded := base64.StdEncoding.EncodeToString(ciphertext)
+	return "ENC(" + encoded + ")", nil
+}
+
+func (c *Config) DecryptConfig() error {
+	return decryptConfigFields(reflect.ValueOf(c).Elem())
+}
+
+func decryptConfigFields(v reflect.Value) error {
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return nil
+		}
+		v = v.Elem()
+	}
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldType := v.Type().Field(i)
+
+		if !field.CanInterface() {
+			continue
+		}
+
+		switch field.Kind() {
+		case reflect.String:
+			val := field.String()
+			if strings.HasPrefix(val, "ENC(") && strings.HasSuffix(val, ")") {
+				decrypted, err := decryptValue(val)
+				if err != nil {
+					return fmt.Errorf("failed to decrypt field %s: %w", fieldType.Name, err)
+				}
+				field.SetString(decrypted)
+			}
+		case reflect.Struct:
+			if err := decryptConfigFields(field); err != nil {
+				return err
+			}
+		case reflect.Ptr:
+			if !field.IsNil() {
+				if field.Elem().Kind() == reflect.Struct {
+					if err := decryptConfigFields(field); err != nil {
+						return err
+					}
+				}
+			}
+		case reflect.Slice:
+			if fieldType.Type.Elem().Kind() == reflect.Struct {
+				for j := 0; j < field.Len(); j++ {
+					if err := decryptConfigFields(field.Index(j)); err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func maskValue(s string) string {
+	if len(s) <= 4 {
+		return "****"
+	}
+	return s[:2] + "****" + s[len(s)-2:]
+}
+
+func maskConfigFields(src, dst reflect.Value) {
+	if src.Kind() == reflect.Ptr {
+		if src.IsNil() {
+			return
+		}
+		src = src.Elem()
+		dst = dst.Elem()
+	}
+
+	for i := 0; i < src.NumField(); i++ {
+		srcField := src.Field(i)
+		dstField := dst.Field(i)
+		fieldType := src.Type().Field(i)
+
+		if !srcField.CanInterface() || !dstField.CanSet() {
+			continue
+		}
+
+		switch srcField.Kind() {
+		case reflect.String:
+			if isSensitiveField(fieldType.Name) && srcField.String() != "" {
+				dstField.SetString(maskValue(srcField.String()))
+			} else {
+				dstField.SetString(srcField.String())
+			}
+		case reflect.Struct:
+			maskConfigFields(srcField, dstField)
+		case reflect.Ptr:
+			if !srcField.IsNil() && srcField.Elem().Kind() == reflect.Struct {
+				dstField.Set(reflect.New(srcField.Elem().Type()))
+				maskConfigFields(srcField, dstField)
+			}
+		case reflect.Slice:
+			if fieldType.Type.Elem().Kind() == reflect.Struct {
+				dstField.Set(reflect.MakeSlice(fieldType.Type, srcField.Len(), srcField.Cap()))
+				for j := 0; j < srcField.Len(); j++ {
+					maskConfigFields(srcField.Index(j), dstField.Index(j))
+				}
+			} else {
+				dstField.Set(srcField)
+			}
+		default:
+			dstField.Set(srcField)
+		}
+	}
+}
+
+var sensitiveFieldNames = map[string]bool{
+	"Password":      true,
+	"APIKey":        true,
+	"PrivateKey":    true,
+	"PublicKey":     true,
+	"Secret":        true,
+	"SecretKey":     true,
+	"AccessKey":     true,
+	"CertSerialNo":  true,
+	"Source":        true,
+}
+
+func isSensitiveField(name string) bool {
+	return sensitiveFieldNames[name]
+}
+
+func (c *Config) Masked() *Config {
+	masked := &Config{}
+	maskConfigFields(reflect.ValueOf(c).Elem(), reflect.ValueOf(masked).Elem())
+	return masked
 }
 
 func MustLoad(path string) *Config {

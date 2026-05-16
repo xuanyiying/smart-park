@@ -111,9 +111,13 @@ func (s *ChargingService) DeleteStation(ctx context.Context, req *v1.DeleteStati
 
 // ListStations retrieves charging stations by lot ID.
 func (s *ChargingService) ListStations(ctx context.Context, req *v1.ListStationsRequest) (*v1.ListStationsResponse, error) {
-	lotID, err := uuid.Parse(req.LotId)
-	if err != nil {
-		return &v1.ListStationsResponse{Code: 400, Message: "无效的停车场ID"}, nil
+	var lotID uuid.UUID
+	if req.LotId != "" {
+		var err error
+		lotID, err = uuid.Parse(req.LotId)
+		if err != nil {
+			return &v1.ListStationsResponse{Code: 400, Message: "无效的停车场ID"}, nil
+		}
 	}
 
 	stations, err := s.uc.ListStations(ctx, lotID)
@@ -302,11 +306,6 @@ func (s *ChargingService) GetSession(ctx context.Context, req *v1.GetSessionRequ
 
 // ListUserSessions retrieves sessions for a user with pagination.
 func (s *ChargingService) ListUserSessions(ctx context.Context, req *v1.ListUserSessionsRequest) (*v1.ListUserSessionsResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return &v1.ListUserSessionsResponse{Code: 400, Message: "无效的用户ID"}, nil
-	}
-
 	page := int(req.Page)
 	if page <= 0 {
 		page = 1
@@ -314,6 +313,31 @@ func (s *ChargingService) ListUserSessions(ctx context.Context, req *v1.ListUser
 	pageSize := int(req.PageSize)
 	if pageSize <= 0 {
 		pageSize = 20
+	}
+
+	if req.UserId == "" {
+		sessions, total, err := s.uc.ListAllSessions(ctx, page, pageSize)
+		if err != nil {
+			s.log.WithContext(ctx).Errorf("ListAllSessions failed: %v", err)
+			return &v1.ListUserSessionsResponse{Code: 500, Message: "获取会话列表失败"}, nil
+		}
+
+		data := make([]*v1.Session, len(sessions))
+		for i, session := range sessions {
+			data[i] = toProtoSession(session)
+		}
+
+		return &v1.ListUserSessionsResponse{
+			Code:    0,
+			Message: "success",
+			Data:    data,
+			Total:   total,
+		}, nil
+	}
+
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return &v1.ListUserSessionsResponse{Code: 400, Message: "无效的用户ID"}, nil
 	}
 
 	sessions, total, err := s.uc.GetUserSessions(ctx, userID, page, pageSize)

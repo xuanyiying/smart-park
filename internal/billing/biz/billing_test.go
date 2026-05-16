@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -419,6 +420,488 @@ func TestCeilToDecimal(t *testing.T) {
 			got := ceilToDecimal(tt.amount, tt.decimals)
 			if got != tt.expected {
 				t.Errorf("ceilToDecimal() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestApplyActions_FreeDuration(t *testing.T) {
+	exitTime := time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		name     string
+		actions  []*Action
+		duration time.Duration
+		expected float64
+	}{
+		{
+			name:     "free_duration within limit",
+			actions:  []*Action{{Type: "per_hour", Amount: 5.0}, {Type: "free_duration", Value: 1800}},
+			duration: 20 * time.Minute,
+			expected: 0,
+		},
+		{
+			name:     "free_duration exceeds limit",
+			actions:  []*Action{{Type: "per_hour", Amount: 5.0}, {Type: "free_duration", Value: 1800}},
+			duration: 40 * time.Minute,
+			expected: 5.0 * 40.0 / 60.0,
+		},
+		{
+			name:     "first_hour_free within 1 hour",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "first_hour_free"}},
+			duration: 45 * time.Minute,
+			expected: 0,
+		},
+		{
+			name:     "first_hour_free over 1 hour",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "first_hour_free"}},
+			duration: 2 * time.Hour,
+			expected: 20.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyActions(tt.actions, tt.duration, exitTime)
+			if math.Abs(got-tt.expected) > 0.0001 {
+				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestApplyActions_Cap(t *testing.T) {
+	exitTime := time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		name     string
+		actions  []*Action
+		duration time.Duration
+		expected float64
+	}{
+		{
+			name:     "cap not exceeded",
+			actions:  []*Action{{Type: "per_hour", Amount: 5.0}, {Type: "cap", Cap: 50.0}},
+			duration: 2 * time.Hour,
+			expected: 10.0,
+		},
+		{
+			name:     "cap exceeded",
+			actions:  []*Action{{Type: "per_hour", Amount: 50.0}, {Type: "cap", Cap: 80.0}},
+			duration: 3 * time.Hour,
+			expected: 80.0,
+		},
+		{
+			name:     "cap exactly at threshold",
+			actions:  []*Action{{Type: "fixed", Amount: 50.0}, {Type: "cap", Cap: 50.0}},
+			duration: 2 * time.Hour,
+			expected: 50.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyActions(tt.actions, tt.duration, exitTime)
+			if got != tt.expected {
+				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestApplyActions_MaxDaily(t *testing.T) {
+	exitTime := time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		name     string
+		actions  []*Action
+		duration time.Duration
+		expected float64
+	}{
+		{
+			name:     "max_daily within single day",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "max_daily", Amount: 50.0}},
+			duration: 6 * time.Hour,
+			expected: 50.0,
+		},
+		{
+			name:     "max_daily not exceeded single day",
+			actions:  []*Action{{Type: "per_hour", Amount: 5.0}, {Type: "max_daily", Amount: 50.0}},
+			duration: 4 * time.Hour,
+			expected: 20.0,
+		},
+		{
+			name:     "max_daily cross two days",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "max_daily", Amount: 50.0}},
+			duration: 30 * time.Hour,
+			expected: 100.0,
+		},
+		{
+			name:     "max_daily cross three days",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "max_daily", Amount: 50.0}},
+			duration: 55 * time.Hour,
+			expected: 150.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyActions(tt.actions, tt.duration, exitTime)
+			if got != tt.expected {
+				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestApplyActions_MinCharge(t *testing.T) {
+	exitTime := time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		name     string
+		actions  []*Action
+		duration time.Duration
+		expected float64
+	}{
+		{
+			name:     "min_charge below threshold",
+			actions:  []*Action{{Type: "per_hour", Amount: 2.0}, {Type: "min_charge", Amount: 5.0}},
+			duration: 30 * time.Minute,
+			expected: 5.0,
+		},
+		{
+			name:     "min_charge above threshold",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "min_charge", Amount: 5.0}},
+			duration: 2 * time.Hour,
+			expected: 20.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyActions(tt.actions, tt.duration, exitTime)
+			if got != tt.expected {
+				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestApplyActions_NightDiscount(t *testing.T) {
+	tests := []struct {
+		name     string
+		actions  []*Action
+		duration time.Duration
+		exitTime time.Time
+		expected float64
+	}{
+		{
+			name:     "night discount at 23:00",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "night_discount", Amount: 30.0}},
+			duration: 2 * time.Hour,
+			exitTime: time.Date(2026, 3, 26, 23, 0, 0, 0, time.UTC),
+			expected: 14.0,
+		},
+		{
+			name:     "night discount at 03:00",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "night_discount", Amount: 30.0}},
+			duration: 2 * time.Hour,
+			exitTime: time.Date(2026, 3, 26, 3, 0, 0, 0, time.UTC),
+			expected: 14.0,
+		},
+		{
+			name:     "no night discount at 12:00",
+			actions:  []*Action{{Type: "per_hour", Amount: 10.0}, {Type: "night_discount", Amount: 30.0}},
+			duration: 2 * time.Hour,
+			exitTime: time.Date(2026, 3, 26, 12, 0, 0, 0, time.UTC),
+			expected: 20.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyActions(tt.actions, tt.duration, tt.exitTime)
+			if got != tt.expected {
+				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestApplyActions_Ceil(t *testing.T) {
+	exitTime := time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		name     string
+		actions  []*Action
+		duration time.Duration
+		expected float64
+	}{
+		{
+			name:     "ceil rounds up",
+			actions:  []*Action{{Type: "per_hour", Amount: 3.331}, {Type: "ceil"}},
+			duration: 1 * time.Hour,
+			expected: 3.34,
+		},
+		{
+			name:     "ceil already integer",
+			actions:  []*Action{{Type: "fixed", Amount: 10.0}, {Type: "ceil"}},
+			duration: 1 * time.Hour,
+			expected: 10.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyActions(tt.actions, tt.duration, exitTime)
+			if got != tt.expected {
+				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestCalculateDefaultFee_Boundary(t *testing.T) {
+	tests := []struct {
+		name   string
+		hours  float64
+		expect float64
+	}{
+		{
+			name:   "zero hours",
+			hours:  0,
+			expect: 5.0,
+		},
+		{
+			name:   "very small duration",
+			hours:  0.01,
+			expect: 5.0,
+		},
+		{
+			name:   "just under 1 hour",
+			hours:  0.99,
+			expect: 5.0,
+		},
+		{
+			name:   "exactly 1 hour boundary",
+			hours:  1.0,
+			expect: 2.0,
+		},
+		{
+			name:   "large duration",
+			hours:  24.0,
+			expect: 48.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := calculateDefaultFee(tt.hours)
+			if got != tt.expect {
+				t.Errorf("calculateDefaultFee() = %v, want %v", got, tt.expect)
+			}
+		})
+	}
+}
+
+func TestEvaluateCondition_Holiday(t *testing.T) {
+	holidayCtx := &BillingContext{
+		VehicleType: "temporary",
+		Duration:    60 * time.Minute,
+		ExitTime:    time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC),
+		IsHoliday:   true,
+	}
+	normalCtx := &BillingContext{
+		VehicleType: "temporary",
+		Duration:    60 * time.Minute,
+		ExitTime:    time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC),
+		IsHoliday:   false,
+	}
+
+	tests := []struct {
+		name   string
+		cond   *Condition
+		ctx    *BillingContext
+		expect bool
+	}{
+		{
+			name:   "holiday true",
+			cond:   &Condition{Type: "holiday"},
+			ctx:    holidayCtx,
+			expect: true,
+		},
+		{
+			name:   "holiday false",
+			cond:   &Condition{Type: "holiday"},
+			ctx:    normalCtx,
+			expect: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := EvaluateCondition(tt.cond, tt.ctx)
+			if got != tt.expect {
+				t.Errorf("EvaluateCondition() = %v, want %v", got, tt.expect)
+			}
+		})
+	}
+}
+
+func TestEvaluateCondition_DurationOperators(t *testing.T) {
+	ctx := &BillingContext{
+		VehicleType: "temporary",
+		Duration:    90 * time.Minute,
+		ExitTime:    time.Date(2026, 3, 26, 10, 30, 0, 0, time.UTC),
+	}
+
+	tests := []struct {
+		name   string
+		cond   *Condition
+		ctx    *BillingContext
+		expect bool
+	}{
+		{
+			name:   "duration_min lte true",
+			cond:   &Condition{Type: "duration_min", Operator: "lte", Value: 120.0},
+			ctx:    ctx,
+			expect: true,
+		},
+		{
+			name:   "duration_min lte false",
+			cond:   &Condition{Type: "duration_min", Operator: "lte", Value: 60.0},
+			ctx:    ctx,
+			expect: false,
+		},
+		{
+			name:   "duration_min gt true",
+			cond:   &Condition{Type: "duration_min", Operator: "gt", Value: 60.0},
+			ctx:    ctx,
+			expect: true,
+		},
+		{
+			name:   "duration_min gt false",
+			cond:   &Condition{Type: "duration_min", Operator: "gt", Value: 120.0},
+			ctx:    ctx,
+			expect: false,
+		},
+		{
+			name:   "duration_min lt true",
+			cond:   &Condition{Type: "duration_min", Operator: "lt", Value: 120.0},
+			ctx:    ctx,
+			expect: true,
+		},
+		{
+			name:   "duration_min lt false",
+			cond:   &Condition{Type: "duration_min", Operator: "lt", Value: 60.0},
+			ctx:    ctx,
+			expect: false,
+		},
+		{
+			name:   "duration_min eq true",
+			cond:   &Condition{Type: "duration_min", Operator: "eq", Value: 90.0},
+			ctx:    ctx,
+			expect: true,
+		},
+		{
+			name:   "duration_min eq false",
+			cond:   &Condition{Type: "duration_min", Operator: "eq", Value: 60.0},
+			ctx:    ctx,
+			expect: false,
+		},
+		{
+			name:   "duration_min invalid value type",
+			cond:   &Condition{Type: "duration_min", Operator: "gte", Value: "invalid"},
+			ctx:    ctx,
+			expect: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := EvaluateCondition(tt.cond, tt.ctx)
+			if got != tt.expect {
+				t.Errorf("EvaluateCondition() = %v, want %v", got, tt.expect)
+			}
+		})
+	}
+}
+
+func TestEvaluateCondition_TimeRangeBoundary(t *testing.T) {
+	tests := []struct {
+		name     string
+		cond     *Condition
+		exitTime time.Time
+		expect   bool
+	}{
+		{
+			name: "exact start boundary",
+			cond: &Condition{
+				Type: "time_range",
+				Value: map[string]interface{}{
+					"start": 9.0,
+					"end":   18.0,
+				},
+			},
+			exitTime: time.Date(2026, 3, 26, 9, 0, 0, 0, time.UTC),
+			expect:   true,
+		},
+		{
+			name: "exact end boundary",
+			cond: &Condition{
+				Type: "time_range",
+				Value: map[string]interface{}{
+					"start": 9.0,
+					"end":   18.0,
+				},
+			},
+			exitTime: time.Date(2026, 3, 26, 18, 0, 0, 0, time.UTC),
+			expect:   true,
+		},
+		{
+			name: "just before start",
+			cond: &Condition{
+				Type: "time_range",
+				Value: map[string]interface{}{
+					"start": 9.0,
+					"end":   18.0,
+				},
+			},
+			exitTime: time.Date(2026, 3, 26, 8, 59, 0, 0, time.UTC),
+			expect:   false,
+		},
+		{
+			name: "time_range invalid value type",
+			cond: &Condition{
+				Type:  "time_range",
+				Value: "invalid",
+			},
+			exitTime: time.Date(2026, 3, 26, 10, 0, 0, 0, time.UTC),
+			expect:   false,
+		},
+		{
+			name: "time_range missing start",
+			cond: &Condition{
+				Type: "time_range",
+				Value: map[string]interface{}{
+					"end": 18.0,
+				},
+			},
+			exitTime: time.Date(2026, 3, 26, 10, 0, 0, 0, time.UTC),
+			expect:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := &BillingContext{
+				VehicleType: "temporary",
+				Duration:    60 * time.Minute,
+				ExitTime:    tt.exitTime,
+			}
+			got := EvaluateCondition(tt.cond, ctx)
+			if got != tt.expect {
+				t.Errorf("EvaluateCondition() = %v, want %v", got, tt.expect)
 			}
 		})
 	}

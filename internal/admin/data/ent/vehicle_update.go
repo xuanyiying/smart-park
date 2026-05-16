@@ -43,13 +43,13 @@ func (_u *VehicleUpdate) SetNillablePlateNumber(v *string) *VehicleUpdate {
 }
 
 // SetVehicleType sets the "vehicle_type" field.
-func (_u *VehicleUpdate) SetVehicleType(v vehicle.VehicleType) *VehicleUpdate {
+func (_u *VehicleUpdate) SetVehicleType(v string) *VehicleUpdate {
 	_u.mutation.SetVehicleType(v)
 	return _u
 }
 
 // SetNillableVehicleType sets the "vehicle_type" field if the given value is not nil.
-func (_u *VehicleUpdate) SetNillableVehicleType(v *vehicle.VehicleType) *VehicleUpdate {
+func (_u *VehicleUpdate) SetNillableVehicleType(v *string) *VehicleUpdate {
 	if v != nil {
 		_u.SetVehicleType(*v)
 	}
@@ -170,11 +170,6 @@ func (_u *VehicleUpdate) check() error {
 			return &ValidationError{Name: "plate_number", err: fmt.Errorf(`ent: validator failed for field "Vehicle.plate_number": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.VehicleType(); ok {
-		if err := vehicle.VehicleTypeValidator(v); err != nil {
-			return &ValidationError{Name: "vehicle_type", err: fmt.Errorf(`ent: validator failed for field "Vehicle.vehicle_type": %w`, err)}
-		}
-	}
 	if v, ok := _u.mutation.OwnerName(); ok {
 		if err := vehicle.OwnerNameValidator(v); err != nil {
 			return &ValidationError{Name: "owner_name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.owner_name": %w`, err)}
@@ -204,7 +199,7 @@ func (_u *VehicleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(vehicle.FieldPlateNumber, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.VehicleType(); ok {
-		_spec.SetField(vehicle.FieldVehicleType, field.TypeEnum, value)
+		_spec.SetField(vehicle.FieldVehicleType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.OwnerName(); ok {
 		_spec.SetField(vehicle.FieldOwnerName, field.TypeString, value)
@@ -262,13 +257,13 @@ func (_u *VehicleUpdateOne) SetNillablePlateNumber(v *string) *VehicleUpdateOne 
 }
 
 // SetVehicleType sets the "vehicle_type" field.
-func (_u *VehicleUpdateOne) SetVehicleType(v vehicle.VehicleType) *VehicleUpdateOne {
+func (_u *VehicleUpdateOne) SetVehicleType(v string) *VehicleUpdateOne {
 	_u.mutation.SetVehicleType(v)
 	return _u
 }
 
 // SetNillableVehicleType sets the "vehicle_type" field if the given value is not nil.
-func (_u *VehicleUpdateOne) SetNillableVehicleType(v *vehicle.VehicleType) *VehicleUpdateOne {
+func (_u *VehicleUpdateOne) SetNillableVehicleType(v *string) *VehicleUpdateOne {
 	if v != nil {
 		_u.SetVehicleType(*v)
 	}
@@ -402,11 +397,6 @@ func (_u *VehicleUpdateOne) check() error {
 			return &ValidationError{Name: "plate_number", err: fmt.Errorf(`ent: validator failed for field "Vehicle.plate_number": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.VehicleType(); ok {
-		if err := vehicle.VehicleTypeValidator(v); err != nil {
-			return &ValidationError{Name: "vehicle_type", err: fmt.Errorf(`ent: validator failed for field "Vehicle.vehicle_type": %w`, err)}
-		}
-	}
 	if v, ok := _u.mutation.OwnerName(); ok {
 		if err := vehicle.OwnerNameValidator(v); err != nil {
 			return &ValidationError{Name: "owner_name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.owner_name": %w`, err)}
@@ -453,7 +443,7 @@ func (_u *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err er
 		_spec.SetField(vehicle.FieldPlateNumber, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.VehicleType(); ok {
-		_spec.SetField(vehicle.FieldVehicleType, field.TypeEnum, value)
+		_spec.SetField(vehicle.FieldVehicleType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.OwnerName(); ok {
 		_spec.SetField(vehicle.FieldOwnerName, field.TypeString, value)

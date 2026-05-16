@@ -1,3 +1,24 @@
+# Environment variables override YAML values with SP_{SECTION}_{KEY} naming convention.
+# Encrypted values can be used with ENC(...) format (requires SP_CONFIG_ENCRYPTION_KEY).
+#
+# Available environment variables:
+#   SP_DATABASE_SOURCE         - Database connection string (required in production)
+#   SP_REDIS_ADDR              - Redis address
+#   SP_REDIS_PASSWORD          - Redis password (required in production)
+#   SP_WECHAT_APP_ID           - WeChat Pay app ID
+#   SP_WECHAT_MCH_ID           - WeChat Pay merchant ID
+#   SP_WECHAT_API_KEY          - WeChat Pay API key (required in production)
+#   SP_WECHAT_CERT_SERIAL_NO   - WeChat Pay certificate serial number
+#   SP_WECHAT_PRIVATE_KEY_PATH - WeChat Pay private key path
+#   SP_WECHAT_PUBLIC_KEY_PATH  - WeChat Pay public key path
+#   SP_WECHAT_NOTIFY_URL       - WeChat Pay notification URL
+#   SP_ALIPAY_APP_ID           - Alipay app ID
+#   SP_ALIPAY_PRIVATE_KEY      - Alipay private key (required in production)
+#   SP_ALIPAY_PUBLIC_KEY       - Alipay public key
+#   SP_ALIPAY_NOTIFY_URL       - Alipay notification URL
+#   SP_JWT_SECRET              - JWT signing secret (required in production)
+#   SP_CONFIG_ENCRYPTION_KEY   - AES-256-GCM key (64 hex chars) for decrypting ENC(...) values
+
 server:
   port: 8003
   timeout: 60

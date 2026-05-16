@@ -22,8 +22,7 @@ func (Vehicle) Fields() []ent.Field {
 			MaxLen(20).
 			Unique().
 			Comment("车牌号"),
-		field.Enum("vehicle_type").
-			Values("temporary", "monthly", "vip").
+		field.String("vehicle_type").
 			Default("temporary").
 			Comment("车辆类型: 临时车/月卡车/VIP"),
 		field.String("owner_name").

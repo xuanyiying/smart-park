@@ -13,6 +13,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/conf"
 	"github.com/xuanyiying/smart-park/internal/gateway/biz"
 	"github.com/xuanyiying/smart-park/internal/gateway/service"
+	"github.com/xuanyiying/smart-park/pkg/ws"
 )
 
 var (
@@ -50,7 +51,11 @@ func main() {
 	var etcdReg *biz.EtcdRegistry
 	useEtcd := false
 	routerUseCase := biz.NewRouterUseCase(discovery, etcdReg, routes, useEtcd, logger)
-	gatewaySvc := service.NewGatewayService(routerUseCase, logger)
+
+	hub := ws.NewHub(logger)
+	go hub.Run()
+
+	gatewaySvc := service.NewGatewayService(routerUseCase, hub, logger)
 
 	hs := khttp.NewServer(
 		khttp.Address(fmt.Sprintf(":%d", cfg.Server.Port)),
@@ -59,6 +64,7 @@ func main() {
 	hs.HandlePrefix("/", gatewaySvc)
 	hs.HandleFunc("/health", gatewaySvc.LivenessProbe)
 	hs.HandleFunc("/ready", gatewaySvc.ReadinessProbe)
+	hs.HandleFunc("/ws", gatewaySvc.HandleWebSocket)
 	hs.HandleFunc("/routes", func(w http.ResponseWriter, r *http.Request) {
 		routes, _ := gatewaySvc.GetRoutes(r.Context())
 		for _, route := range routes {

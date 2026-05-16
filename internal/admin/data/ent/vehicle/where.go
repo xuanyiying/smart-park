@@ -60,6 +60,11 @@ func PlateNumber(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldPlateNumber, v))
 }
 
+// VehicleType applies equality check predicate on the "vehicle_type" field. It's identical to VehicleTypeEQ.
+func VehicleType(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldVehicleType, v))
+}
+
 // OwnerName applies equality check predicate on the "owner_name" field. It's identical to OwnerNameEQ.
 func OwnerName(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldOwnerName, v))
@@ -151,23 +156,68 @@ func PlateNumberContainsFold(v string) predicate.Vehicle {
 }
 
 // VehicleTypeEQ applies the EQ predicate on the "vehicle_type" field.
-func VehicleTypeEQ(v VehicleType) predicate.Vehicle {
+func VehicleTypeEQ(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldVehicleType, v))
 }
 
 // VehicleTypeNEQ applies the NEQ predicate on the "vehicle_type" field.
-func VehicleTypeNEQ(v VehicleType) predicate.Vehicle {
+func VehicleTypeNEQ(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldNEQ(FieldVehicleType, v))
 }
 
 // VehicleTypeIn applies the In predicate on the "vehicle_type" field.
-func VehicleTypeIn(vs ...VehicleType) predicate.Vehicle {
+func VehicleTypeIn(vs ...string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldIn(FieldVehicleType, vs...))
 }
 
 // VehicleTypeNotIn applies the NotIn predicate on the "vehicle_type" field.
-func VehicleTypeNotIn(vs ...VehicleType) predicate.Vehicle {
+func VehicleTypeNotIn(vs ...string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldNotIn(FieldVehicleType, vs...))
+}
+
+// VehicleTypeGT applies the GT predicate on the "vehicle_type" field.
+func VehicleTypeGT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGT(FieldVehicleType, v))
+}
+
+// VehicleTypeGTE applies the GTE predicate on the "vehicle_type" field.
+func VehicleTypeGTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGTE(FieldVehicleType, v))
+}
+
+// VehicleTypeLT applies the LT predicate on the "vehicle_type" field.
+func VehicleTypeLT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLT(FieldVehicleType, v))
+}
+
+// VehicleTypeLTE applies the LTE predicate on the "vehicle_type" field.
+func VehicleTypeLTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLTE(FieldVehicleType, v))
+}
+
+// VehicleTypeContains applies the Contains predicate on the "vehicle_type" field.
+func VehicleTypeContains(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContains(FieldVehicleType, v))
+}
+
+// VehicleTypeHasPrefix applies the HasPrefix predicate on the "vehicle_type" field.
+func VehicleTypeHasPrefix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasPrefix(FieldVehicleType, v))
+}
+
+// VehicleTypeHasSuffix applies the HasSuffix predicate on the "vehicle_type" field.
+func VehicleTypeHasSuffix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasSuffix(FieldVehicleType, v))
+}
+
+// VehicleTypeEqualFold applies the EqualFold predicate on the "vehicle_type" field.
+func VehicleTypeEqualFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEqualFold(FieldVehicleType, v))
+}
+
+// VehicleTypeContainsFold applies the ContainsFold predicate on the "vehicle_type" field.
+func VehicleTypeContainsFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContainsFold(FieldVehicleType, v))
 }
 
 // OwnerNameEQ applies the EQ predicate on the "owner_name" field.

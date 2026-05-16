@@ -70,6 +70,11 @@ func Lanes(v int) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldEQ(FieldLanes, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldEQ(FieldStatus, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldEQ(FieldCreatedAt, v))
@@ -261,23 +266,68 @@ func LanesLTE(v int) predicate.ParkingLot {
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.ParkingLot {
+func StatusEQ(v string) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.ParkingLot {
+func StatusNEQ(v string) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.ParkingLot {
+func StatusIn(vs ...string) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.ParkingLot {
+func StatusNotIn(vs ...string) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldLTE(FieldStatus, v))
+}
+
+// StatusContains applies the Contains predicate on the "status" field.
+func StatusContains(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldContains(FieldStatus, v))
+}
+
+// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
+func StatusHasPrefix(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldHasPrefix(FieldStatus, v))
+}
+
+// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
+func StatusHasSuffix(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldHasSuffix(FieldStatus, v))
+}
+
+// StatusEqualFold applies the EqualFold predicate on the "status" field.
+func StatusEqualFold(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldEqualFold(FieldStatus, v))
+}
+
+// StatusContainsFold applies the ContainsFold predicate on the "status" field.
+func StatusContainsFold(v string) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldContainsFold(FieldStatus, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

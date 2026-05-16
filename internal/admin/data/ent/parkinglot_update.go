@@ -84,13 +84,13 @@ func (_u *ParkingLotUpdate) AddLanes(v int) *ParkingLotUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (_u *ParkingLotUpdate) SetStatus(v parkinglot.Status) *ParkingLotUpdate {
+func (_u *ParkingLotUpdate) SetStatus(v string) *ParkingLotUpdate {
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ParkingLotUpdate) SetNillableStatus(v *parkinglot.Status) *ParkingLotUpdate {
+func (_u *ParkingLotUpdate) SetNillableStatus(v *string) *ParkingLotUpdate {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -161,11 +161,6 @@ func (_u *ParkingLotUpdate) check() error {
 			return &ValidationError{Name: "lanes", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.lanes": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.Status(); ok {
-		if err := parkinglot.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.status": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -197,7 +192,7 @@ func (_u *ParkingLotUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		_spec.AddField(parkinglot.FieldLanes, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(parkinglot.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(parkinglot.FieldStatus, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(parkinglot.FieldUpdatedAt, field.TypeTime, value)
@@ -278,13 +273,13 @@ func (_u *ParkingLotUpdateOne) AddLanes(v int) *ParkingLotUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (_u *ParkingLotUpdateOne) SetStatus(v parkinglot.Status) *ParkingLotUpdateOne {
+func (_u *ParkingLotUpdateOne) SetStatus(v string) *ParkingLotUpdateOne {
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ParkingLotUpdateOne) SetNillableStatus(v *parkinglot.Status) *ParkingLotUpdateOne {
+func (_u *ParkingLotUpdateOne) SetNillableStatus(v *string) *ParkingLotUpdateOne {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -368,11 +363,6 @@ func (_u *ParkingLotUpdateOne) check() error {
 			return &ValidationError{Name: "lanes", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.lanes": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.Status(); ok {
-		if err := parkinglot.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.status": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -421,7 +411,7 @@ func (_u *ParkingLotUpdateOne) sqlSave(ctx context.Context) (_node *ParkingLot, 
 		_spec.AddField(parkinglot.FieldLanes, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(parkinglot.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(parkinglot.FieldStatus, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(parkinglot.FieldUpdatedAt, field.TypeTime, value)

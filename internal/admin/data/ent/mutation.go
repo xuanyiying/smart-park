@@ -1460,7 +1460,7 @@ type ParkingLotMutation struct {
 	address       *string
 	lanes         *int
 	addlanes      *int
-	status        *parkinglot.Status
+	status        *string
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -1715,12 +1715,12 @@ func (m *ParkingLotMutation) ResetLanes() {
 }
 
 // SetStatus sets the "status" field.
-func (m *ParkingLotMutation) SetStatus(pa parkinglot.Status) {
-	m.status = &pa
+func (m *ParkingLotMutation) SetStatus(s string) {
+	m.status = &s
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *ParkingLotMutation) Status() (r parkinglot.Status, exists bool) {
+func (m *ParkingLotMutation) Status() (r string, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -1731,7 +1731,7 @@ func (m *ParkingLotMutation) Status() (r parkinglot.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the ParkingLot entity.
 // If the ParkingLot object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ParkingLotMutation) OldStatus(ctx context.Context) (v parkinglot.Status, err error) {
+func (m *ParkingLotMutation) OldStatus(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -1947,7 +1947,7 @@ func (m *ParkingLotMutation) SetField(name string, value ent.Value) error {
 		m.SetLanes(v)
 		return nil
 	case parkinglot.FieldStatus:
-		v, ok := value.(parkinglot.Status)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4308,7 +4308,7 @@ type VehicleMutation struct {
 	typ                 string
 	id                  *uuid.UUID
 	plate_number        *string
-	vehicle_type        *vehicle.VehicleType
+	vehicle_type        *string
 	owner_name          *string
 	owner_phone         *string
 	monthly_valid_until *time.Time
@@ -4461,12 +4461,12 @@ func (m *VehicleMutation) ResetPlateNumber() {
 }
 
 // SetVehicleType sets the "vehicle_type" field.
-func (m *VehicleMutation) SetVehicleType(vt vehicle.VehicleType) {
-	m.vehicle_type = &vt
+func (m *VehicleMutation) SetVehicleType(s string) {
+	m.vehicle_type = &s
 }
 
 // VehicleType returns the value of the "vehicle_type" field in the mutation.
-func (m *VehicleMutation) VehicleType() (r vehicle.VehicleType, exists bool) {
+func (m *VehicleMutation) VehicleType() (r string, exists bool) {
 	v := m.vehicle_type
 	if v == nil {
 		return
@@ -4477,7 +4477,7 @@ func (m *VehicleMutation) VehicleType() (r vehicle.VehicleType, exists bool) {
 // OldVehicleType returns the old "vehicle_type" field's value of the Vehicle entity.
 // If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *VehicleMutation) OldVehicleType(ctx context.Context) (v vehicle.VehicleType, err error) {
+func (m *VehicleMutation) OldVehicleType(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldVehicleType is only allowed on UpdateOne operations")
 	}
@@ -4833,7 +4833,7 @@ func (m *VehicleMutation) SetField(name string, value ent.Value) error {
 		m.SetPlateNumber(v)
 		return nil
 	case vehicle.FieldVehicleType:
-		v, ok := value.(vehicle.VehicleType)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

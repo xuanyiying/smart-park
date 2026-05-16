@@ -1,4 +1,3 @@
-// Package biz provides business logic for the payment service.
 package biz
 
 import (
@@ -6,6 +5,7 @@ import (
 	"crypto"
 	"crypto/md5"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
@@ -14,15 +14,56 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 )
 
 const (
-	SecurityEventAmountMismatch = "amount_mismatch"
-	SecurityEventInvalidStatus  = "invalid_status"
+	SecurityEventAmountMismatch    = "amount_mismatch"
+	SecurityEventInvalidStatus     = "invalid_status"
+	SecurityEventDuplicateCallback = "duplicate_callback"
+	SecurityEventSignatureFailed   = "signature_failed"
+	SecurityEventInvalidTradeNo    = "invalid_trade_no"
+	SecurityEventOrderNotFound     = "order_not_found"
+	SecurityEventUnknown           = "unknown"
 )
+
+var (
+	processedCallbacks = &callbackDeduplication{
+		callbacks: make(map[string]time.Time),
+	}
+)
+
+type callbackDeduplication struct {
+	mu        sync.RWMutex
+	callbacks map[string]time.Time
+}
+
+func (d *callbackDeduplication) isProcessed(id string) bool {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	_, exists := d.callbacks[id]
+	return exists
+}
+
+func (d *callbackDeduplication) markProcessed(id string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.callbacks[id] = time.Now()
+	d.cleanup()
+}
+
+func (d *callbackDeduplication) cleanup() {
+	now := time.Now()
+	for id, timestamp := range d.callbacks {
+		if now.Sub(timestamp) > 24*time.Hour {
+			delete(d.callbacks, id)
+		}
+	}
+}
 
 type SecurityEvent struct {
 	Type        string
@@ -30,6 +71,8 @@ type SecurityEvent struct {
 	Expected    float64
 	Received    float64
 	Transaction string
+	Timestamp   time.Time
+	Details     string
 }
 
 type GateControlService interface {
@@ -49,19 +92,35 @@ type ParkingRecordInfo struct {
 }
 
 func (uc *PaymentUseCase) HandleWechatCallback(ctx context.Context, req *v1.WechatCallbackRequest) (*v1.WechatCallbackResponse, error) {
+	callbackID := fmt.Sprintf("wechat_%s_%s", req.OutTradeNo, req.TransactionId)
+
+	if processedCallbacks.isProcessed(callbackID) {
+		uc.log.WithContext(ctx).Warnf("duplicate WeChat callback detected: %s", callbackID)
+		return &v1.WechatCallbackResponse{
+			ReturnCode: string(WechatStatusSuccess),
+			ReturnMsg:  "OK",
+		}, nil
+	}
+
 	if req.ReturnCode != string(WechatStatusSuccess) {
 		uc.log.WithContext(ctx).Warnf("WeChat callback failed: %s - %s", req.ReturnCode, req.ReturnMsg)
 		return uc.buildWechatErrorResponse(req.ReturnMsg), nil
 	}
 
 	if err := uc.verifyWechatSign(req); err != nil {
-		uc.log.WithContext(ctx).Errorf("WeChat signature verification failed: %v", err)
+		uc.logSecurityEvent(ctx, SecurityEventSignatureFailed, req.OutTradeNo, 0, parseAmount(req.TotalFee), req.TransactionId, err.Error())
 		return uc.buildWechatErrorResponse("Signature verification failed"), nil
+	}
+
+	if err := uc.validateWechatCallbackTime(req.TimeEnd); err != nil {
+		uc.log.WithContext(ctx).Warnf("WeChat callback time validation failed: %v", err)
 	}
 
 	if err := uc.processWechatPayment(ctx, req); err != nil {
 		return uc.buildWechatErrorResponse(err.Error()), nil
 	}
+
+	processedCallbacks.markProcessed(callbackID)
 
 	return &v1.WechatCallbackResponse{
 		ReturnCode: string(WechatStatusSuccess),
@@ -77,46 +136,62 @@ func (uc *PaymentUseCase) buildWechatErrorResponse(msg string) *v1.WechatCallbac
 }
 
 func (uc *PaymentUseCase) processWechatPayment(ctx context.Context, req *v1.WechatCallbackRequest) error {
-	// Look up order by OutTradeNo (order ID), not TransactionId
-	// TransactionId is set only after payment is confirmed
 	orderID, err := uuid.Parse(req.OutTradeNo)
 	if err != nil {
+		uc.logSecurityEvent(ctx, SecurityEventInvalidTradeNo, req.OutTradeNo, 0, parseAmount(req.TotalFee), req.TransactionId, err.Error())
 		return fmt.Errorf("invalid out_trade_no: %w", err)
 	}
-	order, err := uc.orderRepo.GetOrder(ctx, orderID)
-	if err != nil || order == nil {
-		return fmt.Errorf("order not found: %s", req.OutTradeNo)
-	}
 
-	if order.Status != string(StatusPending) {
-		uc.logSecurityEvent(ctx, SecurityEventInvalidStatus, order.ID.String(), 0, 0, req.TransactionId)
-		return nil
-	}
+	var order *Order
 
-	paidAmount := parseAmount(req.TotalFee)
-	if err := uc.validateAmount(order, paidAmount); err != nil {
-		uc.logSecurityEvent(ctx, SecurityEventAmountMismatch, order.ID.String(), order.FinalAmount, paidAmount, req.TransactionId)
+	err = uc.orderRepo.WithTx(ctx, func(txCtx context.Context) error {
+		var err error
+		order, err = uc.orderRepo.GetOrder(txCtx, orderID)
+		if err != nil || order == nil {
+			uc.logSecurityEvent(txCtx, SecurityEventOrderNotFound, req.OutTradeNo, 0, parseAmount(req.TotalFee), req.TransactionId, "order not found")
+			return fmt.Errorf("order not found: %s", req.OutTradeNo)
+		}
+
+		if order.Status != string(StatusPending) {
+			uc.logSecurityEvent(txCtx, SecurityEventInvalidStatus, order.ID.String(), order.FinalAmount, parseAmount(req.TotalFee), req.TransactionId,
+				fmt.Sprintf("status: %s", order.Status))
+			return nil
+		}
+
+		paidAmount := parseAmount(req.TotalFee)
+		if err := uc.validateAmount(order, paidAmount); err != nil {
+			uc.logSecurityEvent(txCtx, SecurityEventAmountMismatch, order.ID.String(), order.FinalAmount, paidAmount, req.TransactionId, err.Error())
+			return err
+		}
+
+		if err := uc.updateOrderAsPaid(order, MethodWechat, req.TransactionId, paidAmount); err != nil {
+			uc.log.WithContext(txCtx).Errorf("failed to update order: %v", err)
+			return fmt.Errorf("update failed")
+		}
+
+		return uc.orderRepo.UpdateOrder(txCtx, order)
+	})
+	if err != nil {
 		return err
 	}
 
-	if err := uc.updateOrderAsPaid(order, MethodWechat, req.TransactionId, paidAmount); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to update order: %v", err)
-		return fmt.Errorf("update failed")
+	if order != nil && order.Status == string(StatusPaid) {
+		if err := uc.triggerAutoGateOpen(ctx, order); err != nil {
+			uc.log.WithContext(ctx).Warnf("auto gate open failed: %v, owner can manually scan again", err)
+		}
 	}
 
-	if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to update order: %v", err)
-		return fmt.Errorf("update failed")
-	}
-
-	if err := uc.triggerAutoGateOpen(ctx, order); err != nil {
-		uc.log.WithContext(ctx).Warnf("auto gate open failed: %v, owner can manually scan again", err)
-	}
+	uc.log.WithContext(ctx).Infof("WeChat payment processed successfully: order=%s, amount=%.2f, transaction=%s",
+		order.ID.String(), parseAmount(req.TotalFee), req.TransactionId)
 
 	return nil
 }
 
 func (uc *PaymentUseCase) validateAmount(order *Order, paidAmount float64) error {
+	if paidAmount < 0 {
+		return fmt.Errorf("invalid paid amount: %.2f", paidAmount)
+	}
+
 	diff := math.Abs(paidAmount - order.FinalAmount)
 	if diff > 0.01 {
 		return fmt.Errorf("amount mismatch: expected %.2f, received %.2f", order.FinalAmount, paidAmount)
@@ -124,15 +199,9 @@ func (uc *PaymentUseCase) validateAmount(order *Order, paidAmount float64) error
 	return nil
 }
 
-func (uc *PaymentUseCase) logSecurityEvent(ctx context.Context, eventType, orderID string, expected, received float64, transactionID string) {
-	event := &SecurityEvent{
-		Type:        eventType,
-		OrderID:     orderID,
-		Expected:    expected,
-		Received:    received,
-		Transaction: transactionID,
-	}
-	uc.log.WithContext(ctx).Errorf("security event: %+v", event)
+func (uc *PaymentUseCase) logSecurityEvent(ctx context.Context, eventType, orderID string, expected, received float64, transactionID string, details string) {
+	uc.log.WithContext(ctx).Errorf("SECURITY EVENT [%s]: order=%s, expected=%.2f, received=%.2f, transaction=%s, details=%s",
+		eventType, orderID, expected, received, transactionID, details)
 }
 
 func (uc *PaymentUseCase) triggerAutoGateOpen(ctx context.Context, order *Order) error {
@@ -172,7 +241,29 @@ func (uc *PaymentUseCase) verifyWechatSign(req *v1.WechatCallbackRequest) error 
 	expectedSign := calculateMD5(signData + "&key=" + uc.config.WechatKey)
 
 	if !strings.EqualFold(req.Sign, expectedSign) {
-		return fmt.Errorf("signature mismatch: expected %s, got %s", expectedSign, req.Sign)
+		return fmt.Errorf("signature mismatch")
+	}
+
+	return nil
+}
+
+func (uc *PaymentUseCase) validateWechatCallbackTime(timeEnd string) error {
+	if timeEnd == "" {
+		return fmt.Errorf("time_end is empty")
+	}
+
+	callbackTime, err := time.ParseInLocation("20060102150405", timeEnd, time.Local)
+	if err != nil {
+		return fmt.Errorf("invalid time format: %w", err)
+	}
+
+	now := time.Now()
+	if callbackTime.After(now.Add(5 * time.Minute)) {
+		return fmt.Errorf("callback time is in the future")
+	}
+
+	if callbackTime.Before(now.Add(-24 * time.Hour)) {
+		return fmt.Errorf("callback time is too old (>24h)")
 	}
 
 	return nil
@@ -193,19 +284,35 @@ func buildWechatSignString(req *v1.WechatCallbackRequest) string {
 }
 
 func (uc *PaymentUseCase) HandleAlipayCallback(ctx context.Context, req *v1.AlipayCallbackRequest) (*v1.AlipayCallbackResponse, error) {
+	callbackID := fmt.Sprintf("alipay_%s_%s", req.OutTradeNo, req.TradeNo)
+
+	if processedCallbacks.isProcessed(callbackID) {
+		uc.log.WithContext(ctx).Warnf("duplicate Alipay callback detected: %s", callbackID)
+		return &v1.AlipayCallbackResponse{
+			Code: "success",
+			Msg:  "OK",
+		}, nil
+	}
+
 	if !uc.isAlipaySuccessStatus(req.TradeStatus) {
 		uc.log.WithContext(ctx).Warnf("Alipay callback failed: %s", req.TradeStatus)
 		return uc.buildAlipayErrorResponse(req.TradeStatus), nil
 	}
 
 	if err := uc.verifyAlipaySign(req); err != nil {
-		uc.log.WithContext(ctx).Errorf("Alipay signature verification failed: %v", err)
+		uc.logSecurityEvent(ctx, SecurityEventSignatureFailed, req.OutTradeNo, 0, parseAmountFloat(req.TotalAmount), req.TradeNo, err.Error())
 		return uc.buildAlipayErrorResponse("Signature verification failed"), nil
+	}
+
+	if err := uc.validateAlipayCallbackTime(req.GmtPayment); err != nil {
+		uc.log.WithContext(ctx).Warnf("Alipay callback time validation failed: %v", err)
 	}
 
 	if err := uc.processAlipayPayment(ctx, req); err != nil {
 		return uc.buildAlipayErrorResponse(err.Error()), nil
 	}
+
+	processedCallbacks.markProcessed(callbackID)
 
 	return &v1.AlipayCallbackResponse{
 		Code: "success",
@@ -225,40 +332,74 @@ func (uc *PaymentUseCase) buildAlipayErrorResponse(msg string) *v1.AlipayCallbac
 }
 
 func (uc *PaymentUseCase) processAlipayPayment(ctx context.Context, req *v1.AlipayCallbackRequest) error {
-	// Look up order by OutTradeNo (order ID), not TradeNo
-	// TradeNo is the Alipay transaction ID, set only after payment
 	orderID, err := uuid.Parse(req.OutTradeNo)
 	if err != nil {
+		uc.logSecurityEvent(ctx, SecurityEventInvalidTradeNo, req.OutTradeNo, 0, parseAmountFloat(req.TotalAmount), req.TradeNo, err.Error())
 		return fmt.Errorf("invalid out_trade_no: %w", err)
 	}
-	order, err := uc.orderRepo.GetOrder(ctx, orderID)
-	if err != nil || order == nil {
-		return fmt.Errorf("order not found: %s", req.OutTradeNo)
-	}
 
-	if order.Status != string(StatusPending) {
-		uc.logSecurityEvent(ctx, SecurityEventInvalidStatus, order.ID.String(), 0, 0, req.TradeNo)
-		return nil
-	}
+	var order *Order
 
-	paidAmount := parseAmountFloat(req.TotalAmount)
-	if err := uc.validateAmount(order, paidAmount); err != nil {
-		uc.logSecurityEvent(ctx, SecurityEventAmountMismatch, order.ID.String(), order.FinalAmount, paidAmount, req.TradeNo)
+	err = uc.orderRepo.WithTx(ctx, func(txCtx context.Context) error {
+		var err error
+		order, err = uc.orderRepo.GetOrder(txCtx, orderID)
+		if err != nil || order == nil {
+			uc.logSecurityEvent(txCtx, SecurityEventOrderNotFound, req.OutTradeNo, 0, parseAmountFloat(req.TotalAmount), req.TradeNo, "order not found")
+			return fmt.Errorf("order not found: %s", req.OutTradeNo)
+		}
+
+		if order.Status != string(StatusPending) {
+			uc.logSecurityEvent(txCtx, SecurityEventInvalidStatus, order.ID.String(), order.FinalAmount, parseAmountFloat(req.TotalAmount), req.TradeNo,
+				fmt.Sprintf("status: %s", order.Status))
+			return nil
+		}
+
+		paidAmount := parseAmountFloat(req.TotalAmount)
+		if err := uc.validateAmount(order, paidAmount); err != nil {
+			uc.logSecurityEvent(txCtx, SecurityEventAmountMismatch, order.ID.String(), order.FinalAmount, paidAmount, req.TradeNo, err.Error())
+			return err
+		}
+
+		if err := uc.updateOrderAsPaid(order, MethodAlipay, req.TradeNo, paidAmount); err != nil {
+			uc.log.WithContext(txCtx).Errorf("failed to update order: %v", err)
+			return fmt.Errorf("update failed")
+		}
+
+		return uc.orderRepo.UpdateOrder(txCtx, order)
+	})
+	if err != nil {
 		return err
 	}
 
-	if err := uc.updateOrderAsPaid(order, MethodAlipay, req.TradeNo, paidAmount); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to update order: %v", err)
-		return fmt.Errorf("update failed")
+	if order != nil && order.Status == string(StatusPaid) {
+		if err := uc.triggerAutoGateOpen(ctx, order); err != nil {
+			uc.log.WithContext(ctx).Warnf("auto gate open failed: %v, owner can manually scan again", err)
+		}
 	}
 
-	if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to update order: %v", err)
-		return fmt.Errorf("update failed")
+	uc.log.WithContext(ctx).Infof("Alipay payment processed successfully: order=%s, amount=%.2f, trade_no=%s",
+		order.ID.String(), parseAmountFloat(req.TotalAmount), req.TradeNo)
+
+	return nil
+}
+
+func (uc *PaymentUseCase) validateAlipayCallbackTime(gmtPayment string) error {
+	if gmtPayment == "" {
+		return fmt.Errorf("gmt_payment is empty")
 	}
 
-	if err := uc.triggerAutoGateOpen(ctx, order); err != nil {
-		uc.log.WithContext(ctx).Warnf("auto gate open failed: %v, owner can manually scan again", err)
+	callbackTime, err := time.ParseInLocation("2006-01-02 15:04:05", gmtPayment, time.Local)
+	if err != nil {
+		return fmt.Errorf("invalid time format: %w", err)
+	}
+
+	now := time.Now()
+	if callbackTime.After(now.Add(5 * time.Minute)) {
+		return fmt.Errorf("callback time is in the future")
+	}
+
+	if callbackTime.Before(now.Add(-24 * time.Hour)) {
+		return fmt.Errorf("callback time is too old (>24h)")
 	}
 
 	return nil
@@ -267,6 +408,10 @@ func (uc *PaymentUseCase) processAlipayPayment(ctx context.Context, req *v1.Alip
 func (uc *PaymentUseCase) updateOrderAsPaid(order *Order, method PayMethod, transactionID string, amount float64) error {
 	if order.Status != string(StatusPending) {
 		return fmt.Errorf("order status is not pending: %s", order.Status)
+	}
+
+	if amount <= 0 {
+		return fmt.Errorf("invalid payment amount: %.2f", amount)
 	}
 
 	now := currentTime()
@@ -298,7 +443,7 @@ func (uc *PaymentUseCase) verifyAlipaySign(req *v1.AlipayCallbackRequest) error 
 	hash := uc.getAlipayHashAlgorithm()
 
 	if err := rsa.VerifyPKCS1v15(pubKey, hash, hashData(hash, signData), signBytes); err != nil {
-		return fmt.Errorf("signature verification failed: %w", err)
+		return fmt.Errorf("signature verification failed")
 	}
 
 	return nil
@@ -388,6 +533,12 @@ func calculateMD5(input string) string {
 	h := md5.New()
 	h.Write([]byte(input))
 	return strings.ToUpper(hex.EncodeToString(h.Sum(nil)))
+}
+
+func calculateSHA256(input string) []byte {
+	h := sha256.New()
+	h.Write([]byte(input))
+	return h.Sum(nil)
 }
 
 func hashData(h crypto.Hash, data string) []byte {

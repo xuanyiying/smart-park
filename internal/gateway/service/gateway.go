@@ -13,18 +13,21 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/xuanyiying/smart-park/internal/gateway/biz"
+	"github.com/xuanyiying/smart-park/pkg/ws"
 )
 
-// GatewayService 网关服务
 type GatewayService struct {
 	router *biz.RouterUseCase
+	hub    *ws.Hub
+	logger log.Logger
 	log    *log.Helper
 }
 
-// NewGatewayService 创建网关服务
-func NewGatewayService(router *biz.RouterUseCase, logger log.Logger) *GatewayService {
+func NewGatewayService(router *biz.RouterUseCase, hub *ws.Hub, logger log.Logger) *GatewayService {
 	return &GatewayService{
 		router: router,
+		hub:    hub,
+		logger: logger,
 		log:    log.NewHelper(logger),
 	}
 }
@@ -150,18 +153,15 @@ func (s *GatewayService) GetRoutes(ctx context.Context) ([]*biz.RouteConfig, err
 	return s.router.GetAllRoutes(), nil
 }
 
-// StreamProxy WebSocket 代理支持
 func (s *GatewayService) StreamProxy(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	// 匹配路由
 	target, err := s.router.GetServiceTarget(ctx, r.URL.Path)
 	if err != nil {
 		http.Error(w, "Not Found", http.StatusNotFound)
 		return
 	}
 
-	// 创建 WebSocket 代理 (Go 1.12+ httputil.ReverseProxy 自动处理 Upgrade)
 	proxy, err := s.createProxy(target)
 	if err != nil {
 		s.log.Errorf("failed to create websocket proxy for %s: %v", target, err)
@@ -171,6 +171,27 @@ func (s *GatewayService) StreamProxy(w http.ResponseWriter, r *http.Request) {
 
 	s.log.Infof("stream proxy upgrading: %s -> %s", r.URL.Path, target)
 	proxy.ServeHTTP(w, r)
+}
+
+func (s *GatewayService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	userID := r.URL.Query().Get("user_id")
+	tenantID := r.URL.Query().Get("tenant_id")
+
+	opts := ws.UpgradeOptions{
+		UserID:   userID,
+		TenantID: tenantID,
+	}
+
+	if err := ws.UpgradeHTTP(w, r, s.hub, opts, s.logger); err != nil {
+		s.log.Errorf("websocket upgrade failed: %v", err)
+		return
+	}
+
+	s.log.Infof("websocket connection established: user=%s, tenant=%s", userID, tenantID)
+}
+
+func (s *GatewayService) Hub() *ws.Hub {
+	return s.hub
 }
 
 // ReadinessProbe 就绪探针

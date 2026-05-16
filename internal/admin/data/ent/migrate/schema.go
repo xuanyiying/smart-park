@@ -62,7 +62,7 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 100},
 		{Name: "address", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "lanes", Type: field.TypeInt, Default: 1},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "inactive", "maintenance"}, Default: "active"},
+		{Name: "status", Type: field.TypeString, Default: "active"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -138,7 +138,7 @@ var (
 	VehiclesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "plate_number", Type: field.TypeString, Unique: true, Size: 20},
-		{Name: "vehicle_type", Type: field.TypeEnum, Enums: []string{"temporary", "monthly", "vip"}, Default: "temporary"},
+		{Name: "vehicle_type", Type: field.TypeString, Default: "temporary"},
 		{Name: "owner_name", Type: field.TypeString, Nullable: true, Size: 100},
 		{Name: "owner_phone", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "monthly_valid_until", Type: field.TypeTime, Nullable: true},

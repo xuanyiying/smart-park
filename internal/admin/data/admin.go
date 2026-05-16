@@ -1,67 +1,51 @@
-// Package data provides data access layer for the admin service.
 package data
 
 import (
 	"context"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
 	"github.com/xuanyiying/smart-park/internal/admin/biz"
-	ent "github.com/xuanyiying/smart-park/internal/admin/data/ent"
+	"github.com/xuanyiying/smart-park/internal/admin/data/ent"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/order"
-	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/user"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/vehicle"
+	"github.com/xuanyiying/smart-park/pkg/database"
+	apperrors "github.com/xuanyiying/smart-park/pkg/errors"
 )
 
-func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
-	d := &Data{
-		db:  db,
-		log: log.NewHelper(logger),
-	}
-
-	cleanup := func() {
-		if err := d.db.Close(); err != nil {
-			d.log.Errorf("failed to close database: %v", err)
-		}
-	}
-
-	return d, cleanup, nil
-}
-
-// adminRepo implements biz.AdminRepo.
 type adminRepo struct {
 	data *Data
 }
 
-// NewAdminRepo creates a new AdminRepo.
 func NewAdminRepo(data *Data) biz.AdminRepo {
 	return &adminRepo{data: data}
 }
 
-// CreateParkingLot creates a new parking lot.
 func (r *adminRepo) CreateParkingLot(ctx context.Context, lot *biz.ParkingLot) error {
-	_, err := r.data.db.ParkingLot.Create().
+	_, err := r.clientFromCtx(ctx).ParkingLot.Create().
 		SetID(lot.ID).
 		SetName(lot.Name).
 		SetAddress(lot.Address).
 		SetLanes(lot.Lanes).
-		SetStatus(parkinglot.StatusActive).
+		SetStatus(lot.Status).
 		Save(ctx)
-	return err
+
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to create parking lot: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "创建停车场失败")
+	}
+
+	return nil
 }
 
-// GetParkingLot retrieves a parking lot by ID.
 func (r *adminRepo) GetParkingLot(ctx context.Context, lotID uuid.UUID) (*biz.ParkingLot, error) {
-	lot, err := r.data.db.ParkingLot.Get(ctx, lotID)
+	lot, err := r.clientFromCtx(ctx).ParkingLot.Get(ctx, lotID)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
-		}
-		return nil, err
+		r.data.log.WithContext(ctx).Errorf("failed to get parking lot: %v", err)
+		return nil, apperrors.NotFoundf("停车场不存在: %s", lotID)
 	}
 
 	return &biz.ParkingLot{
@@ -69,59 +53,54 @@ func (r *adminRepo) GetParkingLot(ctx context.Context, lotID uuid.UUID) (*biz.Pa
 		Name:      lot.Name,
 		Address:   lot.Address,
 		Lanes:     lot.Lanes,
-		Status:    string(lot.Status),
+		Status:    lot.Status,
 		CreatedAt: lot.CreatedAt,
 		UpdatedAt: lot.UpdatedAt,
 	}, nil
 }
 
-// UpdateParkingLot updates a parking lot.
 func (r *adminRepo) UpdateParkingLot(ctx context.Context, lot *biz.ParkingLot) error {
-	update := r.data.db.ParkingLot.UpdateOneID(lot.ID).
+	_, err := r.clientFromCtx(ctx).ParkingLot.UpdateOneID(lot.ID).
 		SetName(lot.Name).
 		SetAddress(lot.Address).
-		SetLanes(lot.Lanes)
+		SetLanes(lot.Lanes).
+		SetStatus(lot.Status).
+		Save(ctx)
 
-	switch lot.Status {
-	case "active":
-		update.SetStatus(parkinglot.StatusActive)
-	case "inactive":
-		update.SetStatus(parkinglot.StatusInactive)
-	case "maintenance":
-		update.SetStatus(parkinglot.StatusMaintenance)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to update parking lot: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "更新停车场失败")
 	}
 
-	_, err := update.Save(ctx)
-	return err
+	return nil
 }
 
-// ListParkingLots lists parking lots with pagination.
 func (r *adminRepo) ListParkingLots(ctx context.Context, page, pageSize int) ([]*biz.ParkingLot, int64, error) {
-	query := r.data.db.ParkingLot.Query()
-
-	total, err := query.Count(ctx)
-	if err != nil {
-		return nil, 0, err
-	}
-
 	offset := (page - 1) * pageSize
-	lots, err := query.
-		Order(ent.Desc("created_at")).
+
+	lots, err := r.clientFromCtx(ctx).ParkingLot.Query().
 		Offset(offset).
 		Limit(pageSize).
 		All(ctx)
 	if err != nil {
-		return nil, 0, err
+		r.data.log.WithContext(ctx).Errorf("failed to list parking lots: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "查询停车场列表失败")
 	}
 
-	var result []*biz.ParkingLot
+	total, err := r.clientFromCtx(ctx).ParkingLot.Query().Count(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to count parking lots: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "统计停车场数量失败")
+	}
+
+	result := make([]*biz.ParkingLot, 0, len(lots))
 	for _, lot := range lots {
 		result = append(result, &biz.ParkingLot{
 			ID:        lot.ID,
 			Name:      lot.Name,
 			Address:   lot.Address,
 			Lanes:     lot.Lanes,
-			Status:    string(lot.Status),
+			Status:    lot.Status,
 			CreatedAt: lot.CreatedAt,
 			UpdatedAt: lot.UpdatedAt,
 		})
@@ -130,67 +109,52 @@ func (r *adminRepo) ListParkingLots(ctx context.Context, page, pageSize int) ([]
 	return result, int64(total), nil
 }
 
-// CreateVehicle creates a new vehicle.
-func (r *adminRepo) CreateVehicle(ctx context.Context, v *biz.Vehicle) error {
-	vehicleType := vehicle.VehicleTypeTemporary
-	switch v.VehicleType {
-	case "monthly":
-		vehicleType = vehicle.VehicleTypeMonthly
-	case "vip":
-		vehicleType = vehicle.VehicleTypeVip
+func (r *adminRepo) CreateVehicle(ctx context.Context, vehicle *biz.Vehicle) error {
+	create := r.clientFromCtx(ctx).Vehicle.Create().
+		SetID(vehicle.ID).
+		SetPlateNumber(vehicle.PlateNumber).
+		SetVehicleType(vehicle.VehicleType).
+		SetOwnerName(vehicle.OwnerName).
+		SetOwnerPhone(vehicle.OwnerPhone)
+	if vehicle.MonthlyValidUntil != nil {
+		create.SetMonthlyValidUntil(*vehicle.MonthlyValidUntil)
 	}
-
-	create := r.data.db.Vehicle.Create().
-		SetID(v.ID).
-		SetPlateNumber(v.PlateNumber).
-		SetVehicleType(vehicleType).
-		SetOwnerName(v.OwnerName).
-		SetOwnerPhone(v.OwnerPhone)
-
-	if v.MonthlyValidUntil != nil {
-		create.SetMonthlyValidUntil(*v.MonthlyValidUntil)
-	}
-
 	_, err := create.Save(ctx)
-	return err
+
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to create vehicle: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "创建车辆信息失败")
+	}
+
+	return nil
 }
 
-// ListVehicles lists vehicles with pagination.
 func (r *adminRepo) ListVehicles(ctx context.Context, vehicleType string, page, pageSize int) ([]*biz.Vehicle, int64, error) {
-	query := r.data.db.Vehicle.Query()
+	offset := (page - 1) * pageSize
+	query := r.clientFromCtx(ctx).Vehicle.Query()
 
 	if vehicleType != "" {
-		switch vehicleType {
-		case "temporary":
-			query = query.Where(vehicle.VehicleTypeEQ(vehicle.VehicleTypeTemporary))
-		case "monthly":
-			query = query.Where(vehicle.VehicleTypeEQ(vehicle.VehicleTypeMonthly))
-		case "vip":
-			query = query.Where(vehicle.VehicleTypeEQ(vehicle.VehicleTypeVip))
-		}
+		query = query.Where(vehicle.VehicleType(vehicleType))
+	}
+
+	vehicles, err := query.Offset(offset).Limit(pageSize).All(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to list vehicles: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "查询车辆列表失败")
 	}
 
 	total, err := query.Count(ctx)
 	if err != nil {
-		return nil, 0, err
+		r.data.log.WithContext(ctx).Errorf("failed to count vehicles: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "统计车辆数量失败")
 	}
 
-	offset := (page - 1) * pageSize
-	vehicles, err := query.
-		Order(ent.Desc("created_at")).
-		Offset(offset).
-		Limit(pageSize).
-		All(ctx)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	var result []*biz.Vehicle
+	result := make([]*biz.Vehicle, 0, len(vehicles))
 	for _, v := range vehicles {
 		result = append(result, &biz.Vehicle{
 			ID:                v.ID,
 			PlateNumber:       v.PlateNumber,
-			VehicleType:       string(v.VehicleType),
+			VehicleType:       v.VehicleType,
 			OwnerName:         v.OwnerName,
 			OwnerPhone:        v.OwnerPhone,
 			MonthlyValidUntil: v.MonthlyValidUntil,
@@ -201,48 +165,52 @@ func (r *adminRepo) ListVehicles(ctx context.Context, vehicleType string, page, 
 	return result, int64(total), nil
 }
 
-// ListParkingRecords lists parking records with pagination.
 func (r *adminRepo) ListParkingRecords(ctx context.Context, lotID uuid.UUID, plateNumber, startTime, endTime string, page, pageSize int) ([]*biz.ParkingRecord, int64, error) {
-	query := r.data.db.ParkingRecord.Query()
+	offset := (page - 1) * pageSize
+	query := r.clientFromCtx(ctx).ParkingRecord.Query()
 
 	if lotID != uuid.Nil {
 		query = query.Where(parkingrecord.LotID(lotID))
 	}
+
 	if plateNumber != "" {
-		query = query.Where(parkingrecord.PlateNumberContains(plateNumber))
+		query = query.Where(parkingrecord.PlateNumber(plateNumber))
 	}
+
 	if startTime != "" {
 		if t, err := time.Parse(time.RFC3339, startTime); err == nil {
 			query = query.Where(parkingrecord.EntryTimeGTE(t))
 		}
 	}
+
 	if endTime != "" {
 		if t, err := time.Parse(time.RFC3339, endTime); err == nil {
 			query = query.Where(parkingrecord.EntryTimeLTE(t))
 		}
 	}
 
+	records, err := query.Offset(offset).Limit(pageSize).All(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to list parking records: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "查询停车记录失败")
+	}
+
 	total, err := query.Count(ctx)
 	if err != nil {
-		return nil, 0, err
+		r.data.log.WithContext(ctx).Errorf("failed to count parking records: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "统计停车记录数量失败")
 	}
 
-	offset := (page - 1) * pageSize
-	records, err := query.
-		Order(ent.Desc("entry_time")).
-		Offset(offset).
-		Limit(pageSize).
-		All(ctx)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	var result []*biz.ParkingRecord
+	result := make([]*biz.ParkingRecord, 0, len(records))
 	for _, rec := range records {
+		plateNum := ""
+		if rec.PlateNumber != nil {
+			plateNum = *rec.PlateNumber
+		}
 		result = append(result, &biz.ParkingRecord{
 			ID:              rec.ID,
 			LotID:           rec.LotID,
-			PlateNumber:     *rec.PlateNumber,
+			PlateNumber:     plateNum,
 			EntryTime:       rec.EntryTime,
 			ExitTime:        rec.ExitTime,
 			ParkingDuration: rec.ParkingDuration,
@@ -253,44 +221,31 @@ func (r *adminRepo) ListParkingRecords(ctx context.Context, lotID uuid.UUID, pla
 	return result, int64(total), nil
 }
 
-// ListOrders lists orders with pagination.
 func (r *adminRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*biz.Order, int64, error) {
-	query := r.data.db.Order.Query()
+	offset := (page - 1) * pageSize
+	query := r.clientFromCtx(ctx).Order.Query()
 
 	if lotID != uuid.Nil {
 		query = query.Where(order.LotID(lotID))
 	}
+
 	if status != "" {
-		switch status {
-		case "pending":
-			query = query.Where(order.StatusEQ(order.StatusPending))
-		case "paid":
-			query = query.Where(order.StatusEQ(order.StatusPaid))
-		case "refunding":
-			query = query.Where(order.StatusEQ(order.StatusRefunding))
-		case "refunded":
-			query = query.Where(order.StatusEQ(order.StatusRefunded))
-		case "failed":
-			query = query.Where(order.StatusEQ(order.StatusFailed))
-		}
+		query = query.Where(order.StatusEQ(order.Status(status)))
+	}
+
+	orders, err := query.Offset(offset).Limit(pageSize).All(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to list orders: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "查询订单列表失败")
 	}
 
 	total, err := query.Count(ctx)
 	if err != nil {
-		return nil, 0, err
+		r.data.log.WithContext(ctx).Errorf("failed to count orders: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "统计订单数量失败")
 	}
 
-	offset := (page - 1) * pageSize
-	orders, err := query.
-		Order(ent.Desc("created_at")).
-		Offset(offset).
-		Limit(pageSize).
-		All(ctx)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	var result []*biz.Order
+	result := make([]*biz.Order, 0, len(orders))
 	for _, o := range orders {
 		result = append(result, &biz.Order{
 			ID:             o.ID,
@@ -309,14 +264,11 @@ func (r *adminRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 	return result, int64(total), nil
 }
 
-// GetOrder retrieves an order by ID.
 func (r *adminRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order, error) {
-	o, err := r.data.db.Order.Get(ctx, orderID)
+	o, err := r.clientFromCtx(ctx).Order.Get(ctx, orderID)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
-		}
-		return nil, err
+		r.data.log.WithContext(ctx).Errorf("failed to get order: %v", err)
+		return nil, apperrors.NotFoundf("订单不存在: %s", orderID)
 	}
 
 	return &biz.Order{
@@ -333,28 +285,28 @@ func (r *adminRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order
 	}, nil
 }
 
-// GetDailyReport retrieves a daily report.
 func (r *adminRepo) GetDailyReport(ctx context.Context, lotID uuid.UUID, date string) (*biz.DailyReport, error) {
-	// Parse date
 	t, err := time.Parse("2006-01-02", date)
 	if err != nil {
-		return nil, err
+		return nil, apperrors.InvalidArgument("无效的日期格式")
 	}
 
 	startOfDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 	endOfDay := startOfDay.Add(24 * time.Hour)
 
-	// Count entries
-	entries, _ := r.data.db.ParkingRecord.Query().
+	entryCount, err := r.clientFromCtx(ctx).ParkingRecord.Query().
 		Where(
 			parkingrecord.LotID(lotID),
 			parkingrecord.EntryTimeGTE(startOfDay),
 			parkingrecord.EntryTimeLT(endOfDay),
 		).
 		Count(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to count entries: %v", err)
+		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计入场记录失败")
+	}
 
-	// Count exits
-	exits, _ := r.data.db.ParkingRecord.Query().
+	exitCount, err := r.clientFromCtx(ctx).ParkingRecord.Query().
 		Where(
 			parkingrecord.LotID(lotID),
 			parkingrecord.ExitTimeNotNil(),
@@ -362,9 +314,12 @@ func (r *adminRepo) GetDailyReport(ctx context.Context, lotID uuid.UUID, date st
 			parkingrecord.ExitTimeLT(endOfDay),
 		).
 		Count(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to count exits: %v", err)
+		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计出场记录失败")
+	}
 
-	// Calculate total amount
-	orders, _ := r.data.db.Order.Query().
+	orders, err := r.clientFromCtx(ctx).Order.Query().
 		Where(
 			order.LotID(lotID),
 			order.StatusEQ(order.StatusPaid),
@@ -373,51 +328,45 @@ func (r *adminRepo) GetDailyReport(ctx context.Context, lotID uuid.UUID, date st
 			order.PayTimeLT(endOfDay),
 		).
 		All(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to query orders: %v", err)
+		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计订单失败")
+	}
 
 	var totalAmount, totalDiscount float64
 	for _, o := range orders {
-		totalAmount += o.FinalAmount
+		totalAmount += o.Amount
 		totalDiscount += o.DiscountAmount
 	}
 
 	return &biz.DailyReport{
 		LotID:         lotID.String(),
 		Date:          date,
-		TotalEntries:  entries,
-		TotalExits:    exits,
-		TotalVehicles: entries,
+		TotalEntries:  entryCount,
+		TotalExits:    exitCount,
 		TotalAmount:   totalAmount,
 		TotalDiscount: totalDiscount,
-		NetAmount:     totalAmount,
+		NetAmount:     totalAmount - totalDiscount,
 	}, nil
 }
 
-// GetMonthlyReport retrieves a monthly report.
 func (r *adminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year, month int) (*biz.MonthlyReport, error) {
-	startOfMonth := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	startOfMonth := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	endOfMonth := startOfMonth.AddDate(0, 1, 0)
 
-	// Count entries
-	entries, _ := r.data.db.ParkingRecord.Query().
+	entryCount, err := r.clientFromCtx(ctx).ParkingRecord.Query().
 		Where(
 			parkingrecord.LotID(lotID),
 			parkingrecord.EntryTimeGTE(startOfMonth),
 			parkingrecord.EntryTimeLT(endOfMonth),
 		).
 		Count(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to count monthly entries: %v", err)
+		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计月度入场记录失败")
+	}
 
-	// Count exits
-	exits, _ := r.data.db.ParkingRecord.Query().
-		Where(
-			parkingrecord.LotID(lotID),
-			parkingrecord.ExitTimeNotNil(),
-			parkingrecord.ExitTimeGTE(startOfMonth),
-			parkingrecord.ExitTimeLT(endOfMonth),
-		).
-		Count(ctx)
-
-	// Calculate total amount
-	orders, _ := r.data.db.Order.Query().
+	orders, err := r.clientFromCtx(ctx).Order.Query().
 		Where(
 			order.LotID(lotID),
 			order.StatusEQ(order.StatusPaid),
@@ -426,10 +375,14 @@ func (r *adminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year,
 			order.PayTimeLT(endOfMonth),
 		).
 		All(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to query monthly orders: %v", err)
+		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计月度订单失败")
+	}
 
 	var totalAmount, totalDiscount float64
 	for _, o := range orders {
-		totalAmount += o.FinalAmount
+		totalAmount += o.Amount
 		totalDiscount += o.DiscountAmount
 	}
 
@@ -437,115 +390,141 @@ func (r *adminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year,
 		LotID:         lotID.String(),
 		Year:          year,
 		Month:         month,
-		TotalEntries:  entries,
-		TotalExits:    exits,
-		TotalVehicles: entries,
+		TotalEntries:  entryCount,
 		TotalAmount:   totalAmount,
 		TotalDiscount: totalDiscount,
-		NetAmount:     totalAmount,
+		NetAmount:     totalAmount - totalDiscount,
 	}, nil
 }
 
-// GetUserByUsername retrieves a user by username.
 func (r *adminRepo) GetUserByUsername(ctx context.Context, username string) (*biz.User, error) {
-	u, err := r.data.db.User.Query().Where(user.Username(username)).First(ctx)
+	u, err := r.clientFromCtx(ctx).User.Query().
+		Where(user.Username(username)).
+		Only(ctx)
 	if err != nil {
-		return nil, err
+		r.data.log.WithContext(ctx).Errorf("failed to get user by username: %v", err)
+		return nil, apperrors.NotFoundf("用户不存在: %s", username)
 	}
 
-	return &biz.User{
-		ID:        u.ID,
-		Username:  u.Username,
-		Password:  u.Password,
-		Name:      u.Name,
-		Role:      u.Role,
-		Avatar:    u.Avatar,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
-	}, nil
+	return r.toBizUser(u), nil
 }
 
-// GetUserByID retrieves a user by ID.
 func (r *adminRepo) GetUserByID(ctx context.Context, userID uuid.UUID) (*biz.User, error) {
-	u, err := r.data.db.User.Query().Where(user.ID(userID)).First(ctx)
+	u, err := r.clientFromCtx(ctx).User.Get(ctx, userID)
 	if err != nil {
-		return nil, err
+		r.data.log.WithContext(ctx).Errorf("failed to get user: %v", err)
+		return nil, apperrors.NotFoundf("用户不存在: %s", userID)
 	}
 
-	return &biz.User{
-		ID:        u.ID,
-		Username:  u.Username,
-		Password:  u.Password,
-		Name:      u.Name,
-		Role:      u.Role,
-		Avatar:    u.Avatar,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
-	}, nil
+	return r.toBizUser(u), nil
 }
 
-// ListUsers lists all users with pagination.
 func (r *adminRepo) ListUsers(ctx context.Context, page, pageSize int) ([]*biz.User, int64, error) {
-	total, err := r.data.db.User.Query().Count(ctx)
-	if err != nil {
-		return nil, 0, err
-	}
-
 	offset := (page - 1) * pageSize
-	users, err := r.data.db.User.Query().
-		Order(ent.Desc("created_at")).
-		Offset(offset).
-		Limit(pageSize).
-		All(ctx)
+
+	users, err := r.clientFromCtx(ctx).User.Query().Offset(offset).Limit(pageSize).All(ctx)
 	if err != nil {
-		return nil, 0, err
+		r.data.log.WithContext(ctx).Errorf("failed to list users: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "查询用户列表失败")
 	}
 
-	var result []*biz.User
+	total, err := r.clientFromCtx(ctx).User.Query().Count(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to count users: %v", err)
+		return nil, 0, apperrors.Wrapf(err, apperrors.CodeInternal, "统计用户数量失败")
+	}
+
+	result := make([]*biz.User, 0, len(users))
 	for _, u := range users {
-		result = append(result, &biz.User{
-			ID:        u.ID,
-			Username:  u.Username,
-			Password:  u.Password,
-			Name:      u.Name,
-			Role:      u.Role,
-			Avatar:    u.Avatar,
-			CreatedAt: u.CreatedAt,
-			UpdatedAt: u.UpdatedAt,
-		})
+		result = append(result, r.toBizUser(u))
 	}
 
 	return result, int64(total), nil
 }
 
-// CreateUser creates a new user.
-func (r *adminRepo) CreateUser(ctx context.Context, u *biz.User) error {
-	_, err := r.data.db.User.Create().
-		SetID(u.ID).
-		SetUsername(u.Username).
-		SetPassword(u.Password).
-		SetName(u.Name).
-		SetRole(u.Role).
-		SetAvatar(u.Avatar).
-		SetCreatedAt(u.CreatedAt).
-		SetUpdatedAt(u.UpdatedAt).
+func (r *adminRepo) CreateUser(ctx context.Context, user *biz.User) error {
+	_, err := r.clientFromCtx(ctx).User.Create().
+		SetID(user.ID).
+		SetUsername(user.Username).
+		SetPassword(user.Password).
+		SetName(user.Name).
+		SetRole(user.Role).
+		SetAvatar(user.Avatar).
 		Save(ctx)
-	return err
+
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to create user: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "创建用户失败")
+	}
+
+	return nil
 }
 
-// UpdateUser updates an existing user.
-func (r *adminRepo) UpdateUser(ctx context.Context, u *biz.User) error {
-	_, err := r.data.db.User.UpdateOneID(u.ID).
-		SetUsername(u.Username).
-		SetName(u.Name).
-		SetRole(u.Role).
-		SetAvatar(u.Avatar).
-		SetUpdatedAt(u.UpdatedAt).
+func (r *adminRepo) UpdateUser(ctx context.Context, user *biz.User) error {
+	_, err := r.clientFromCtx(ctx).User.UpdateOneID(user.ID).
+		SetUsername(user.Username).
+		SetPassword(user.Password).
+		SetName(user.Name).
+		SetRole(user.Role).
+		SetAvatar(user.Avatar).
 		Save(ctx)
-	return err
+
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to update user: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "更新用户失败")
+	}
+
+	return nil
 }
 
-// DeleteUser deletes a user by ID.
 func (r *adminRepo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	return r.data.db.User.DeleteOneID(userID).Exec(ctx)
+	err := r.clientFromCtx(ctx).User.DeleteOneID(userID).Exec(ctx)
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to delete user: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "删除用户失败")
+	}
+
+	return nil
+}
+
+func (r *adminRepo) SeedData(ctx context.Context) error {
+	lotID := uuid.New()
+	_, err := r.clientFromCtx(ctx).ParkingLot.Create().
+		SetID(lotID).
+		SetName("测试停车场").
+		SetAddress("测试地址").
+		SetLanes(4).
+		SetStatus("active").
+		Save(ctx)
+
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to seed parking lot: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "初始化停车场数据失败")
+	}
+
+	return nil
+}
+
+func (r *adminRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return r.data.txm.WithTx(ctx, fn)
+}
+
+func (r *adminRepo) clientFromCtx(ctx context.Context) *ent.Client {
+	if tx, ok := database.TxFromCtx(ctx).(*ent.Tx); ok {
+		return tx.Client()
+	}
+	return r.data.db
+}
+
+func (r *adminRepo) toBizUser(user *ent.User) *biz.User {
+	return &biz.User{
+		ID:        user.ID,
+		Username:  user.Username,
+		Password:  user.Password,
+		Name:      user.Name,
+		Role:      user.Role,
+		Avatar:    user.Avatar,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
 }

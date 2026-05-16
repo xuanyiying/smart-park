@@ -29,8 +29,7 @@ func (ParkingLot) Fields() []ent.Field {
 			Default(1).
 			Min(1).
 			Comment("车道数量"),
-		field.Enum("status").
-			Values("active", "inactive", "maintenance").
+		field.String("status").
 			Default("active").
 			Comment("状态"),
 		field.Time("created_at").

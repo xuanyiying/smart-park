@@ -14,6 +14,8 @@ import (
 
 	billingv1 "github.com/xuanyiying/smart-park/api/billing/v1"
 	v1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
+	multentdata "github.com/xuanyiying/smart-park/internal/multitenancy/data"
+	multent "github.com/xuanyiying/smart-park/internal/multitenancy/data/ent"
 	"github.com/xuanyiying/smart-park/internal/vehicle/biz"
 	"github.com/xuanyiying/smart-park/internal/vehicle/client/billing"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data"
@@ -22,6 +24,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
 	"github.com/xuanyiying/smart-park/pkg/lock"
+	tenantpkg "github.com/xuanyiying/smart-park/pkg/tenant"
 )
 
 var (
@@ -156,14 +159,34 @@ func main() {
 	// Initialize gRPC service
 	vehicleSvc := service.NewVehicleService(entryExitUseCase, deviceUseCase, vehicleQueryUseCase, commandUseCase, recordQueryUseCase, logger)
 
+	multentClient, err := multent.Open("postgres", cfg.Database.Source)
+	if err != nil {
+		logHelper.Errorf("failed to connect multitenancy database: %v", err)
+		os.Exit(1)
+	}
+	defer multentClient.Close()
+
+	multentDataLayer, multentCleanup, err := multentdata.NewData(multentClient, logger)
+	if err != nil {
+		logHelper.Errorf("failed to initialize multitenancy data layer: %v", err)
+		os.Exit(1)
+	}
+	defer multentCleanup()
+
+	tenantRepo := multentdata.NewTenantRepo(multentDataLayer)
+	tenantExtractor := tenantpkg.NewHeaderExtractor("X-Tenant-ID")
+	tenantMW := tenantpkg.TenantMiddleware(tenantRepo, tenantExtractor, logger)
+
 	// Create gRPC server
 	gs := grpc.NewServer(
 		grpc.Address(":9001"),
+		grpc.Middleware(tenantMW),
 	)
 
 	// Create HTTP server
 	hs := http.NewServer(
 		http.Address(":8001"),
+		http.Middleware(tenantMW),
 	)
 
 	// Register services

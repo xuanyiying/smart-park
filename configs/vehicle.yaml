@@ -1,3 +1,18 @@
+# Environment variables override YAML values with SP_{SECTION}_{KEY} naming convention.
+# Encrypted values can be used with ENC(...) format (requires SP_CONFIG_ENCRYPTION_KEY).
+#
+# Available environment variables:
+#   SP_DATABASE_SOURCE         - Database connection string (required in production)
+#   SP_REDIS_ADDR              - Redis address
+#   SP_REDIS_PASSWORD          - Redis password (required in production)
+#   SP_MQ_REDIS_PASSWORD       - Message queue Redis password
+#   SP_MQ_NATS_PASSWORD        - NATS password
+#   SP_MQ_ROCKETMQ_ACCESS_KEY  - RocketMQ access key
+#   SP_MQ_ROCKETMQ_SECRET_KEY  - RocketMQ secret key
+#   SP_MQTT_PASSWORD           - MQTT broker password
+#   SP_JWT_SECRET              - JWT signing secret (required in production)
+#   SP_CONFIG_ENCRYPTION_KEY   - AES-256-GCM key (64 hex chars) for decrypting ENC(...) values
+
 server:
   port: 8001
   timeout: 60

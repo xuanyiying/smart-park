@@ -51,6 +51,7 @@ type ChargingRepo interface {
 	GetActiveSession(ctx context.Context, connectorID uuid.UUID) (*Session, error)
 	ListUserSessions(ctx context.Context, userID uuid.UUID, page, pageSize int) ([]*Session, int64, error)
 	ListStationSessions(ctx context.Context, stationID uuid.UUID, page, pageSize int) ([]*Session, int64, error)
+	ListAllSessions(ctx context.Context, page, pageSize int) ([]*Session, int64, error)
 	ExpireOldSessions(ctx context.Context, threshold time.Duration) (int64, error)
 
 	CreatePrice(ctx context.Context, price *Price) error
@@ -58,6 +59,8 @@ type ChargingRepo interface {
 	UpdatePrice(ctx context.Context, price *Price) error
 	GetCurrentPrice(ctx context.Context, stationID uuid.UUID) (*Price, error)
 	ListPrices(ctx context.Context, stationID uuid.UUID) ([]*Price, error)
+
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 // ChargingUseCase implements charging business logic.
@@ -296,7 +299,10 @@ func (uc *ChargingUseCase) StopCharging(ctx context.Context, sessionID, userID u
 	}
 
 	session.Cost = uc.calculateEnergyCost(chargedEnergy, price)
-	session.ServiceFee = uc.config.DefaultServiceFee
+	session.ServiceFee = price.ServiceFee
+	if session.ServiceFee <= 0 {
+		session.ServiceFee = uc.config.DefaultServiceFee
+	}
 	session.TotalAmount = session.Cost + session.ServiceFee
 
 	if session.Status == SessionStatusCompleted {
@@ -632,4 +638,15 @@ func (uc *ChargingUseCase) ListConnectors(ctx context.Context, stationID uuid.UU
 // ListPrices retrieves price configurations for a station.
 func (uc *ChargingUseCase) ListPrices(ctx context.Context, stationID uuid.UUID) ([]*Price, error) {
 	return uc.repo.ListPrices(ctx, stationID)
+}
+
+// ListAllSessions retrieves all sessions with pagination for admin queries.
+func (uc *ChargingUseCase) ListAllSessions(ctx context.Context, page, pageSize int) ([]*Session, int64, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if pageSize <= 0 || pageSize > 100 {
+		pageSize = 20
+	}
+	return uc.repo.ListAllSessions(ctx, page, pageSize)
 }

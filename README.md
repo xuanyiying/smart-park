@@ -34,8 +34,10 @@
   <img src="docs/assets/demo.gif" alt="Smart Park Demo" width="800">
 </p>
 
-> 💡 **在线演示**: [https://demo.smart-park.example.com](https://demo.smart-park.example.com)  
+> 💡 **在线演示**: [https://demo.smart-park.example.com](https://demo.smart-park.example.com)
 > 📱 **测试账号**: admin / admin123
+>
+> 🖥️ **功能预览**: [docs/demo.html](docs/demo.html) - 包含所有页面效果预览
 
 ---
 

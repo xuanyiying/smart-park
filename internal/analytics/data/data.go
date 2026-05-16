@@ -1,31 +1,32 @@
-// Package data provides data access layer for the analytics service.
 package data
 
 import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+
+	"github.com/xuanyiying/smart-park/internal/analytics/data/ent"
 )
 
-// ProviderSet is the provider set for data layer.
 var ProviderSet = wire.NewSet(
 	NewData,
 	NewAnalyticsRepo,
 )
 
-// Data wraps database connection.
 type Data struct {
-	// db *ent.Client
+	db  *ent.Client
 	log *log.Helper
 }
 
-// NewData creates a new Data instance.
-func NewData(logger log.Logger) (*Data, func(), error) {
+func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
 	d := &Data{
+		db:  db,
 		log: log.NewHelper(logger),
 	}
 
 	cleanup := func() {
-		// Close database connection if needed
+		if err := d.db.Close(); err != nil {
+			d.log.Errorf("failed to close database: %v", err)
+		}
 	}
 
 	return d, cleanup, nil

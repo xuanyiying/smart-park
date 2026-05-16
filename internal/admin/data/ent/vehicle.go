@@ -21,7 +21,7 @@ type Vehicle struct {
 	// 车牌号
 	PlateNumber string `json:"plate_number,omitempty"`
 	// 车辆类型: 临时车/月卡车/VIP
-	VehicleType vehicle.VehicleType `json:"vehicle_type,omitempty"`
+	VehicleType string `json:"vehicle_type,omitempty"`
 	// 车主姓名
 	OwnerName string `json:"owner_name,omitempty"`
 	// 车主电话(加密存储)
@@ -77,7 +77,7 @@ func (_m *Vehicle) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field vehicle_type", values[i])
 			} else if value.Valid {
-				_m.VehicleType = vehicle.VehicleType(value.String)
+				_m.VehicleType = value.String
 			}
 		case vehicle.FieldOwnerName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -150,7 +150,7 @@ func (_m *Vehicle) String() string {
 	builder.WriteString(_m.PlateNumber)
 	builder.WriteString(", ")
 	builder.WriteString("vehicle_type=")
-	builder.WriteString(fmt.Sprintf("%v", _m.VehicleType))
+	builder.WriteString(_m.VehicleType)
 	builder.WriteString(", ")
 	builder.WriteString("owner_name=")
 	builder.WriteString(_m.OwnerName)

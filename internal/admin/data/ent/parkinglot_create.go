@@ -56,13 +56,13 @@ func (_c *ParkingLotCreate) SetNillableLanes(v *int) *ParkingLotCreate {
 }
 
 // SetStatus sets the "status" field.
-func (_c *ParkingLotCreate) SetStatus(v parkinglot.Status) *ParkingLotCreate {
+func (_c *ParkingLotCreate) SetStatus(v string) *ParkingLotCreate {
 	_c.mutation.SetStatus(v)
 	return _c
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_c *ParkingLotCreate) SetNillableStatus(v *parkinglot.Status) *ParkingLotCreate {
+func (_c *ParkingLotCreate) SetNillableStatus(v *string) *ParkingLotCreate {
 	if v != nil {
 		_c.SetStatus(*v)
 	}
@@ -194,11 +194,6 @@ func (_c *ParkingLotCreate) check() error {
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ParkingLot.status"`)}
 	}
-	if v, ok := _c.mutation.Status(); ok {
-		if err := parkinglot.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.status": %w`, err)}
-		}
-	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ParkingLot.created_at"`)}
 	}
@@ -253,7 +248,7 @@ func (_c *ParkingLotCreate) createSpec() (*ParkingLot, *sqlgraph.CreateSpec) {
 		_node.Lanes = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
-		_spec.SetField(parkinglot.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(parkinglot.FieldStatus, field.TypeString, value)
 		_node.Status = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {

@@ -20,6 +20,11 @@ type MockAdminRepo struct {
 	Users        map[uuid.UUID]*User
 }
 
+// WithTx implements [AdminRepo].
+func (m *MockAdminRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	panic("unimplemented")
+}
+
 func NewMockAdminRepo() *MockAdminRepo {
 	return &MockAdminRepo{
 		ParkingLots:  make(map[uuid.UUID]*ParkingLot),

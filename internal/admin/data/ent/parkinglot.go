@@ -25,7 +25,7 @@ type ParkingLot struct {
 	// 车道数量
 	Lanes int `json:"lanes,omitempty"`
 	// 状态
-	Status parkinglot.Status `json:"status,omitempty"`
+	Status string `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -89,7 +89,7 @@ func (_m *ParkingLot) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				_m.Status = parkinglot.Status(value.String)
+				_m.Status = value.String
 			}
 		case parkinglot.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -149,7 +149,7 @@ func (_m *ParkingLot) String() string {
 	builder.WriteString(fmt.Sprintf("%v", _m.Lanes))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Status))
+	builder.WriteString(_m.Status)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

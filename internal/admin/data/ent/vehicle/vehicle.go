@@ -3,7 +3,6 @@
 package vehicle
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -58,6 +57,8 @@ func ValidColumn(column string) bool {
 var (
 	// PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	PlateNumberValidator func(string) error
+	// DefaultVehicleType holds the default value on creation for the "vehicle_type" field.
+	DefaultVehicleType string
 	// OwnerNameValidator is a validator for the "owner_name" field. It is called by the builders before save.
 	OwnerNameValidator func(string) error
 	// OwnerPhoneValidator is a validator for the "owner_phone" field. It is called by the builders before save.
@@ -71,33 +72,6 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
-
-// VehicleType defines the type for the "vehicle_type" enum field.
-type VehicleType string
-
-// VehicleTypeTemporary is the default value of the VehicleType enum.
-const DefaultVehicleType = VehicleTypeTemporary
-
-// VehicleType values.
-const (
-	VehicleTypeTemporary VehicleType = "temporary"
-	VehicleTypeMonthly   VehicleType = "monthly"
-	VehicleTypeVip       VehicleType = "vip"
-)
-
-func (vt VehicleType) String() string {
-	return string(vt)
-}
-
-// VehicleTypeValidator is a validator for the "vehicle_type" field enum values. It is called by the builders before save.
-func VehicleTypeValidator(vt VehicleType) error {
-	switch vt {
-	case VehicleTypeTemporary, VehicleTypeMonthly, VehicleTypeVip:
-		return nil
-	default:
-		return fmt.Errorf("vehicle: invalid enum value for vehicle_type field: %q", vt)
-	}
-}
 
 // OrderOption defines the ordering options for the Vehicle queries.
 type OrderOption func(*sql.Selector)

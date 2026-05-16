@@ -48,6 +48,8 @@ message CreatePaymentRequest {
   string payMethod = 3;
   string openId    = 4;
   string notifyUrl = 5;
+  string orderType = 6;
+  string sessionId = 7;
 }
 
 message CreatePaymentResponse {

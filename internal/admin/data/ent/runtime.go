@@ -108,6 +108,10 @@ func init() {
 	parkinglot.DefaultLanes = parkinglotDescLanes.Default.(int)
 	// parkinglot.LanesValidator is a validator for the "lanes" field. It is called by the builders before save.
 	parkinglot.LanesValidator = parkinglotDescLanes.Validators[0].(func(int) error)
+	// parkinglotDescStatus is the schema descriptor for status field.
+	parkinglotDescStatus := parkinglotFields[4].Descriptor()
+	// parkinglot.DefaultStatus holds the default value on creation for the status field.
+	parkinglot.DefaultStatus = parkinglotDescStatus.Default.(string)
 	// parkinglotDescCreatedAt is the schema descriptor for created_at field.
 	parkinglotDescCreatedAt := parkinglotFields[5].Descriptor()
 	// parkinglot.DefaultCreatedAt holds the default value on creation for the created_at field.
@@ -188,6 +192,10 @@ func init() {
 	vehicleDescPlateNumber := vehicleFields[1].Descriptor()
 	// vehicle.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	vehicle.PlateNumberValidator = vehicleDescPlateNumber.Validators[0].(func(string) error)
+	// vehicleDescVehicleType is the schema descriptor for vehicle_type field.
+	vehicleDescVehicleType := vehicleFields[2].Descriptor()
+	// vehicle.DefaultVehicleType holds the default value on creation for the vehicle_type field.
+	vehicle.DefaultVehicleType = vehicleDescVehicleType.Default.(string)
 	// vehicleDescOwnerName is the schema descriptor for owner_name field.
 	vehicleDescOwnerName := vehicleFields[3].Descriptor()
 	// vehicle.OwnerNameValidator is a validator for the "owner_name" field. It is called by the builders before save.

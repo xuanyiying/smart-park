@@ -179,6 +179,7 @@ type BillingRuleRepo interface {
 	DeleteBillingRule(ctx context.Context, ruleID uuid.UUID) error
 	ListBillingRules(ctx context.Context, lotID uuid.UUID, page, pageSize int) ([]*BillingRule, int64, error)
 	SeedData(ctx context.Context) error
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 // BillingUseCase implements billing business logic.
