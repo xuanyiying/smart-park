@@ -5,6 +5,7 @@ import (
 	"github.com/google/wire"
 
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
+	"github.com/xuanyiying/smart-park/pkg/multitenancy"
 )
 
 var ProviderSet = wire.NewSet(
@@ -15,4 +16,11 @@ var ProviderSet = wire.NewSet(
 type Data struct {
 	db  *ent.Client
 	log *log.Helper
+}
+
+func init() {
+}
+
+func RegisterTenantHooks(db *ent.Client) {
+	multitenancy.RegisterTenantHooks(&db.Client, nil)
 }

@@ -19,6 +19,8 @@ func (User) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			Unique(),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.String("username").
 			Unique(),
 		field.String("password"),

@@ -69,6 +69,10 @@ func (m *MockOrderRepo) WithTx(ctx context.Context, fn func(ctx context.Context)
 	return fn(ctx)
 }
 
+func (m *MockOrderRepo) GetOrdersByTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*Order, error) {
+	return []*Order{}, nil
+}
+
 type MockRecordRepo struct{}
 
 func NewMockRecordRepo() *MockRecordRepo {
@@ -220,7 +224,7 @@ func TestPaymentUseCase_Refund(t *testing.T) {
 		LotID:       uuid.New(),
 		Status:      string(StatusPaid),
 		FinalAmount: 10.00,
-		PayMethod:   string(MethodAlipay),
+		PayMethod:   string(MethodWechat),
 	}
 
 	uc := NewPaymentUseCase(mockRepo, mockRecordRepo, mockGateSvc, config, nil, nil, logger)

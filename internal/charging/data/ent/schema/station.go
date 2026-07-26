@@ -21,6 +21,8 @@ func (Station) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("lot_id", uuid.UUID{}).
 			Comment("停车场ID"),
 		field.String("name").
@@ -81,6 +83,7 @@ func (Station) Edges() []ent.Edge {
 // Indexes of the Station.
 func (Station) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("lot_id"),
 		index.Fields("status"),
 		index.Fields("lot_id", "status"),

@@ -18,6 +18,8 @@ func (Order) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("record_id", uuid.UUID{}).
 			Comment("停车记录ID"),
 		field.UUID("lot_id", uuid.UUID{}).
@@ -79,6 +81,7 @@ func (Order) Fields() []ent.Field {
 
 func (Order) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("status").StorageKey("idx_orders_status"),
 		index.Fields("pay_time").StorageKey("idx_orders_pay_time"),
 		index.Fields("transaction_id").StorageKey("idx_orders_transaction"),

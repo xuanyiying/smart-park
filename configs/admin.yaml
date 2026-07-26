@@ -4,7 +4,10 @@ server:
 
 database:
   driver: postgres
-  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  primary:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  replica:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 
 redis:
   addr: "localhost:6379"
@@ -14,3 +17,9 @@ redis:
 log:
   level: info
   format: json
+
+telemetry:
+  enabled: true
+  endpoint: "localhost:4317"
+  serviceName: "admin-svc"
+  sampleRate: 1.0

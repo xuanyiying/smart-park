@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: gateway
+        istio-injection: enabled
     spec:
       containers:
       - name: gateway
@@ -83,6 +84,7 @@ spec:
     metadata:
       labels:
         app: vehicle
+        istio-injection: enabled
     spec:
       containers:
       - name: vehicle
@@ -148,6 +150,7 @@ spec:
     metadata:
       labels:
         app: billing
+        istio-injection: enabled
     spec:
       containers:
       - name: billing
@@ -213,6 +216,7 @@ spec:
     metadata:
       labels:
         app: payment
+        istio-injection: enabled
     spec:
       containers:
       - name: payment
@@ -284,6 +288,7 @@ spec:
     metadata:
       labels:
         app: admin
+        istio-injection: enabled
     spec:
       containers:
       - name: admin

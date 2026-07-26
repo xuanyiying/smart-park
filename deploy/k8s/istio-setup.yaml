@@ -1,0 +1,131 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: istio-control-plane
+  namespace: istio-system
+spec:
+  profile: default
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        service:
+          ports:
+          - port: 80
+            targetPort: 8080
+            name: http2
+          - port: 443
+            targetPort: 8443
+            name: https
+          - port: 31400
+            targetPort: 31400
+            name: tcp
+          - port: 15011
+            targetPort: 15011
+            name: tcp-istiod
+          - port: 15021
+            targetPort: 15021
+            name: tcp-istio-ingressgateway
+          - port: 15090
+            targetPort: 15090
+            name: http-envoy-prom
+  values:
+    global:
+      proxy:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      jwtPolicy: first-party-jwt
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: smart-park-gateway
+  namespace: smart-park
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: smart-park-vs
+  namespace: smart-park
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - smart-park-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: gateway
+        port:
+          number: 8000
+  - match:
+    - uri:
+        prefix: /vehicle/
+    route:
+    - destination:
+        host: vehicle
+        port:
+          number: 8001
+  - match:
+    - uri:
+        prefix: /billing/
+    route:
+    - destination:
+        host: billing
+        port:
+          number: 8002
+  - match:
+    - uri:
+        prefix: /payment/
+    route:
+    - destination:
+        host: payment
+        port:
+          number: 8003
+  - match:
+    - uri:
+        prefix: /admin/
+    route:
+    - destination:
+        host: admin
+        port:
+          number: 8004

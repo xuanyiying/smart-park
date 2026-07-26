@@ -21,8 +21,10 @@ func (Connector) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("station_id", uuid.UUID{}).
-			Comment("充电桩ID"),
+			Comment("充电站ID"),
 		field.Int("number").
 			Min(1).
 			Comment("连接器编号"),
@@ -71,8 +73,9 @@ func (Connector) Edges() []ent.Edge {
 // Indexes of the Connector.
 func (Connector) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("station_id"),
 		index.Fields("status"),
-		index.Fields("station_id", "number").Unique(),
+		index.Fields("station_id", "status"),
 	}
 }

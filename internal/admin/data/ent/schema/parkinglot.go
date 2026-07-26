@@ -17,6 +17,8 @@ func (ParkingLot) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.String("name").
 			MaxLen(100).
 			NotEmpty().

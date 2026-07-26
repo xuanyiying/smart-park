@@ -1,7 +1,9 @@
+// Package data provides data access layer for the payment service.
 package data
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -45,7 +47,7 @@ func (r *orderRepo) GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) 
 }
 
 func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID string) (*biz.Order, error) {
-	o, err := r.clientFromCtx(ctx).Order.Query().
+	o, err := r.data.db.Order.Query().
 		Where(order.TransactionID(transactionID)).
 		Only(ctx)
 	if err != nil {
@@ -58,7 +60,7 @@ func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID s
 }
 
 func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
-	_, err := r.clientFromCtx(ctx).Order.Create().
+	_, err := r.data.db.Order.Create().
 		SetID(o.ID).
 		SetRecordID(o.RecordID).
 		SetLotID(o.LotID).
@@ -72,7 +74,7 @@ func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
 }
 
 func (r *orderRepo) UpdateOrder(ctx context.Context, o *biz.Order) error {
-	update := r.clientFromCtx(ctx).Order.UpdateOneID(o.ID)
+	update := r.data.db.Order.UpdateOneID(o.ID)
 
 	switch o.Status {
 	case "pending":
@@ -132,7 +134,7 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 		predicates = append(predicates, order.StatusEQ(orderStatus))
 	}
 
-	query := r.clientFromCtx(ctx).Order.Query().Where(predicates...)
+	query := r.data.db.Order.Query().Where(predicates...)
 
 	total, err := query.Count(ctx)
 	if err != nil {
@@ -156,15 +158,23 @@ func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status stri
 	return result, int64(total), nil
 }
 
-func (r *orderRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
-	return r.data.txm.WithTx(ctx, fn)
-}
-
-func (r *orderRepo) clientFromCtx(ctx context.Context) *ent.Client {
-	if tx, ok := database.TxFromCtx(ctx).(*ent.Tx); ok {
-		return tx.Client()
+func (r *orderRepo) GetOrdersByTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*biz.Order, error) {
+	orders, err := r.data.db.Order.Query().
+		Where(
+			order.PayTimeGTE(startTime),
+			order.PayTimeLT(endTime),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return r.data.db
+
+	var result []*biz.Order
+	for _, o := range orders {
+		result = append(result, toBizOrder(o))
+	}
+
+	return result, nil
 }
 
 func toBizOrder(o *ent.Order) *biz.Order {

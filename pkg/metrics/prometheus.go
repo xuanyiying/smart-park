@@ -2,9 +2,11 @@ package metrics
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -160,4 +162,8 @@ func RecordNotification(notificationType, status string) {
 
 func RecordMQTTCommand(commandType, status string) {
 	MQTTCommandTotal.WithLabelValues(commandType, status).Inc()
+}
+
+func NewHandler() http.Handler {
+	return promhttp.Handler()
 }

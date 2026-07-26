@@ -18,6 +18,8 @@ func (Vehicle) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.String("plate_number").
 			MaxLen(20).
 			Unique().
@@ -50,6 +52,7 @@ func (Vehicle) Fields() []ent.Field {
 
 func (Vehicle) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("plate_number").Unique(),
 		index.Fields("vehicle_type"),
 		index.Fields("monthly_valid_until"),

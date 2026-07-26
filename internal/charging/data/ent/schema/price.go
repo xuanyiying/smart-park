@@ -21,8 +21,10 @@ func (Price) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("station_id", uuid.UUID{}).
-			Comment("充电桩ID"),
+			Comment("充电站ID"),
 		field.String("name").
 			MaxLen(100).
 			NotEmpty().
@@ -80,8 +82,9 @@ func (Price) Edges() []ent.Edge {
 // Indexes of the Price.
 func (Price) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("station_id"),
-		index.Fields("effective_at", "expires_at"),
-		index.Fields("station_id", "is_peak_hours"),
+		index.Fields("is_active"),
+		index.Fields("station_id", "is_active"),
 	}
 }

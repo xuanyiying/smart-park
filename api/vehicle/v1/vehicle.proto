@@ -3,6 +3,8 @@ syntax = "proto3";
 package api.vehicle.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "api/vehicle/v1/manufacturer.proto";
 
 option go_package = "github.com/xuanyiying/smart-park/api/vehicle/v1;v1";
 
@@ -88,6 +90,149 @@ service VehicleService {
   rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse) {
     option (google.api.http) = {
       delete: "/api/v1/devices/{deviceId}",
+    };
+  }
+
+  // Manufacturer management
+  rpc CreateManufacturer(CreateManufacturerRequest) returns (CreateManufacturerResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/manufacturers",
+      body: "*",
+    };
+  }
+
+  rpc GetManufacturer(GetManufacturerRequest) returns (GetManufacturerResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/manufacturers/{id}",
+    };
+  }
+
+  rpc ListManufacturers(ListManufacturersRequest) returns (ListManufacturersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/manufacturers",
+    };
+  }
+
+  rpc UpdateManufacturer(UpdateManufacturerRequest) returns (UpdateManufacturerResponse) {
+    option (google.api.http) = {
+      put:  "/api/v1/manufacturers/{id}",
+      body: "*",
+    };
+  }
+
+  rpc DeleteManufacturer(DeleteManufacturerRequest) returns (DeleteManufacturerResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/manufacturers/{id}",
+    };
+  }
+
+  // Firmware management
+  rpc CreateFirmware(CreateFirmwareRequest) returns (CreateFirmwareResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/firmwares",
+      body: "*",
+    };
+  }
+
+  rpc GetFirmware(GetFirmwareRequest) returns (GetFirmwareResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/firmwares/{id}",
+    };
+  }
+
+  rpc GetFirmwareByID(GetFirmwareByIDRequest) returns (GetFirmwareByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/firmwares/by-id/{firmwareId}",
+    };
+  }
+
+  rpc ListFirmwares(ListFirmwaresRequest) returns (ListFirmwaresResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/firmwares",
+    };
+  }
+
+  rpc UpdateFirmware(UpdateFirmwareRequest) returns (UpdateFirmwareResponse) {
+    option (google.api.http) = {
+      put:  "/api/v1/firmwares/{id}",
+      body: "*",
+    };
+  }
+
+  rpc DeleteFirmware(DeleteFirmwareRequest) returns (DeleteFirmwareResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/firmwares/{id}",
+    };
+  }
+
+  rpc GetLatestFirmware(GetLatestFirmwareRequest) returns (GetLatestFirmwareResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/firmwares/latest",
+    };
+  }
+
+  // Device performance monitoring
+  rpc CreateDevicePerformance(CreateDevicePerformanceRequest) returns (CreateDevicePerformanceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/performance",
+      body: "*",
+    };
+  }
+
+  rpc GetDevicePerformance(GetDevicePerformanceRequest) returns (GetDevicePerformanceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/performance",
+    };
+  }
+
+  rpc GetDevicePerformanceLatest(GetDevicePerformanceLatestRequest) returns (GetDevicePerformanceLatestResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/performance/latest",
+    };
+  }
+
+  // Device fault diagnosis
+  rpc CreateDeviceFault(CreateDeviceFaultRequest) returns (CreateDeviceFaultResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/fault",
+      body: "*",
+    };
+  }
+
+  rpc GetDeviceFault(GetDeviceFaultRequest) returns (GetDeviceFaultResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/fault/{id}",
+    };
+  }
+
+  rpc ListDeviceFaults(ListDeviceFaultsRequest) returns (ListDeviceFaultsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/faults",
+    };
+  }
+
+  rpc ResolveDeviceFault(ResolveDeviceFaultRequest) returns (ResolveDeviceFaultResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/device/fault/{id}/resolve",
+    };
+  }
+
+  // Device statistics
+  rpc GetDeviceUsageStats(GetDeviceUsageStatsRequest) returns (GetDeviceUsageStatsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/usage-stats",
+    };
+  }
+
+  rpc GetDeviceFaultStats(GetDeviceFaultStatsRequest) returns (GetDeviceFaultStatsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/fault-stats",
+    };
+  }
+
+  rpc GetDeviceStatsSummary(GetDeviceStatsSummaryRequest) returns (GetDeviceStatsSummaryResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/stats-summary",
     };
   }
 }
@@ -262,24 +407,36 @@ message ListDevicesResponse {
 }
 
 message DeviceInfo {
-  string deviceId      = 1;
-  string status        = 2;
-  string lastHeartbeat = 3;
-  bool   online        = 4;
-  string laneId        = 5;
-  string lotId         = 6;
-  string deviceType    = 7;
-  string deviceSecret  = 8;
-  string createdAt     = 9;
-  string updatedAt     = 10;
+  string              deviceId            = 1;
+  string              status              = 2;
+  string              lastHeartbeat       = 3;
+  string              lastOnline          = 15;
+  bool                online              = 4;
+  string              laneId              = 5;
+  string              lotId               = 6;
+  string              deviceType          = 7;
+  string              deviceSecret        = 8;
+  string              createdAt           = 9;
+  string              updatedAt           = 10;
+  string              manufacturer        = 11;
+  string              model               = 12;
+  string              firmwareVersion     = 13;
+  string              faultInfo           = 16;
+  int32               heartbeatCount      = 17;
+  int32               offlineCount        = 18;
+  map<string, string> vendorSpecificConfig = 14;
 }
 
 message CreateDeviceRequest {
-  string deviceId   = 1;
-  string deviceType = 2;
-  string lotId      = 3;
-  string laneId     = 4;
-  string status     = 5;
+  string              deviceId            = 1;
+  string              deviceType          = 2;
+  string              lotId               = 3;
+  string              laneId              = 4;
+  string              status              = 5;
+  string              manufacturer        = 6;
+  string              model               = 7;
+  string              firmwareVersion     = 8;
+  map<string, string> vendorSpecificConfig = 9;
 }
 
 message CreateDeviceResponse {
@@ -299,11 +456,15 @@ message GetDeviceResponse {
 }
 
 message UpdateDeviceRequest {
-  string deviceId   = 1;
-  string deviceType = 2;
-  string lotId      = 3;
-  string laneId     = 4;
-  string status     = 5;
+  string              deviceId            = 1;
+  string              deviceType          = 2;
+  string              lotId               = 3;
+  string              laneId              = 4;
+  string              status              = 5;
+  string              manufacturer        = 6;
+  string              model               = 7;
+  string              firmwareVersion     = 8;
+  map<string, string> vendorSpecificConfig = 9;
 }
 
 message UpdateDeviceResponse {
@@ -319,4 +480,265 @@ message DeleteDeviceRequest {
 message DeleteDeviceResponse {
   int32  code    = 1;
   string message = 2;
+}
+
+// Firmware messages
+message CreateFirmwareRequest {
+  string firmwareId  = 1;
+  string manufacturer = 2;
+  string model       = 3;
+  string version     = 4;
+  string url         = 5;
+  int64  size        = 6;
+  string md5         = 7;
+  string description = 8;
+  string status      = 9;
+}
+
+message CreateFirmwareResponse {
+  int32    code    = 1;
+  string   message = 2;
+  Firmware data    = 3;
+}
+
+message GetFirmwareRequest {
+  string id = 1;
+}
+
+message GetFirmwareResponse {
+  int32    code    = 1;
+  string   message = 2;
+  Firmware data    = 3;
+}
+
+message GetFirmwareByIDRequest {
+  string firmwareId = 1;
+}
+
+message GetFirmwareByIDResponse {
+  int32    code    = 1;
+  string   message = 2;
+  Firmware data    = 3;
+}
+
+message ListFirmwaresRequest {
+  string manufacturer = 1;
+  string model       = 2;
+  int32  page        = 3;
+  int32  pageSize    = 4;
+}
+
+message ListFirmwaresResponse {
+  int32     code    = 1;
+  string    message = 2;
+  repeated Firmware data = 3;
+  int32     total   = 4;
+}
+
+message UpdateFirmwareRequest {
+  string id          = 1;
+  string firmwareId  = 2;
+  string manufacturer = 3;
+  string model       = 4;
+  string version     = 5;
+  string url         = 6;
+  int64  size        = 7;
+  string md5         = 8;
+  string description = 9;
+  string status      = 10;
+}
+
+message UpdateFirmwareResponse {
+  int32    code    = 1;
+  string   message = 2;
+  Firmware data    = 3;
+}
+
+message DeleteFirmwareRequest {
+  string id = 1;
+}
+
+message DeleteFirmwareResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message GetLatestFirmwareRequest {
+  string manufacturer = 1;
+  string model       = 2;
+}
+
+message GetLatestFirmwareResponse {
+  int32    code    = 1;
+  string   message = 2;
+  Firmware data    = 3;
+}
+
+message Firmware {
+  string id          = 1;
+  string firmwareId  = 2;
+  string manufacturer = 3;
+  string model       = 4;
+  string version     = 5;
+  string url         = 6;
+  int64  size        = 7;
+  string md5         = 8;
+  string description = 9;
+  string status      = 10;
+  string releaseDate = 11;
+  string createdAt   = 12;
+  string updatedAt   = 13;
+}
+
+// Device performance messages
+message CreateDevicePerformanceRequest {
+  string deviceId     = 1;
+  double cpuUsage     = 2;
+  double memoryUsage  = 3;
+  double storageUsage = 4;
+  int64  networkIn    = 5;
+  int64  networkOut   = 6;
+  double temperature  = 7;
+  string timestamp    = 8;
+}
+
+message CreateDevicePerformanceResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message GetDevicePerformanceRequest {
+  string deviceId = 1;
+  string startTime = 2;
+  string endTime = 3;
+}
+
+message GetDevicePerformanceResponse {
+  int32     code    = 1;
+  string    message = 2;
+  repeated DevicePerformance data = 3;
+}
+
+message GetDevicePerformanceLatestRequest {
+  string deviceId = 1;
+}
+
+message GetDevicePerformanceLatestResponse {
+  int32              code    = 1;
+  string             message = 2;
+  DevicePerformance  data    = 3;
+}
+
+message DevicePerformance {
+  string id           = 1;
+  string deviceId     = 2;
+  double cpuUsage     = 3;
+  double memoryUsage  = 4;
+  double storageUsage = 5;
+  int64  networkIn    = 6;
+  int64  networkOut   = 7;
+  double temperature  = 8;
+  string timestamp    = 9;
+  string createdAt    = 10;
+}
+
+// Device fault messages
+message CreateDeviceFaultRequest {
+  string deviceId     = 1;
+  string faultType    = 2;
+  string faultCode    = 3;
+  string description  = 4;
+  string severity     = 5;
+  string status       = 6;
+  string suggestion   = 7;
+  string detectedAt   = 8;
+}
+
+message CreateDeviceFaultResponse {
+  int32       code    = 1;
+  string      message = 2;
+  DeviceFault data    = 3;
+}
+
+message GetDeviceFaultRequest {
+  string id = 1;
+}
+
+message GetDeviceFaultResponse {
+  int32       code    = 1;
+  string      message = 2;
+  DeviceFault data    = 3;
+}
+
+message ListDeviceFaultsRequest {
+  string deviceId = 1;
+  string status   = 2;
+  int32  page     = 3;
+  int32  pageSize = 4;
+}
+
+message ListDeviceFaultsResponse {
+  int32         code    = 1;
+  string        message = 2;
+  repeated DeviceFault data = 3;
+  int32         total   = 4;
+}
+
+message ResolveDeviceFaultRequest {
+  string id = 1;
+}
+
+message ResolveDeviceFaultResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message DeviceFault {
+  string id          = 1;
+  string deviceId    = 2;
+  string faultType   = 3;
+  string faultCode   = 4;
+  string description = 5;
+  string severity    = 6;
+  string status      = 7;
+  string suggestion  = 8;
+  string detectedAt  = 9;
+  string resolvedAt  = 10;
+  string createdAt   = 11;
+  string updatedAt   = 12;
+}
+
+// Device statistics messages
+message GetDeviceUsageStatsRequest {
+  string deviceId  = 1;
+  string startTime = 2;
+  string endTime   = 3;
+}
+
+message GetDeviceUsageStatsResponse {
+  int32  code    = 1;
+  string message = 2;
+  map<string, google.protobuf.Value> data = 3;
+}
+
+message GetDeviceFaultStatsRequest {
+  string deviceId  = 1;
+  string startTime = 2;
+  string endTime   = 3;
+}
+
+message GetDeviceFaultStatsResponse {
+  int32  code    = 1;
+  string message = 2;
+  map<string, google.protobuf.Value> data = 3;
+}
+
+message GetDeviceStatsSummaryRequest {
+  string deviceId = 1;
+}
+
+message GetDeviceStatsSummaryResponse {
+  int32  code    = 1;
+  string message = 2;
+  map<string, google.protobuf.Value> data = 3;
 }

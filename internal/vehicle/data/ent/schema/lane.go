@@ -17,8 +17,10 @@ func (Lane) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("lot_id", uuid.UUID{}).
-			Comment("所属停车场ID"),
+			Comment("停车场ID"),
 		field.Int("lane_no").
 			Min(1).
 			Comment("车道编号"),

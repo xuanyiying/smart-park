@@ -21,8 +21,8 @@ func (Session) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
-		field.UUID("station_id", uuid.UUID{}).
-			Comment("充电桩ID"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("connector_id", uuid.UUID{}).
 			Comment("连接器ID"),
 		field.UUID("user_id", uuid.UUID{}).
@@ -99,11 +99,12 @@ func (Session) Edges() []ent.Edge {
 // Indexes of the Session.
 func (Session) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("station_id"),
+		index.Fields("tenant_id"),
 		index.Fields("connector_id"),
-		index.Fields("user_id"),
 		index.Fields("status"),
-		index.Fields("payment_status"),
+		index.Fields("user_id"),
+		index.Fields("start_time"),
+		index.Fields("end_time"),
 		index.Fields("user_id", "created_at"),
 	}
 }

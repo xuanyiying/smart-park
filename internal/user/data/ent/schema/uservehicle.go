@@ -20,6 +20,8 @@ func (UserVehicle) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.UUID("user_id", uuid.UUID{}).
 			Comment("用户ID"),
 		field.String("plate_number").
@@ -46,6 +48,7 @@ func (UserVehicle) Fields() []ent.Field {
 // Indexes of the UserVehicle.
 func (UserVehicle) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("user_id"),
 		index.Fields("plate_number"),
 		index.Fields("user_id", "plate_number").Unique(),

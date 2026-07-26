@@ -20,6 +20,8 @@ func (User) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			StorageKey("id"),
+		field.UUID("tenant_id", uuid.UUID{}).
+			Comment("租户ID"),
 		field.String("open_id").
 			MaxLen(100).
 			Unique().
@@ -49,6 +51,7 @@ func (User) Fields() []ent.Field {
 // Indexes of the User.
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
+		index.Fields("tenant_id"),
 		index.Fields("open_id").Unique(),
 	}
 }
