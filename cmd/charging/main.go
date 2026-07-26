@@ -90,6 +90,7 @@ func main() {
 
 	// Register services
 	v1.RegisterChargingServiceServer(gs, chargingSvc)
+	v1.RegisterChargingServiceHTTPServer(hs, chargingSvc)
 
 	// Start application
 	app := newApp(logger, gs, hs)

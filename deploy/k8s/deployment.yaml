@@ -331,3 +331,68 @@ spec:
           items:
           - key: admin.yaml
             path: admin.yaml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: charging
+  namespace: smart-park
+  labels:
+    app: charging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: charging
+  template:
+    metadata:
+      labels:
+        app: charging
+    spec:
+      containers:
+      - name: charging
+        image: smart-park/charging:latest
+        ports:
+        - containerPort: 8005
+          name: http
+        - containerPort: 9005
+          name: grpc
+        env:
+        - name: KRATOS_CONF
+          value: "/configs/charging.yaml"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: smart-park-secrets
+              key: db-password
+        volumeMounts:
+        - name: config
+          mountPath: /configs
+          readOnly: true
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8005
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8005
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: smart-park-config
+          items:
+          - key: charging.yaml
+            path: charging.yaml

@@ -269,7 +269,8 @@ curl -X POST http://localhost:8000/api/v1/pay/create \
 | **Billing** | 8002 | 费用计算，计费规则 | ✅ 已完成 | [文档](docs/billing.md) |
 | **Payment** | 8003 | 支付处理，订单管理 | ✅ 已完成 | [文档](docs/payment.md) |
 | **Admin** | 8004 | 停车场管理，报表统计 | ✅ 已完成 | [文档](docs/admin.md) |
-| **Charging** | 8005 | 充电桩管理 | 🚧 开发中 | [文档](docs/charging.md) |
+| **Charging** | 8005 | 充电桩管理 | ✅ 已完成 | [文档](docs/charging.md) |
+| **User** | 8007 | 用户认证，扫码支付，车牌绑定 | ✅ 已完成 | [文档](docs/user.md) |
 
 ---
 

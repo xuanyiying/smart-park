@@ -129,11 +129,11 @@ func main() {
 	userSvc := service.NewUserService(userUseCase)
 
 	gs := grpc.NewServer(
-		grpc.Address(":9005"),
+		grpc.Address(":9007"),
 	)
 
 	hs := http.NewServer(
-		http.Address(":8005"),
+		http.Address(":8007"),
 	)
 
 	v1.RegisterUserServiceServer(gs, userSvc)

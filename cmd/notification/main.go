@@ -76,11 +76,11 @@ func main() {
 	_ = dataLayer
 
 	gs := grpc.NewServer(
-		grpc.Address(":9006"),
+		grpc.Address(":9008"),
 	)
 
 	hs := http.NewServer(
-		http.Address(":8006"),
+		http.Address(":8008"),
 	)
 
 	app := newApp(logger, gs, hs)

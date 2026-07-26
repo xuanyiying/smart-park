@@ -4,84 +4,160 @@ metadata:
   name: smart-park-config
   namespace: smart-park
 data:
+  # NOTE: 配置格式与 configs/*.yaml 及 pkg/config.Load 保持一致（扁平结构）。
+  # 生产环境敏感字段（数据库连接串、密码等）通过 SP_* 环境变量覆盖，
+  # 详见各服务 configs/*.yaml 顶部的环境变量说明。
   gateway.yaml: |
     server:
-      http:
-        addr: 0.0.0.0:8000
-        timeout: 1s
-      grpc:
-        addr: 0.0.0.0:9000
-        timeout: 1s
-    data:
-      database:
-        driver: postgres
-        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
-      redis:
-        addr: redis:6379
-        password: ""
-        db: 0
-        read_timeout: 0.2s
-        write_timeout: 0.2s
-    trace:
-      endpoint: http://jaeger:14268/api/traces
+      port: 8000
+      timeout: 60
+    routes:
+      - path: /api/v1/device
+        target: vehicle:8001
+      - path: /api/v1/billing
+        target: billing:8002
+      - path: /api/v1/pay
+        target: payment:8003
+      - path: /api/v1/admin/billing
+        target: billing:8002
+      - path: /api/v1/admin
+        target: admin:8004
+      - path: /api/v1/charging
+        target: charging:8005
+      - path: /api/v1/user
+        target: user:8007
+    jwt:
+      public_key_path: "/keys/public.pem"
+    etcd:
+      endpoints:
+        - "etcd:2379"
+      timeout: 5s
+    log:
+      level: info
+      format: json
+    otel:
+      endpoint: "jaeger:4317"
+      serviceName: "gateway-svc"
 
   vehicle.yaml: |
     server:
-      http:
-        addr: 0.0.0.0:8001
-      grpc:
-        addr: 0.0.0.0:9001
-    data:
-      database:
-        driver: postgres
-        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      port: 8001
+      timeout: 60
+    database:
+      driver: postgres
+      source: "postgres://postgres:postgres@postgres:5432/parking?sslmode=disable"
+    redis:
+      addr: "redis:6379"
+      password: ""
+      db: 0
+    mq:
+      type: "redis"
       redis:
-        addr: redis:6379
-    lock:
-      ttl: 30s
+        addr: "redis:6379"
+        password: ""
+        db: 0
+        stream: "parking"
+    mqtt:
+      broker: ""
+      client_id: "vehicle-service"
+      username: ""
+      password: ""
+    log:
+      level: info
+      format: json
+    telemetry:
+      enabled: true
+      endpoint: "jaeger:4317"
+      serviceName: "vehicle-svc"
+      sampleRate: 1.0
 
   billing.yaml: |
     server:
-      http:
-        addr: 0.0.0.0:8002
-      grpc:
-        addr: 0.0.0.0:9002
-    data:
-      database:
-        driver: postgres
-        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      port: 8002
+      timeout: 60
+    database:
+      driver: postgres
+      source: "postgres://postgres:postgres@postgres:5432/parking?sslmode=disable"
+    redis:
+      addr: "redis:6379"
+      password: ""
+      db: 0
+    mq:
+      type: "redis"
       redis:
-        addr: redis:6379
+        addr: "redis:6379"
+        password: ""
+        db: 0
+        stream: "parking"
+    log:
+      level: info
+      format: json
 
   payment.yaml: |
     server:
-      http:
-        addr: 0.0.0.0:8003
-      grpc:
-        addr: 0.0.0.0:9003
-    data:
-      database:
-        driver: postgres
-        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
-      redis:
-        addr: redis:6379
-    payment:
-      orderExpiration: 30m
-      refundWindow: 30m
+      port: 8003
+      timeout: 60
+    database:
+      driver: postgres
+      source: "postgres://postgres:postgres@postgres:5432/parking?sslmode=disable"
+    redis:
+      addr: "redis:6379"
+      password: ""
+      db: 0
+    wechat:
+      app_id: ""
+      mch_id: ""
+      api_key: ""
+      cert_serial_no: ""
+      private_key_path: ""
+      public_key_path: ""
+      notify_url: ""
+    alipay:
+      app_id: ""
+      private_key: ""
+      public_key: ""
+      notify_url: ""
+      is_production: false
+    log:
+      level: info
+      format: json
+    otel:
+      endpoint: "jaeger:4317"
+      serviceName: "payment-svc"
 
   admin.yaml: |
     server:
-      http:
-        addr: 0.0.0.0:8004
-      grpc:
-        addr: 0.0.0.0:9004
-    data:
-      database:
-        driver: postgres
-        source: postgres://postgres:${DB_PASSWORD}@postgres:5432/parking?sslmode=disable
+      port: 8004
+      timeout: 60
+    database:
+      driver: postgres
+      source: "postgres://postgres:postgres@postgres:5432/parking?sslmode=disable"
+    redis:
+      addr: "redis:6379"
+      password: ""
+      db: 0
+    log:
+      level: info
+      format: json
+
+  charging.yaml: |
+    server:
+      port: 8005
+      timeout: 60
+    database:
+      driver: postgres
+      source: "postgres://postgres:postgres@postgres:5432/parking?sslmode=disable"
+    redis:
+      addr: "redis:6379"
+      password: ""
+      db: 0
+    mq:
+      type: "redis"
       redis:
-        addr: redis:6379
-    admin:
-      defaultPageSize: 20
-      maxPageSize: 100
-      reportCacheTTL: 5m
+        addr: "redis:6379"
+        password: ""
+        db: 0
+        stream: "parking"
+    log:
+      level: info
+      format: json

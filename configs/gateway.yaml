@@ -16,7 +16,7 @@ routes:
   - path: /api/v1/charging
     target: localhost:8005
   - path: /api/v1/user
-    target: localhost:8005
+    target: localhost:8007
 
 # JWT 认证配置
 jwt:

@@ -114,6 +114,20 @@ services:
     environment:
       - KRATOS_CONF=../../configs/admin.yaml
 
+  charging:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.charging
+    container_name: smart-park-charging
+    ports:
+      - "8005:8005"
+      - "9005:9005"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - KRATOS_CONF=../../configs/charging.yaml
+
 volumes:
   postgres_data:
   redis_data:

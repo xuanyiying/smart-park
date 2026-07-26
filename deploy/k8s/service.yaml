@@ -113,3 +113,23 @@ spec:
     port: 9004
     targetPort: 9004
   type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: charging
+  namespace: smart-park
+  labels:
+    app: charging
+spec:
+  selector:
+    app: charging
+  ports:
+  - name: http
+    port: 8005
+    targetPort: 8005
+  - name: grpc
+    port: 9005
+    targetPort: 9005
+  type: ClusterIP

@@ -1,28 +1,52 @@
+# 用户服务配置
+# 配置格式与 pkg/config.Load 保持一致（扁平结构）。
+# 敏感字段可通过 SP_* 环境变量覆盖，例如：
+#   SP_DATABASE_SOURCE  - 数据库连接串
+#   SP_REDIS_ADDR       - Redis 地址
+#   SP_REDIS_PASSWORD   - Redis 密码
+#   SP_WECHAT_APP_ID    - 微信小程序 AppID
+#   SP_WECHAT_API_KEY   - 微信小程序 AppSecret（映射到 wechat.api_key）
+#   SP_JWT_SECRET       - JWT 签名密钥
+#
+# 注意：vehicle / payment 为用户服务依赖的下游 gRPC 服务端点，必填，
+# 缺失时服务启动会直接退出。
+
 server:
-  port: 8005
+  port: 8007
   timeout: 60
 
 database:
   driver: postgres
-  source: "host=${DB_HOST} user=${DB_USER} password=${DB_PASSWORD} dbname=parking port=${DB_PORT} sslmode=disable"
+  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 
 redis:
-  addr: "${REDIS_ADDR}"
-  password: "${REDIS_PASSWORD}"
+  addr: "localhost:6379"
+  password: ""
   db: 0
 
+# 下游依赖服务 gRPC 端点（必填）
+vehicle:
+  endpoint: "localhost:9001"
+
+payment:
+  endpoint: "localhost:9003"
+
 jwt:
-  secret_key: ${JWT_SECRET_KEY}
+  # RSA 公私钥路径；留空时 JWTManager 不加载密钥（开发态可用）。
+  # 生产环境请生成密钥并配置路径，或通过 SP_JWT_SECRET 使用对称签名。
+  public_key_path: ""
+  private_key_path: ""
   token_duration: 24h
 
 wechat:
-  app_id: ${WECHAT_MINI_APP_ID}
-  app_secret: ${WECHAT_MINI_APP_SECRET}
+  app_id: ""
+  # 微信小程序 AppSecret（代码中映射到 Wechat.APIKey 字段）
+  api_key: ""
 
 log:
   level: info
   format: json
 
 otel:
-  endpoint: "${OTEL_ENDPOINT}"
+  endpoint: "localhost:4317"
   serviceName: "user-svc"

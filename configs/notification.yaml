@@ -1,5 +1,5 @@
 server:
-  port: 8006
+  port: 8008
   timeout: 60
 
 log:
