@@ -29,6 +29,20 @@ func (_u *ParkingRecordUpdate) Where(ps ...predicate.ParkingRecord) *ParkingReco
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ParkingRecordUpdate) SetTenantID(v uuid.UUID) *ParkingRecordUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ParkingRecordUpdate) SetNillableTenantID(v *uuid.UUID) *ParkingRecordUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetLotID sets the "lot_id" field.
 func (_u *ParkingRecordUpdate) SetLotID(v uuid.UUID) *ParkingRecordUpdate {
 	_u.mutation.SetLotID(v)
@@ -418,6 +432,9 @@ func (_u *ParkingRecordUpdate) sqlSave(ctx context.Context) (_node int, err erro
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(parkingrecord.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(parkingrecord.FieldLotID, field.TypeUUID, value)
 	}
@@ -523,6 +540,20 @@ type ParkingRecordUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ParkingRecordMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ParkingRecordUpdateOne) SetTenantID(v uuid.UUID) *ParkingRecordUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ParkingRecordUpdateOne) SetNillableTenantID(v *uuid.UUID) *ParkingRecordUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetLotID sets the "lot_id" field.
@@ -943,6 +974,9 @@ func (_u *ParkingRecordUpdateOne) sqlSave(ctx context.Context) (_node *ParkingRe
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(parkingrecord.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(parkingrecord.FieldLotID, field.TypeUUID, value)

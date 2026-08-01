@@ -29,6 +29,20 @@ func (_u *OfflineSyncRecordUpdate) Where(ps ...predicate.OfflineSyncRecord) *Off
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *OfflineSyncRecordUpdate) SetTenantID(v uuid.UUID) *OfflineSyncRecordUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *OfflineSyncRecordUpdate) SetNillableTenantID(v *uuid.UUID) *OfflineSyncRecordUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetOfflineID sets the "offline_id" field.
 func (_u *OfflineSyncRecordUpdate) SetOfflineID(v string) *OfflineSyncRecordUpdate {
 	_u.mutation.SetOfflineID(v)
@@ -301,6 +315,9 @@ func (_u *OfflineSyncRecordUpdate) sqlSave(ctx context.Context) (_node int, err 
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(offlinesyncrecord.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.OfflineID(); ok {
 		_spec.SetField(offlinesyncrecord.FieldOfflineID, field.TypeString, value)
 	}
@@ -373,6 +390,20 @@ type OfflineSyncRecordUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *OfflineSyncRecordMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *OfflineSyncRecordUpdateOne) SetTenantID(v uuid.UUID) *OfflineSyncRecordUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *OfflineSyncRecordUpdateOne) SetNillableTenantID(v *uuid.UUID) *OfflineSyncRecordUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetOfflineID sets the "offline_id" field.
@@ -676,6 +707,9 @@ func (_u *OfflineSyncRecordUpdateOne) sqlSave(ctx context.Context) (_node *Offli
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(offlinesyncrecord.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.OfflineID(); ok {
 		_spec.SetField(offlinesyncrecord.FieldOfflineID, field.TypeString, value)

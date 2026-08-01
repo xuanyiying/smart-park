@@ -12,8 +12,26 @@ type BillingRule func(*sql.Selector)
 // Device is the predicate function for device builders.
 type Device func(*sql.Selector)
 
+// DeviceFault is the predicate function for devicefault builders.
+type DeviceFault func(*sql.Selector)
+
+// DeviceLog is the predicate function for devicelog builders.
+type DeviceLog func(*sql.Selector)
+
+// DevicePerformance is the predicate function for deviceperformance builders.
+type DevicePerformance func(*sql.Selector)
+
+// DeviceUpgrade is the predicate function for deviceupgrade builders.
+type DeviceUpgrade func(*sql.Selector)
+
+// Firmware is the predicate function for firmware builders.
+type Firmware func(*sql.Selector)
+
 // Lane is the predicate function for lane builders.
 type Lane func(*sql.Selector)
+
+// Manufacturer is the predicate function for manufacturer builders.
+type Manufacturer func(*sql.Selector)
 
 // OfflineSyncRecord is the predicate function for offlinesyncrecord builders.
 type OfflineSyncRecord func(*sql.Selector)

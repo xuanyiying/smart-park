@@ -11,7 +11,6 @@ import (
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/predicate"
-	"github.com/xuanyiying/smart-park/pkg/database"
 )
 
 type orderRepo struct {
@@ -22,8 +21,12 @@ func NewOrderRepo(data *Data) biz.OrderRepo {
 	return &orderRepo{data: data}
 }
 
+func (r *orderRepo) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return r.data.txm.WithTx(ctx, fn)
+}
+
 func (r *orderRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order, error) {
-	o, err := r.clientFromCtx(ctx).Order.Get(ctx, orderID)
+	o, err := r.data.db.Order.Get(ctx, orderID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -34,7 +37,7 @@ func (r *orderRepo) GetOrder(ctx context.Context, orderID uuid.UUID) (*biz.Order
 }
 
 func (r *orderRepo) GetOrderByRecordID(ctx context.Context, recordID uuid.UUID) (*biz.Order, error) {
-	o, err := r.clientFromCtx(ctx).Order.Query().
+	o, err := r.data.db.Order.Query().
 		Where(order.RecordID(recordID)).
 		Only(ctx)
 	if err != nil {

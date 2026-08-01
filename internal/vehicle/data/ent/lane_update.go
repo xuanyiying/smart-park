@@ -29,6 +29,20 @@ func (_u *LaneUpdate) Where(ps ...predicate.Lane) *LaneUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *LaneUpdate) SetTenantID(v uuid.UUID) *LaneUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *LaneUpdate) SetNillableTenantID(v *uuid.UUID) *LaneUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetLotID sets the "lot_id" field.
 func (_u *LaneUpdate) SetLotID(v uuid.UUID) *LaneUpdate {
 	_u.mutation.SetLotID(v)
@@ -183,6 +197,9 @@ func (_u *LaneUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(lane.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(lane.FieldLotID, field.TypeUUID, value)
 	}
@@ -225,6 +242,20 @@ type LaneUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *LaneMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *LaneUpdateOne) SetTenantID(v uuid.UUID) *LaneUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *LaneUpdateOne) SetNillableTenantID(v *uuid.UUID) *LaneUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetLotID sets the "lot_id" field.
@@ -410,6 +441,9 @@ func (_u *LaneUpdateOne) sqlSave(ctx context.Context) (_node *Lane, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(lane.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(lane.FieldLotID, field.TypeUUID, value)

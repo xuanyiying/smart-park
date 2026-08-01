@@ -263,12 +263,12 @@ func (_q *VehicleQuery) Clone() *VehicleQuery {
 // Example:
 //
 //	var v []struct {
-//		PlateNumber string `json:"plate_number,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Vehicle.Query().
-//		GroupBy(vehicle.FieldPlateNumber).
+//		GroupBy(vehicle.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *VehicleQuery) GroupBy(field string, fields ...string) *VehicleGroupBy {
@@ -286,11 +286,11 @@ func (_q *VehicleQuery) GroupBy(field string, fields ...string) *VehicleGroupBy 
 // Example:
 //
 //	var v []struct {
-//		PlateNumber string `json:"plate_number,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.Vehicle.Query().
-//		Select(vehicle.FieldPlateNumber).
+//		Select(vehicle.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *VehicleQuery) Select(fields ...string) *VehicleSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

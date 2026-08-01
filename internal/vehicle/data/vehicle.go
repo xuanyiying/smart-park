@@ -12,7 +12,9 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceperformance"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceupgrade"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/firmware"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
@@ -324,11 +326,6 @@ func (r *vehicleRepo) GetDeviceByCode(ctx context.Context, deviceCode string) (*
 
 // UpdateDeviceHeartbeat updates device heartbeat.
 func (r *vehicleRepo) UpdateDeviceHeartbeat(ctx context.Context, deviceCode string) error {
-	now := time.Now()
-	return r.data.db.Device.Update().
-		Where(device.DeviceID(deviceCode)).
-		SetLastHeartbeat(now).
-		SetLastOnline(now).
 	update := r.data.db.Device.Update().
 		Where(device.DeviceID(deviceCode))
 
@@ -338,6 +335,7 @@ func (r *vehicleRepo) UpdateDeviceHeartbeat(ctx context.Context, deviceCode stri
 
 	return update.
 		SetLastHeartbeat(time.Now()).
+		SetLastOnline(time.Now()).
 		SetStatus(device.StatusActive).
 		AddHeartbeatCount(1).
 		ClearFaultInfo().
@@ -840,8 +838,7 @@ func (r *vehicleRepo) UpdateManufacturer(ctx context.Context, m *biz.Manufacture
 
 // DeleteManufacturer deletes a manufacturer by ID.
 func (r *vehicleRepo) DeleteManufacturer(ctx context.Context, id uuid.UUID) error {
-	_, err := r.data.db.Manufacturer.DeleteOneID(id).Exec(ctx)
-	return err
+	return r.data.db.Manufacturer.DeleteOneID(id).Exec(ctx)
 }
 
 // ListManufacturers retrieves all manufacturers with pagination.
@@ -890,64 +887,64 @@ func (r *vehicleRepo) CreateFirmware(ctx context.Context, f *biz.Firmware) error
 		SetVersion(f.Version).
 		SetURL(f.URL).
 		SetSize(f.Size).
-		SetMD5(f.MD5).
+		SetMd5(f.MD5).
 		SetDescription(f.Description).
-		SetStatus(f.Status).
-		SetReleaseDate(f.ReleaseDate).
-		Save(ctx)
-	return err
-}
-
+		SetStatus(firmware.Status(f.Status)).
+			SetReleaseDate(f.ReleaseDate).
+			Save(ctx)
+		return err
+	}
+	
 // GetFirmware retrieves a firmware by ID.
 func (r *vehicleRepo) GetFirmware(ctx context.Context, id uuid.UUID) (*biz.Firmware, error) {
-	f, err := r.data.db.Firmware.Get(ctx, id)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
+		f, err := r.data.db.Firmware.Get(ctx, id)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, nil
+			}
+			return nil, err
 		}
-		return nil, err
+	
+		return &biz.Firmware{
+			ID:          f.ID,
+			FirmwareID:  f.FirmwareID,
+			Manufacturer: f.Manufacturer,
+			Model:       f.Model,
+			Version:     f.Version,
+			URL:         f.URL,
+			Size:        f.Size,
+			MD5:         f.Md5,
+			Description: f.Description,
+			Status:      string(f.Status),
+			ReleaseDate: f.ReleaseDate,
+			CreatedAt:   f.CreatedAt,
+			UpdatedAt:   f.UpdatedAt,
+		}, nil
 	}
-
-	return &biz.Firmware{
-		ID:          f.ID,
-		FirmwareID:  f.FirmwareID,
-		Manufacturer: f.Manufacturer,
-		Model:       f.Model,
-		Version:     f.Version,
-		URL:         f.URL,
-		Size:        f.Size,
-		MD5:         f.MD5,
-		Description: f.Description,
-		Status:      f.Status,
-		ReleaseDate: f.ReleaseDate,
-		CreatedAt:   f.CreatedAt,
-		UpdatedAt:   f.UpdatedAt,
-	}, nil
-}
-
+	
 // GetFirmwareByID retrieves a firmware by firmware ID.
-func (r *vehicleRepo) GetFirmwareByID(ctx context.Context, firmwareID string) (*biz.Firmware, error) {
-	f, err := r.data.db.Firmware.Query().
-		Where(firmware.FirmwareID(firmwareID)).
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
+	func (r *vehicleRepo) GetFirmwareByID(ctx context.Context, firmwareID string) (*biz.Firmware, error) {
+		f, err := r.data.db.Firmware.Query().
+			Where(firmware.FirmwareID(firmwareID)).
+			Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, nil
+			}
+			return nil, err
 		}
-		return nil, err
-	}
-
-	return &biz.Firmware{
-		ID:          f.ID,
-		FirmwareID:  f.FirmwareID,
-		Manufacturer: f.Manufacturer,
-		Model:       f.Model,
-		Version:     f.Version,
-		URL:         f.URL,
-		Size:        f.Size,
-		MD5:         f.MD5,
-		Description: f.Description,
-		Status:      f.Status,
+	
+		return &biz.Firmware{
+			ID:          f.ID,
+			FirmwareID:  f.FirmwareID,
+			Manufacturer: f.Manufacturer,
+			Model:       f.Model,
+			Version:     f.Version,
+			URL:         f.URL,
+			Size:        f.Size,
+			MD5:         f.Md5,
+			Description: f.Description,
+			Status:      string(f.Status),
 		ReleaseDate: f.ReleaseDate,
 		CreatedAt:   f.CreatedAt,
 		UpdatedAt:   f.UpdatedAt,
@@ -962,18 +959,17 @@ func (r *vehicleRepo) UpdateFirmware(ctx context.Context, f *biz.Firmware) error
 		SetVersion(f.Version).
 		SetURL(f.URL).
 		SetSize(f.Size).
-		SetMD5(f.MD5).
+		SetMd5(f.MD5).
 		SetDescription(f.Description).
-		SetStatus(f.Status).
-		SetReleaseDate(f.ReleaseDate).
-		Save(ctx)
-	return err
-}
-
+		SetStatus(firmware.Status(f.Status)).
+			SetReleaseDate(f.ReleaseDate).
+			Save(ctx)
+		return err
+	}
+	
 // DeleteFirmware deletes a firmware by ID.
 func (r *vehicleRepo) DeleteFirmware(ctx context.Context, id uuid.UUID) error {
-	_, err := r.data.db.Firmware.DeleteOneID(id).Exec(ctx)
-	return err
+	return r.data.db.Firmware.DeleteOneID(id).Exec(ctx)
 }
 
 // ListFirmwares retrieves firmwares with pagination.
@@ -1015,9 +1011,9 @@ func (r *vehicleRepo) ListFirmwares(ctx context.Context, manufacturer, model str
 			Version:     f.Version,
 			URL:         f.URL,
 			Size:        f.Size,
-			MD5:         f.MD5,
+			MD5:         f.Md5,
 			Description: f.Description,
-			Status:      f.Status,
+			Status:      string(f.Status),
 			ReleaseDate: f.ReleaseDate,
 			CreatedAt:   f.CreatedAt,
 			UpdatedAt:   f.UpdatedAt,
@@ -1030,7 +1026,7 @@ func (r *vehicleRepo) ListFirmwares(ctx context.Context, manufacturer, model str
 // GetLatestFirmware retrieves the latest firmware for a specific manufacturer and model.
 func (r *vehicleRepo) GetLatestFirmware(ctx context.Context, manufacturer, model string) (*biz.Firmware, error) {
 	f, err := r.data.db.Firmware.Query().
-		Where(firmware.Manufacturer(manufacturer), firmware.Model(model), firmware.Status("published")).
+		Where(firmware.Manufacturer(manufacturer), firmware.Model(model), firmware.StatusEQ(firmware.StatusPublished)).
 		Order(ent.Desc(firmware.FieldReleaseDate)).
 		First(ctx)
 	if err != nil {
@@ -1048,14 +1044,14 @@ func (r *vehicleRepo) GetLatestFirmware(ctx context.Context, manufacturer, model
 		Version:     f.Version,
 		URL:         f.URL,
 		Size:        f.Size,
-		MD5:         f.MD5,
+		MD5:         f.Md5,
 		Description: f.Description,
-		Status:      f.Status,
-		ReleaseDate: f.ReleaseDate,
-		CreatedAt:   f.CreatedAt,
-		UpdatedAt:   f.UpdatedAt,
-	}, nil
-}
+			Status:      string(f.Status),
+			ReleaseDate: f.ReleaseDate,
+			CreatedAt:   f.CreatedAt,
+			UpdatedAt:   f.UpdatedAt,
+		}, nil
+	}
 
 // CreateDevicePerformance creates a new device performance record.
 func (r *vehicleRepo) CreateDevicePerformance(ctx context.Context, performance *biz.DevicePerformance) error {
@@ -1139,11 +1135,11 @@ func (r *vehicleRepo) CreateDeviceFault(ctx context.Context, fault *biz.DeviceFa
 		SetFaultType(fault.FaultType).
 		SetFaultCode(fault.FaultCode).
 		SetDescription(fault.Description).
-		SetSeverity(fault.Severity).
-		SetStatus(fault.Status).
-		SetSuggestion(fault.Suggestion).
-		SetDetectedAt(fault.DetectedAt).
-		Save(ctx)
+		SetSeverity(devicefault.Severity(fault.Severity)).
+			SetStatus(devicefault.Status(fault.Status)).
+			SetSuggestion(fault.Suggestion).
+			SetDetectedAt(fault.DetectedAt).
+			Save(ctx)
 	return err
 }
 
@@ -1157,30 +1153,35 @@ func (r *vehicleRepo) GetDeviceFault(ctx context.Context, id uuid.UUID) (*biz.De
 		return nil, err
 	}
 
-	return &biz.DeviceFault{
-		ID:          fault.ID,
-		DeviceID:    fault.DeviceID,
-		FaultType:   fault.FaultType,
-		FaultCode:   fault.FaultCode,
-		Description: fault.Description,
-		Severity:    fault.Severity,
-		Status:      fault.Status,
-		Suggestion:  fault.Suggestion,
-		DetectedAt:  fault.DetectedAt,
-		ResolvedAt:  fault.ResolvedAt,
-		CreatedAt:   fault.CreatedAt,
-		UpdatedAt:   fault.UpdatedAt,
-	}, nil
-}
+	var resolvedAt *time.Time
+		if !fault.ResolvedAt.IsZero() {
+			resolvedAt = &fault.ResolvedAt
+		}
+
+		return &biz.DeviceFault{
+			ID:          fault.ID,
+			DeviceID:    fault.DeviceID,
+			FaultType:   fault.FaultType,
+			FaultCode:   fault.FaultCode,
+			Description: fault.Description,
+			Severity:    string(fault.Severity),
+			Status:      string(fault.Status),
+			Suggestion:  fault.Suggestion,
+			DetectedAt:  fault.DetectedAt,
+			ResolvedAt:  resolvedAt,
+			CreatedAt:   fault.CreatedAt,
+			UpdatedAt:   fault.UpdatedAt,
+		}, nil
+	}
 
 // UpdateDeviceFault updates an existing device fault.
-func (r *vehicleRepo) UpdateDeviceFault(ctx context.Context, fault *biz.DeviceFault) error {
-	update := r.data.db.DeviceFault.UpdateOneID(fault.ID).
-		SetFaultType(fault.FaultType).
-		SetFaultCode(fault.FaultCode).
-		SetDescription(fault.Description).
-		SetSeverity(fault.Severity).
-		SetStatus(fault.Status).
+	func (r *vehicleRepo) UpdateDeviceFault(ctx context.Context, fault *biz.DeviceFault) error {
+		update := r.data.db.DeviceFault.UpdateOneID(fault.ID).
+			SetFaultType(fault.FaultType).
+			SetFaultCode(fault.FaultCode).
+			SetDescription(fault.Description).
+			SetSeverity(devicefault.Severity(fault.Severity)).
+			SetStatus(devicefault.Status(fault.Status)).
 		SetSuggestion(fault.Suggestion)
 
 	if fault.ResolvedAt != nil {
@@ -1199,7 +1200,7 @@ func (r *vehicleRepo) ListDeviceFaults(ctx context.Context, deviceID string, sta
 		query = query.Where(devicefault.DeviceID(deviceID))
 	}
 	if status != "" {
-		query = query.Where(devicefault.Status(status))
+		query = query.Where(devicefault.StatusEQ(devicefault.Status(status)))
 	}
 
 	// Get total count
@@ -1222,21 +1223,25 @@ func (r *vehicleRepo) ListDeviceFaults(ctx context.Context, deviceID string, sta
 	// Convert to biz entities
 	result := make([]*biz.DeviceFault, len(faults))
 	for i, fault := range faults {
-		result[i] = &biz.DeviceFault{
-			ID:          fault.ID,
-			DeviceID:    fault.DeviceID,
-			FaultType:   fault.FaultType,
-			FaultCode:   fault.FaultCode,
-			Description: fault.Description,
-			Severity:    fault.Severity,
-			Status:      fault.Status,
-			Suggestion:  fault.Suggestion,
-			DetectedAt:  fault.DetectedAt,
-			ResolvedAt:  fault.ResolvedAt,
-			CreatedAt:   fault.CreatedAt,
-			UpdatedAt:   fault.UpdatedAt,
+			var resolvedAt *time.Time
+			if !fault.ResolvedAt.IsZero() {
+				resolvedAt = &fault.ResolvedAt
+			}
+			result[i] = &biz.DeviceFault{
+				ID:          fault.ID,
+				DeviceID:    fault.DeviceID,
+				FaultType:   fault.FaultType,
+				FaultCode:   fault.FaultCode,
+				Description: fault.Description,
+				Severity:    string(fault.Severity),
+				Status:      string(fault.Status),
+				Suggestion:  fault.Suggestion,
+				DetectedAt:  fault.DetectedAt,
+				ResolvedAt:  resolvedAt,
+				CreatedAt:   fault.CreatedAt,
+				UpdatedAt:   fault.UpdatedAt,
+			}
 		}
-	}
 
 	return result, total, nil
 }
@@ -1322,14 +1327,221 @@ func (r *vehicleRepo) GetDeviceStatsSummary(ctx context.Context, deviceID string
 	}
 
 	return map[string]interface{}{
-		"device_id":      deviceID,
-		"manufacturer":   device.Manufacturer,
-		"model":          device.Model,
-		"firmware_version": device.FirmwareVersion,
-		"online_time_hours": onlineTime,
-		"heartbeat_count": device.HeartbeatCount,
-		"offline_count":   device.OfflineCount,
-		"fault_count":     faultCount,
-		"status":          device.Status,
+			"device_id":      deviceID,
+			"manufacturer":   device.Manufacturer,
+			"model":          device.Model,
+			"firmware_version": device.FirmwareVersion,
+			"online_time_hours": onlineTime,
+			"heartbeat_count": device.HeartbeatCount,
+			"offline_count":   device.OfflineCount,
+			"fault_count":     faultCount,
+			"status":          device.Status,
+		}, nil
+}
+
+// UpdateDeviceStatus updates the status of a device by device ID.
+func (r *vehicleRepo) UpdateDeviceStatus(ctx context.Context, deviceID string, status string) error {
+	entStatus := device.StatusActive
+	switch status {
+	case "offline":
+		entStatus = device.StatusOffline
+	case "disabled":
+		entStatus = device.StatusDisabled
+	case "upgrading":
+		entStatus = device.StatusUpgrading
+	case "fault":
+		entStatus = device.StatusFault
+	}
+
+	update := r.data.db.Device.Update().
+		Where(device.DeviceID(deviceID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(device.TenantID(*tenantID))
+	}
+
+	_, err := update.
+		SetStatus(entStatus).
+		Save(ctx)
+	return err
+}
+
+// UpdateDeviceVersion updates the firmware and hardware version of a device by device ID.
+func (r *vehicleRepo) UpdateDeviceVersion(ctx context.Context, deviceID string, firmwareVersion string, hardwareVersion string) error {
+	update := r.data.db.Device.Update().
+		Where(device.DeviceID(deviceID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(device.TenantID(*tenantID))
+	}
+
+	if firmwareVersion != "" {
+		update.SetFirmwareVersion(firmwareVersion)
+	}
+	if hardwareVersion != "" {
+		update.SetHardwareVersion(hardwareVersion)
+	}
+
+	_, err := update.Save(ctx)
+	return err
+}
+
+// UpdateDeviceStats updates the device stats of a device by device ID.
+func (r *vehicleRepo) UpdateDeviceStats(ctx context.Context, deviceID string, stats map[string]string) error {
+	update := r.data.db.Device.Update().
+		Where(device.DeviceID(deviceID))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(device.TenantID(*tenantID))
+	}
+
+	// Convert map[string]string to map[string]interface{} for the ent field
+	statsIf := make(map[string]interface{}, len(stats))
+	for k, v := range stats {
+		statsIf[k] = v
+	}
+	update.SetDeviceStats(statsIf)
+
+	_, err := update.Save(ctx)
+	return err
+}
+
+// CreateDeviceLog creates a new device log record.
+func (r *vehicleRepo) CreateDeviceLog(ctx context.Context, log *biz.DeviceLog) error {
+	// TODO: fully integrate DeviceLog ent schema with biz layer mapping
+	entLogType := devicelog.LogTypeInfo
+	switch log.LogType {
+	case "warning":
+		entLogType = devicelog.LogTypeWarning
+	case "error":
+		entLogType = devicelog.LogTypeError
+	case "debug":
+		entLogType = devicelog.LogTypeDebug
+	}
+
+	create := r.data.db.DeviceLog.Create().
+		SetDeviceID(log.DeviceID).
+		SetLogType(entLogType).
+		SetLogLevel(log.Level).
+		SetMessage(log.Message)
+
+	if log.Detail != "" {
+		create.SetDetails(map[string]interface{}{"detail": log.Detail})
+	}
+
+	_, err := create.Save(ctx)
+	return err
+}
+
+// GetDeviceLogs retrieves device logs with pagination.
+func (r *vehicleRepo) GetDeviceLogs(ctx context.Context, deviceID string, page, pageSize int) ([]*biz.DeviceLog, int, error) {
+	query := r.data.db.DeviceLog.Query().
+		Where(devicelog.DeviceID(deviceID))
+
+	// Get total count
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Apply pagination
+	offset := (page - 1) * pageSize
+	logs, err := query.
+		Order(ent.Desc(devicelog.FieldCreatedAt)).
+		Offset(offset).
+		Limit(pageSize).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Convert to biz entities
+	result := make([]*biz.DeviceLog, len(logs))
+	for i, l := range logs {
+		detail := ""
+		if l.Details != nil {
+			if d, ok := l.Details["detail"].(string); ok {
+				detail = d
+			}
+		}
+		result[i] = &biz.DeviceLog{
+			ID:        l.ID,
+			DeviceID:  l.DeviceID,
+			Level:     l.LogLevel,
+			LogType:   string(l.LogType),
+			Message:   l.Message,
+			Detail:    detail,
+			CreatedAt: l.CreatedAt,
+		}
+	}
+
+	return result, total, nil
+}
+
+// CreateDeviceUpgrade creates a new device upgrade record and returns its ID.
+func (r *vehicleRepo) CreateDeviceUpgrade(ctx context.Context, deviceID string, fromVersion string, toVersion string, firmwareURL string) (uuid.UUID, error) {
+	created, err := r.data.db.DeviceUpgrade.Create().
+		SetDeviceID(deviceID).
+		SetFromVersion(fromVersion).
+		SetToVersion(toVersion).
+		SetFirmwareURL(firmwareURL).
+		SetStatus(deviceupgrade.StatusPending).
+		Save(ctx)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return created.ID, nil
+}
+
+// GetDeviceUpgrade retrieves a device upgrade record by ID.
+func (r *vehicleRepo) GetDeviceUpgrade(ctx context.Context, id uuid.UUID) (*biz.DeviceUpgrade, error) {
+	upgrade, err := r.data.db.DeviceUpgrade.Get(ctx, id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &biz.DeviceUpgrade{
+		ID:           upgrade.ID,
+		DeviceID:     upgrade.DeviceID,
+		FromVersion:  upgrade.FromVersion,
+		ToVersion:    upgrade.ToVersion,
+		FirmwareURL:  upgrade.FirmwareURL,
+		Status:       string(upgrade.Status),
+		ErrorMessage: upgrade.ErrorMessage,
+		StartTime:    upgrade.StartTime,
+		EndTime:      upgrade.EndTime,
+		CreatedAt:    upgrade.CreatedAt,
+		UpdatedAt:    upgrade.UpdatedAt,
 	}, nil
+}
+
+// UpdateDeviceUpgradeStatus updates the status and error message of a device upgrade record.
+func (r *vehicleRepo) UpdateDeviceUpgradeStatus(ctx context.Context, id uuid.UUID, status string, errMsg string) error {
+	entStatus := deviceupgrade.StatusPending
+	switch status {
+	case "in_progress":
+		entStatus = deviceupgrade.StatusInProgress
+	case "success":
+		entStatus = deviceupgrade.StatusSuccess
+	case "failed":
+		entStatus = deviceupgrade.StatusFailed
+	}
+
+	update := r.data.db.DeviceUpgrade.UpdateOneID(id).
+		SetStatus(entStatus)
+
+	if errMsg != "" {
+		update.SetErrorMessage(errMsg)
+	}
+
+	if status == "success" {
+		now := time.Now()
+		update.SetEndTime(now)
+	}
+
+	_, err := update.Save(ctx)
+	return err
 }

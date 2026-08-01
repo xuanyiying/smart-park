@@ -8,8 +8,9 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
-	"github.com/xuanyiying/smart-park/internal/vehicle/device"
 	v1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/mqtt"
+	"github.com/xuanyiying/smart-park/internal/vehicle/device"
 )
 
 // DeviceUseCase handles device management business logic.
@@ -18,38 +19,17 @@ type DeviceUseCase struct {
 	adapterFactory *device.AdapterFactory
 	config         *Config
 	log            *log.Helper
+	mqttClient     mqtt.Client
 }
 
 // NewDeviceUseCase creates a new DeviceUseCase.
-func NewDeviceUseCase(vehicleRepo VehicleRepo, adapterFactory *device.AdapterFactory, logger log.Logger) *DeviceUseCase {
+func NewDeviceUseCase(vehicleRepo VehicleRepo, adapterFactory *device.AdapterFactory, mqttClient mqtt.Client, logger log.Logger) *DeviceUseCase {
 	return &DeviceUseCase{
 		vehicleRepo:    vehicleRepo,
 		adapterFactory: adapterFactory,
 		config:         DefaultConfig(),
 		log:            log.NewHelper(logger),
-	vehicleRepo VehicleRepo
-	config      *Config
-	log         *log.Helper
-	mqttClient  MqttClient
-}
-
-// MqttClient MQTT客户端接口
-type MqttClient interface {
-	// Publish 发布消息
-	Publish(ctx context.Context, topic string, payload interface{}) error
-	// Subscribe 订阅消息
-	Subscribe(ctx context.Context, topic string, handler func(topic string, payload []byte)) error
-	// Close 关闭连接
-	Close() error
-}
-
-// NewDeviceUseCase creates a new DeviceUseCase.
-func NewDeviceUseCase(vehicleRepo VehicleRepo, mqttClient MqttClient, logger log.Logger) *DeviceUseCase {
-	return &DeviceUseCase{
-		vehicleRepo: vehicleRepo,
-		config:      DefaultConfig(),
-		log:         log.NewHelper(logger),
-		mqttClient:  mqttClient,
+		mqttClient:     mqttClient,
 	}
 }
 
@@ -58,48 +38,66 @@ func (uc *DeviceUseCase) Heartbeat(ctx context.Context, req *v1.HeartbeatRequest
 	if req.DeviceId == "" {
 		return fmt.Errorf("device id is required")
 	}
-	
+
 	// 更新设备心跳
 	if err := uc.vehicleRepo.UpdateDeviceHeartbeat(ctx, req.DeviceId); err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to update heartbeat: %v", err)
 		return fmt.Errorf("failed to update device heartbeat: %w", err)
 	}
-	
+
 	// 处理设备状态和故障信息
 	if req.Status != "" {
-		// 更新设备状态
 		if err := uc.vehicleRepo.UpdateDeviceStatus(ctx, req.DeviceId, req.Status); err != nil {
 			uc.log.WithContext(ctx).Errorf("failed to update device status: %v", err)
 		}
 	}
-	
+
 	// 处理故障信息
 	if req.FaultCode != "" {
-		// 记录故障信息
-		if err := uc.vehicleRepo.UpdateDeviceFault(ctx, req.DeviceId, req.FaultCode, req.FaultMessage); err != nil {
+		fault := &DeviceFault{
+			ID:          uuid.New(),
+			DeviceID:    req.DeviceId,
+			FaultType:   "device",
+			FaultCode:   req.FaultCode,
+			Description: req.FaultMessage,
+			Severity:    "error",
+			Status:      "detected",
+			DetectedAt:  time.Now(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+		if err := uc.vehicleRepo.UpdateDeviceFault(ctx, fault); err != nil {
 			uc.log.WithContext(ctx).Errorf("failed to update device fault: %v", err)
 		}
-		
+
 		// 记录故障日志
-		if err := uc.vehicleRepo.CreateDeviceLog(ctx, req.DeviceId, "error", "error", req.FaultMessage, req.FaultCode, nil); err != nil {
+		if err := uc.vehicleRepo.CreateDeviceLog(ctx, &DeviceLog{
+			ID:        uuid.New(),
+			DeviceID:  req.DeviceId,
+			Level:     "error",
+			LogType:   "fault",
+			Message:   req.FaultMessage,
+			Detail:    req.FaultCode,
+			CreatedAt: time.Now(),
+		}); err != nil {
 			uc.log.WithContext(ctx).Errorf("failed to create device log: %v", err)
 		}
 	}
-	
+
 	// 处理设备统计信息
 	if len(req.Stats) > 0 {
 		if err := uc.vehicleRepo.UpdateDeviceStats(ctx, req.DeviceId, req.Stats); err != nil {
 			uc.log.WithContext(ctx).Errorf("failed to update device stats: %v", err)
 		}
 	}
-	
+
 	// 处理设备版本信息
 	if req.FirmwareVersion != "" {
 		if err := uc.vehicleRepo.UpdateDeviceVersion(ctx, req.DeviceId, req.FirmwareVersion, req.HardwareVersion); err != nil {
 			uc.log.WithContext(ctx).Errorf("failed to update device version: %v", err)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -185,20 +183,20 @@ func (uc *DeviceUseCase) convertDeviceToProto(d *Device) *v1.DeviceInfo {
 	}
 
 	return &v1.DeviceInfo{
-		DeviceId:            d.DeviceID,
-		Status:              d.Status,
-		LastHeartbeat:       lastHeartbeat,
-		LastOnline:          lastOnline,
-		Online:              online,
-		LaneId:              laneID,
-		LotId:               lotID,
-		DeviceType:          d.DeviceType,
-		Manufacturer:        d.Manufacturer,
-		Model:               d.Model,
-		FirmwareVersion:     d.FirmwareVersion,
-		FaultInfo:           d.FaultInfo,
-		HeartbeatCount:      int32(d.HeartbeatCount),
-		OfflineCount:        int32(d.OfflineCount),
+		DeviceId:             d.DeviceID,
+		Status:               d.Status,
+		LastHeartbeat:        lastHeartbeat,
+		LastOnline:           lastOnline,
+		Online:               online,
+		LaneId:               laneID,
+		LotId:                lotID,
+		DeviceType:           d.DeviceType,
+		Manufacturer:         d.Manufacturer,
+		Model:                d.Model,
+		FirmwareVersion:      d.FirmwareVersion,
+		FaultInfo:            d.FaultInfo,
+		HeartbeatCount:       int32(d.HeartbeatCount),
+		OfflineCount:         int32(d.OfflineCount),
 		VendorSpecificConfig: vendorConfig,
 	}
 }
@@ -244,15 +242,15 @@ func (uc *DeviceUseCase) CreateDevice(ctx context.Context, req *v1.CreateDeviceR
 	}
 
 	device := &Device{
-		DeviceID:            req.DeviceId,
-		DeviceType:          req.DeviceType,
-		Manufacturer:        req.Manufacturer,
-		Model:               req.Model,
-		FirmwareVersion:     req.FirmwareVersion,
+		DeviceID:             req.DeviceId,
+		DeviceType:           req.DeviceType,
+		Manufacturer:         req.Manufacturer,
+		Model:                req.Model,
+		FirmwareVersion:      req.FirmwareVersion,
 		VendorSpecificConfig: vendorConfig,
-		LotID:               lotID,
-		LaneID:              laneID,
-		Status:              req.Status,
+		LotID:                lotID,
+		LaneID:               laneID,
+		Status:               req.Status,
 	}
 
 	if device.Status == "" {
@@ -330,15 +328,15 @@ func (uc *DeviceUseCase) UpdateDevice(ctx context.Context, req *v1.UpdateDeviceR
 	}
 
 	device := &Device{
-		DeviceID:            req.DeviceId,
-		DeviceType:          req.DeviceType,
-		Manufacturer:        req.Manufacturer,
-		Model:               req.Model,
-		FirmwareVersion:     req.FirmwareVersion,
+		DeviceID:             req.DeviceId,
+		DeviceType:           req.DeviceType,
+		Manufacturer:         req.Manufacturer,
+		Model:                req.Model,
+		FirmwareVersion:      req.FirmwareVersion,
 		VendorSpecificConfig: vendorConfig,
-		LotID:               lotID,
-		LaneID:              laneID,
-		Status:              req.Status,
+		LotID:                lotID,
+		LaneID:               laneID,
+		Status:               req.Status,
 	}
 
 	if err := uc.vehicleRepo.UpdateDevice(ctx, device); err != nil {
@@ -571,16 +569,16 @@ func (uc *FirmwareUseCase) CreateFirmware(ctx context.Context, req *v1.CreateFir
 	}
 
 	firmware := &Firmware{
-		ID:          uuid.New(),
-		FirmwareID:  req.FirmwareId,
+		ID:           uuid.New(),
+		FirmwareID:   req.FirmwareId,
 		Manufacturer: req.Manufacturer,
-		Model:       req.Model,
-		Version:     req.Version,
-		URL:         req.Url,
-		Size:        req.Size,
-		MD5:         req.Md5,
-		Description: req.Description,
-		Status:      req.Status,
+		Model:        req.Model,
+		Version:      req.Version,
+		URL:          req.Url,
+		Size:         req.Size,
+		MD5:          req.Md5,
+		Description:  req.Description,
+		Status:       req.Status,
 	}
 
 	if firmware.Status == "" {
@@ -649,6 +647,11 @@ func (uc *FirmwareUseCase) ListFirmwares(ctx context.Context, manufacturer, mode
 	result := make([]*v1.Firmware, len(firmwares))
 	for i, f := range firmwares {
 		result[i] = uc.convertFirmwareToProto(f)
+	}
+
+	return result, total, nil
+}
+
 // UpgradeDevice handles device remote upgrade.
 func (uc *DeviceUseCase) UpgradeDevice(ctx context.Context, req *v1.UpgradeDeviceRequest) (*v1.UpgradeDeviceResponse, error) {
 	if req.DeviceId == "" {
@@ -683,16 +686,13 @@ func (uc *DeviceUseCase) UpgradeDevice(ctx context.Context, req *v1.UpgradeDevic
 	}
 
 	// Send upgrade command to device via MQTT
-	upgradeCmd := map[string]interface{}{
-		"command":         "upgrade",
-		"firmware_url":    req.FirmwareUrl,
-		"firmware_version": req.FirmwareVersion,
-		"upgrade_id":      upgradeID.String(),
-		"timestamp":       time.Now().Unix(),
-	}
-
-	topic := fmt.Sprintf("devices/%s/commands", req.DeviceId)
-	if err := uc.mqttClient.Publish(ctx, topic, upgradeCmd); err != nil {
+	if err := uc.mqttClient.PublishCommand(ctx, &mqtt.Command{
+		CommandID: upgradeID.String(),
+		DeviceID:  req.DeviceId,
+		Command:   mqtt.CommandType("upgrade"),
+		Params:    map[string]string{"firmware_url": req.FirmwareUrl, "firmware_version": req.FirmwareVersion, "upgrade_id": upgradeID.String()},
+		Timestamp: time.Now().Unix(),
+	}); err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to send upgrade command: %v", err)
 		// Update upgrade status to failed
 		_ = uc.vehicleRepo.UpdateDeviceUpgradeStatus(ctx, upgradeID, "failed", fmt.Sprintf("Failed to send upgrade command: %v", err))
@@ -704,9 +704,13 @@ func (uc *DeviceUseCase) UpgradeDevice(ctx context.Context, req *v1.UpgradeDevic
 	uc.log.WithContext(ctx).Infof("Upgrade command sent to device %s: %s", req.DeviceId, req.FirmwareVersion)
 
 	return &v1.UpgradeDeviceResponse{
-		UpgradeId: upgradeID.String(),
-		Status:    "in_progress",
-		Message:   "Upgrade command sent successfully",
+		Code:    0,
+		Message: "Upgrade command sent successfully",
+		Data: &v1.UpgradeStatusData{
+			UpgradeId: upgradeID.String(),
+			Status:    "in_progress",
+			Message:   "Upgrade command sent successfully",
+		},
 	}, nil
 }
 
@@ -730,20 +734,19 @@ func (uc *DeviceUseCase) GetDeviceUpgradeStatus(ctx context.Context, upgradeID s
 	}
 
 	return &v1.UpgradeStatusResponse{
-		UpgradeId:     upgradeID,
-		DeviceId:      upgrade.DeviceID,
-		FromVersion:   upgrade.FromVersion,
-		ToVersion:     upgrade.ToVersion,
-		Status:        upgrade.Status,
-		ErrorMessage:  upgrade.ErrorMessage,
-		StartTime:     upgrade.StartTime.Format(time.RFC3339),
-		EndTime:       func() string {
+		UpgradeId:    upgradeID,
+		DeviceId:     upgrade.DeviceID,
+		FromVersion:  upgrade.FromVersion,
+		ToVersion:    upgrade.ToVersion,
+		Status:       upgrade.Status,
+		ErrorMessage: upgrade.ErrorMessage,
+		StartTime:    upgrade.StartTime.Format(time.RFC3339),
+		EndTime: func() string {
 			if upgrade.EndTime != nil {
 				return upgrade.EndTime.Format(time.RFC3339)
 			}
 			return ""
 		}(),
-		Duration:      upgrade.Duration,
 	}, nil
 }
 
@@ -761,14 +764,13 @@ func (uc *DeviceUseCase) GetDeviceLogs(ctx context.Context, deviceID string, pag
 	result := make([]*v1.DeviceLog, len(logs))
 	for i, log := range logs {
 		result[i] = &v1.DeviceLog{
-			Id:         log.ID.String(),
-			DeviceId:   log.DeviceID,
-			LogType:    log.LogType,
-			LogLevel:   log.LogLevel,
-			Message:    log.Message,
-			FaultCode:  log.FaultCode,
-			Details:    log.Details,
-			CreatedAt:  log.CreatedAt.Format(time.RFC3339),
+			Id:        log.ID.String(),
+			DeviceId:  log.DeviceID,
+			Level:     log.Level,
+			LogType:   log.LogType,
+			Message:   log.Message,
+			Detail:    log.Detail,
+			CreatedAt: log.CreatedAt.Format(time.RFC3339),
 		}
 	}
 
@@ -796,16 +798,16 @@ func (uc *FirmwareUseCase) UpdateFirmware(ctx context.Context, req *v1.UpdateFir
 	}
 
 	firmware := &Firmware{
-		ID:          firmwareID,
-		FirmwareID:  req.FirmwareId,
+		ID:           firmwareID,
+		FirmwareID:   req.FirmwareId,
 		Manufacturer: req.Manufacturer,
-		Model:       req.Model,
-		Version:     req.Version,
-		URL:         req.Url,
-		Size:        req.Size,
-		MD5:         req.Md5,
-		Description: req.Description,
-		Status:      req.Status,
+		Model:        req.Model,
+		Version:      req.Version,
+		URL:          req.Url,
+		Size:         req.Size,
+		MD5:          req.Md5,
+		Description:  req.Description,
+		Status:       req.Status,
 	}
 
 	if err := uc.vehicleRepo.UpdateFirmware(ctx, firmware); err != nil {
@@ -871,19 +873,19 @@ func (uc *FirmwareUseCase) GetLatestFirmware(ctx context.Context, manufacturer, 
 // convertFirmwareToProto converts biz.Firmware to v1.Firmware.
 func (uc *FirmwareUseCase) convertFirmwareToProto(f *Firmware) *v1.Firmware {
 	return &v1.Firmware{
-		Id:          f.ID.String(),
-		FirmwareId:  f.FirmwareID,
+		Id:           f.ID.String(),
+		FirmwareId:   f.FirmwareID,
 		Manufacturer: f.Manufacturer,
-		Model:       f.Model,
-		Version:     f.Version,
-		Url:         f.URL,
-		Size:        f.Size,
-		Md5:         f.MD5,
-		Description: f.Description,
-		Status:      f.Status,
-		ReleaseDate: f.ReleaseDate.Format(time.RFC3339),
-		CreatedAt:   f.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:   f.UpdatedAt.Format(time.RFC3339),
+		Model:        f.Model,
+		Version:      f.Version,
+		Url:          f.URL,
+		Size:         f.Size,
+		Md5:          f.MD5,
+		Description:  f.Description,
+		Status:       f.Status,
+		ReleaseDate:  f.ReleaseDate.Format(time.RFC3339),
+		CreatedAt:    f.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:    f.UpdatedAt.Format(time.RFC3339),
 	}
 }
 
@@ -959,8 +961,6 @@ func (uc *DevicePerformanceUseCase) GetDevicePerformance(ctx context.Context, re
 
 // GetDevicePerformanceLatest retrieves the latest device performance record.
 func (uc *DevicePerformanceUseCase) GetDevicePerformanceLatest(ctx context.Context, deviceID string) (*v1.DevicePerformance, error) {
-// GetDeviceStats retrieves device statistics.
-func (uc *DeviceUseCase) GetDeviceStats(ctx context.Context, deviceID string) (*v1.DeviceStatsResponse, error) {
 	if deviceID == "" {
 		return nil, fmt.Errorf("device id is required")
 	}
@@ -1146,62 +1146,12 @@ func NewDeviceStatsUseCase(vehicleRepo VehicleRepo, logger log.Logger) *DeviceSt
 }
 
 // GetDeviceUsageStats retrieves device usage statistics.
-func (uc *DeviceStatsUseCase) GetDeviceUsageStats(ctx context.Context, req *v1.GetDeviceUsageStatsRequest) (map[string]interface{}, error) {
-	device, err := uc.vehicleRepo.GetDeviceByID(ctx, deviceID)
+func (uc *DeviceStatsUseCase) GetDeviceUsageStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error) {
+	stats, err := uc.vehicleRepo.GetDeviceUsageStats(ctx, deviceID, startTime, endTime)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get device: %w", err)
+		return nil, fmt.Errorf("failed to get device usage stats: %w", err)
 	}
-	if device == nil {
-		return nil, fmt.Errorf("device not found: %s", deviceID)
-	}
-
-	// Calculate uptime
-	var uptime int64
-	if device.LastHeartbeat != nil {
-		uptime = time.Since(*device.LastHeartbeat).Seconds()
-	}
-
-	// Get device logs count
-	errorCount, err := uc.vehicleRepo.GetDeviceLogCount(ctx, deviceID, "error")
-	if err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to get error count: %v", err)
-		errorCount = 0
-	}
-
-	warningCount, err := uc.vehicleRepo.GetDeviceLogCount(ctx, deviceID, "warning")
-	if err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to get warning count: %v", err)
-		warningCount = 0
-	}
-
-	return &v1.DeviceStatsResponse{
-		DeviceId:        device.DeviceID,
-		FirmwareVersion: device.FirmwareVersion,
-		HardwareVersion: device.HardwareVersion,
-		Status:          device.Status,
-		Uptime:          uptime,
-		ErrorCount:      errorCount,
-		WarningCount:    warningCount,
-		Stats:           device.DeviceStats,
-		LastHeartbeat:   func() string {
-			if device.LastHeartbeat != nil {
-				return device.LastHeartbeat.Format(time.RFC3339)
-			}
-			return ""
-		}(),
-		LastFaultTime:   func() string {
-			if device.LastFaultTime != nil {
-				return device.LastFaultTime.Format(time.RFC3339)
-			}
-			return ""
-		}(),
-		LastUpgradeTime: func() string {
-			if device.LastUpgradeTime != nil {
-				return device.LastUpgradeTime.Format(time.RFC3339)
-			}
-			return ""
-		}(),
-	}, nil
+	return stats, nil
 }
 
 // UpdateDeviceConfig updates device configuration.
@@ -1210,45 +1160,53 @@ func (uc *DeviceUseCase) UpdateDeviceConfig(ctx context.Context, req *v1.UpdateD
 		return nil, fmt.Errorf("device id is required")
 	}
 
-	startTime, err := time.Parse(time.RFC3339, req.StartTime)
+	// Check if device exists
+	device, err := uc.vehicleRepo.GetDeviceByID(ctx, req.DeviceId)
 	if err != nil {
-		startTime = time.Now().Add(-7 * 24 * time.Hour)
+		return nil, fmt.Errorf("failed to get device: %w", err)
+	}
+	if device == nil {
+		return nil, fmt.Errorf("device not found: %s", req.DeviceId)
 	}
 
-	endTime, err := time.Parse(time.RFC3339, req.EndTime)
-	if err != nil {
-		endTime = time.Now()
+	// Update device vendor-specific config
+	config := make(map[string]interface{})
+	for k, v := range req.Config {
+		config[k] = v
+	}
+	device.VendorSpecificConfig = config
+	if err := uc.vehicleRepo.UpdateDevice(ctx, device); err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to update device config: %v", err)
+		return nil, fmt.Errorf("failed to update device config: %w", err)
 	}
 
-	stats, err := uc.vehicleRepo.GetDeviceUsageStats(ctx, req.DeviceId, startTime, endTime)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get device usage stats: %w", err)
-	}
+	// Send config update command to device via MQTT
+		if uc.mqttClient != nil {
+			if err := uc.mqttClient.PublishCommand(ctx, &mqtt.Command{
+				CommandID: uuid.New().String(),
+				DeviceID:  req.DeviceId,
+				Command:   mqtt.CommandType("config"),
+				Params:    nil,
+				Timestamp: time.Now().Unix(),
+			}); err != nil {
+				uc.log.WithContext(ctx).Errorf("failed to send config command: %v", err)
+			}
+		}
 
-	return stats, nil
+	uc.log.WithContext(ctx).Infof("Config updated for device %s", req.DeviceId)
+
+	return &v1.UpdateDeviceConfigResponse{
+		Code:    0,
+		Message: "Device config updated successfully",
+	}, nil
 }
 
 // GetDeviceFaultStats retrieves device fault statistics.
-func (uc *DeviceStatsUseCase) GetDeviceFaultStats(ctx context.Context, req *v1.GetDeviceFaultStatsRequest) (map[string]interface{}, error) {
-	if req.DeviceId == "" {
-		return nil, fmt.Errorf("device id is required")
-	}
-
-	startTime, err := time.Parse(time.RFC3339, req.StartTime)
-	if err != nil {
-		startTime = time.Now().Add(-30 * 24 * time.Hour)
-	}
-
-	endTime, err := time.Parse(time.RFC3339, req.EndTime)
-	if err != nil {
-		endTime = time.Now()
-	}
-
-	stats, err := uc.vehicleRepo.GetDeviceFaultStats(ctx, req.DeviceId, startTime, endTime)
+func (uc *DeviceStatsUseCase) GetDeviceFaultStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error) {
+	stats, err := uc.vehicleRepo.GetDeviceFaultStats(ctx, deviceID, startTime, endTime)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get device fault stats: %w", err)
 	}
-
 	return stats, nil
 }
 
@@ -1264,38 +1222,4 @@ func (uc *DeviceStatsUseCase) GetDeviceStatsSummary(ctx context.Context, deviceI
 	}
 
 	return stats, nil
-	// Check if device exists
-	device, err := uc.vehicleRepo.GetDeviceByID(ctx, req.DeviceId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get device: %w", err)
-	}
-	if device == nil {
-		return nil, fmt.Errorf("device not found: %s", req.DeviceId)
-	}
-
-	// Update device configuration
-	if err := uc.vehicleRepo.UpdateDeviceConfig(ctx, req.DeviceId, req.Config); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to update device config: %v", err)
-		return nil, fmt.Errorf("failed to update device config: %w", err)
-	}
-
-	// Send config update command to device via MQTT
-	configCmd := map[string]interface{}{
-		"command":   "config",
-		"config":    req.Config,
-		"timestamp": time.Now().Unix(),
-	}
-
-	topic := fmt.Sprintf("devices/%s/commands", req.DeviceId)
-	if err := uc.mqttClient.Publish(ctx, topic, configCmd); err != nil {
-		uc.log.WithContext(ctx).Errorf("failed to send config command: %v", err)
-		// Config update is still successful in database, just log the error
-	}
-
-	uc.log.WithContext(ctx).Infof("Config updated for device %s", req.DeviceId)
-
-	return &v1.UpdateDeviceConfigResponse{
-		Status:  "success",
-		Message: "Device config updated successfully",
-	}, nil
 }

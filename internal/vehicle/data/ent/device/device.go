@@ -15,6 +15,8 @@ const (
 	Label = "device"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldDeviceID holds the string denoting the device_id field in the database.
 	FieldDeviceID = "device_id"
 	// FieldLotID holds the string denoting the lot_id field in the database.
@@ -25,6 +27,14 @@ const (
 	FieldDeviceSecret = "device_secret"
 	// FieldDeviceType holds the string denoting the device_type field in the database.
 	FieldDeviceType = "device_type"
+	// FieldManufacturer holds the string denoting the manufacturer field in the database.
+	FieldManufacturer = "manufacturer"
+	// FieldModel holds the string denoting the model field in the database.
+	FieldModel = "model"
+	// FieldFirmwareVersion holds the string denoting the firmware_version field in the database.
+	FieldFirmwareVersion = "firmware_version"
+	// FieldVendorSpecificConfig holds the string denoting the vendor_specific_config field in the database.
+	FieldVendorSpecificConfig = "vendor_specific_config"
 	// FieldGateID holds the string denoting the gate_id field in the database.
 	FieldGateID = "gate_id"
 	// FieldEnabled holds the string denoting the enabled field in the database.
@@ -33,6 +43,30 @@ const (
 	FieldStatus = "status"
 	// FieldLastHeartbeat holds the string denoting the last_heartbeat field in the database.
 	FieldLastHeartbeat = "last_heartbeat"
+	// FieldLastOnline holds the string denoting the last_online field in the database.
+	FieldLastOnline = "last_online"
+	// FieldFaultInfo holds the string denoting the fault_info field in the database.
+	FieldFaultInfo = "fault_info"
+	// FieldHeartbeatCount holds the string denoting the heartbeat_count field in the database.
+	FieldHeartbeatCount = "heartbeat_count"
+	// FieldOfflineCount holds the string denoting the offline_count field in the database.
+	FieldOfflineCount = "offline_count"
+	// FieldHardwareVersion holds the string denoting the hardware_version field in the database.
+	FieldHardwareVersion = "hardware_version"
+	// FieldDeviceConfig holds the string denoting the device_config field in the database.
+	FieldDeviceConfig = "device_config"
+	// FieldDeviceStats holds the string denoting the device_stats field in the database.
+	FieldDeviceStats = "device_stats"
+	// FieldFaultCode holds the string denoting the fault_code field in the database.
+	FieldFaultCode = "fault_code"
+	// FieldFaultMessage holds the string denoting the fault_message field in the database.
+	FieldFaultMessage = "fault_message"
+	// FieldLastFaultTime holds the string denoting the last_fault_time field in the database.
+	FieldLastFaultTime = "last_fault_time"
+	// FieldLastUpgradeTime holds the string denoting the last_upgrade_time field in the database.
+	FieldLastUpgradeTime = "last_upgrade_time"
+	// FieldLocation holds the string denoting the location field in the database.
+	FieldLocation = "location"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -44,15 +78,32 @@ const (
 // Columns holds all SQL columns for device fields.
 var Columns = []string{
 	FieldID,
+	FieldTenantID,
 	FieldDeviceID,
 	FieldLotID,
 	FieldLaneID,
 	FieldDeviceSecret,
 	FieldDeviceType,
+	FieldManufacturer,
+	FieldModel,
+	FieldFirmwareVersion,
+	FieldVendorSpecificConfig,
 	FieldGateID,
 	FieldEnabled,
 	FieldStatus,
 	FieldLastHeartbeat,
+	FieldLastOnline,
+	FieldFaultInfo,
+	FieldHeartbeatCount,
+	FieldOfflineCount,
+	FieldHardwareVersion,
+	FieldDeviceConfig,
+	FieldDeviceStats,
+	FieldFaultCode,
+	FieldFaultMessage,
+	FieldLastFaultTime,
+	FieldLastUpgradeTime,
+	FieldLocation,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -72,10 +123,30 @@ var (
 	DeviceIDValidator func(string) error
 	// DeviceSecretValidator is a validator for the "device_secret" field. It is called by the builders before save.
 	DeviceSecretValidator func(string) error
+	// ManufacturerValidator is a validator for the "manufacturer" field. It is called by the builders before save.
+	ManufacturerValidator func(string) error
+	// ModelValidator is a validator for the "model" field. It is called by the builders before save.
+	ModelValidator func(string) error
+	// FirmwareVersionValidator is a validator for the "firmware_version" field. It is called by the builders before save.
+	FirmwareVersionValidator func(string) error
 	// GateIDValidator is a validator for the "gate_id" field. It is called by the builders before save.
 	GateIDValidator func(string) error
 	// DefaultEnabled holds the default value on creation for the "enabled" field.
 	DefaultEnabled bool
+	// FaultInfoValidator is a validator for the "fault_info" field. It is called by the builders before save.
+	FaultInfoValidator func(string) error
+	// DefaultHeartbeatCount holds the default value on creation for the "heartbeat_count" field.
+	DefaultHeartbeatCount int
+	// DefaultOfflineCount holds the default value on creation for the "offline_count" field.
+	DefaultOfflineCount int
+	// HardwareVersionValidator is a validator for the "hardware_version" field. It is called by the builders before save.
+	HardwareVersionValidator func(string) error
+	// FaultCodeValidator is a validator for the "fault_code" field. It is called by the builders before save.
+	FaultCodeValidator func(string) error
+	// FaultMessageValidator is a validator for the "fault_message" field. It is called by the builders before save.
+	FaultMessageValidator func(string) error
+	// LocationValidator is a validator for the "location" field. It is called by the builders before save.
+	LocationValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -120,9 +191,11 @@ const DefaultStatus = StatusActive
 
 // Status values.
 const (
-	StatusActive   Status = "active"
-	StatusOffline  Status = "offline"
-	StatusDisabled Status = "disabled"
+	StatusActive    Status = "active"
+	StatusOffline   Status = "offline"
+	StatusDisabled  Status = "disabled"
+	StatusUpgrading Status = "upgrading"
+	StatusFault     Status = "fault"
 )
 
 func (s Status) String() string {
@@ -132,7 +205,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusActive, StatusOffline, StatusDisabled:
+	case StatusActive, StatusOffline, StatusDisabled, StatusUpgrading, StatusFault:
 		return nil
 	default:
 		return fmt.Errorf("device: invalid enum value for status field: %q", s)
@@ -145,6 +218,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByDeviceID orders the results by the device_id field.
@@ -172,6 +250,21 @@ func ByDeviceType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeviceType, opts...).ToFunc()
 }
 
+// ByManufacturer orders the results by the manufacturer field.
+func ByManufacturer(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldManufacturer, opts...).ToFunc()
+}
+
+// ByModel orders the results by the model field.
+func ByModel(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldModel, opts...).ToFunc()
+}
+
+// ByFirmwareVersion orders the results by the firmware_version field.
+func ByFirmwareVersion(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirmwareVersion, opts...).ToFunc()
+}
+
 // ByGateID orders the results by the gate_id field.
 func ByGateID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGateID, opts...).ToFunc()
@@ -190,6 +283,56 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByLastHeartbeat orders the results by the last_heartbeat field.
 func ByLastHeartbeat(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastHeartbeat, opts...).ToFunc()
+}
+
+// ByLastOnline orders the results by the last_online field.
+func ByLastOnline(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastOnline, opts...).ToFunc()
+}
+
+// ByFaultInfo orders the results by the fault_info field.
+func ByFaultInfo(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFaultInfo, opts...).ToFunc()
+}
+
+// ByHeartbeatCount orders the results by the heartbeat_count field.
+func ByHeartbeatCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHeartbeatCount, opts...).ToFunc()
+}
+
+// ByOfflineCount orders the results by the offline_count field.
+func ByOfflineCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOfflineCount, opts...).ToFunc()
+}
+
+// ByHardwareVersion orders the results by the hardware_version field.
+func ByHardwareVersion(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHardwareVersion, opts...).ToFunc()
+}
+
+// ByFaultCode orders the results by the fault_code field.
+func ByFaultCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFaultCode, opts...).ToFunc()
+}
+
+// ByFaultMessage orders the results by the fault_message field.
+func ByFaultMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFaultMessage, opts...).ToFunc()
+}
+
+// ByLastFaultTime orders the results by the last_fault_time field.
+func ByLastFaultTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastFaultTime, opts...).ToFunc()
+}
+
+// ByLastUpgradeTime orders the results by the last_upgrade_time field.
+func ByLastUpgradeTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastUpgradeTime, opts...).ToFunc()
+}
+
+// ByLocation orders the results by the location field.
+func ByLocation(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLocation, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

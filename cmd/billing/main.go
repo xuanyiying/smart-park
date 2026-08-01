@@ -13,6 +13,7 @@ import (
 
 	v1 "github.com/xuanyiying/smart-park/api/billing/v1"
 	"github.com/xuanyiying/smart-park/internal/billing/biz"
+	"github.com/xuanyiying/smart-park/internal/billing/data"
 	"github.com/xuanyiying/smart-park/internal/billing/data/ent"
 	"github.com/xuanyiying/smart-park/internal/billing/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
@@ -66,16 +67,16 @@ func main() {
 	}
 
 	// Connect to database with read-write separation
-	dbCfg := &database.Config{
+	dbCfg := &database.RWConfig{
 		Primary: struct {
 			Source string
 		}{
-			Source: cfg.Database.Primary.Source,
+			Source: cfg.Database.Source,
 		},
 		Replica: struct {
 			Source string
 		}{
-			Source: cfg.Database.Replica.Source,
+			Source: cfg.Database.Source,
 		},
 	}
 	dbManager, err := database.NewDBManager(dbCfg)
@@ -86,7 +87,7 @@ func main() {
 	defer dbManager.Close()
 
 	// Connect to database using ent
-	dbClient, err := ent.Open("postgres", dbManager.Primary())
+	dbClient, err := ent.Open("postgres", cfg.Database.Source)
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)

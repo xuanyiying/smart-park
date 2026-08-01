@@ -19,7 +19,9 @@ type Lane struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// 所属停车场ID
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
+	// 停车场ID
 	LotID uuid.UUID `json:"lot_id,omitempty"`
 	// 车道编号
 	LaneNo int `json:"lane_no,omitempty"`
@@ -49,7 +51,7 @@ func (*Lane) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case lane.FieldCreatedAt, lane.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case lane.FieldID, lane.FieldLotID:
+		case lane.FieldID, lane.FieldTenantID, lane.FieldLotID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -71,6 +73,12 @@ func (_m *Lane) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case lane.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case lane.FieldLotID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -152,6 +160,9 @@ func (_m *Lane) String() string {
 	var builder strings.Builder
 	builder.WriteString("Lane(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("lot_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.LotID))
 	builder.WriteString(", ")

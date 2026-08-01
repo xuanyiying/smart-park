@@ -16,8 +16,20 @@ type Tx struct {
 	BillingRule *BillingRuleClient
 	// Device is the client for interacting with the Device builders.
 	Device *DeviceClient
+	// DeviceFault is the client for interacting with the DeviceFault builders.
+	DeviceFault *DeviceFaultClient
+	// DeviceLog is the client for interacting with the DeviceLog builders.
+	DeviceLog *DeviceLogClient
+	// DevicePerformance is the client for interacting with the DevicePerformance builders.
+	DevicePerformance *DevicePerformanceClient
+	// DeviceUpgrade is the client for interacting with the DeviceUpgrade builders.
+	DeviceUpgrade *DeviceUpgradeClient
+	// Firmware is the client for interacting with the Firmware builders.
+	Firmware *FirmwareClient
 	// Lane is the client for interacting with the Lane builders.
 	Lane *LaneClient
+	// Manufacturer is the client for interacting with the Manufacturer builders.
+	Manufacturer *ManufacturerClient
 	// OfflineSyncRecord is the client for interacting with the OfflineSyncRecord builders.
 	OfflineSyncRecord *OfflineSyncRecordClient
 	// ParkingRecord is the client for interacting with the ParkingRecord builders.
@@ -157,7 +169,13 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.BillingRule = NewBillingRuleClient(tx.config)
 	tx.Device = NewDeviceClient(tx.config)
+	tx.DeviceFault = NewDeviceFaultClient(tx.config)
+	tx.DeviceLog = NewDeviceLogClient(tx.config)
+	tx.DevicePerformance = NewDevicePerformanceClient(tx.config)
+	tx.DeviceUpgrade = NewDeviceUpgradeClient(tx.config)
+	tx.Firmware = NewFirmwareClient(tx.config)
 	tx.Lane = NewLaneClient(tx.config)
+	tx.Manufacturer = NewManufacturerClient(tx.config)
 	tx.OfflineSyncRecord = NewOfflineSyncRecordClient(tx.config)
 	tx.ParkingRecord = NewParkingRecordClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)

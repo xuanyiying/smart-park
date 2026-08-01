@@ -18,6 +18,8 @@ type OfflineSyncRecord struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
 	// 设备本地流水号
 	OfflineID string `json:"offline_id,omitempty"`
 	// 停车记录ID
@@ -60,7 +62,7 @@ func (*OfflineSyncRecord) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case offlinesyncrecord.FieldOpenTime, offlinesyncrecord.FieldSyncedAt, offlinesyncrecord.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case offlinesyncrecord.FieldID:
+		case offlinesyncrecord.FieldID, offlinesyncrecord.FieldTenantID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -82,6 +84,12 @@ func (_m *OfflineSyncRecord) assignValues(columns []string, values []any) error 
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case offlinesyncrecord.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case offlinesyncrecord.FieldOfflineID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -194,6 +202,9 @@ func (_m *OfflineSyncRecord) String() string {
 	var builder strings.Builder
 	builder.WriteString("OfflineSyncRecord(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("offline_id=")
 	builder.WriteString(_m.OfflineID)
 	builder.WriteString(", ")

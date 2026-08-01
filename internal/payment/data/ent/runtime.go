@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliation"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/refundapproval"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/schema"
 )
@@ -75,6 +76,46 @@ func init() {
 	orderDescID := orderFields[0].Descriptor()
 	// order.DefaultID holds the default value on creation for the id field.
 	order.DefaultID = orderDescID.Default.(func() uuid.UUID)
+	reconciliationFields := schema.Reconciliation{}.Fields()
+	_ = reconciliationFields
+	// reconciliationDescPaymentMethod is the schema descriptor for payment_method field.
+	reconciliationDescPaymentMethod := reconciliationFields[2].Descriptor()
+	// reconciliation.PaymentMethodValidator is a validator for the "payment_method" field. It is called by the builders before save.
+	reconciliation.PaymentMethodValidator = reconciliationDescPaymentMethod.Validators[0].(func(string) error)
+	// reconciliationDescOrderAmount is the schema descriptor for order_amount field.
+	reconciliationDescOrderAmount := reconciliationFields[3].Descriptor()
+	// reconciliation.OrderAmountValidator is a validator for the "order_amount" field. It is called by the builders before save.
+	reconciliation.OrderAmountValidator = reconciliationDescOrderAmount.Validators[0].(func(float64) error)
+	// reconciliationDescPaidAmount is the schema descriptor for paid_amount field.
+	reconciliationDescPaidAmount := reconciliationFields[4].Descriptor()
+	// reconciliation.PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
+	reconciliation.PaidAmountValidator = reconciliationDescPaidAmount.Validators[0].(func(float64) error)
+	// reconciliationDescTransactionID is the schema descriptor for transaction_id field.
+	reconciliationDescTransactionID := reconciliationFields[5].Descriptor()
+	// reconciliation.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
+	reconciliation.TransactionIDValidator = reconciliationDescTransactionID.Validators[0].(func(string) error)
+	// reconciliationDescReconciliationTime is the schema descriptor for reconciliation_time field.
+	reconciliationDescReconciliationTime := reconciliationFields[6].Descriptor()
+	// reconciliation.DefaultReconciliationTime holds the default value on creation for the reconciliation_time field.
+	reconciliation.DefaultReconciliationTime = reconciliationDescReconciliationTime.Default.(func() time.Time)
+	// reconciliationDescNotes is the schema descriptor for notes field.
+	reconciliationDescNotes := reconciliationFields[8].Descriptor()
+	// reconciliation.NotesValidator is a validator for the "notes" field. It is called by the builders before save.
+	reconciliation.NotesValidator = reconciliationDescNotes.Validators[0].(func(string) error)
+	// reconciliationDescCreatedAt is the schema descriptor for created_at field.
+	reconciliationDescCreatedAt := reconciliationFields[9].Descriptor()
+	// reconciliation.DefaultCreatedAt holds the default value on creation for the created_at field.
+	reconciliation.DefaultCreatedAt = reconciliationDescCreatedAt.Default.(func() time.Time)
+	// reconciliationDescUpdatedAt is the schema descriptor for updated_at field.
+	reconciliationDescUpdatedAt := reconciliationFields[10].Descriptor()
+	// reconciliation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	reconciliation.DefaultUpdatedAt = reconciliationDescUpdatedAt.Default.(func() time.Time)
+	// reconciliation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	reconciliation.UpdateDefaultUpdatedAt = reconciliationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// reconciliationDescID is the schema descriptor for id field.
+	reconciliationDescID := reconciliationFields[0].Descriptor()
+	// reconciliation.DefaultID holds the default value on creation for the id field.
+	reconciliation.DefaultID = reconciliationDescID.Default.(func() uuid.UUID)
 	refundapprovalFields := schema.RefundApproval{}.Fields()
 	_ = refundapprovalFields
 	// refundapprovalDescApplicant is the schema descriptor for applicant field.

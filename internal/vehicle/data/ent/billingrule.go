@@ -19,6 +19,8 @@ type BillingRule struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
 	// 停车场ID
 	LotID uuid.UUID `json:"lot_id,omitempty"`
 	// 规则名称
@@ -57,7 +59,7 @@ func (*BillingRule) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case billingrule.FieldCreatedAt, billingrule.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case billingrule.FieldID, billingrule.FieldLotID:
+		case billingrule.FieldID, billingrule.FieldTenantID, billingrule.FieldLotID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -79,6 +81,12 @@ func (_m *BillingRule) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case billingrule.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case billingrule.FieldLotID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -178,6 +186,9 @@ func (_m *BillingRule) String() string {
 	var builder strings.Builder
 	builder.WriteString("BillingRule(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("lot_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.LotID))
 	builder.WriteString(", ")

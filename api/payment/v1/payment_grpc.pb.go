@@ -19,11 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PaymentService_CreatePayment_FullMethodName    = "/api.payment.v1.PaymentService/CreatePayment"
-	PaymentService_GetPaymentStatus_FullMethodName = "/api.payment.v1.PaymentService/GetPaymentStatus"
-	PaymentService_WechatCallback_FullMethodName   = "/api.payment.v1.PaymentService/WechatCallback"
-	PaymentService_AlipayCallback_FullMethodName   = "/api.payment.v1.PaymentService/AlipayCallback"
-	PaymentService_Refund_FullMethodName           = "/api.payment.v1.PaymentService/Refund"
+	PaymentService_CreatePayment_FullMethodName           = "/api.payment.v1.PaymentService/CreatePayment"
+	PaymentService_GetPaymentStatus_FullMethodName        = "/api.payment.v1.PaymentService/GetPaymentStatus"
+	PaymentService_WechatCallback_FullMethodName          = "/api.payment.v1.PaymentService/WechatCallback"
+	PaymentService_AlipayCallback_FullMethodName          = "/api.payment.v1.PaymentService/AlipayCallback"
+	PaymentService_Refund_FullMethodName                  = "/api.payment.v1.PaymentService/Refund"
+	PaymentService_ReconcileDaily_FullMethodName          = "/api.payment.v1.PaymentService/ReconcileDaily"
+	PaymentService_GetReconciliationReport_FullMethodName = "/api.payment.v1.PaymentService/GetReconciliationReport"
+	PaymentService_FixMismatchedOrders_FullMethodName     = "/api.payment.v1.PaymentService/FixMismatchedOrders"
 )
 
 // PaymentServiceClient is the client API for PaymentService service.
@@ -35,6 +38,9 @@ type PaymentServiceClient interface {
 	WechatCallback(ctx context.Context, in *WechatCallbackRequest, opts ...grpc.CallOption) (*WechatCallbackResponse, error)
 	AlipayCallback(ctx context.Context, in *AlipayCallbackRequest, opts ...grpc.CallOption) (*AlipayCallbackResponse, error)
 	Refund(ctx context.Context, in *RefundRequest, opts ...grpc.CallOption) (*RefundResponse, error)
+	ReconcileDaily(ctx context.Context, in *ReconcileDailyRequest, opts ...grpc.CallOption) (*ReconcileDailyResponse, error)
+	GetReconciliationReport(ctx context.Context, in *GetReconciliationReportRequest, opts ...grpc.CallOption) (*GetReconciliationReportResponse, error)
+	FixMismatchedOrders(ctx context.Context, in *FixMismatchedOrdersRequest, opts ...grpc.CallOption) (*FixMismatchedOrdersResponse, error)
 }
 
 type paymentServiceClient struct {
@@ -95,6 +101,36 @@ func (c *paymentServiceClient) Refund(ctx context.Context, in *RefundRequest, op
 	return out, nil
 }
 
+func (c *paymentServiceClient) ReconcileDaily(ctx context.Context, in *ReconcileDailyRequest, opts ...grpc.CallOption) (*ReconcileDailyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReconcileDailyResponse)
+	err := c.cc.Invoke(ctx, PaymentService_ReconcileDaily_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) GetReconciliationReport(ctx context.Context, in *GetReconciliationReportRequest, opts ...grpc.CallOption) (*GetReconciliationReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetReconciliationReportResponse)
+	err := c.cc.Invoke(ctx, PaymentService_GetReconciliationReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) FixMismatchedOrders(ctx context.Context, in *FixMismatchedOrdersRequest, opts ...grpc.CallOption) (*FixMismatchedOrdersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FixMismatchedOrdersResponse)
+	err := c.cc.Invoke(ctx, PaymentService_FixMismatchedOrders_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PaymentServiceServer is the server API for PaymentService service.
 // All implementations must embed UnimplementedPaymentServiceServer
 // for forward compatibility.
@@ -104,6 +140,9 @@ type PaymentServiceServer interface {
 	WechatCallback(context.Context, *WechatCallbackRequest) (*WechatCallbackResponse, error)
 	AlipayCallback(context.Context, *AlipayCallbackRequest) (*AlipayCallbackResponse, error)
 	Refund(context.Context, *RefundRequest) (*RefundResponse, error)
+	ReconcileDaily(context.Context, *ReconcileDailyRequest) (*ReconcileDailyResponse, error)
+	GetReconciliationReport(context.Context, *GetReconciliationReportRequest) (*GetReconciliationReportResponse, error)
+	FixMismatchedOrders(context.Context, *FixMismatchedOrdersRequest) (*FixMismatchedOrdersResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
 
@@ -128,6 +167,15 @@ func (UnimplementedPaymentServiceServer) AlipayCallback(context.Context, *Alipay
 }
 func (UnimplementedPaymentServiceServer) Refund(context.Context, *RefundRequest) (*RefundResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Refund not implemented")
+}
+func (UnimplementedPaymentServiceServer) ReconcileDaily(context.Context, *ReconcileDailyRequest) (*ReconcileDailyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReconcileDaily not implemented")
+}
+func (UnimplementedPaymentServiceServer) GetReconciliationReport(context.Context, *GetReconciliationReportRequest) (*GetReconciliationReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetReconciliationReport not implemented")
+}
+func (UnimplementedPaymentServiceServer) FixMismatchedOrders(context.Context, *FixMismatchedOrdersRequest) (*FixMismatchedOrdersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FixMismatchedOrders not implemented")
 }
 func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
 func (UnimplementedPaymentServiceServer) testEmbeddedByValue()                        {}
@@ -240,6 +288,60 @@ func _PaymentService_Refund_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PaymentService_ReconcileDaily_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReconcileDailyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).ReconcileDaily(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_ReconcileDaily_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).ReconcileDaily(ctx, req.(*ReconcileDailyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_GetReconciliationReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetReconciliationReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).GetReconciliationReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_GetReconciliationReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).GetReconciliationReport(ctx, req.(*GetReconciliationReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_FixMismatchedOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FixMismatchedOrdersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).FixMismatchedOrders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_FixMismatchedOrders_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).FixMismatchedOrders(ctx, req.(*FixMismatchedOrdersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PaymentService_ServiceDesc is the grpc.ServiceDesc for PaymentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +368,18 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Refund",
 			Handler:    _PaymentService_Refund_Handler,
+		},
+		{
+			MethodName: "ReconcileDaily",
+			Handler:    _PaymentService_ReconcileDaily_Handler,
+		},
+		{
+			MethodName: "GetReconciliationReport",
+			Handler:    _PaymentService_GetReconciliationReport_Handler,
+		},
+		{
+			MethodName: "FixMismatchedOrders",
+			Handler:    _PaymentService_FixMismatchedOrders_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

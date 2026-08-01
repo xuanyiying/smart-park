@@ -19,19 +19,46 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	VehicleService_Entry_FullMethodName              = "/api.vehicle.v1.VehicleService/Entry"
-	VehicleService_Exit_FullMethodName               = "/api.vehicle.v1.VehicleService/Exit"
-	VehicleService_Heartbeat_FullMethodName          = "/api.vehicle.v1.VehicleService/Heartbeat"
-	VehicleService_GetDeviceStatus_FullMethodName    = "/api.vehicle.v1.VehicleService/GetDeviceStatus"
-	VehicleService_SendCommand_FullMethodName        = "/api.vehicle.v1.VehicleService/SendCommand"
-	VehicleService_GetVehicleInfo_FullMethodName     = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
-	VehicleService_ListParkingRecords_FullMethodName = "/api.vehicle.v1.VehicleService/ListParkingRecords"
-	VehicleService_GetParkingRecord_FullMethodName   = "/api.vehicle.v1.VehicleService/GetParkingRecord"
-	VehicleService_ListDevices_FullMethodName        = "/api.vehicle.v1.VehicleService/ListDevices"
-	VehicleService_CreateDevice_FullMethodName       = "/api.vehicle.v1.VehicleService/CreateDevice"
-	VehicleService_GetDevice_FullMethodName          = "/api.vehicle.v1.VehicleService/GetDevice"
-	VehicleService_UpdateDevice_FullMethodName       = "/api.vehicle.v1.VehicleService/UpdateDevice"
-	VehicleService_DeleteDevice_FullMethodName       = "/api.vehicle.v1.VehicleService/DeleteDevice"
+	VehicleService_Entry_FullMethodName                      = "/api.vehicle.v1.VehicleService/Entry"
+	VehicleService_Exit_FullMethodName                       = "/api.vehicle.v1.VehicleService/Exit"
+	VehicleService_Heartbeat_FullMethodName                  = "/api.vehicle.v1.VehicleService/Heartbeat"
+	VehicleService_GetDeviceStatus_FullMethodName            = "/api.vehicle.v1.VehicleService/GetDeviceStatus"
+	VehicleService_SendCommand_FullMethodName                = "/api.vehicle.v1.VehicleService/SendCommand"
+	VehicleService_GetVehicleInfo_FullMethodName             = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
+	VehicleService_ListParkingRecords_FullMethodName         = "/api.vehicle.v1.VehicleService/ListParkingRecords"
+	VehicleService_GetParkingRecord_FullMethodName           = "/api.vehicle.v1.VehicleService/GetParkingRecord"
+	VehicleService_ListDevices_FullMethodName                = "/api.vehicle.v1.VehicleService/ListDevices"
+	VehicleService_CreateDevice_FullMethodName               = "/api.vehicle.v1.VehicleService/CreateDevice"
+	VehicleService_GetDevice_FullMethodName                  = "/api.vehicle.v1.VehicleService/GetDevice"
+	VehicleService_UpdateDevice_FullMethodName               = "/api.vehicle.v1.VehicleService/UpdateDevice"
+	VehicleService_DeleteDevice_FullMethodName               = "/api.vehicle.v1.VehicleService/DeleteDevice"
+	VehicleService_CreateManufacturer_FullMethodName         = "/api.vehicle.v1.VehicleService/CreateManufacturer"
+	VehicleService_GetManufacturer_FullMethodName            = "/api.vehicle.v1.VehicleService/GetManufacturer"
+	VehicleService_ListManufacturers_FullMethodName          = "/api.vehicle.v1.VehicleService/ListManufacturers"
+	VehicleService_UpdateManufacturer_FullMethodName         = "/api.vehicle.v1.VehicleService/UpdateManufacturer"
+	VehicleService_DeleteManufacturer_FullMethodName         = "/api.vehicle.v1.VehicleService/DeleteManufacturer"
+	VehicleService_CreateFirmware_FullMethodName             = "/api.vehicle.v1.VehicleService/CreateFirmware"
+	VehicleService_GetFirmware_FullMethodName                = "/api.vehicle.v1.VehicleService/GetFirmware"
+	VehicleService_GetFirmwareByID_FullMethodName            = "/api.vehicle.v1.VehicleService/GetFirmwareByID"
+	VehicleService_ListFirmwares_FullMethodName              = "/api.vehicle.v1.VehicleService/ListFirmwares"
+	VehicleService_UpdateFirmware_FullMethodName             = "/api.vehicle.v1.VehicleService/UpdateFirmware"
+	VehicleService_DeleteFirmware_FullMethodName             = "/api.vehicle.v1.VehicleService/DeleteFirmware"
+	VehicleService_GetLatestFirmware_FullMethodName          = "/api.vehicle.v1.VehicleService/GetLatestFirmware"
+	VehicleService_CreateDevicePerformance_FullMethodName    = "/api.vehicle.v1.VehicleService/CreateDevicePerformance"
+	VehicleService_GetDevicePerformance_FullMethodName       = "/api.vehicle.v1.VehicleService/GetDevicePerformance"
+	VehicleService_GetDevicePerformanceLatest_FullMethodName = "/api.vehicle.v1.VehicleService/GetDevicePerformanceLatest"
+	VehicleService_CreateDeviceFault_FullMethodName          = "/api.vehicle.v1.VehicleService/CreateDeviceFault"
+	VehicleService_GetDeviceFault_FullMethodName             = "/api.vehicle.v1.VehicleService/GetDeviceFault"
+	VehicleService_ListDeviceFaults_FullMethodName           = "/api.vehicle.v1.VehicleService/ListDeviceFaults"
+	VehicleService_ResolveDeviceFault_FullMethodName         = "/api.vehicle.v1.VehicleService/ResolveDeviceFault"
+	VehicleService_GetDeviceUsageStats_FullMethodName        = "/api.vehicle.v1.VehicleService/GetDeviceUsageStats"
+	VehicleService_GetDeviceFaultStats_FullMethodName        = "/api.vehicle.v1.VehicleService/GetDeviceFaultStats"
+	VehicleService_GetDeviceStatsSummary_FullMethodName      = "/api.vehicle.v1.VehicleService/GetDeviceStatsSummary"
+	VehicleService_UpgradeDevice_FullMethodName              = "/api.vehicle.v1.VehicleService/UpgradeDevice"
+	VehicleService_GetDeviceUpgradeStatus_FullMethodName     = "/api.vehicle.v1.VehicleService/GetDeviceUpgradeStatus"
+	VehicleService_GetDeviceLogs_FullMethodName              = "/api.vehicle.v1.VehicleService/GetDeviceLogs"
+	VehicleService_GetDeviceStats_FullMethodName             = "/api.vehicle.v1.VehicleService/GetDeviceStats"
+	VehicleService_UpdateDeviceConfig_FullMethodName         = "/api.vehicle.v1.VehicleService/UpdateDeviceConfig"
 )
 
 // VehicleServiceClient is the client API for VehicleService service.
@@ -51,6 +78,42 @@ type VehicleServiceClient interface {
 	GetDevice(ctx context.Context, in *GetDeviceRequest, opts ...grpc.CallOption) (*GetDeviceResponse, error)
 	UpdateDevice(ctx context.Context, in *UpdateDeviceRequest, opts ...grpc.CallOption) (*UpdateDeviceResponse, error)
 	DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...grpc.CallOption) (*DeleteDeviceResponse, error)
+	// Manufacturer management
+	CreateManufacturer(ctx context.Context, in *CreateManufacturerRequest, opts ...grpc.CallOption) (*CreateManufacturerResponse, error)
+	GetManufacturer(ctx context.Context, in *GetManufacturerRequest, opts ...grpc.CallOption) (*GetManufacturerResponse, error)
+	ListManufacturers(ctx context.Context, in *ListManufacturersRequest, opts ...grpc.CallOption) (*ListManufacturersResponse, error)
+	UpdateManufacturer(ctx context.Context, in *UpdateManufacturerRequest, opts ...grpc.CallOption) (*UpdateManufacturerResponse, error)
+	DeleteManufacturer(ctx context.Context, in *DeleteManufacturerRequest, opts ...grpc.CallOption) (*DeleteManufacturerResponse, error)
+	// Firmware management
+	CreateFirmware(ctx context.Context, in *CreateFirmwareRequest, opts ...grpc.CallOption) (*CreateFirmwareResponse, error)
+	GetFirmware(ctx context.Context, in *GetFirmwareRequest, opts ...grpc.CallOption) (*GetFirmwareResponse, error)
+	GetFirmwareByID(ctx context.Context, in *GetFirmwareByIDRequest, opts ...grpc.CallOption) (*GetFirmwareByIDResponse, error)
+	ListFirmwares(ctx context.Context, in *ListFirmwaresRequest, opts ...grpc.CallOption) (*ListFirmwaresResponse, error)
+	UpdateFirmware(ctx context.Context, in *UpdateFirmwareRequest, opts ...grpc.CallOption) (*UpdateFirmwareResponse, error)
+	DeleteFirmware(ctx context.Context, in *DeleteFirmwareRequest, opts ...grpc.CallOption) (*DeleteFirmwareResponse, error)
+	GetLatestFirmware(ctx context.Context, in *GetLatestFirmwareRequest, opts ...grpc.CallOption) (*GetLatestFirmwareResponse, error)
+	// Device performance monitoring
+	CreateDevicePerformance(ctx context.Context, in *CreateDevicePerformanceRequest, opts ...grpc.CallOption) (*CreateDevicePerformanceResponse, error)
+	GetDevicePerformance(ctx context.Context, in *GetDevicePerformanceRequest, opts ...grpc.CallOption) (*GetDevicePerformanceResponse, error)
+	GetDevicePerformanceLatest(ctx context.Context, in *GetDevicePerformanceLatestRequest, opts ...grpc.CallOption) (*GetDevicePerformanceLatestResponse, error)
+	// Device fault diagnosis
+	CreateDeviceFault(ctx context.Context, in *CreateDeviceFaultRequest, opts ...grpc.CallOption) (*CreateDeviceFaultResponse, error)
+	GetDeviceFault(ctx context.Context, in *GetDeviceFaultRequest, opts ...grpc.CallOption) (*GetDeviceFaultResponse, error)
+	ListDeviceFaults(ctx context.Context, in *ListDeviceFaultsRequest, opts ...grpc.CallOption) (*ListDeviceFaultsResponse, error)
+	ResolveDeviceFault(ctx context.Context, in *ResolveDeviceFaultRequest, opts ...grpc.CallOption) (*ResolveDeviceFaultResponse, error)
+	// Device statistics
+	GetDeviceUsageStats(ctx context.Context, in *GetDeviceUsageStatsRequest, opts ...grpc.CallOption) (*GetDeviceUsageStatsResponse, error)
+	GetDeviceFaultStats(ctx context.Context, in *GetDeviceFaultStatsRequest, opts ...grpc.CallOption) (*GetDeviceFaultStatsResponse, error)
+	GetDeviceStatsSummary(ctx context.Context, in *GetDeviceStatsSummaryRequest, opts ...grpc.CallOption) (*GetDeviceStatsSummaryResponse, error)
+	// Device upgrade
+	UpgradeDevice(ctx context.Context, in *UpgradeDeviceRequest, opts ...grpc.CallOption) (*UpgradeDeviceResponse, error)
+	GetDeviceUpgradeStatus(ctx context.Context, in *GetDeviceUpgradeStatusRequest, opts ...grpc.CallOption) (*UpgradeStatusResponse, error)
+	// Device logs
+	GetDeviceLogs(ctx context.Context, in *GetDeviceLogsRequest, opts ...grpc.CallOption) (*GetDeviceLogsResponse, error)
+	// Device stats
+	GetDeviceStats(ctx context.Context, in *GetDeviceStatsRequest, opts ...grpc.CallOption) (*DeviceStatsResponse, error)
+	// Device config
+	UpdateDeviceConfig(ctx context.Context, in *UpdateDeviceConfigRequest, opts ...grpc.CallOption) (*UpdateDeviceConfigResponse, error)
 }
 
 type vehicleServiceClient struct {
@@ -191,6 +254,276 @@ func (c *vehicleServiceClient) DeleteDevice(ctx context.Context, in *DeleteDevic
 	return out, nil
 }
 
+func (c *vehicleServiceClient) CreateManufacturer(ctx context.Context, in *CreateManufacturerRequest, opts ...grpc.CallOption) (*CreateManufacturerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateManufacturerResponse)
+	err := c.cc.Invoke(ctx, VehicleService_CreateManufacturer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetManufacturer(ctx context.Context, in *GetManufacturerRequest, opts ...grpc.CallOption) (*GetManufacturerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetManufacturerResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetManufacturer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) ListManufacturers(ctx context.Context, in *ListManufacturersRequest, opts ...grpc.CallOption) (*ListManufacturersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListManufacturersResponse)
+	err := c.cc.Invoke(ctx, VehicleService_ListManufacturers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) UpdateManufacturer(ctx context.Context, in *UpdateManufacturerRequest, opts ...grpc.CallOption) (*UpdateManufacturerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateManufacturerResponse)
+	err := c.cc.Invoke(ctx, VehicleService_UpdateManufacturer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) DeleteManufacturer(ctx context.Context, in *DeleteManufacturerRequest, opts ...grpc.CallOption) (*DeleteManufacturerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteManufacturerResponse)
+	err := c.cc.Invoke(ctx, VehicleService_DeleteManufacturer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) CreateFirmware(ctx context.Context, in *CreateFirmwareRequest, opts ...grpc.CallOption) (*CreateFirmwareResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateFirmwareResponse)
+	err := c.cc.Invoke(ctx, VehicleService_CreateFirmware_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetFirmware(ctx context.Context, in *GetFirmwareRequest, opts ...grpc.CallOption) (*GetFirmwareResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFirmwareResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetFirmware_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetFirmwareByID(ctx context.Context, in *GetFirmwareByIDRequest, opts ...grpc.CallOption) (*GetFirmwareByIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFirmwareByIDResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetFirmwareByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) ListFirmwares(ctx context.Context, in *ListFirmwaresRequest, opts ...grpc.CallOption) (*ListFirmwaresResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListFirmwaresResponse)
+	err := c.cc.Invoke(ctx, VehicleService_ListFirmwares_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) UpdateFirmware(ctx context.Context, in *UpdateFirmwareRequest, opts ...grpc.CallOption) (*UpdateFirmwareResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateFirmwareResponse)
+	err := c.cc.Invoke(ctx, VehicleService_UpdateFirmware_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) DeleteFirmware(ctx context.Context, in *DeleteFirmwareRequest, opts ...grpc.CallOption) (*DeleteFirmwareResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteFirmwareResponse)
+	err := c.cc.Invoke(ctx, VehicleService_DeleteFirmware_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetLatestFirmware(ctx context.Context, in *GetLatestFirmwareRequest, opts ...grpc.CallOption) (*GetLatestFirmwareResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLatestFirmwareResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetLatestFirmware_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) CreateDevicePerformance(ctx context.Context, in *CreateDevicePerformanceRequest, opts ...grpc.CallOption) (*CreateDevicePerformanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDevicePerformanceResponse)
+	err := c.cc.Invoke(ctx, VehicleService_CreateDevicePerformance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDevicePerformance(ctx context.Context, in *GetDevicePerformanceRequest, opts ...grpc.CallOption) (*GetDevicePerformanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDevicePerformanceResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDevicePerformance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDevicePerformanceLatest(ctx context.Context, in *GetDevicePerformanceLatestRequest, opts ...grpc.CallOption) (*GetDevicePerformanceLatestResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDevicePerformanceLatestResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDevicePerformanceLatest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) CreateDeviceFault(ctx context.Context, in *CreateDeviceFaultRequest, opts ...grpc.CallOption) (*CreateDeviceFaultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDeviceFaultResponse)
+	err := c.cc.Invoke(ctx, VehicleService_CreateDeviceFault_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceFault(ctx context.Context, in *GetDeviceFaultRequest, opts ...grpc.CallOption) (*GetDeviceFaultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceFaultResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceFault_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) ListDeviceFaults(ctx context.Context, in *ListDeviceFaultsRequest, opts ...grpc.CallOption) (*ListDeviceFaultsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListDeviceFaultsResponse)
+	err := c.cc.Invoke(ctx, VehicleService_ListDeviceFaults_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) ResolveDeviceFault(ctx context.Context, in *ResolveDeviceFaultRequest, opts ...grpc.CallOption) (*ResolveDeviceFaultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResolveDeviceFaultResponse)
+	err := c.cc.Invoke(ctx, VehicleService_ResolveDeviceFault_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceUsageStats(ctx context.Context, in *GetDeviceUsageStatsRequest, opts ...grpc.CallOption) (*GetDeviceUsageStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceUsageStatsResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceUsageStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceFaultStats(ctx context.Context, in *GetDeviceFaultStatsRequest, opts ...grpc.CallOption) (*GetDeviceFaultStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceFaultStatsResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceFaultStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceStatsSummary(ctx context.Context, in *GetDeviceStatsSummaryRequest, opts ...grpc.CallOption) (*GetDeviceStatsSummaryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceStatsSummaryResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceStatsSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) UpgradeDevice(ctx context.Context, in *UpgradeDeviceRequest, opts ...grpc.CallOption) (*UpgradeDeviceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpgradeDeviceResponse)
+	err := c.cc.Invoke(ctx, VehicleService_UpgradeDevice_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceUpgradeStatus(ctx context.Context, in *GetDeviceUpgradeStatusRequest, opts ...grpc.CallOption) (*UpgradeStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpgradeStatusResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceUpgradeStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceLogs(ctx context.Context, in *GetDeviceLogsRequest, opts ...grpc.CallOption) (*GetDeviceLogsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceLogsResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceStats(ctx context.Context, in *GetDeviceStatsRequest, opts ...grpc.CallOption) (*DeviceStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeviceStatsResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) UpdateDeviceConfig(ctx context.Context, in *UpdateDeviceConfigRequest, opts ...grpc.CallOption) (*UpdateDeviceConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateDeviceConfigResponse)
+	err := c.cc.Invoke(ctx, VehicleService_UpdateDeviceConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VehicleServiceServer is the server API for VehicleService service.
 // All implementations must embed UnimplementedVehicleServiceServer
 // for forward compatibility.
@@ -208,6 +541,42 @@ type VehicleServiceServer interface {
 	GetDevice(context.Context, *GetDeviceRequest) (*GetDeviceResponse, error)
 	UpdateDevice(context.Context, *UpdateDeviceRequest) (*UpdateDeviceResponse, error)
 	DeleteDevice(context.Context, *DeleteDeviceRequest) (*DeleteDeviceResponse, error)
+	// Manufacturer management
+	CreateManufacturer(context.Context, *CreateManufacturerRequest) (*CreateManufacturerResponse, error)
+	GetManufacturer(context.Context, *GetManufacturerRequest) (*GetManufacturerResponse, error)
+	ListManufacturers(context.Context, *ListManufacturersRequest) (*ListManufacturersResponse, error)
+	UpdateManufacturer(context.Context, *UpdateManufacturerRequest) (*UpdateManufacturerResponse, error)
+	DeleteManufacturer(context.Context, *DeleteManufacturerRequest) (*DeleteManufacturerResponse, error)
+	// Firmware management
+	CreateFirmware(context.Context, *CreateFirmwareRequest) (*CreateFirmwareResponse, error)
+	GetFirmware(context.Context, *GetFirmwareRequest) (*GetFirmwareResponse, error)
+	GetFirmwareByID(context.Context, *GetFirmwareByIDRequest) (*GetFirmwareByIDResponse, error)
+	ListFirmwares(context.Context, *ListFirmwaresRequest) (*ListFirmwaresResponse, error)
+	UpdateFirmware(context.Context, *UpdateFirmwareRequest) (*UpdateFirmwareResponse, error)
+	DeleteFirmware(context.Context, *DeleteFirmwareRequest) (*DeleteFirmwareResponse, error)
+	GetLatestFirmware(context.Context, *GetLatestFirmwareRequest) (*GetLatestFirmwareResponse, error)
+	// Device performance monitoring
+	CreateDevicePerformance(context.Context, *CreateDevicePerformanceRequest) (*CreateDevicePerformanceResponse, error)
+	GetDevicePerformance(context.Context, *GetDevicePerformanceRequest) (*GetDevicePerformanceResponse, error)
+	GetDevicePerformanceLatest(context.Context, *GetDevicePerformanceLatestRequest) (*GetDevicePerformanceLatestResponse, error)
+	// Device fault diagnosis
+	CreateDeviceFault(context.Context, *CreateDeviceFaultRequest) (*CreateDeviceFaultResponse, error)
+	GetDeviceFault(context.Context, *GetDeviceFaultRequest) (*GetDeviceFaultResponse, error)
+	ListDeviceFaults(context.Context, *ListDeviceFaultsRequest) (*ListDeviceFaultsResponse, error)
+	ResolveDeviceFault(context.Context, *ResolveDeviceFaultRequest) (*ResolveDeviceFaultResponse, error)
+	// Device statistics
+	GetDeviceUsageStats(context.Context, *GetDeviceUsageStatsRequest) (*GetDeviceUsageStatsResponse, error)
+	GetDeviceFaultStats(context.Context, *GetDeviceFaultStatsRequest) (*GetDeviceFaultStatsResponse, error)
+	GetDeviceStatsSummary(context.Context, *GetDeviceStatsSummaryRequest) (*GetDeviceStatsSummaryResponse, error)
+	// Device upgrade
+	UpgradeDevice(context.Context, *UpgradeDeviceRequest) (*UpgradeDeviceResponse, error)
+	GetDeviceUpgradeStatus(context.Context, *GetDeviceUpgradeStatusRequest) (*UpgradeStatusResponse, error)
+	// Device logs
+	GetDeviceLogs(context.Context, *GetDeviceLogsRequest) (*GetDeviceLogsResponse, error)
+	// Device stats
+	GetDeviceStats(context.Context, *GetDeviceStatsRequest) (*DeviceStatsResponse, error)
+	// Device config
+	UpdateDeviceConfig(context.Context, *UpdateDeviceConfigRequest) (*UpdateDeviceConfigResponse, error)
 	mustEmbedUnimplementedVehicleServiceServer()
 }
 
@@ -256,6 +625,87 @@ func (UnimplementedVehicleServiceServer) UpdateDevice(context.Context, *UpdateDe
 }
 func (UnimplementedVehicleServiceServer) DeleteDevice(context.Context, *DeleteDeviceRequest) (*DeleteDeviceResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteDevice not implemented")
+}
+func (UnimplementedVehicleServiceServer) CreateManufacturer(context.Context, *CreateManufacturerRequest) (*CreateManufacturerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateManufacturer not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetManufacturer(context.Context, *GetManufacturerRequest) (*GetManufacturerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetManufacturer not implemented")
+}
+func (UnimplementedVehicleServiceServer) ListManufacturers(context.Context, *ListManufacturersRequest) (*ListManufacturersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListManufacturers not implemented")
+}
+func (UnimplementedVehicleServiceServer) UpdateManufacturer(context.Context, *UpdateManufacturerRequest) (*UpdateManufacturerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateManufacturer not implemented")
+}
+func (UnimplementedVehicleServiceServer) DeleteManufacturer(context.Context, *DeleteManufacturerRequest) (*DeleteManufacturerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteManufacturer not implemented")
+}
+func (UnimplementedVehicleServiceServer) CreateFirmware(context.Context, *CreateFirmwareRequest) (*CreateFirmwareResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateFirmware not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetFirmware(context.Context, *GetFirmwareRequest) (*GetFirmwareResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetFirmware not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetFirmwareByID(context.Context, *GetFirmwareByIDRequest) (*GetFirmwareByIDResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetFirmwareByID not implemented")
+}
+func (UnimplementedVehicleServiceServer) ListFirmwares(context.Context, *ListFirmwaresRequest) (*ListFirmwaresResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListFirmwares not implemented")
+}
+func (UnimplementedVehicleServiceServer) UpdateFirmware(context.Context, *UpdateFirmwareRequest) (*UpdateFirmwareResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateFirmware not implemented")
+}
+func (UnimplementedVehicleServiceServer) DeleteFirmware(context.Context, *DeleteFirmwareRequest) (*DeleteFirmwareResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteFirmware not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetLatestFirmware(context.Context, *GetLatestFirmwareRequest) (*GetLatestFirmwareResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLatestFirmware not implemented")
+}
+func (UnimplementedVehicleServiceServer) CreateDevicePerformance(context.Context, *CreateDevicePerformanceRequest) (*CreateDevicePerformanceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDevicePerformance not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDevicePerformance(context.Context, *GetDevicePerformanceRequest) (*GetDevicePerformanceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDevicePerformance not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDevicePerformanceLatest(context.Context, *GetDevicePerformanceLatestRequest) (*GetDevicePerformanceLatestResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDevicePerformanceLatest not implemented")
+}
+func (UnimplementedVehicleServiceServer) CreateDeviceFault(context.Context, *CreateDeviceFaultRequest) (*CreateDeviceFaultResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDeviceFault not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceFault(context.Context, *GetDeviceFaultRequest) (*GetDeviceFaultResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceFault not implemented")
+}
+func (UnimplementedVehicleServiceServer) ListDeviceFaults(context.Context, *ListDeviceFaultsRequest) (*ListDeviceFaultsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDeviceFaults not implemented")
+}
+func (UnimplementedVehicleServiceServer) ResolveDeviceFault(context.Context, *ResolveDeviceFaultRequest) (*ResolveDeviceFaultResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveDeviceFault not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceUsageStats(context.Context, *GetDeviceUsageStatsRequest) (*GetDeviceUsageStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceUsageStats not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceFaultStats(context.Context, *GetDeviceFaultStatsRequest) (*GetDeviceFaultStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceFaultStats not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceStatsSummary(context.Context, *GetDeviceStatsSummaryRequest) (*GetDeviceStatsSummaryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceStatsSummary not implemented")
+}
+func (UnimplementedVehicleServiceServer) UpgradeDevice(context.Context, *UpgradeDeviceRequest) (*UpgradeDeviceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpgradeDevice not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceUpgradeStatus(context.Context, *GetDeviceUpgradeStatusRequest) (*UpgradeStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceUpgradeStatus not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceLogs(context.Context, *GetDeviceLogsRequest) (*GetDeviceLogsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceLogs not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceStats(context.Context, *GetDeviceStatsRequest) (*DeviceStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceStats not implemented")
+}
+func (UnimplementedVehicleServiceServer) UpdateDeviceConfig(context.Context, *UpdateDeviceConfigRequest) (*UpdateDeviceConfigResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateDeviceConfig not implemented")
 }
 func (UnimplementedVehicleServiceServer) mustEmbedUnimplementedVehicleServiceServer() {}
 func (UnimplementedVehicleServiceServer) testEmbeddedByValue()                        {}
@@ -512,6 +962,492 @@ func _VehicleService_DeleteDevice_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VehicleService_CreateManufacturer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateManufacturerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).CreateManufacturer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_CreateManufacturer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).CreateManufacturer(ctx, req.(*CreateManufacturerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetManufacturer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetManufacturerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetManufacturer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetManufacturer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetManufacturer(ctx, req.(*GetManufacturerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_ListManufacturers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListManufacturersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).ListManufacturers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_ListManufacturers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).ListManufacturers(ctx, req.(*ListManufacturersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_UpdateManufacturer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateManufacturerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).UpdateManufacturer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_UpdateManufacturer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).UpdateManufacturer(ctx, req.(*UpdateManufacturerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_DeleteManufacturer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteManufacturerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).DeleteManufacturer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_DeleteManufacturer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).DeleteManufacturer(ctx, req.(*DeleteManufacturerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_CreateFirmware_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateFirmwareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).CreateFirmware(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_CreateFirmware_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).CreateFirmware(ctx, req.(*CreateFirmwareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetFirmware_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFirmwareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetFirmware(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetFirmware_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetFirmware(ctx, req.(*GetFirmwareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetFirmwareByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFirmwareByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetFirmwareByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetFirmwareByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetFirmwareByID(ctx, req.(*GetFirmwareByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_ListFirmwares_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListFirmwaresRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).ListFirmwares(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_ListFirmwares_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).ListFirmwares(ctx, req.(*ListFirmwaresRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_UpdateFirmware_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFirmwareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).UpdateFirmware(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_UpdateFirmware_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).UpdateFirmware(ctx, req.(*UpdateFirmwareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_DeleteFirmware_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFirmwareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).DeleteFirmware(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_DeleteFirmware_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).DeleteFirmware(ctx, req.(*DeleteFirmwareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetLatestFirmware_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLatestFirmwareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetLatestFirmware(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetLatestFirmware_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetLatestFirmware(ctx, req.(*GetLatestFirmwareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_CreateDevicePerformance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDevicePerformanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).CreateDevicePerformance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_CreateDevicePerformance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).CreateDevicePerformance(ctx, req.(*CreateDevicePerformanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDevicePerformance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDevicePerformanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDevicePerformance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDevicePerformance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDevicePerformance(ctx, req.(*GetDevicePerformanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDevicePerformanceLatest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDevicePerformanceLatestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDevicePerformanceLatest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDevicePerformanceLatest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDevicePerformanceLatest(ctx, req.(*GetDevicePerformanceLatestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_CreateDeviceFault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDeviceFaultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).CreateDeviceFault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_CreateDeviceFault_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).CreateDeviceFault(ctx, req.(*CreateDeviceFaultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceFault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceFaultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceFault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceFault_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceFault(ctx, req.(*GetDeviceFaultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_ListDeviceFaults_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDeviceFaultsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).ListDeviceFaults(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_ListDeviceFaults_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).ListDeviceFaults(ctx, req.(*ListDeviceFaultsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_ResolveDeviceFault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveDeviceFaultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).ResolveDeviceFault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_ResolveDeviceFault_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).ResolveDeviceFault(ctx, req.(*ResolveDeviceFaultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceUsageStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceUsageStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceUsageStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceUsageStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceUsageStats(ctx, req.(*GetDeviceUsageStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceFaultStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceFaultStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceFaultStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceFaultStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceFaultStats(ctx, req.(*GetDeviceFaultStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceStatsSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceStatsSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceStatsSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceStatsSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceStatsSummary(ctx, req.(*GetDeviceStatsSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_UpgradeDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpgradeDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).UpgradeDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_UpgradeDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).UpgradeDevice(ctx, req.(*UpgradeDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceUpgradeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceUpgradeStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceUpgradeStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceUpgradeStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceUpgradeStatus(ctx, req.(*GetDeviceUpgradeStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceLogs(ctx, req.(*GetDeviceLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceStats(ctx, req.(*GetDeviceStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_UpdateDeviceConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeviceConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).UpdateDeviceConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_UpdateDeviceConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).UpdateDeviceConfig(ctx, req.(*UpdateDeviceConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VehicleService_ServiceDesc is the grpc.ServiceDesc for VehicleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -570,6 +1506,114 @@ var VehicleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteDevice",
 			Handler:    _VehicleService_DeleteDevice_Handler,
+		},
+		{
+			MethodName: "CreateManufacturer",
+			Handler:    _VehicleService_CreateManufacturer_Handler,
+		},
+		{
+			MethodName: "GetManufacturer",
+			Handler:    _VehicleService_GetManufacturer_Handler,
+		},
+		{
+			MethodName: "ListManufacturers",
+			Handler:    _VehicleService_ListManufacturers_Handler,
+		},
+		{
+			MethodName: "UpdateManufacturer",
+			Handler:    _VehicleService_UpdateManufacturer_Handler,
+		},
+		{
+			MethodName: "DeleteManufacturer",
+			Handler:    _VehicleService_DeleteManufacturer_Handler,
+		},
+		{
+			MethodName: "CreateFirmware",
+			Handler:    _VehicleService_CreateFirmware_Handler,
+		},
+		{
+			MethodName: "GetFirmware",
+			Handler:    _VehicleService_GetFirmware_Handler,
+		},
+		{
+			MethodName: "GetFirmwareByID",
+			Handler:    _VehicleService_GetFirmwareByID_Handler,
+		},
+		{
+			MethodName: "ListFirmwares",
+			Handler:    _VehicleService_ListFirmwares_Handler,
+		},
+		{
+			MethodName: "UpdateFirmware",
+			Handler:    _VehicleService_UpdateFirmware_Handler,
+		},
+		{
+			MethodName: "DeleteFirmware",
+			Handler:    _VehicleService_DeleteFirmware_Handler,
+		},
+		{
+			MethodName: "GetLatestFirmware",
+			Handler:    _VehicleService_GetLatestFirmware_Handler,
+		},
+		{
+			MethodName: "CreateDevicePerformance",
+			Handler:    _VehicleService_CreateDevicePerformance_Handler,
+		},
+		{
+			MethodName: "GetDevicePerformance",
+			Handler:    _VehicleService_GetDevicePerformance_Handler,
+		},
+		{
+			MethodName: "GetDevicePerformanceLatest",
+			Handler:    _VehicleService_GetDevicePerformanceLatest_Handler,
+		},
+		{
+			MethodName: "CreateDeviceFault",
+			Handler:    _VehicleService_CreateDeviceFault_Handler,
+		},
+		{
+			MethodName: "GetDeviceFault",
+			Handler:    _VehicleService_GetDeviceFault_Handler,
+		},
+		{
+			MethodName: "ListDeviceFaults",
+			Handler:    _VehicleService_ListDeviceFaults_Handler,
+		},
+		{
+			MethodName: "ResolveDeviceFault",
+			Handler:    _VehicleService_ResolveDeviceFault_Handler,
+		},
+		{
+			MethodName: "GetDeviceUsageStats",
+			Handler:    _VehicleService_GetDeviceUsageStats_Handler,
+		},
+		{
+			MethodName: "GetDeviceFaultStats",
+			Handler:    _VehicleService_GetDeviceFaultStats_Handler,
+		},
+		{
+			MethodName: "GetDeviceStatsSummary",
+			Handler:    _VehicleService_GetDeviceStatsSummary_Handler,
+		},
+		{
+			MethodName: "UpgradeDevice",
+			Handler:    _VehicleService_UpgradeDevice_Handler,
+		},
+		{
+			MethodName: "GetDeviceUpgradeStatus",
+			Handler:    _VehicleService_GetDeviceUpgradeStatus_Handler,
+		},
+		{
+			MethodName: "GetDeviceLogs",
+			Handler:    _VehicleService_GetDeviceLogs_Handler,
+		},
+		{
+			MethodName: "GetDeviceStats",
+			Handler:    _VehicleService_GetDeviceStats_Handler,
+		},
+		{
+			MethodName: "UpdateDeviceConfig",
+			Handler:    _VehicleService_UpdateDeviceConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -13,6 +13,7 @@ import (
 var ProviderSet = wire.NewSet(
 	NewData,
 	NewOrderRepo,
+	NewReconciliationRepo,
 )
 
 type Data struct {

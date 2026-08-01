@@ -263,12 +263,12 @@ func (_q *DeviceQuery) Clone() *DeviceQuery {
 // Example:
 //
 //	var v []struct {
-//		DeviceID string `json:"device_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Device.Query().
-//		GroupBy(device.FieldDeviceID).
+//		GroupBy(device.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *DeviceQuery) GroupBy(field string, fields ...string) *DeviceGroupBy {
@@ -286,11 +286,11 @@ func (_q *DeviceQuery) GroupBy(field string, fields ...string) *DeviceGroupBy {
 // Example:
 //
 //	var v []struct {
-//		DeviceID string `json:"device_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.Device.Query().
-//		Select(device.FieldDeviceID).
+//		Select(device.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *DeviceQuery) Select(fields ...string) *DeviceSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

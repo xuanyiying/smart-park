@@ -309,7 +309,8 @@ func (uc *ReconciliationUseCase) FixMismatchedOrders(ctx context.Context, orderI
 			// 更新订单状态
 			order.Status = string(StatusRefunded)
 			order.RefundTransactionID = refundTransactionID
-			order.RefundedAt = time.Now()
+			now := time.Now()
+			order.RefundedAt = &now
 			if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
 				uc.log.WithContext(ctx).Errorf("更新订单状态失败: %v", err)
 				continue

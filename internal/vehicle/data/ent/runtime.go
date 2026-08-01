@@ -8,7 +8,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceperformance"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceupgrade"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/firmware"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/manufacturer"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/schema"
@@ -22,7 +28,7 @@ func init() {
 	billingruleFields := schema.BillingRule{}.Fields()
 	_ = billingruleFields
 	// billingruleDescRuleName is the schema descriptor for rule_name field.
-	billingruleDescRuleName := billingruleFields[2].Descriptor()
+	billingruleDescRuleName := billingruleFields[3].Descriptor()
 	// billingrule.RuleNameValidator is a validator for the "rule_name" field. It is called by the builders before save.
 	billingrule.RuleNameValidator = func() func(string) error {
 		validators := billingruleDescRuleName.Validators
@@ -40,21 +46,21 @@ func init() {
 		}
 	}()
 	// billingruleDescPriority is the schema descriptor for priority field.
-	billingruleDescPriority := billingruleFields[7].Descriptor()
+	billingruleDescPriority := billingruleFields[8].Descriptor()
 	// billingrule.DefaultPriority holds the default value on creation for the priority field.
 	billingrule.DefaultPriority = billingruleDescPriority.Default.(int)
 	// billingrule.PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
 	billingrule.PriorityValidator = billingruleDescPriority.Validators[0].(func(int) error)
 	// billingruleDescIsActive is the schema descriptor for is_active field.
-	billingruleDescIsActive := billingruleFields[8].Descriptor()
+	billingruleDescIsActive := billingruleFields[9].Descriptor()
 	// billingrule.DefaultIsActive holds the default value on creation for the is_active field.
 	billingrule.DefaultIsActive = billingruleDescIsActive.Default.(bool)
 	// billingruleDescCreatedAt is the schema descriptor for created_at field.
-	billingruleDescCreatedAt := billingruleFields[9].Descriptor()
+	billingruleDescCreatedAt := billingruleFields[10].Descriptor()
 	// billingrule.DefaultCreatedAt holds the default value on creation for the created_at field.
 	billingrule.DefaultCreatedAt = billingruleDescCreatedAt.Default.(func() time.Time)
 	// billingruleDescUpdatedAt is the schema descriptor for updated_at field.
-	billingruleDescUpdatedAt := billingruleFields[10].Descriptor()
+	billingruleDescUpdatedAt := billingruleFields[11].Descriptor()
 	// billingrule.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	billingrule.DefaultUpdatedAt = billingruleDescUpdatedAt.Default.(func() time.Time)
 	// billingrule.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -66,7 +72,7 @@ func init() {
 	deviceFields := schema.Device{}.Fields()
 	_ = deviceFields
 	// deviceDescDeviceID is the schema descriptor for device_id field.
-	deviceDescDeviceID := deviceFields[1].Descriptor()
+	deviceDescDeviceID := deviceFields[2].Descriptor()
 	// device.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
 	device.DeviceIDValidator = func() func(string) error {
 		validators := deviceDescDeviceID.Validators
@@ -84,23 +90,63 @@ func init() {
 		}
 	}()
 	// deviceDescDeviceSecret is the schema descriptor for device_secret field.
-	deviceDescDeviceSecret := deviceFields[4].Descriptor()
+	deviceDescDeviceSecret := deviceFields[5].Descriptor()
 	// device.DeviceSecretValidator is a validator for the "device_secret" field. It is called by the builders before save.
 	device.DeviceSecretValidator = deviceDescDeviceSecret.Validators[0].(func(string) error)
+	// deviceDescManufacturer is the schema descriptor for manufacturer field.
+	deviceDescManufacturer := deviceFields[7].Descriptor()
+	// device.ManufacturerValidator is a validator for the "manufacturer" field. It is called by the builders before save.
+	device.ManufacturerValidator = deviceDescManufacturer.Validators[0].(func(string) error)
+	// deviceDescModel is the schema descriptor for model field.
+	deviceDescModel := deviceFields[8].Descriptor()
+	// device.ModelValidator is a validator for the "model" field. It is called by the builders before save.
+	device.ModelValidator = deviceDescModel.Validators[0].(func(string) error)
+	// deviceDescFirmwareVersion is the schema descriptor for firmware_version field.
+	deviceDescFirmwareVersion := deviceFields[9].Descriptor()
+	// device.FirmwareVersionValidator is a validator for the "firmware_version" field. It is called by the builders before save.
+	device.FirmwareVersionValidator = deviceDescFirmwareVersion.Validators[0].(func(string) error)
 	// deviceDescGateID is the schema descriptor for gate_id field.
-	deviceDescGateID := deviceFields[6].Descriptor()
+	deviceDescGateID := deviceFields[11].Descriptor()
 	// device.GateIDValidator is a validator for the "gate_id" field. It is called by the builders before save.
 	device.GateIDValidator = deviceDescGateID.Validators[0].(func(string) error)
 	// deviceDescEnabled is the schema descriptor for enabled field.
-	deviceDescEnabled := deviceFields[7].Descriptor()
+	deviceDescEnabled := deviceFields[12].Descriptor()
 	// device.DefaultEnabled holds the default value on creation for the enabled field.
 	device.DefaultEnabled = deviceDescEnabled.Default.(bool)
+	// deviceDescFaultInfo is the schema descriptor for fault_info field.
+	deviceDescFaultInfo := deviceFields[16].Descriptor()
+	// device.FaultInfoValidator is a validator for the "fault_info" field. It is called by the builders before save.
+	device.FaultInfoValidator = deviceDescFaultInfo.Validators[0].(func(string) error)
+	// deviceDescHeartbeatCount is the schema descriptor for heartbeat_count field.
+	deviceDescHeartbeatCount := deviceFields[17].Descriptor()
+	// device.DefaultHeartbeatCount holds the default value on creation for the heartbeat_count field.
+	device.DefaultHeartbeatCount = deviceDescHeartbeatCount.Default.(int)
+	// deviceDescOfflineCount is the schema descriptor for offline_count field.
+	deviceDescOfflineCount := deviceFields[18].Descriptor()
+	// device.DefaultOfflineCount holds the default value on creation for the offline_count field.
+	device.DefaultOfflineCount = deviceDescOfflineCount.Default.(int)
+	// deviceDescHardwareVersion is the schema descriptor for hardware_version field.
+	deviceDescHardwareVersion := deviceFields[19].Descriptor()
+	// device.HardwareVersionValidator is a validator for the "hardware_version" field. It is called by the builders before save.
+	device.HardwareVersionValidator = deviceDescHardwareVersion.Validators[0].(func(string) error)
+	// deviceDescFaultCode is the schema descriptor for fault_code field.
+	deviceDescFaultCode := deviceFields[22].Descriptor()
+	// device.FaultCodeValidator is a validator for the "fault_code" field. It is called by the builders before save.
+	device.FaultCodeValidator = deviceDescFaultCode.Validators[0].(func(string) error)
+	// deviceDescFaultMessage is the schema descriptor for fault_message field.
+	deviceDescFaultMessage := deviceFields[23].Descriptor()
+	// device.FaultMessageValidator is a validator for the "fault_message" field. It is called by the builders before save.
+	device.FaultMessageValidator = deviceDescFaultMessage.Validators[0].(func(string) error)
+	// deviceDescLocation is the schema descriptor for location field.
+	deviceDescLocation := deviceFields[26].Descriptor()
+	// device.LocationValidator is a validator for the "location" field. It is called by the builders before save.
+	device.LocationValidator = deviceDescLocation.Validators[0].(func(string) error)
 	// deviceDescCreatedAt is the schema descriptor for created_at field.
-	deviceDescCreatedAt := deviceFields[10].Descriptor()
+	deviceDescCreatedAt := deviceFields[27].Descriptor()
 	// device.DefaultCreatedAt holds the default value on creation for the created_at field.
 	device.DefaultCreatedAt = deviceDescCreatedAt.Default.(func() time.Time)
 	// deviceDescUpdatedAt is the schema descriptor for updated_at field.
-	deviceDescUpdatedAt := deviceFields[11].Descriptor()
+	deviceDescUpdatedAt := deviceFields[28].Descriptor()
 	// device.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	device.DefaultUpdatedAt = deviceDescUpdatedAt.Default.(func() time.Time)
 	// device.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -109,18 +155,388 @@ func init() {
 	deviceDescID := deviceFields[0].Descriptor()
 	// device.DefaultID holds the default value on creation for the id field.
 	device.DefaultID = deviceDescID.Default.(func() uuid.UUID)
+	devicefaultFields := schema.DeviceFault{}.Fields()
+	_ = devicefaultFields
+	// devicefaultDescDeviceID is the schema descriptor for device_id field.
+	devicefaultDescDeviceID := devicefaultFields[1].Descriptor()
+	// devicefault.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	devicefault.DeviceIDValidator = func() func(string) error {
+		validators := devicefaultDescDeviceID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(device_id string) error {
+			for _, fn := range fns {
+				if err := fn(device_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// devicefaultDescFaultType is the schema descriptor for fault_type field.
+	devicefaultDescFaultType := devicefaultFields[2].Descriptor()
+	// devicefault.FaultTypeValidator is a validator for the "fault_type" field. It is called by the builders before save.
+	devicefault.FaultTypeValidator = func() func(string) error {
+		validators := devicefaultDescFaultType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(fault_type string) error {
+			for _, fn := range fns {
+				if err := fn(fault_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// devicefaultDescFaultCode is the schema descriptor for fault_code field.
+	devicefaultDescFaultCode := devicefaultFields[3].Descriptor()
+	// devicefault.FaultCodeValidator is a validator for the "fault_code" field. It is called by the builders before save.
+	devicefault.FaultCodeValidator = func() func(string) error {
+		validators := devicefaultDescFaultCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(fault_code string) error {
+			for _, fn := range fns {
+				if err := fn(fault_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// devicefaultDescDescription is the schema descriptor for description field.
+	devicefaultDescDescription := devicefaultFields[4].Descriptor()
+	// devicefault.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	devicefault.DescriptionValidator = devicefaultDescDescription.Validators[0].(func(string) error)
+	// devicefaultDescSuggestion is the schema descriptor for suggestion field.
+	devicefaultDescSuggestion := devicefaultFields[7].Descriptor()
+	// devicefault.SuggestionValidator is a validator for the "suggestion" field. It is called by the builders before save.
+	devicefault.SuggestionValidator = devicefaultDescSuggestion.Validators[0].(func(string) error)
+	// devicefaultDescDetectedAt is the schema descriptor for detected_at field.
+	devicefaultDescDetectedAt := devicefaultFields[8].Descriptor()
+	// devicefault.DefaultDetectedAt holds the default value on creation for the detected_at field.
+	devicefault.DefaultDetectedAt = devicefaultDescDetectedAt.Default.(func() time.Time)
+	// devicefaultDescCreatedAt is the schema descriptor for created_at field.
+	devicefaultDescCreatedAt := devicefaultFields[10].Descriptor()
+	// devicefault.DefaultCreatedAt holds the default value on creation for the created_at field.
+	devicefault.DefaultCreatedAt = devicefaultDescCreatedAt.Default.(func() time.Time)
+	// devicefaultDescUpdatedAt is the schema descriptor for updated_at field.
+	devicefaultDescUpdatedAt := devicefaultFields[11].Descriptor()
+	// devicefault.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	devicefault.DefaultUpdatedAt = devicefaultDescUpdatedAt.Default.(func() time.Time)
+	// devicefault.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	devicefault.UpdateDefaultUpdatedAt = devicefaultDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// devicefaultDescID is the schema descriptor for id field.
+	devicefaultDescID := devicefaultFields[0].Descriptor()
+	// devicefault.DefaultID holds the default value on creation for the id field.
+	devicefault.DefaultID = devicefaultDescID.Default.(func() uuid.UUID)
+	devicelogFields := schema.DeviceLog{}.Fields()
+	_ = devicelogFields
+	// devicelogDescDeviceID is the schema descriptor for device_id field.
+	devicelogDescDeviceID := devicelogFields[1].Descriptor()
+	// devicelog.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	devicelog.DeviceIDValidator = func() func(string) error {
+		validators := devicelogDescDeviceID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(device_id string) error {
+			for _, fn := range fns {
+				if err := fn(device_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// devicelogDescLogLevel is the schema descriptor for log_level field.
+	devicelogDescLogLevel := devicelogFields[3].Descriptor()
+	// devicelog.DefaultLogLevel holds the default value on creation for the log_level field.
+	devicelog.DefaultLogLevel = devicelogDescLogLevel.Default.(string)
+	// devicelog.LogLevelValidator is a validator for the "log_level" field. It is called by the builders before save.
+	devicelog.LogLevelValidator = devicelogDescLogLevel.Validators[0].(func(string) error)
+	// devicelogDescMessage is the schema descriptor for message field.
+	devicelogDescMessage := devicelogFields[4].Descriptor()
+	// devicelog.MessageValidator is a validator for the "message" field. It is called by the builders before save.
+	devicelog.MessageValidator = func() func(string) error {
+		validators := devicelogDescMessage.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(message string) error {
+			for _, fn := range fns {
+				if err := fn(message); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// devicelogDescFaultCode is the schema descriptor for fault_code field.
+	devicelogDescFaultCode := devicelogFields[5].Descriptor()
+	// devicelog.FaultCodeValidator is a validator for the "fault_code" field. It is called by the builders before save.
+	devicelog.FaultCodeValidator = devicelogDescFaultCode.Validators[0].(func(string) error)
+	// devicelogDescCreatedAt is the schema descriptor for created_at field.
+	devicelogDescCreatedAt := devicelogFields[7].Descriptor()
+	// devicelog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	devicelog.DefaultCreatedAt = devicelogDescCreatedAt.Default.(func() time.Time)
+	// devicelogDescID is the schema descriptor for id field.
+	devicelogDescID := devicelogFields[0].Descriptor()
+	// devicelog.DefaultID holds the default value on creation for the id field.
+	devicelog.DefaultID = devicelogDescID.Default.(func() uuid.UUID)
+	deviceperformanceFields := schema.DevicePerformance{}.Fields()
+	_ = deviceperformanceFields
+	// deviceperformanceDescDeviceID is the schema descriptor for device_id field.
+	deviceperformanceDescDeviceID := deviceperformanceFields[1].Descriptor()
+	// deviceperformance.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	deviceperformance.DeviceIDValidator = func() func(string) error {
+		validators := deviceperformanceDescDeviceID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(device_id string) error {
+			for _, fn := range fns {
+				if err := fn(device_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// deviceperformanceDescTimestamp is the schema descriptor for timestamp field.
+	deviceperformanceDescTimestamp := deviceperformanceFields[8].Descriptor()
+	// deviceperformance.DefaultTimestamp holds the default value on creation for the timestamp field.
+	deviceperformance.DefaultTimestamp = deviceperformanceDescTimestamp.Default.(func() time.Time)
+	// deviceperformanceDescCreatedAt is the schema descriptor for created_at field.
+	deviceperformanceDescCreatedAt := deviceperformanceFields[9].Descriptor()
+	// deviceperformance.DefaultCreatedAt holds the default value on creation for the created_at field.
+	deviceperformance.DefaultCreatedAt = deviceperformanceDescCreatedAt.Default.(func() time.Time)
+	// deviceperformanceDescID is the schema descriptor for id field.
+	deviceperformanceDescID := deviceperformanceFields[0].Descriptor()
+	// deviceperformance.DefaultID holds the default value on creation for the id field.
+	deviceperformance.DefaultID = deviceperformanceDescID.Default.(func() uuid.UUID)
+	deviceupgradeFields := schema.DeviceUpgrade{}.Fields()
+	_ = deviceupgradeFields
+	// deviceupgradeDescDeviceID is the schema descriptor for device_id field.
+	deviceupgradeDescDeviceID := deviceupgradeFields[1].Descriptor()
+	// deviceupgrade.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	deviceupgrade.DeviceIDValidator = func() func(string) error {
+		validators := deviceupgradeDescDeviceID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(device_id string) error {
+			for _, fn := range fns {
+				if err := fn(device_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// deviceupgradeDescFromVersion is the schema descriptor for from_version field.
+	deviceupgradeDescFromVersion := deviceupgradeFields[2].Descriptor()
+	// deviceupgrade.FromVersionValidator is a validator for the "from_version" field. It is called by the builders before save.
+	deviceupgrade.FromVersionValidator = func() func(string) error {
+		validators := deviceupgradeDescFromVersion.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(from_version string) error {
+			for _, fn := range fns {
+				if err := fn(from_version); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// deviceupgradeDescToVersion is the schema descriptor for to_version field.
+	deviceupgradeDescToVersion := deviceupgradeFields[3].Descriptor()
+	// deviceupgrade.ToVersionValidator is a validator for the "to_version" field. It is called by the builders before save.
+	deviceupgrade.ToVersionValidator = func() func(string) error {
+		validators := deviceupgradeDescToVersion.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(to_version string) error {
+			for _, fn := range fns {
+				if err := fn(to_version); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// deviceupgradeDescFirmwareURL is the schema descriptor for firmware_url field.
+	deviceupgradeDescFirmwareURL := deviceupgradeFields[4].Descriptor()
+	// deviceupgrade.FirmwareURLValidator is a validator for the "firmware_url" field. It is called by the builders before save.
+	deviceupgrade.FirmwareURLValidator = deviceupgradeDescFirmwareURL.Validators[0].(func(string) error)
+	// deviceupgradeDescErrorMessage is the schema descriptor for error_message field.
+	deviceupgradeDescErrorMessage := deviceupgradeFields[6].Descriptor()
+	// deviceupgrade.ErrorMessageValidator is a validator for the "error_message" field. It is called by the builders before save.
+	deviceupgrade.ErrorMessageValidator = deviceupgradeDescErrorMessage.Validators[0].(func(string) error)
+	// deviceupgradeDescStartTime is the schema descriptor for start_time field.
+	deviceupgradeDescStartTime := deviceupgradeFields[8].Descriptor()
+	// deviceupgrade.DefaultStartTime holds the default value on creation for the start_time field.
+	deviceupgrade.DefaultStartTime = deviceupgradeDescStartTime.Default.(func() time.Time)
+	// deviceupgradeDescCreatedAt is the schema descriptor for created_at field.
+	deviceupgradeDescCreatedAt := deviceupgradeFields[10].Descriptor()
+	// deviceupgrade.DefaultCreatedAt holds the default value on creation for the created_at field.
+	deviceupgrade.DefaultCreatedAt = deviceupgradeDescCreatedAt.Default.(func() time.Time)
+	// deviceupgradeDescUpdatedAt is the schema descriptor for updated_at field.
+	deviceupgradeDescUpdatedAt := deviceupgradeFields[11].Descriptor()
+	// deviceupgrade.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	deviceupgrade.DefaultUpdatedAt = deviceupgradeDescUpdatedAt.Default.(func() time.Time)
+	// deviceupgrade.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	deviceupgrade.UpdateDefaultUpdatedAt = deviceupgradeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deviceupgradeDescID is the schema descriptor for id field.
+	deviceupgradeDescID := deviceupgradeFields[0].Descriptor()
+	// deviceupgrade.DefaultID holds the default value on creation for the id field.
+	deviceupgrade.DefaultID = deviceupgradeDescID.Default.(func() uuid.UUID)
+	firmwareFields := schema.Firmware{}.Fields()
+	_ = firmwareFields
+	// firmwareDescFirmwareID is the schema descriptor for firmware_id field.
+	firmwareDescFirmwareID := firmwareFields[1].Descriptor()
+	// firmware.FirmwareIDValidator is a validator for the "firmware_id" field. It is called by the builders before save.
+	firmware.FirmwareIDValidator = func() func(string) error {
+		validators := firmwareDescFirmwareID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(firmware_id string) error {
+			for _, fn := range fns {
+				if err := fn(firmware_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// firmwareDescManufacturer is the schema descriptor for manufacturer field.
+	firmwareDescManufacturer := firmwareFields[2].Descriptor()
+	// firmware.ManufacturerValidator is a validator for the "manufacturer" field. It is called by the builders before save.
+	firmware.ManufacturerValidator = func() func(string) error {
+		validators := firmwareDescManufacturer.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(manufacturer string) error {
+			for _, fn := range fns {
+				if err := fn(manufacturer); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// firmwareDescModel is the schema descriptor for model field.
+	firmwareDescModel := firmwareFields[3].Descriptor()
+	// firmware.ModelValidator is a validator for the "model" field. It is called by the builders before save.
+	firmware.ModelValidator = func() func(string) error {
+		validators := firmwareDescModel.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(model string) error {
+			for _, fn := range fns {
+				if err := fn(model); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// firmwareDescVersion is the schema descriptor for version field.
+	firmwareDescVersion := firmwareFields[4].Descriptor()
+	// firmware.VersionValidator is a validator for the "version" field. It is called by the builders before save.
+	firmware.VersionValidator = func() func(string) error {
+		validators := firmwareDescVersion.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(version string) error {
+			for _, fn := range fns {
+				if err := fn(version); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// firmwareDescURL is the schema descriptor for url field.
+	firmwareDescURL := firmwareFields[5].Descriptor()
+	// firmware.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	firmware.URLValidator = func() func(string) error {
+		validators := firmwareDescURL.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(url string) error {
+			for _, fn := range fns {
+				if err := fn(url); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// firmwareDescMd5 is the schema descriptor for md5 field.
+	firmwareDescMd5 := firmwareFields[7].Descriptor()
+	// firmware.Md5Validator is a validator for the "md5" field. It is called by the builders before save.
+	firmware.Md5Validator = firmwareDescMd5.Validators[0].(func(string) error)
+	// firmwareDescDescription is the schema descriptor for description field.
+	firmwareDescDescription := firmwareFields[8].Descriptor()
+	// firmware.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	firmware.DescriptionValidator = firmwareDescDescription.Validators[0].(func(string) error)
+	// firmwareDescReleaseDate is the schema descriptor for release_date field.
+	firmwareDescReleaseDate := firmwareFields[10].Descriptor()
+	// firmware.DefaultReleaseDate holds the default value on creation for the release_date field.
+	firmware.DefaultReleaseDate = firmwareDescReleaseDate.Default.(func() time.Time)
+	// firmwareDescCreatedAt is the schema descriptor for created_at field.
+	firmwareDescCreatedAt := firmwareFields[11].Descriptor()
+	// firmware.DefaultCreatedAt holds the default value on creation for the created_at field.
+	firmware.DefaultCreatedAt = firmwareDescCreatedAt.Default.(func() time.Time)
+	// firmwareDescUpdatedAt is the schema descriptor for updated_at field.
+	firmwareDescUpdatedAt := firmwareFields[12].Descriptor()
+	// firmware.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	firmware.DefaultUpdatedAt = firmwareDescUpdatedAt.Default.(func() time.Time)
+	// firmware.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	firmware.UpdateDefaultUpdatedAt = firmwareDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// firmwareDescID is the schema descriptor for id field.
+	firmwareDescID := firmwareFields[0].Descriptor()
+	// firmware.DefaultID holds the default value on creation for the id field.
+	firmware.DefaultID = firmwareDescID.Default.(func() uuid.UUID)
 	laneFields := schema.Lane{}.Fields()
 	_ = laneFields
 	// laneDescLaneNo is the schema descriptor for lane_no field.
-	laneDescLaneNo := laneFields[2].Descriptor()
+	laneDescLaneNo := laneFields[3].Descriptor()
 	// lane.LaneNoValidator is a validator for the "lane_no" field. It is called by the builders before save.
 	lane.LaneNoValidator = laneDescLaneNo.Validators[0].(func(int) error)
 	// laneDescCreatedAt is the schema descriptor for created_at field.
-	laneDescCreatedAt := laneFields[6].Descriptor()
+	laneDescCreatedAt := laneFields[7].Descriptor()
 	// lane.DefaultCreatedAt holds the default value on creation for the created_at field.
 	lane.DefaultCreatedAt = laneDescCreatedAt.Default.(func() time.Time)
 	// laneDescUpdatedAt is the schema descriptor for updated_at field.
-	laneDescUpdatedAt := laneFields[7].Descriptor()
+	laneDescUpdatedAt := laneFields[8].Descriptor()
 	// lane.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	lane.DefaultUpdatedAt = laneDescUpdatedAt.Default.(func() time.Time)
 	// lane.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -129,10 +545,56 @@ func init() {
 	laneDescID := laneFields[0].Descriptor()
 	// lane.DefaultID holds the default value on creation for the id field.
 	lane.DefaultID = laneDescID.Default.(func() uuid.UUID)
+	manufacturerFields := schema.Manufacturer{}.Fields()
+	_ = manufacturerFields
+	// manufacturerDescName is the schema descriptor for name field.
+	manufacturerDescName := manufacturerFields[1].Descriptor()
+	// manufacturer.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	manufacturer.NameValidator = func() func(string) error {
+		validators := manufacturerDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// manufacturerDescWebsite is the schema descriptor for website field.
+	manufacturerDescWebsite := manufacturerFields[2].Descriptor()
+	// manufacturer.WebsiteValidator is a validator for the "website" field. It is called by the builders before save.
+	manufacturer.WebsiteValidator = manufacturerDescWebsite.Validators[0].(func(string) error)
+	// manufacturerDescContactInfo is the schema descriptor for contact_info field.
+	manufacturerDescContactInfo := manufacturerFields[3].Descriptor()
+	// manufacturer.ContactInfoValidator is a validator for the "contact_info" field. It is called by the builders before save.
+	manufacturer.ContactInfoValidator = manufacturerDescContactInfo.Validators[0].(func(string) error)
+	// manufacturerDescDescription is the schema descriptor for description field.
+	manufacturerDescDescription := manufacturerFields[4].Descriptor()
+	// manufacturer.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	manufacturer.DescriptionValidator = manufacturerDescDescription.Validators[0].(func(string) error)
+	// manufacturerDescCreatedAt is the schema descriptor for created_at field.
+	manufacturerDescCreatedAt := manufacturerFields[5].Descriptor()
+	// manufacturer.DefaultCreatedAt holds the default value on creation for the created_at field.
+	manufacturer.DefaultCreatedAt = manufacturerDescCreatedAt.Default.(func() time.Time)
+	// manufacturerDescUpdatedAt is the schema descriptor for updated_at field.
+	manufacturerDescUpdatedAt := manufacturerFields[6].Descriptor()
+	// manufacturer.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	manufacturer.DefaultUpdatedAt = manufacturerDescUpdatedAt.Default.(func() time.Time)
+	// manufacturer.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	manufacturer.UpdateDefaultUpdatedAt = manufacturerDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// manufacturerDescID is the schema descriptor for id field.
+	manufacturerDescID := manufacturerFields[0].Descriptor()
+	// manufacturer.DefaultID holds the default value on creation for the id field.
+	manufacturer.DefaultID = manufacturerDescID.Default.(func() uuid.UUID)
 	offlinesyncrecordFields := schema.OfflineSyncRecord{}.Fields()
 	_ = offlinesyncrecordFields
 	// offlinesyncrecordDescOfflineID is the schema descriptor for offline_id field.
-	offlinesyncrecordDescOfflineID := offlinesyncrecordFields[1].Descriptor()
+	offlinesyncrecordDescOfflineID := offlinesyncrecordFields[2].Descriptor()
 	// offlinesyncrecord.OfflineIDValidator is a validator for the "offline_id" field. It is called by the builders before save.
 	offlinesyncrecord.OfflineIDValidator = func() func(string) error {
 		validators := offlinesyncrecordDescOfflineID.Validators
@@ -150,7 +612,7 @@ func init() {
 		}
 	}()
 	// offlinesyncrecordDescDeviceID is the schema descriptor for device_id field.
-	offlinesyncrecordDescDeviceID := offlinesyncrecordFields[4].Descriptor()
+	offlinesyncrecordDescDeviceID := offlinesyncrecordFields[5].Descriptor()
 	// offlinesyncrecord.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
 	offlinesyncrecord.DeviceIDValidator = func() func(string) error {
 		validators := offlinesyncrecordDescDeviceID.Validators
@@ -168,7 +630,7 @@ func init() {
 		}
 	}()
 	// offlinesyncrecordDescGateID is the schema descriptor for gate_id field.
-	offlinesyncrecordDescGateID := offlinesyncrecordFields[5].Descriptor()
+	offlinesyncrecordDescGateID := offlinesyncrecordFields[6].Descriptor()
 	// offlinesyncrecord.GateIDValidator is a validator for the "gate_id" field. It is called by the builders before save.
 	offlinesyncrecord.GateIDValidator = func() func(string) error {
 		validators := offlinesyncrecordDescGateID.Validators
@@ -186,13 +648,13 @@ func init() {
 		}
 	}()
 	// offlinesyncrecordDescRetryCount is the schema descriptor for retry_count field.
-	offlinesyncrecordDescRetryCount := offlinesyncrecordFields[10].Descriptor()
+	offlinesyncrecordDescRetryCount := offlinesyncrecordFields[11].Descriptor()
 	// offlinesyncrecord.DefaultRetryCount holds the default value on creation for the retry_count field.
 	offlinesyncrecord.DefaultRetryCount = offlinesyncrecordDescRetryCount.Default.(int)
 	// offlinesyncrecord.RetryCountValidator is a validator for the "retry_count" field. It is called by the builders before save.
 	offlinesyncrecord.RetryCountValidator = offlinesyncrecordDescRetryCount.Validators[0].(func(int) error)
 	// offlinesyncrecordDescCreatedAt is the schema descriptor for created_at field.
-	offlinesyncrecordDescCreatedAt := offlinesyncrecordFields[12].Descriptor()
+	offlinesyncrecordDescCreatedAt := offlinesyncrecordFields[13].Descriptor()
 	// offlinesyncrecord.DefaultCreatedAt holds the default value on creation for the created_at field.
 	offlinesyncrecord.DefaultCreatedAt = offlinesyncrecordDescCreatedAt.Default.(func() time.Time)
 	// offlinesyncrecordDescID is the schema descriptor for id field.
@@ -202,35 +664,35 @@ func init() {
 	parkingrecordFields := schema.ParkingRecord{}.Fields()
 	_ = parkingrecordFields
 	// parkingrecordDescPlateNumber is the schema descriptor for plate_number field.
-	parkingrecordDescPlateNumber := parkingrecordFields[4].Descriptor()
+	parkingrecordDescPlateNumber := parkingrecordFields[5].Descriptor()
 	// parkingrecord.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	parkingrecord.PlateNumberValidator = parkingrecordDescPlateNumber.Validators[0].(func(string) error)
 	// parkingrecordDescEntryImageURL is the schema descriptor for entry_image_url field.
-	parkingrecordDescEntryImageURL := parkingrecordFields[7].Descriptor()
+	parkingrecordDescEntryImageURL := parkingrecordFields[8].Descriptor()
 	// parkingrecord.EntryImageURLValidator is a validator for the "entry_image_url" field. It is called by the builders before save.
 	parkingrecord.EntryImageURLValidator = parkingrecordDescEntryImageURL.Validators[0].(func(string) error)
 	// parkingrecordDescExitImageURL is the schema descriptor for exit_image_url field.
-	parkingrecordDescExitImageURL := parkingrecordFields[10].Descriptor()
+	parkingrecordDescExitImageURL := parkingrecordFields[11].Descriptor()
 	// parkingrecord.ExitImageURLValidator is a validator for the "exit_image_url" field. It is called by the builders before save.
 	parkingrecord.ExitImageURLValidator = parkingrecordDescExitImageURL.Validators[0].(func(string) error)
 	// parkingrecordDescExitDeviceID is the schema descriptor for exit_device_id field.
-	parkingrecordDescExitDeviceID := parkingrecordFields[12].Descriptor()
+	parkingrecordDescExitDeviceID := parkingrecordFields[13].Descriptor()
 	// parkingrecord.ExitDeviceIDValidator is a validator for the "exit_device_id" field. It is called by the builders before save.
 	parkingrecord.ExitDeviceIDValidator = parkingrecordDescExitDeviceID.Validators[0].(func(string) error)
 	// parkingrecordDescParkingDuration is the schema descriptor for parking_duration field.
-	parkingrecordDescParkingDuration := parkingrecordFields[13].Descriptor()
+	parkingrecordDescParkingDuration := parkingrecordFields[14].Descriptor()
 	// parkingrecord.DefaultParkingDuration holds the default value on creation for the parking_duration field.
 	parkingrecord.DefaultParkingDuration = parkingrecordDescParkingDuration.Default.(int)
 	// parkingrecordDescPaymentLock is the schema descriptor for payment_lock field.
-	parkingrecordDescPaymentLock := parkingrecordFields[15].Descriptor()
+	parkingrecordDescPaymentLock := parkingrecordFields[16].Descriptor()
 	// parkingrecord.DefaultPaymentLock holds the default value on creation for the payment_lock field.
 	parkingrecord.DefaultPaymentLock = parkingrecordDescPaymentLock.Default.(int)
 	// parkingrecordDescCreatedAt is the schema descriptor for created_at field.
-	parkingrecordDescCreatedAt := parkingrecordFields[17].Descriptor()
+	parkingrecordDescCreatedAt := parkingrecordFields[18].Descriptor()
 	// parkingrecord.DefaultCreatedAt holds the default value on creation for the created_at field.
 	parkingrecord.DefaultCreatedAt = parkingrecordDescCreatedAt.Default.(func() time.Time)
 	// parkingrecordDescUpdatedAt is the schema descriptor for updated_at field.
-	parkingrecordDescUpdatedAt := parkingrecordFields[18].Descriptor()
+	parkingrecordDescUpdatedAt := parkingrecordFields[19].Descriptor()
 	// parkingrecord.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	parkingrecord.DefaultUpdatedAt = parkingrecordDescUpdatedAt.Default.(func() time.Time)
 	// parkingrecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -242,23 +704,23 @@ func init() {
 	vehicleFields := schema.Vehicle{}.Fields()
 	_ = vehicleFields
 	// vehicleDescPlateNumber is the schema descriptor for plate_number field.
-	vehicleDescPlateNumber := vehicleFields[1].Descriptor()
+	vehicleDescPlateNumber := vehicleFields[2].Descriptor()
 	// vehicle.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	vehicle.PlateNumberValidator = vehicleDescPlateNumber.Validators[0].(func(string) error)
 	// vehicleDescOwnerName is the schema descriptor for owner_name field.
-	vehicleDescOwnerName := vehicleFields[3].Descriptor()
+	vehicleDescOwnerName := vehicleFields[4].Descriptor()
 	// vehicle.OwnerNameValidator is a validator for the "owner_name" field. It is called by the builders before save.
 	vehicle.OwnerNameValidator = vehicleDescOwnerName.Validators[0].(func(string) error)
 	// vehicleDescOwnerPhone is the schema descriptor for owner_phone field.
-	vehicleDescOwnerPhone := vehicleFields[4].Descriptor()
+	vehicleDescOwnerPhone := vehicleFields[5].Descriptor()
 	// vehicle.OwnerPhoneValidator is a validator for the "owner_phone" field. It is called by the builders before save.
 	vehicle.OwnerPhoneValidator = vehicleDescOwnerPhone.Validators[0].(func(string) error)
 	// vehicleDescCreatedAt is the schema descriptor for created_at field.
-	vehicleDescCreatedAt := vehicleFields[6].Descriptor()
+	vehicleDescCreatedAt := vehicleFields[7].Descriptor()
 	// vehicle.DefaultCreatedAt holds the default value on creation for the created_at field.
 	vehicle.DefaultCreatedAt = vehicleDescCreatedAt.Default.(func() time.Time)
 	// vehicleDescUpdatedAt is the schema descriptor for updated_at field.
-	vehicleDescUpdatedAt := vehicleFields[7].Descriptor()
+	vehicleDescUpdatedAt := vehicleFields[8].Descriptor()
 	// vehicle.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	vehicle.DefaultUpdatedAt = vehicleDescUpdatedAt.Default.(func() time.Time)
 	// vehicle.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

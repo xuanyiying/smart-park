@@ -10,6 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/xuanyiying/smart-park/pkg/database"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 
 	v1 "github.com/xuanyiying/smart-park/api/admin/v1"
 	"github.com/xuanyiying/smart-park/internal/admin/biz"
@@ -19,6 +20,7 @@ import (
 	multentdata "github.com/xuanyiying/smart-park/internal/multitenancy/data"
 	multent "github.com/xuanyiying/smart-park/internal/multitenancy/data/ent"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/metrics"
 	tenantpkg "github.com/xuanyiying/smart-park/pkg/tenant"
 )
 
@@ -68,16 +70,16 @@ func main() {
 	}
 
 	// Connect to database with read-write separation
-	dbCfg := &database.Config{
+	dbCfg := &database.RWConfig{
 		Primary: struct {
 			Source string
 		}{
-			Source: cfg.Database.Primary.Source,
+			Source: cfg.Database.Source,
 		},
 		Replica: struct {
 			Source string
 		}{
-			Source: cfg.Database.Replica.Source,
+			Source: cfg.Database.Source,
 		},
 	}
 	dbManager, err := database.NewDBManager(dbCfg)
@@ -88,7 +90,7 @@ func main() {
 	defer dbManager.Close()
 
 	// Connect to database using ent
-	dbClient, err := ent.Open("postgres", dbManager.Primary())
+	dbClient, err := ent.Open("postgres", cfg.Database.Source)
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)

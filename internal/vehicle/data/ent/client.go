@@ -17,7 +17,13 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceperformance"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceupgrade"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/firmware"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/manufacturer"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
@@ -32,8 +38,20 @@ type Client struct {
 	BillingRule *BillingRuleClient
 	// Device is the client for interacting with the Device builders.
 	Device *DeviceClient
+	// DeviceFault is the client for interacting with the DeviceFault builders.
+	DeviceFault *DeviceFaultClient
+	// DeviceLog is the client for interacting with the DeviceLog builders.
+	DeviceLog *DeviceLogClient
+	// DevicePerformance is the client for interacting with the DevicePerformance builders.
+	DevicePerformance *DevicePerformanceClient
+	// DeviceUpgrade is the client for interacting with the DeviceUpgrade builders.
+	DeviceUpgrade *DeviceUpgradeClient
+	// Firmware is the client for interacting with the Firmware builders.
+	Firmware *FirmwareClient
 	// Lane is the client for interacting with the Lane builders.
 	Lane *LaneClient
+	// Manufacturer is the client for interacting with the Manufacturer builders.
+	Manufacturer *ManufacturerClient
 	// OfflineSyncRecord is the client for interacting with the OfflineSyncRecord builders.
 	OfflineSyncRecord *OfflineSyncRecordClient
 	// ParkingRecord is the client for interacting with the ParkingRecord builders.
@@ -53,7 +71,13 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.BillingRule = NewBillingRuleClient(c.config)
 	c.Device = NewDeviceClient(c.config)
+	c.DeviceFault = NewDeviceFaultClient(c.config)
+	c.DeviceLog = NewDeviceLogClient(c.config)
+	c.DevicePerformance = NewDevicePerformanceClient(c.config)
+	c.DeviceUpgrade = NewDeviceUpgradeClient(c.config)
+	c.Firmware = NewFirmwareClient(c.config)
 	c.Lane = NewLaneClient(c.config)
+	c.Manufacturer = NewManufacturerClient(c.config)
 	c.OfflineSyncRecord = NewOfflineSyncRecordClient(c.config)
 	c.ParkingRecord = NewParkingRecordClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
@@ -151,7 +175,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:            cfg,
 		BillingRule:       NewBillingRuleClient(cfg),
 		Device:            NewDeviceClient(cfg),
+		DeviceFault:       NewDeviceFaultClient(cfg),
+		DeviceLog:         NewDeviceLogClient(cfg),
+		DevicePerformance: NewDevicePerformanceClient(cfg),
+		DeviceUpgrade:     NewDeviceUpgradeClient(cfg),
+		Firmware:          NewFirmwareClient(cfg),
 		Lane:              NewLaneClient(cfg),
+		Manufacturer:      NewManufacturerClient(cfg),
 		OfflineSyncRecord: NewOfflineSyncRecordClient(cfg),
 		ParkingRecord:     NewParkingRecordClient(cfg),
 		Vehicle:           NewVehicleClient(cfg),
@@ -176,7 +206,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:            cfg,
 		BillingRule:       NewBillingRuleClient(cfg),
 		Device:            NewDeviceClient(cfg),
+		DeviceFault:       NewDeviceFaultClient(cfg),
+		DeviceLog:         NewDeviceLogClient(cfg),
+		DevicePerformance: NewDevicePerformanceClient(cfg),
+		DeviceUpgrade:     NewDeviceUpgradeClient(cfg),
+		Firmware:          NewFirmwareClient(cfg),
 		Lane:              NewLaneClient(cfg),
+		Manufacturer:      NewManufacturerClient(cfg),
 		OfflineSyncRecord: NewOfflineSyncRecordClient(cfg),
 		ParkingRecord:     NewParkingRecordClient(cfg),
 		Vehicle:           NewVehicleClient(cfg),
@@ -209,8 +245,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.BillingRule, c.Device, c.Lane, c.OfflineSyncRecord, c.ParkingRecord,
-		c.Vehicle,
+		c.BillingRule, c.Device, c.DeviceFault, c.DeviceLog, c.DevicePerformance,
+		c.DeviceUpgrade, c.Firmware, c.Lane, c.Manufacturer, c.OfflineSyncRecord,
+		c.ParkingRecord, c.Vehicle,
 	} {
 		n.Use(hooks...)
 	}
@@ -220,8 +257,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.BillingRule, c.Device, c.Lane, c.OfflineSyncRecord, c.ParkingRecord,
-		c.Vehicle,
+		c.BillingRule, c.Device, c.DeviceFault, c.DeviceLog, c.DevicePerformance,
+		c.DeviceUpgrade, c.Firmware, c.Lane, c.Manufacturer, c.OfflineSyncRecord,
+		c.ParkingRecord, c.Vehicle,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -234,8 +272,20 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BillingRule.mutate(ctx, m)
 	case *DeviceMutation:
 		return c.Device.mutate(ctx, m)
+	case *DeviceFaultMutation:
+		return c.DeviceFault.mutate(ctx, m)
+	case *DeviceLogMutation:
+		return c.DeviceLog.mutate(ctx, m)
+	case *DevicePerformanceMutation:
+		return c.DevicePerformance.mutate(ctx, m)
+	case *DeviceUpgradeMutation:
+		return c.DeviceUpgrade.mutate(ctx, m)
+	case *FirmwareMutation:
+		return c.Firmware.mutate(ctx, m)
 	case *LaneMutation:
 		return c.Lane.mutate(ctx, m)
+	case *ManufacturerMutation:
+		return c.Manufacturer.mutate(ctx, m)
 	case *OfflineSyncRecordMutation:
 		return c.OfflineSyncRecord.mutate(ctx, m)
 	case *ParkingRecordMutation:
@@ -513,6 +563,671 @@ func (c *DeviceClient) mutate(ctx context.Context, m *DeviceMutation) (Value, er
 	}
 }
 
+// DeviceFaultClient is a client for the DeviceFault schema.
+type DeviceFaultClient struct {
+	config
+}
+
+// NewDeviceFaultClient returns a client for the DeviceFault from the given config.
+func NewDeviceFaultClient(c config) *DeviceFaultClient {
+	return &DeviceFaultClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `devicefault.Hooks(f(g(h())))`.
+func (c *DeviceFaultClient) Use(hooks ...Hook) {
+	c.hooks.DeviceFault = append(c.hooks.DeviceFault, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `devicefault.Intercept(f(g(h())))`.
+func (c *DeviceFaultClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DeviceFault = append(c.inters.DeviceFault, interceptors...)
+}
+
+// Create returns a builder for creating a DeviceFault entity.
+func (c *DeviceFaultClient) Create() *DeviceFaultCreate {
+	mutation := newDeviceFaultMutation(c.config, OpCreate)
+	return &DeviceFaultCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DeviceFault entities.
+func (c *DeviceFaultClient) CreateBulk(builders ...*DeviceFaultCreate) *DeviceFaultCreateBulk {
+	return &DeviceFaultCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DeviceFaultClient) MapCreateBulk(slice any, setFunc func(*DeviceFaultCreate, int)) *DeviceFaultCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DeviceFaultCreateBulk{err: fmt.Errorf("calling to DeviceFaultClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DeviceFaultCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DeviceFaultCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DeviceFault.
+func (c *DeviceFaultClient) Update() *DeviceFaultUpdate {
+	mutation := newDeviceFaultMutation(c.config, OpUpdate)
+	return &DeviceFaultUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceFaultClient) UpdateOne(_m *DeviceFault) *DeviceFaultUpdateOne {
+	mutation := newDeviceFaultMutation(c.config, OpUpdateOne, withDeviceFault(_m))
+	return &DeviceFaultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceFaultClient) UpdateOneID(id uuid.UUID) *DeviceFaultUpdateOne {
+	mutation := newDeviceFaultMutation(c.config, OpUpdateOne, withDeviceFaultID(id))
+	return &DeviceFaultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DeviceFault.
+func (c *DeviceFaultClient) Delete() *DeviceFaultDelete {
+	mutation := newDeviceFaultMutation(c.config, OpDelete)
+	return &DeviceFaultDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DeviceFaultClient) DeleteOne(_m *DeviceFault) *DeviceFaultDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DeviceFaultClient) DeleteOneID(id uuid.UUID) *DeviceFaultDeleteOne {
+	builder := c.Delete().Where(devicefault.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceFaultDeleteOne{builder}
+}
+
+// Query returns a query builder for DeviceFault.
+func (c *DeviceFaultClient) Query() *DeviceFaultQuery {
+	return &DeviceFaultQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDeviceFault},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DeviceFault entity by its id.
+func (c *DeviceFaultClient) Get(ctx context.Context, id uuid.UUID) (*DeviceFault, error) {
+	return c.Query().Where(devicefault.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceFaultClient) GetX(ctx context.Context, id uuid.UUID) *DeviceFault {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceFaultClient) Hooks() []Hook {
+	return c.hooks.DeviceFault
+}
+
+// Interceptors returns the client interceptors.
+func (c *DeviceFaultClient) Interceptors() []Interceptor {
+	return c.inters.DeviceFault
+}
+
+func (c *DeviceFaultClient) mutate(ctx context.Context, m *DeviceFaultMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DeviceFaultCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DeviceFaultUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DeviceFaultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DeviceFaultDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DeviceFault mutation op: %q", m.Op())
+	}
+}
+
+// DeviceLogClient is a client for the DeviceLog schema.
+type DeviceLogClient struct {
+	config
+}
+
+// NewDeviceLogClient returns a client for the DeviceLog from the given config.
+func NewDeviceLogClient(c config) *DeviceLogClient {
+	return &DeviceLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `devicelog.Hooks(f(g(h())))`.
+func (c *DeviceLogClient) Use(hooks ...Hook) {
+	c.hooks.DeviceLog = append(c.hooks.DeviceLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `devicelog.Intercept(f(g(h())))`.
+func (c *DeviceLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DeviceLog = append(c.inters.DeviceLog, interceptors...)
+}
+
+// Create returns a builder for creating a DeviceLog entity.
+func (c *DeviceLogClient) Create() *DeviceLogCreate {
+	mutation := newDeviceLogMutation(c.config, OpCreate)
+	return &DeviceLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DeviceLog entities.
+func (c *DeviceLogClient) CreateBulk(builders ...*DeviceLogCreate) *DeviceLogCreateBulk {
+	return &DeviceLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DeviceLogClient) MapCreateBulk(slice any, setFunc func(*DeviceLogCreate, int)) *DeviceLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DeviceLogCreateBulk{err: fmt.Errorf("calling to DeviceLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DeviceLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DeviceLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DeviceLog.
+func (c *DeviceLogClient) Update() *DeviceLogUpdate {
+	mutation := newDeviceLogMutation(c.config, OpUpdate)
+	return &DeviceLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceLogClient) UpdateOne(_m *DeviceLog) *DeviceLogUpdateOne {
+	mutation := newDeviceLogMutation(c.config, OpUpdateOne, withDeviceLog(_m))
+	return &DeviceLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceLogClient) UpdateOneID(id uuid.UUID) *DeviceLogUpdateOne {
+	mutation := newDeviceLogMutation(c.config, OpUpdateOne, withDeviceLogID(id))
+	return &DeviceLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DeviceLog.
+func (c *DeviceLogClient) Delete() *DeviceLogDelete {
+	mutation := newDeviceLogMutation(c.config, OpDelete)
+	return &DeviceLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DeviceLogClient) DeleteOne(_m *DeviceLog) *DeviceLogDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DeviceLogClient) DeleteOneID(id uuid.UUID) *DeviceLogDeleteOne {
+	builder := c.Delete().Where(devicelog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceLogDeleteOne{builder}
+}
+
+// Query returns a query builder for DeviceLog.
+func (c *DeviceLogClient) Query() *DeviceLogQuery {
+	return &DeviceLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDeviceLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DeviceLog entity by its id.
+func (c *DeviceLogClient) Get(ctx context.Context, id uuid.UUID) (*DeviceLog, error) {
+	return c.Query().Where(devicelog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceLogClient) GetX(ctx context.Context, id uuid.UUID) *DeviceLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceLogClient) Hooks() []Hook {
+	return c.hooks.DeviceLog
+}
+
+// Interceptors returns the client interceptors.
+func (c *DeviceLogClient) Interceptors() []Interceptor {
+	return c.inters.DeviceLog
+}
+
+func (c *DeviceLogClient) mutate(ctx context.Context, m *DeviceLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DeviceLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DeviceLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DeviceLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DeviceLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DeviceLog mutation op: %q", m.Op())
+	}
+}
+
+// DevicePerformanceClient is a client for the DevicePerformance schema.
+type DevicePerformanceClient struct {
+	config
+}
+
+// NewDevicePerformanceClient returns a client for the DevicePerformance from the given config.
+func NewDevicePerformanceClient(c config) *DevicePerformanceClient {
+	return &DevicePerformanceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `deviceperformance.Hooks(f(g(h())))`.
+func (c *DevicePerformanceClient) Use(hooks ...Hook) {
+	c.hooks.DevicePerformance = append(c.hooks.DevicePerformance, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `deviceperformance.Intercept(f(g(h())))`.
+func (c *DevicePerformanceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DevicePerformance = append(c.inters.DevicePerformance, interceptors...)
+}
+
+// Create returns a builder for creating a DevicePerformance entity.
+func (c *DevicePerformanceClient) Create() *DevicePerformanceCreate {
+	mutation := newDevicePerformanceMutation(c.config, OpCreate)
+	return &DevicePerformanceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DevicePerformance entities.
+func (c *DevicePerformanceClient) CreateBulk(builders ...*DevicePerformanceCreate) *DevicePerformanceCreateBulk {
+	return &DevicePerformanceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DevicePerformanceClient) MapCreateBulk(slice any, setFunc func(*DevicePerformanceCreate, int)) *DevicePerformanceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DevicePerformanceCreateBulk{err: fmt.Errorf("calling to DevicePerformanceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DevicePerformanceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DevicePerformanceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DevicePerformance.
+func (c *DevicePerformanceClient) Update() *DevicePerformanceUpdate {
+	mutation := newDevicePerformanceMutation(c.config, OpUpdate)
+	return &DevicePerformanceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DevicePerformanceClient) UpdateOne(_m *DevicePerformance) *DevicePerformanceUpdateOne {
+	mutation := newDevicePerformanceMutation(c.config, OpUpdateOne, withDevicePerformance(_m))
+	return &DevicePerformanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DevicePerformanceClient) UpdateOneID(id uuid.UUID) *DevicePerformanceUpdateOne {
+	mutation := newDevicePerformanceMutation(c.config, OpUpdateOne, withDevicePerformanceID(id))
+	return &DevicePerformanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DevicePerformance.
+func (c *DevicePerformanceClient) Delete() *DevicePerformanceDelete {
+	mutation := newDevicePerformanceMutation(c.config, OpDelete)
+	return &DevicePerformanceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DevicePerformanceClient) DeleteOne(_m *DevicePerformance) *DevicePerformanceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DevicePerformanceClient) DeleteOneID(id uuid.UUID) *DevicePerformanceDeleteOne {
+	builder := c.Delete().Where(deviceperformance.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DevicePerformanceDeleteOne{builder}
+}
+
+// Query returns a query builder for DevicePerformance.
+func (c *DevicePerformanceClient) Query() *DevicePerformanceQuery {
+	return &DevicePerformanceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDevicePerformance},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DevicePerformance entity by its id.
+func (c *DevicePerformanceClient) Get(ctx context.Context, id uuid.UUID) (*DevicePerformance, error) {
+	return c.Query().Where(deviceperformance.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DevicePerformanceClient) GetX(ctx context.Context, id uuid.UUID) *DevicePerformance {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DevicePerformanceClient) Hooks() []Hook {
+	return c.hooks.DevicePerformance
+}
+
+// Interceptors returns the client interceptors.
+func (c *DevicePerformanceClient) Interceptors() []Interceptor {
+	return c.inters.DevicePerformance
+}
+
+func (c *DevicePerformanceClient) mutate(ctx context.Context, m *DevicePerformanceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DevicePerformanceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DevicePerformanceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DevicePerformanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DevicePerformanceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DevicePerformance mutation op: %q", m.Op())
+	}
+}
+
+// DeviceUpgradeClient is a client for the DeviceUpgrade schema.
+type DeviceUpgradeClient struct {
+	config
+}
+
+// NewDeviceUpgradeClient returns a client for the DeviceUpgrade from the given config.
+func NewDeviceUpgradeClient(c config) *DeviceUpgradeClient {
+	return &DeviceUpgradeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `deviceupgrade.Hooks(f(g(h())))`.
+func (c *DeviceUpgradeClient) Use(hooks ...Hook) {
+	c.hooks.DeviceUpgrade = append(c.hooks.DeviceUpgrade, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `deviceupgrade.Intercept(f(g(h())))`.
+func (c *DeviceUpgradeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DeviceUpgrade = append(c.inters.DeviceUpgrade, interceptors...)
+}
+
+// Create returns a builder for creating a DeviceUpgrade entity.
+func (c *DeviceUpgradeClient) Create() *DeviceUpgradeCreate {
+	mutation := newDeviceUpgradeMutation(c.config, OpCreate)
+	return &DeviceUpgradeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DeviceUpgrade entities.
+func (c *DeviceUpgradeClient) CreateBulk(builders ...*DeviceUpgradeCreate) *DeviceUpgradeCreateBulk {
+	return &DeviceUpgradeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DeviceUpgradeClient) MapCreateBulk(slice any, setFunc func(*DeviceUpgradeCreate, int)) *DeviceUpgradeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DeviceUpgradeCreateBulk{err: fmt.Errorf("calling to DeviceUpgradeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DeviceUpgradeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DeviceUpgradeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DeviceUpgrade.
+func (c *DeviceUpgradeClient) Update() *DeviceUpgradeUpdate {
+	mutation := newDeviceUpgradeMutation(c.config, OpUpdate)
+	return &DeviceUpgradeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceUpgradeClient) UpdateOne(_m *DeviceUpgrade) *DeviceUpgradeUpdateOne {
+	mutation := newDeviceUpgradeMutation(c.config, OpUpdateOne, withDeviceUpgrade(_m))
+	return &DeviceUpgradeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceUpgradeClient) UpdateOneID(id uuid.UUID) *DeviceUpgradeUpdateOne {
+	mutation := newDeviceUpgradeMutation(c.config, OpUpdateOne, withDeviceUpgradeID(id))
+	return &DeviceUpgradeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DeviceUpgrade.
+func (c *DeviceUpgradeClient) Delete() *DeviceUpgradeDelete {
+	mutation := newDeviceUpgradeMutation(c.config, OpDelete)
+	return &DeviceUpgradeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DeviceUpgradeClient) DeleteOne(_m *DeviceUpgrade) *DeviceUpgradeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DeviceUpgradeClient) DeleteOneID(id uuid.UUID) *DeviceUpgradeDeleteOne {
+	builder := c.Delete().Where(deviceupgrade.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceUpgradeDeleteOne{builder}
+}
+
+// Query returns a query builder for DeviceUpgrade.
+func (c *DeviceUpgradeClient) Query() *DeviceUpgradeQuery {
+	return &DeviceUpgradeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDeviceUpgrade},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DeviceUpgrade entity by its id.
+func (c *DeviceUpgradeClient) Get(ctx context.Context, id uuid.UUID) (*DeviceUpgrade, error) {
+	return c.Query().Where(deviceupgrade.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceUpgradeClient) GetX(ctx context.Context, id uuid.UUID) *DeviceUpgrade {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceUpgradeClient) Hooks() []Hook {
+	return c.hooks.DeviceUpgrade
+}
+
+// Interceptors returns the client interceptors.
+func (c *DeviceUpgradeClient) Interceptors() []Interceptor {
+	return c.inters.DeviceUpgrade
+}
+
+func (c *DeviceUpgradeClient) mutate(ctx context.Context, m *DeviceUpgradeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DeviceUpgradeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DeviceUpgradeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DeviceUpgradeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DeviceUpgradeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DeviceUpgrade mutation op: %q", m.Op())
+	}
+}
+
+// FirmwareClient is a client for the Firmware schema.
+type FirmwareClient struct {
+	config
+}
+
+// NewFirmwareClient returns a client for the Firmware from the given config.
+func NewFirmwareClient(c config) *FirmwareClient {
+	return &FirmwareClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `firmware.Hooks(f(g(h())))`.
+func (c *FirmwareClient) Use(hooks ...Hook) {
+	c.hooks.Firmware = append(c.hooks.Firmware, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `firmware.Intercept(f(g(h())))`.
+func (c *FirmwareClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Firmware = append(c.inters.Firmware, interceptors...)
+}
+
+// Create returns a builder for creating a Firmware entity.
+func (c *FirmwareClient) Create() *FirmwareCreate {
+	mutation := newFirmwareMutation(c.config, OpCreate)
+	return &FirmwareCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Firmware entities.
+func (c *FirmwareClient) CreateBulk(builders ...*FirmwareCreate) *FirmwareCreateBulk {
+	return &FirmwareCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FirmwareClient) MapCreateBulk(slice any, setFunc func(*FirmwareCreate, int)) *FirmwareCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FirmwareCreateBulk{err: fmt.Errorf("calling to FirmwareClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FirmwareCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FirmwareCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Firmware.
+func (c *FirmwareClient) Update() *FirmwareUpdate {
+	mutation := newFirmwareMutation(c.config, OpUpdate)
+	return &FirmwareUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FirmwareClient) UpdateOne(_m *Firmware) *FirmwareUpdateOne {
+	mutation := newFirmwareMutation(c.config, OpUpdateOne, withFirmware(_m))
+	return &FirmwareUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FirmwareClient) UpdateOneID(id uuid.UUID) *FirmwareUpdateOne {
+	mutation := newFirmwareMutation(c.config, OpUpdateOne, withFirmwareID(id))
+	return &FirmwareUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Firmware.
+func (c *FirmwareClient) Delete() *FirmwareDelete {
+	mutation := newFirmwareMutation(c.config, OpDelete)
+	return &FirmwareDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FirmwareClient) DeleteOne(_m *Firmware) *FirmwareDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FirmwareClient) DeleteOneID(id uuid.UUID) *FirmwareDeleteOne {
+	builder := c.Delete().Where(firmware.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FirmwareDeleteOne{builder}
+}
+
+// Query returns a query builder for Firmware.
+func (c *FirmwareClient) Query() *FirmwareQuery {
+	return &FirmwareQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFirmware},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Firmware entity by its id.
+func (c *FirmwareClient) Get(ctx context.Context, id uuid.UUID) (*Firmware, error) {
+	return c.Query().Where(firmware.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FirmwareClient) GetX(ctx context.Context, id uuid.UUID) *Firmware {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FirmwareClient) Hooks() []Hook {
+	return c.hooks.Firmware
+}
+
+// Interceptors returns the client interceptors.
+func (c *FirmwareClient) Interceptors() []Interceptor {
+	return c.inters.Firmware
+}
+
+func (c *FirmwareClient) mutate(ctx context.Context, m *FirmwareMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FirmwareCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FirmwareUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FirmwareUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FirmwareDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Firmware mutation op: %q", m.Op())
+	}
+}
+
 // LaneClient is a client for the Lane schema.
 type LaneClient struct {
 	config
@@ -643,6 +1358,139 @@ func (c *LaneClient) mutate(ctx context.Context, m *LaneMutation) (Value, error)
 		return (&LaneDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Lane mutation op: %q", m.Op())
+	}
+}
+
+// ManufacturerClient is a client for the Manufacturer schema.
+type ManufacturerClient struct {
+	config
+}
+
+// NewManufacturerClient returns a client for the Manufacturer from the given config.
+func NewManufacturerClient(c config) *ManufacturerClient {
+	return &ManufacturerClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `manufacturer.Hooks(f(g(h())))`.
+func (c *ManufacturerClient) Use(hooks ...Hook) {
+	c.hooks.Manufacturer = append(c.hooks.Manufacturer, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `manufacturer.Intercept(f(g(h())))`.
+func (c *ManufacturerClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Manufacturer = append(c.inters.Manufacturer, interceptors...)
+}
+
+// Create returns a builder for creating a Manufacturer entity.
+func (c *ManufacturerClient) Create() *ManufacturerCreate {
+	mutation := newManufacturerMutation(c.config, OpCreate)
+	return &ManufacturerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Manufacturer entities.
+func (c *ManufacturerClient) CreateBulk(builders ...*ManufacturerCreate) *ManufacturerCreateBulk {
+	return &ManufacturerCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ManufacturerClient) MapCreateBulk(slice any, setFunc func(*ManufacturerCreate, int)) *ManufacturerCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ManufacturerCreateBulk{err: fmt.Errorf("calling to ManufacturerClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ManufacturerCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ManufacturerCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Manufacturer.
+func (c *ManufacturerClient) Update() *ManufacturerUpdate {
+	mutation := newManufacturerMutation(c.config, OpUpdate)
+	return &ManufacturerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ManufacturerClient) UpdateOne(_m *Manufacturer) *ManufacturerUpdateOne {
+	mutation := newManufacturerMutation(c.config, OpUpdateOne, withManufacturer(_m))
+	return &ManufacturerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ManufacturerClient) UpdateOneID(id uuid.UUID) *ManufacturerUpdateOne {
+	mutation := newManufacturerMutation(c.config, OpUpdateOne, withManufacturerID(id))
+	return &ManufacturerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Manufacturer.
+func (c *ManufacturerClient) Delete() *ManufacturerDelete {
+	mutation := newManufacturerMutation(c.config, OpDelete)
+	return &ManufacturerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ManufacturerClient) DeleteOne(_m *Manufacturer) *ManufacturerDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ManufacturerClient) DeleteOneID(id uuid.UUID) *ManufacturerDeleteOne {
+	builder := c.Delete().Where(manufacturer.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ManufacturerDeleteOne{builder}
+}
+
+// Query returns a query builder for Manufacturer.
+func (c *ManufacturerClient) Query() *ManufacturerQuery {
+	return &ManufacturerQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeManufacturer},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Manufacturer entity by its id.
+func (c *ManufacturerClient) Get(ctx context.Context, id uuid.UUID) (*Manufacturer, error) {
+	return c.Query().Where(manufacturer.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ManufacturerClient) GetX(ctx context.Context, id uuid.UUID) *Manufacturer {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ManufacturerClient) Hooks() []Hook {
+	return c.hooks.Manufacturer
+}
+
+// Interceptors returns the client interceptors.
+func (c *ManufacturerClient) Interceptors() []Interceptor {
+	return c.inters.Manufacturer
+}
+
+func (c *ManufacturerClient) mutate(ctx context.Context, m *ManufacturerMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ManufacturerCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ManufacturerUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ManufacturerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ManufacturerDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Manufacturer mutation op: %q", m.Op())
 	}
 }
 
@@ -1048,10 +1896,13 @@ func (c *VehicleClient) mutate(ctx context.Context, m *VehicleMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		BillingRule, Device, Lane, OfflineSyncRecord, ParkingRecord, Vehicle []ent.Hook
+		BillingRule, Device, DeviceFault, DeviceLog, DevicePerformance, DeviceUpgrade,
+		Firmware, Lane, Manufacturer, OfflineSyncRecord, ParkingRecord,
+		Vehicle []ent.Hook
 	}
 	inters struct {
-		BillingRule, Device, Lane, OfflineSyncRecord, ParkingRecord,
+		BillingRule, Device, DeviceFault, DeviceLog, DevicePerformance, DeviceUpgrade,
+		Firmware, Lane, Manufacturer, OfflineSyncRecord, ParkingRecord,
 		Vehicle []ent.Interceptor
 	}
 )

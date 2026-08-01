@@ -39,6 +39,13 @@ service BillingService {
       get: "/api/v1/admin/billing/rules"
     };
   }
+
+  rpc TestBillingRule (TestBillingRuleRequest) returns (TestBillingRuleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/billing/rules/test"
+      body: "*"
+    };
+  }
 }
 
 message CalculateFeeRequest {
@@ -130,4 +137,20 @@ message BillingRule {
   int32 priority = 7;
   bool isActive = 8;
   string createdAt = 9;
+}
+
+message TestBillingRuleRequest {
+  string vehicleType    = 1;
+  int64  entryTime      = 2;
+  int64  exitTime        = 3;
+  bool   isHoliday      = 4;
+  string conditionsJson = 5;
+  string actionsJson    = 6;
+}
+
+message TestBillingRuleResponse {
+  bool     conditionMet   = 1;
+  double   calculatedFee = 2;
+  repeated string appliedActions = 3;
+  double   duration      = 4;
 }

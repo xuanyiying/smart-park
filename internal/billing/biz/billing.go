@@ -33,7 +33,7 @@ type Action struct {
 	Unit    string  `json:"unit,omitempty"`
 	Ceil    float64 `json:"ceil,omitempty"`
 	Cap     float64 `json:"cap,omitempty"`
-	Value   float64 `json:"value,omitempty"`
+	Value   interface{} `json:"value,omitempty"`
 }
 
 // ParseConditions parses JSON conditions string into Condition struct.
@@ -486,14 +486,14 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 				amount = a.Amount
 			}
 		case "free_duration":
-			freeMinutes := a.Value
-			if duration.Minutes() <= freeMinutes {
-				amount = 0
-			} else {
-				// 扣除免费时长后计算费用
-				remainingMinutes := duration.Minutes() - freeMinutes
-				amount = (remainingMinutes / 60) * a.Amount
-			}
+				freeMinutes, _ := a.Value.(float64)
+				if duration.Minutes() <= freeMinutes {
+					amount = 0
+				} else {
+					// 扣除免费时长后计算费用
+					remainingMinutes := duration.Minutes() - freeMinutes
+					amount = (remainingMinutes / 60) * a.Amount
+				}
 		case "night_discount":
 			hour := exitTime.Hour()
 			if hour >= 22 || hour < 8 {
@@ -574,8 +574,9 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 			// 季节性折扣
 			amount = amount * (1 - a.Percent/100)
 		case "long_term_discount":
-			// 长期停车折扣
-			if hours >= a.Value {
+				// 长期停车折扣
+				longTermThreshold, _ := a.Value.(float64)
+				if hours >= longTermThreshold {
 				amount = amount * (1 - a.Percent/100)
 			}
 		case "flat_rate":

@@ -56,6 +56,48 @@ var (
 			},
 		},
 	}
+	// ReconciliationsColumns holds the columns for the "reconciliations" table.
+	ReconciliationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "order_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "payment_method", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "order_amount", Type: field.TypeFloat64},
+		{Name: "paid_amount", Type: field.TypeFloat64},
+		{Name: "transaction_id", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "reconciliation_time", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "matched", "mismatch", "missing"}, Default: "pending"},
+		{Name: "notes", Type: field.TypeString, Nullable: true, Size: 500},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ReconciliationsTable holds the schema information for the "reconciliations" table.
+	ReconciliationsTable = &schema.Table{
+		Name:       "reconciliations",
+		Columns:    ReconciliationsColumns,
+		PrimaryKey: []*schema.Column{ReconciliationsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_reconciliation_order",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[1]},
+			},
+			{
+				Name:    "idx_reconciliation_status",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[7]},
+			},
+			{
+				Name:    "idx_reconciliation_time",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[6]},
+			},
+			{
+				Name:    "idx_reconciliation_transaction",
+				Unique:  false,
+				Columns: []*schema.Column{ReconciliationsColumns[5]},
+			},
+		},
+	}
 	// RefundApprovalsColumns holds the columns for the "refund_approvals" table.
 	RefundApprovalsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -96,6 +138,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		OrdersTable,
+		ReconciliationsTable,
 		RefundApprovalsTable,
 	}
 )

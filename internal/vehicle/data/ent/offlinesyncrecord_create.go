@@ -21,6 +21,12 @@ type OfflineSyncRecordCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *OfflineSyncRecordCreate) SetTenantID(v uuid.UUID) *OfflineSyncRecordCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetOfflineID sets the "offline_id" field.
 func (_c *OfflineSyncRecordCreate) SetOfflineID(v string) *OfflineSyncRecordCreate {
 	_c.mutation.SetOfflineID(v)
@@ -226,6 +232,9 @@ func (_c *OfflineSyncRecordCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *OfflineSyncRecordCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "OfflineSyncRecord.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.OfflineID(); !ok {
 		return &ValidationError{Name: "offline_id", err: errors.New(`ent: missing required field "OfflineSyncRecord.offline_id"`)}
 	}
@@ -306,6 +315,10 @@ func (_c *OfflineSyncRecordCreate) createSpec() (*OfflineSyncRecord, *sqlgraph.C
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(offlinesyncrecord.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.OfflineID(); ok {
 		_spec.SetField(offlinesyncrecord.FieldOfflineID, field.TypeString, value)

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/predicate"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
 )
@@ -25,6 +26,20 @@ type VehicleUpdate struct {
 // Where appends a list predicates to the VehicleUpdate builder.
 func (_u *VehicleUpdate) Where(ps ...predicate.Vehicle) *VehicleUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *VehicleUpdate) SetTenantID(v uuid.UUID) *VehicleUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *VehicleUpdate) SetNillableTenantID(v *uuid.UUID) *VehicleUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
 	return _u
 }
 
@@ -200,6 +215,9 @@ func (_u *VehicleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(vehicle.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.PlateNumber(); ok {
 		_spec.SetField(vehicle.FieldPlateNumber, field.TypeString, value)
 	}
@@ -245,6 +263,20 @@ type VehicleUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *VehicleMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *VehicleUpdateOne) SetTenantID(v uuid.UUID) *VehicleUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *VehicleUpdateOne) SetNillableTenantID(v *uuid.UUID) *VehicleUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetPlateNumber sets the "plate_number" field.
@@ -448,6 +480,9 @@ func (_u *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err er
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(vehicle.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.PlateNumber(); ok {
 		_spec.SetField(vehicle.FieldPlateNumber, field.TypeString, value)

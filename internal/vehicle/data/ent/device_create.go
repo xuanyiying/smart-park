@@ -21,6 +21,12 @@ type DeviceCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *DeviceCreate) SetTenantID(v uuid.UUID) *DeviceCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetDeviceID sets the "device_id" field.
 func (_c *DeviceCreate) SetDeviceID(v string) *DeviceCreate {
 	_c.mutation.SetDeviceID(v)
@@ -64,6 +70,54 @@ func (_c *DeviceCreate) SetDeviceSecret(v string) *DeviceCreate {
 // SetDeviceType sets the "device_type" field.
 func (_c *DeviceCreate) SetDeviceType(v device.DeviceType) *DeviceCreate {
 	_c.mutation.SetDeviceType(v)
+	return _c
+}
+
+// SetManufacturer sets the "manufacturer" field.
+func (_c *DeviceCreate) SetManufacturer(v string) *DeviceCreate {
+	_c.mutation.SetManufacturer(v)
+	return _c
+}
+
+// SetNillableManufacturer sets the "manufacturer" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableManufacturer(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetManufacturer(*v)
+	}
+	return _c
+}
+
+// SetModel sets the "model" field.
+func (_c *DeviceCreate) SetModel(v string) *DeviceCreate {
+	_c.mutation.SetModel(v)
+	return _c
+}
+
+// SetNillableModel sets the "model" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableModel(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetModel(*v)
+	}
+	return _c
+}
+
+// SetFirmwareVersion sets the "firmware_version" field.
+func (_c *DeviceCreate) SetFirmwareVersion(v string) *DeviceCreate {
+	_c.mutation.SetFirmwareVersion(v)
+	return _c
+}
+
+// SetNillableFirmwareVersion sets the "firmware_version" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableFirmwareVersion(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetFirmwareVersion(*v)
+	}
+	return _c
+}
+
+// SetVendorSpecificConfig sets the "vendor_specific_config" field.
+func (_c *DeviceCreate) SetVendorSpecificConfig(v map[string]interface{}) *DeviceCreate {
+	_c.mutation.SetVendorSpecificConfig(v)
 	return _c
 }
 
@@ -119,6 +173,158 @@ func (_c *DeviceCreate) SetLastHeartbeat(v time.Time) *DeviceCreate {
 func (_c *DeviceCreate) SetNillableLastHeartbeat(v *time.Time) *DeviceCreate {
 	if v != nil {
 		_c.SetLastHeartbeat(*v)
+	}
+	return _c
+}
+
+// SetLastOnline sets the "last_online" field.
+func (_c *DeviceCreate) SetLastOnline(v time.Time) *DeviceCreate {
+	_c.mutation.SetLastOnline(v)
+	return _c
+}
+
+// SetNillableLastOnline sets the "last_online" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableLastOnline(v *time.Time) *DeviceCreate {
+	if v != nil {
+		_c.SetLastOnline(*v)
+	}
+	return _c
+}
+
+// SetFaultInfo sets the "fault_info" field.
+func (_c *DeviceCreate) SetFaultInfo(v string) *DeviceCreate {
+	_c.mutation.SetFaultInfo(v)
+	return _c
+}
+
+// SetNillableFaultInfo sets the "fault_info" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableFaultInfo(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetFaultInfo(*v)
+	}
+	return _c
+}
+
+// SetHeartbeatCount sets the "heartbeat_count" field.
+func (_c *DeviceCreate) SetHeartbeatCount(v int) *DeviceCreate {
+	_c.mutation.SetHeartbeatCount(v)
+	return _c
+}
+
+// SetNillableHeartbeatCount sets the "heartbeat_count" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableHeartbeatCount(v *int) *DeviceCreate {
+	if v != nil {
+		_c.SetHeartbeatCount(*v)
+	}
+	return _c
+}
+
+// SetOfflineCount sets the "offline_count" field.
+func (_c *DeviceCreate) SetOfflineCount(v int) *DeviceCreate {
+	_c.mutation.SetOfflineCount(v)
+	return _c
+}
+
+// SetNillableOfflineCount sets the "offline_count" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableOfflineCount(v *int) *DeviceCreate {
+	if v != nil {
+		_c.SetOfflineCount(*v)
+	}
+	return _c
+}
+
+// SetHardwareVersion sets the "hardware_version" field.
+func (_c *DeviceCreate) SetHardwareVersion(v string) *DeviceCreate {
+	_c.mutation.SetHardwareVersion(v)
+	return _c
+}
+
+// SetNillableHardwareVersion sets the "hardware_version" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableHardwareVersion(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetHardwareVersion(*v)
+	}
+	return _c
+}
+
+// SetDeviceConfig sets the "device_config" field.
+func (_c *DeviceCreate) SetDeviceConfig(v map[string]interface{}) *DeviceCreate {
+	_c.mutation.SetDeviceConfig(v)
+	return _c
+}
+
+// SetDeviceStats sets the "device_stats" field.
+func (_c *DeviceCreate) SetDeviceStats(v map[string]interface{}) *DeviceCreate {
+	_c.mutation.SetDeviceStats(v)
+	return _c
+}
+
+// SetFaultCode sets the "fault_code" field.
+func (_c *DeviceCreate) SetFaultCode(v string) *DeviceCreate {
+	_c.mutation.SetFaultCode(v)
+	return _c
+}
+
+// SetNillableFaultCode sets the "fault_code" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableFaultCode(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetFaultCode(*v)
+	}
+	return _c
+}
+
+// SetFaultMessage sets the "fault_message" field.
+func (_c *DeviceCreate) SetFaultMessage(v string) *DeviceCreate {
+	_c.mutation.SetFaultMessage(v)
+	return _c
+}
+
+// SetNillableFaultMessage sets the "fault_message" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableFaultMessage(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetFaultMessage(*v)
+	}
+	return _c
+}
+
+// SetLastFaultTime sets the "last_fault_time" field.
+func (_c *DeviceCreate) SetLastFaultTime(v time.Time) *DeviceCreate {
+	_c.mutation.SetLastFaultTime(v)
+	return _c
+}
+
+// SetNillableLastFaultTime sets the "last_fault_time" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableLastFaultTime(v *time.Time) *DeviceCreate {
+	if v != nil {
+		_c.SetLastFaultTime(*v)
+	}
+	return _c
+}
+
+// SetLastUpgradeTime sets the "last_upgrade_time" field.
+func (_c *DeviceCreate) SetLastUpgradeTime(v time.Time) *DeviceCreate {
+	_c.mutation.SetLastUpgradeTime(v)
+	return _c
+}
+
+// SetNillableLastUpgradeTime sets the "last_upgrade_time" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableLastUpgradeTime(v *time.Time) *DeviceCreate {
+	if v != nil {
+		_c.SetLastUpgradeTime(*v)
+	}
+	return _c
+}
+
+// SetLocation sets the "location" field.
+func (_c *DeviceCreate) SetLocation(v string) *DeviceCreate {
+	_c.mutation.SetLocation(v)
+	return _c
+}
+
+// SetNillableLocation sets the "location" field if the given value is not nil.
+func (_c *DeviceCreate) SetNillableLocation(v *string) *DeviceCreate {
+	if v != nil {
+		_c.SetLocation(*v)
 	}
 	return _c
 }
@@ -208,6 +414,14 @@ func (_c *DeviceCreate) defaults() {
 		v := device.DefaultStatus
 		_c.mutation.SetStatus(v)
 	}
+	if _, ok := _c.mutation.HeartbeatCount(); !ok {
+		v := device.DefaultHeartbeatCount
+		_c.mutation.SetHeartbeatCount(v)
+	}
+	if _, ok := _c.mutation.OfflineCount(); !ok {
+		v := device.DefaultOfflineCount
+		_c.mutation.SetOfflineCount(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := device.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -224,6 +438,9 @@ func (_c *DeviceCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *DeviceCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Device.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.DeviceID(); !ok {
 		return &ValidationError{Name: "device_id", err: errors.New(`ent: missing required field "Device.device_id"`)}
 	}
@@ -248,6 +465,21 @@ func (_c *DeviceCreate) check() error {
 			return &ValidationError{Name: "device_type", err: fmt.Errorf(`ent: validator failed for field "Device.device_type": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.Manufacturer(); ok {
+		if err := device.ManufacturerValidator(v); err != nil {
+			return &ValidationError{Name: "manufacturer", err: fmt.Errorf(`ent: validator failed for field "Device.manufacturer": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.Model(); ok {
+		if err := device.ModelValidator(v); err != nil {
+			return &ValidationError{Name: "model", err: fmt.Errorf(`ent: validator failed for field "Device.model": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.FirmwareVersion(); ok {
+		if err := device.FirmwareVersionValidator(v); err != nil {
+			return &ValidationError{Name: "firmware_version", err: fmt.Errorf(`ent: validator failed for field "Device.firmware_version": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.GateID(); ok {
 		if err := device.GateIDValidator(v); err != nil {
 			return &ValidationError{Name: "gate_id", err: fmt.Errorf(`ent: validator failed for field "Device.gate_id": %w`, err)}
@@ -262,6 +494,37 @@ func (_c *DeviceCreate) check() error {
 	if v, ok := _c.mutation.Status(); ok {
 		if err := device.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Device.status": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.FaultInfo(); ok {
+		if err := device.FaultInfoValidator(v); err != nil {
+			return &ValidationError{Name: "fault_info", err: fmt.Errorf(`ent: validator failed for field "Device.fault_info": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.HeartbeatCount(); !ok {
+		return &ValidationError{Name: "heartbeat_count", err: errors.New(`ent: missing required field "Device.heartbeat_count"`)}
+	}
+	if _, ok := _c.mutation.OfflineCount(); !ok {
+		return &ValidationError{Name: "offline_count", err: errors.New(`ent: missing required field "Device.offline_count"`)}
+	}
+	if v, ok := _c.mutation.HardwareVersion(); ok {
+		if err := device.HardwareVersionValidator(v); err != nil {
+			return &ValidationError{Name: "hardware_version", err: fmt.Errorf(`ent: validator failed for field "Device.hardware_version": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.FaultCode(); ok {
+		if err := device.FaultCodeValidator(v); err != nil {
+			return &ValidationError{Name: "fault_code", err: fmt.Errorf(`ent: validator failed for field "Device.fault_code": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.FaultMessage(); ok {
+		if err := device.FaultMessageValidator(v); err != nil {
+			return &ValidationError{Name: "fault_message", err: fmt.Errorf(`ent: validator failed for field "Device.fault_message": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.Location(); ok {
+		if err := device.LocationValidator(v); err != nil {
+			return &ValidationError{Name: "location", err: fmt.Errorf(`ent: validator failed for field "Device.location": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
@@ -305,6 +568,10 @@ func (_c *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(device.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
+	}
 	if value, ok := _c.mutation.DeviceID(); ok {
 		_spec.SetField(device.FieldDeviceID, field.TypeString, value)
 		_node.DeviceID = value
@@ -325,6 +592,22 @@ func (_c *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		_spec.SetField(device.FieldDeviceType, field.TypeEnum, value)
 		_node.DeviceType = value
 	}
+	if value, ok := _c.mutation.Manufacturer(); ok {
+		_spec.SetField(device.FieldManufacturer, field.TypeString, value)
+		_node.Manufacturer = value
+	}
+	if value, ok := _c.mutation.Model(); ok {
+		_spec.SetField(device.FieldModel, field.TypeString, value)
+		_node.Model = value
+	}
+	if value, ok := _c.mutation.FirmwareVersion(); ok {
+		_spec.SetField(device.FieldFirmwareVersion, field.TypeString, value)
+		_node.FirmwareVersion = value
+	}
+	if value, ok := _c.mutation.VendorSpecificConfig(); ok {
+		_spec.SetField(device.FieldVendorSpecificConfig, field.TypeJSON, value)
+		_node.VendorSpecificConfig = value
+	}
 	if value, ok := _c.mutation.GateID(); ok {
 		_spec.SetField(device.FieldGateID, field.TypeString, value)
 		_node.GateID = value
@@ -340,6 +623,54 @@ func (_c *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.LastHeartbeat(); ok {
 		_spec.SetField(device.FieldLastHeartbeat, field.TypeTime, value)
 		_node.LastHeartbeat = &value
+	}
+	if value, ok := _c.mutation.LastOnline(); ok {
+		_spec.SetField(device.FieldLastOnline, field.TypeTime, value)
+		_node.LastOnline = &value
+	}
+	if value, ok := _c.mutation.FaultInfo(); ok {
+		_spec.SetField(device.FieldFaultInfo, field.TypeString, value)
+		_node.FaultInfo = value
+	}
+	if value, ok := _c.mutation.HeartbeatCount(); ok {
+		_spec.SetField(device.FieldHeartbeatCount, field.TypeInt, value)
+		_node.HeartbeatCount = value
+	}
+	if value, ok := _c.mutation.OfflineCount(); ok {
+		_spec.SetField(device.FieldOfflineCount, field.TypeInt, value)
+		_node.OfflineCount = value
+	}
+	if value, ok := _c.mutation.HardwareVersion(); ok {
+		_spec.SetField(device.FieldHardwareVersion, field.TypeString, value)
+		_node.HardwareVersion = value
+	}
+	if value, ok := _c.mutation.DeviceConfig(); ok {
+		_spec.SetField(device.FieldDeviceConfig, field.TypeJSON, value)
+		_node.DeviceConfig = value
+	}
+	if value, ok := _c.mutation.DeviceStats(); ok {
+		_spec.SetField(device.FieldDeviceStats, field.TypeJSON, value)
+		_node.DeviceStats = value
+	}
+	if value, ok := _c.mutation.FaultCode(); ok {
+		_spec.SetField(device.FieldFaultCode, field.TypeString, value)
+		_node.FaultCode = value
+	}
+	if value, ok := _c.mutation.FaultMessage(); ok {
+		_spec.SetField(device.FieldFaultMessage, field.TypeString, value)
+		_node.FaultMessage = value
+	}
+	if value, ok := _c.mutation.LastFaultTime(); ok {
+		_spec.SetField(device.FieldLastFaultTime, field.TypeTime, value)
+		_node.LastFaultTime = &value
+	}
+	if value, ok := _c.mutation.LastUpgradeTime(); ok {
+		_spec.SetField(device.FieldLastUpgradeTime, field.TypeTime, value)
+		_node.LastUpgradeTime = &value
+	}
+	if value, ok := _c.mutation.Location(); ok {
+		_spec.SetField(device.FieldLocation, field.TypeString, value)
+		_node.Location = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(device.FieldCreatedAt, field.TypeTime, value)

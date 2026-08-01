@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -18,6 +19,8 @@ type Device struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
 	// 设备唯一标识
 	DeviceID string `json:"device_id,omitempty"`
 	// 所属停车场ID
@@ -28,6 +31,14 @@ type Device struct {
 	DeviceSecret string `json:"-"`
 	// 设备类型
 	DeviceType device.DeviceType `json:"device_type,omitempty"`
+	// 设备厂商
+	Manufacturer string `json:"manufacturer,omitempty"`
+	// 设备型号
+	Model string `json:"model,omitempty"`
+	// 固件版本
+	FirmwareVersion string `json:"firmware_version,omitempty"`
+	// 厂商特定配置
+	VendorSpecificConfig map[string]interface{} `json:"vendor_specific_config,omitempty"`
 	// 关联闸机ID
 	GateID string `json:"gate_id,omitempty"`
 	// 是否启用(维修时可禁用)
@@ -36,6 +47,30 @@ type Device struct {
 	Status device.Status `json:"status,omitempty"`
 	// 最后心跳时间
 	LastHeartbeat *time.Time `json:"last_heartbeat,omitempty"`
+	// 最后在线时间
+	LastOnline *time.Time `json:"last_online,omitempty"`
+	// 故障信息
+	FaultInfo string `json:"fault_info,omitempty"`
+	// 心跳次数
+	HeartbeatCount int `json:"heartbeat_count,omitempty"`
+	// 离线次数
+	OfflineCount int `json:"offline_count,omitempty"`
+	// 设备硬件版本
+	HardwareVersion string `json:"hardware_version,omitempty"`
+	// 设备配置信息
+	DeviceConfig map[string]interface{} `json:"device_config,omitempty"`
+	// 设备统计信息
+	DeviceStats map[string]interface{} `json:"device_stats,omitempty"`
+	// 故障代码
+	FaultCode string `json:"fault_code,omitempty"`
+	// 故障信息
+	FaultMessage string `json:"fault_message,omitempty"`
+	// 最后故障时间
+	LastFaultTime *time.Time `json:"last_fault_time,omitempty"`
+	// 最后升级时间
+	LastUpgradeTime *time.Time `json:"last_upgrade_time,omitempty"`
+	// 设备位置
+	Location string `json:"location,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -50,13 +85,17 @@ func (*Device) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case device.FieldLotID, device.FieldLaneID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case device.FieldVendorSpecificConfig, device.FieldDeviceConfig, device.FieldDeviceStats:
+			values[i] = new([]byte)
 		case device.FieldEnabled:
 			values[i] = new(sql.NullBool)
-		case device.FieldDeviceID, device.FieldDeviceSecret, device.FieldDeviceType, device.FieldGateID, device.FieldStatus:
+		case device.FieldHeartbeatCount, device.FieldOfflineCount:
+			values[i] = new(sql.NullInt64)
+		case device.FieldDeviceID, device.FieldDeviceSecret, device.FieldDeviceType, device.FieldManufacturer, device.FieldModel, device.FieldFirmwareVersion, device.FieldGateID, device.FieldStatus, device.FieldFaultInfo, device.FieldHardwareVersion, device.FieldFaultCode, device.FieldFaultMessage, device.FieldLocation:
 			values[i] = new(sql.NullString)
-		case device.FieldLastHeartbeat, device.FieldCreatedAt, device.FieldUpdatedAt:
+		case device.FieldLastHeartbeat, device.FieldLastOnline, device.FieldLastFaultTime, device.FieldLastUpgradeTime, device.FieldCreatedAt, device.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case device.FieldID:
+		case device.FieldID, device.FieldTenantID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -78,6 +117,12 @@ func (_m *Device) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case device.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case device.FieldDeviceID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -111,6 +156,32 @@ func (_m *Device) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DeviceType = device.DeviceType(value.String)
 			}
+		case device.FieldManufacturer:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field manufacturer", values[i])
+			} else if value.Valid {
+				_m.Manufacturer = value.String
+			}
+		case device.FieldModel:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field model", values[i])
+			} else if value.Valid {
+				_m.Model = value.String
+			}
+		case device.FieldFirmwareVersion:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field firmware_version", values[i])
+			} else if value.Valid {
+				_m.FirmwareVersion = value.String
+			}
+		case device.FieldVendorSpecificConfig:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field vendor_specific_config", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.VendorSpecificConfig); err != nil {
+					return fmt.Errorf("unmarshal field vendor_specific_config: %w", err)
+				}
+			}
 		case device.FieldGateID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field gate_id", values[i])
@@ -135,6 +206,85 @@ func (_m *Device) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.LastHeartbeat = new(time.Time)
 				*_m.LastHeartbeat = value.Time
+			}
+		case device.FieldLastOnline:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field last_online", values[i])
+			} else if value.Valid {
+				_m.LastOnline = new(time.Time)
+				*_m.LastOnline = value.Time
+			}
+		case device.FieldFaultInfo:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field fault_info", values[i])
+			} else if value.Valid {
+				_m.FaultInfo = value.String
+			}
+		case device.FieldHeartbeatCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field heartbeat_count", values[i])
+			} else if value.Valid {
+				_m.HeartbeatCount = int(value.Int64)
+			}
+		case device.FieldOfflineCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field offline_count", values[i])
+			} else if value.Valid {
+				_m.OfflineCount = int(value.Int64)
+			}
+		case device.FieldHardwareVersion:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field hardware_version", values[i])
+			} else if value.Valid {
+				_m.HardwareVersion = value.String
+			}
+		case device.FieldDeviceConfig:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field device_config", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.DeviceConfig); err != nil {
+					return fmt.Errorf("unmarshal field device_config: %w", err)
+				}
+			}
+		case device.FieldDeviceStats:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field device_stats", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.DeviceStats); err != nil {
+					return fmt.Errorf("unmarshal field device_stats: %w", err)
+				}
+			}
+		case device.FieldFaultCode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field fault_code", values[i])
+			} else if value.Valid {
+				_m.FaultCode = value.String
+			}
+		case device.FieldFaultMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field fault_message", values[i])
+			} else if value.Valid {
+				_m.FaultMessage = value.String
+			}
+		case device.FieldLastFaultTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field last_fault_time", values[i])
+			} else if value.Valid {
+				_m.LastFaultTime = new(time.Time)
+				*_m.LastFaultTime = value.Time
+			}
+		case device.FieldLastUpgradeTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field last_upgrade_time", values[i])
+			} else if value.Valid {
+				_m.LastUpgradeTime = new(time.Time)
+				*_m.LastUpgradeTime = value.Time
+			}
+		case device.FieldLocation:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field location", values[i])
+			} else if value.Valid {
+				_m.Location = value.String
 			}
 		case device.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -184,6 +334,9 @@ func (_m *Device) String() string {
 	var builder strings.Builder
 	builder.WriteString("Device(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("device_id=")
 	builder.WriteString(_m.DeviceID)
 	builder.WriteString(", ")
@@ -202,6 +355,18 @@ func (_m *Device) String() string {
 	builder.WriteString("device_type=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DeviceType))
 	builder.WriteString(", ")
+	builder.WriteString("manufacturer=")
+	builder.WriteString(_m.Manufacturer)
+	builder.WriteString(", ")
+	builder.WriteString("model=")
+	builder.WriteString(_m.Model)
+	builder.WriteString(", ")
+	builder.WriteString("firmware_version=")
+	builder.WriteString(_m.FirmwareVersion)
+	builder.WriteString(", ")
+	builder.WriteString("vendor_specific_config=")
+	builder.WriteString(fmt.Sprintf("%v", _m.VendorSpecificConfig))
+	builder.WriteString(", ")
 	builder.WriteString("gate_id=")
 	builder.WriteString(_m.GateID)
 	builder.WriteString(", ")
@@ -215,6 +380,48 @@ func (_m *Device) String() string {
 		builder.WriteString("last_heartbeat=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
+	builder.WriteString(", ")
+	if v := _m.LastOnline; v != nil {
+		builder.WriteString("last_online=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("fault_info=")
+	builder.WriteString(_m.FaultInfo)
+	builder.WriteString(", ")
+	builder.WriteString("heartbeat_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HeartbeatCount))
+	builder.WriteString(", ")
+	builder.WriteString("offline_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.OfflineCount))
+	builder.WriteString(", ")
+	builder.WriteString("hardware_version=")
+	builder.WriteString(_m.HardwareVersion)
+	builder.WriteString(", ")
+	builder.WriteString("device_config=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DeviceConfig))
+	builder.WriteString(", ")
+	builder.WriteString("device_stats=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DeviceStats))
+	builder.WriteString(", ")
+	builder.WriteString("fault_code=")
+	builder.WriteString(_m.FaultCode)
+	builder.WriteString(", ")
+	builder.WriteString("fault_message=")
+	builder.WriteString(_m.FaultMessage)
+	builder.WriteString(", ")
+	if v := _m.LastFaultTime; v != nil {
+		builder.WriteString("last_fault_time=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.LastUpgradeTime; v != nil {
+		builder.WriteString("last_upgrade_time=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("location=")
+	builder.WriteString(_m.Location)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

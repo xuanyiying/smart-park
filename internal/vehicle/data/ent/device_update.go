@@ -29,6 +29,20 @@ func (_u *DeviceUpdate) Where(ps ...predicate.Device) *DeviceUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *DeviceUpdate) SetTenantID(v uuid.UUID) *DeviceUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableTenantID(v *uuid.UUID) *DeviceUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetDeviceID sets the "device_id" field.
 func (_u *DeviceUpdate) SetDeviceID(v string) *DeviceUpdate {
 	_u.mutation.SetDeviceID(v)
@@ -111,6 +125,78 @@ func (_u *DeviceUpdate) SetNillableDeviceType(v *device.DeviceType) *DeviceUpdat
 	return _u
 }
 
+// SetManufacturer sets the "manufacturer" field.
+func (_u *DeviceUpdate) SetManufacturer(v string) *DeviceUpdate {
+	_u.mutation.SetManufacturer(v)
+	return _u
+}
+
+// SetNillableManufacturer sets the "manufacturer" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableManufacturer(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetManufacturer(*v)
+	}
+	return _u
+}
+
+// ClearManufacturer clears the value of the "manufacturer" field.
+func (_u *DeviceUpdate) ClearManufacturer() *DeviceUpdate {
+	_u.mutation.ClearManufacturer()
+	return _u
+}
+
+// SetModel sets the "model" field.
+func (_u *DeviceUpdate) SetModel(v string) *DeviceUpdate {
+	_u.mutation.SetModel(v)
+	return _u
+}
+
+// SetNillableModel sets the "model" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableModel(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetModel(*v)
+	}
+	return _u
+}
+
+// ClearModel clears the value of the "model" field.
+func (_u *DeviceUpdate) ClearModel() *DeviceUpdate {
+	_u.mutation.ClearModel()
+	return _u
+}
+
+// SetFirmwareVersion sets the "firmware_version" field.
+func (_u *DeviceUpdate) SetFirmwareVersion(v string) *DeviceUpdate {
+	_u.mutation.SetFirmwareVersion(v)
+	return _u
+}
+
+// SetNillableFirmwareVersion sets the "firmware_version" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableFirmwareVersion(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetFirmwareVersion(*v)
+	}
+	return _u
+}
+
+// ClearFirmwareVersion clears the value of the "firmware_version" field.
+func (_u *DeviceUpdate) ClearFirmwareVersion() *DeviceUpdate {
+	_u.mutation.ClearFirmwareVersion()
+	return _u
+}
+
+// SetVendorSpecificConfig sets the "vendor_specific_config" field.
+func (_u *DeviceUpdate) SetVendorSpecificConfig(v map[string]interface{}) *DeviceUpdate {
+	_u.mutation.SetVendorSpecificConfig(v)
+	return _u
+}
+
+// ClearVendorSpecificConfig clears the value of the "vendor_specific_config" field.
+func (_u *DeviceUpdate) ClearVendorSpecificConfig() *DeviceUpdate {
+	_u.mutation.ClearVendorSpecificConfig()
+	return _u
+}
+
 // SetGateID sets the "gate_id" field.
 func (_u *DeviceUpdate) SetGateID(v string) *DeviceUpdate {
 	_u.mutation.SetGateID(v)
@@ -179,6 +265,232 @@ func (_u *DeviceUpdate) ClearLastHeartbeat() *DeviceUpdate {
 	return _u
 }
 
+// SetLastOnline sets the "last_online" field.
+func (_u *DeviceUpdate) SetLastOnline(v time.Time) *DeviceUpdate {
+	_u.mutation.SetLastOnline(v)
+	return _u
+}
+
+// SetNillableLastOnline sets the "last_online" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableLastOnline(v *time.Time) *DeviceUpdate {
+	if v != nil {
+		_u.SetLastOnline(*v)
+	}
+	return _u
+}
+
+// ClearLastOnline clears the value of the "last_online" field.
+func (_u *DeviceUpdate) ClearLastOnline() *DeviceUpdate {
+	_u.mutation.ClearLastOnline()
+	return _u
+}
+
+// SetFaultInfo sets the "fault_info" field.
+func (_u *DeviceUpdate) SetFaultInfo(v string) *DeviceUpdate {
+	_u.mutation.SetFaultInfo(v)
+	return _u
+}
+
+// SetNillableFaultInfo sets the "fault_info" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableFaultInfo(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetFaultInfo(*v)
+	}
+	return _u
+}
+
+// ClearFaultInfo clears the value of the "fault_info" field.
+func (_u *DeviceUpdate) ClearFaultInfo() *DeviceUpdate {
+	_u.mutation.ClearFaultInfo()
+	return _u
+}
+
+// SetHeartbeatCount sets the "heartbeat_count" field.
+func (_u *DeviceUpdate) SetHeartbeatCount(v int) *DeviceUpdate {
+	_u.mutation.ResetHeartbeatCount()
+	_u.mutation.SetHeartbeatCount(v)
+	return _u
+}
+
+// SetNillableHeartbeatCount sets the "heartbeat_count" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableHeartbeatCount(v *int) *DeviceUpdate {
+	if v != nil {
+		_u.SetHeartbeatCount(*v)
+	}
+	return _u
+}
+
+// AddHeartbeatCount adds value to the "heartbeat_count" field.
+func (_u *DeviceUpdate) AddHeartbeatCount(v int) *DeviceUpdate {
+	_u.mutation.AddHeartbeatCount(v)
+	return _u
+}
+
+// SetOfflineCount sets the "offline_count" field.
+func (_u *DeviceUpdate) SetOfflineCount(v int) *DeviceUpdate {
+	_u.mutation.ResetOfflineCount()
+	_u.mutation.SetOfflineCount(v)
+	return _u
+}
+
+// SetNillableOfflineCount sets the "offline_count" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableOfflineCount(v *int) *DeviceUpdate {
+	if v != nil {
+		_u.SetOfflineCount(*v)
+	}
+	return _u
+}
+
+// AddOfflineCount adds value to the "offline_count" field.
+func (_u *DeviceUpdate) AddOfflineCount(v int) *DeviceUpdate {
+	_u.mutation.AddOfflineCount(v)
+	return _u
+}
+
+// SetHardwareVersion sets the "hardware_version" field.
+func (_u *DeviceUpdate) SetHardwareVersion(v string) *DeviceUpdate {
+	_u.mutation.SetHardwareVersion(v)
+	return _u
+}
+
+// SetNillableHardwareVersion sets the "hardware_version" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableHardwareVersion(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetHardwareVersion(*v)
+	}
+	return _u
+}
+
+// ClearHardwareVersion clears the value of the "hardware_version" field.
+func (_u *DeviceUpdate) ClearHardwareVersion() *DeviceUpdate {
+	_u.mutation.ClearHardwareVersion()
+	return _u
+}
+
+// SetDeviceConfig sets the "device_config" field.
+func (_u *DeviceUpdate) SetDeviceConfig(v map[string]interface{}) *DeviceUpdate {
+	_u.mutation.SetDeviceConfig(v)
+	return _u
+}
+
+// ClearDeviceConfig clears the value of the "device_config" field.
+func (_u *DeviceUpdate) ClearDeviceConfig() *DeviceUpdate {
+	_u.mutation.ClearDeviceConfig()
+	return _u
+}
+
+// SetDeviceStats sets the "device_stats" field.
+func (_u *DeviceUpdate) SetDeviceStats(v map[string]interface{}) *DeviceUpdate {
+	_u.mutation.SetDeviceStats(v)
+	return _u
+}
+
+// ClearDeviceStats clears the value of the "device_stats" field.
+func (_u *DeviceUpdate) ClearDeviceStats() *DeviceUpdate {
+	_u.mutation.ClearDeviceStats()
+	return _u
+}
+
+// SetFaultCode sets the "fault_code" field.
+func (_u *DeviceUpdate) SetFaultCode(v string) *DeviceUpdate {
+	_u.mutation.SetFaultCode(v)
+	return _u
+}
+
+// SetNillableFaultCode sets the "fault_code" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableFaultCode(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetFaultCode(*v)
+	}
+	return _u
+}
+
+// ClearFaultCode clears the value of the "fault_code" field.
+func (_u *DeviceUpdate) ClearFaultCode() *DeviceUpdate {
+	_u.mutation.ClearFaultCode()
+	return _u
+}
+
+// SetFaultMessage sets the "fault_message" field.
+func (_u *DeviceUpdate) SetFaultMessage(v string) *DeviceUpdate {
+	_u.mutation.SetFaultMessage(v)
+	return _u
+}
+
+// SetNillableFaultMessage sets the "fault_message" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableFaultMessage(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetFaultMessage(*v)
+	}
+	return _u
+}
+
+// ClearFaultMessage clears the value of the "fault_message" field.
+func (_u *DeviceUpdate) ClearFaultMessage() *DeviceUpdate {
+	_u.mutation.ClearFaultMessage()
+	return _u
+}
+
+// SetLastFaultTime sets the "last_fault_time" field.
+func (_u *DeviceUpdate) SetLastFaultTime(v time.Time) *DeviceUpdate {
+	_u.mutation.SetLastFaultTime(v)
+	return _u
+}
+
+// SetNillableLastFaultTime sets the "last_fault_time" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableLastFaultTime(v *time.Time) *DeviceUpdate {
+	if v != nil {
+		_u.SetLastFaultTime(*v)
+	}
+	return _u
+}
+
+// ClearLastFaultTime clears the value of the "last_fault_time" field.
+func (_u *DeviceUpdate) ClearLastFaultTime() *DeviceUpdate {
+	_u.mutation.ClearLastFaultTime()
+	return _u
+}
+
+// SetLastUpgradeTime sets the "last_upgrade_time" field.
+func (_u *DeviceUpdate) SetLastUpgradeTime(v time.Time) *DeviceUpdate {
+	_u.mutation.SetLastUpgradeTime(v)
+	return _u
+}
+
+// SetNillableLastUpgradeTime sets the "last_upgrade_time" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableLastUpgradeTime(v *time.Time) *DeviceUpdate {
+	if v != nil {
+		_u.SetLastUpgradeTime(*v)
+	}
+	return _u
+}
+
+// ClearLastUpgradeTime clears the value of the "last_upgrade_time" field.
+func (_u *DeviceUpdate) ClearLastUpgradeTime() *DeviceUpdate {
+	_u.mutation.ClearLastUpgradeTime()
+	return _u
+}
+
+// SetLocation sets the "location" field.
+func (_u *DeviceUpdate) SetLocation(v string) *DeviceUpdate {
+	_u.mutation.SetLocation(v)
+	return _u
+}
+
+// SetNillableLocation sets the "location" field if the given value is not nil.
+func (_u *DeviceUpdate) SetNillableLocation(v *string) *DeviceUpdate {
+	if v != nil {
+		_u.SetLocation(*v)
+	}
+	return _u
+}
+
+// ClearLocation clears the value of the "location" field.
+func (_u *DeviceUpdate) ClearLocation() *DeviceUpdate {
+	_u.mutation.ClearLocation()
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *DeviceUpdate) SetUpdatedAt(v time.Time) *DeviceUpdate {
 	_u.mutation.SetUpdatedAt(v)
@@ -243,6 +555,21 @@ func (_u *DeviceUpdate) check() error {
 			return &ValidationError{Name: "device_type", err: fmt.Errorf(`ent: validator failed for field "Device.device_type": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Manufacturer(); ok {
+		if err := device.ManufacturerValidator(v); err != nil {
+			return &ValidationError{Name: "manufacturer", err: fmt.Errorf(`ent: validator failed for field "Device.manufacturer": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Model(); ok {
+		if err := device.ModelValidator(v); err != nil {
+			return &ValidationError{Name: "model", err: fmt.Errorf(`ent: validator failed for field "Device.model": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FirmwareVersion(); ok {
+		if err := device.FirmwareVersionValidator(v); err != nil {
+			return &ValidationError{Name: "firmware_version", err: fmt.Errorf(`ent: validator failed for field "Device.firmware_version": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.GateID(); ok {
 		if err := device.GateIDValidator(v); err != nil {
 			return &ValidationError{Name: "gate_id", err: fmt.Errorf(`ent: validator failed for field "Device.gate_id": %w`, err)}
@@ -251,6 +578,31 @@ func (_u *DeviceUpdate) check() error {
 	if v, ok := _u.mutation.Status(); ok {
 		if err := device.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Device.status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FaultInfo(); ok {
+		if err := device.FaultInfoValidator(v); err != nil {
+			return &ValidationError{Name: "fault_info", err: fmt.Errorf(`ent: validator failed for field "Device.fault_info": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.HardwareVersion(); ok {
+		if err := device.HardwareVersionValidator(v); err != nil {
+			return &ValidationError{Name: "hardware_version", err: fmt.Errorf(`ent: validator failed for field "Device.hardware_version": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FaultCode(); ok {
+		if err := device.FaultCodeValidator(v); err != nil {
+			return &ValidationError{Name: "fault_code", err: fmt.Errorf(`ent: validator failed for field "Device.fault_code": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FaultMessage(); ok {
+		if err := device.FaultMessageValidator(v); err != nil {
+			return &ValidationError{Name: "fault_message", err: fmt.Errorf(`ent: validator failed for field "Device.fault_message": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Location(); ok {
+		if err := device.LocationValidator(v); err != nil {
+			return &ValidationError{Name: "location", err: fmt.Errorf(`ent: validator failed for field "Device.location": %w`, err)}
 		}
 	}
 	return nil
@@ -267,6 +619,9 @@ func (_u *DeviceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(device.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.DeviceID(); ok {
 		_spec.SetField(device.FieldDeviceID, field.TypeString, value)
@@ -289,6 +644,30 @@ func (_u *DeviceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.DeviceType(); ok {
 		_spec.SetField(device.FieldDeviceType, field.TypeEnum, value)
 	}
+	if value, ok := _u.mutation.Manufacturer(); ok {
+		_spec.SetField(device.FieldManufacturer, field.TypeString, value)
+	}
+	if _u.mutation.ManufacturerCleared() {
+		_spec.ClearField(device.FieldManufacturer, field.TypeString)
+	}
+	if value, ok := _u.mutation.Model(); ok {
+		_spec.SetField(device.FieldModel, field.TypeString, value)
+	}
+	if _u.mutation.ModelCleared() {
+		_spec.ClearField(device.FieldModel, field.TypeString)
+	}
+	if value, ok := _u.mutation.FirmwareVersion(); ok {
+		_spec.SetField(device.FieldFirmwareVersion, field.TypeString, value)
+	}
+	if _u.mutation.FirmwareVersionCleared() {
+		_spec.ClearField(device.FieldFirmwareVersion, field.TypeString)
+	}
+	if value, ok := _u.mutation.VendorSpecificConfig(); ok {
+		_spec.SetField(device.FieldVendorSpecificConfig, field.TypeJSON, value)
+	}
+	if _u.mutation.VendorSpecificConfigCleared() {
+		_spec.ClearField(device.FieldVendorSpecificConfig, field.TypeJSON)
+	}
 	if value, ok := _u.mutation.GateID(); ok {
 		_spec.SetField(device.FieldGateID, field.TypeString, value)
 	}
@@ -306,6 +685,78 @@ func (_u *DeviceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.LastHeartbeatCleared() {
 		_spec.ClearField(device.FieldLastHeartbeat, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LastOnline(); ok {
+		_spec.SetField(device.FieldLastOnline, field.TypeTime, value)
+	}
+	if _u.mutation.LastOnlineCleared() {
+		_spec.ClearField(device.FieldLastOnline, field.TypeTime)
+	}
+	if value, ok := _u.mutation.FaultInfo(); ok {
+		_spec.SetField(device.FieldFaultInfo, field.TypeString, value)
+	}
+	if _u.mutation.FaultInfoCleared() {
+		_spec.ClearField(device.FieldFaultInfo, field.TypeString)
+	}
+	if value, ok := _u.mutation.HeartbeatCount(); ok {
+		_spec.SetField(device.FieldHeartbeatCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedHeartbeatCount(); ok {
+		_spec.AddField(device.FieldHeartbeatCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.OfflineCount(); ok {
+		_spec.SetField(device.FieldOfflineCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedOfflineCount(); ok {
+		_spec.AddField(device.FieldOfflineCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.HardwareVersion(); ok {
+		_spec.SetField(device.FieldHardwareVersion, field.TypeString, value)
+	}
+	if _u.mutation.HardwareVersionCleared() {
+		_spec.ClearField(device.FieldHardwareVersion, field.TypeString)
+	}
+	if value, ok := _u.mutation.DeviceConfig(); ok {
+		_spec.SetField(device.FieldDeviceConfig, field.TypeJSON, value)
+	}
+	if _u.mutation.DeviceConfigCleared() {
+		_spec.ClearField(device.FieldDeviceConfig, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.DeviceStats(); ok {
+		_spec.SetField(device.FieldDeviceStats, field.TypeJSON, value)
+	}
+	if _u.mutation.DeviceStatsCleared() {
+		_spec.ClearField(device.FieldDeviceStats, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.FaultCode(); ok {
+		_spec.SetField(device.FieldFaultCode, field.TypeString, value)
+	}
+	if _u.mutation.FaultCodeCleared() {
+		_spec.ClearField(device.FieldFaultCode, field.TypeString)
+	}
+	if value, ok := _u.mutation.FaultMessage(); ok {
+		_spec.SetField(device.FieldFaultMessage, field.TypeString, value)
+	}
+	if _u.mutation.FaultMessageCleared() {
+		_spec.ClearField(device.FieldFaultMessage, field.TypeString)
+	}
+	if value, ok := _u.mutation.LastFaultTime(); ok {
+		_spec.SetField(device.FieldLastFaultTime, field.TypeTime, value)
+	}
+	if _u.mutation.LastFaultTimeCleared() {
+		_spec.ClearField(device.FieldLastFaultTime, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LastUpgradeTime(); ok {
+		_spec.SetField(device.FieldLastUpgradeTime, field.TypeTime, value)
+	}
+	if _u.mutation.LastUpgradeTimeCleared() {
+		_spec.ClearField(device.FieldLastUpgradeTime, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Location(); ok {
+		_spec.SetField(device.FieldLocation, field.TypeString, value)
+	}
+	if _u.mutation.LocationCleared() {
+		_spec.ClearField(device.FieldLocation, field.TypeString)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(device.FieldUpdatedAt, field.TypeTime, value)
@@ -328,6 +779,20 @@ type DeviceUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *DeviceMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *DeviceUpdateOne) SetTenantID(v uuid.UUID) *DeviceUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableTenantID(v *uuid.UUID) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetDeviceID sets the "device_id" field.
@@ -412,6 +877,78 @@ func (_u *DeviceUpdateOne) SetNillableDeviceType(v *device.DeviceType) *DeviceUp
 	return _u
 }
 
+// SetManufacturer sets the "manufacturer" field.
+func (_u *DeviceUpdateOne) SetManufacturer(v string) *DeviceUpdateOne {
+	_u.mutation.SetManufacturer(v)
+	return _u
+}
+
+// SetNillableManufacturer sets the "manufacturer" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableManufacturer(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetManufacturer(*v)
+	}
+	return _u
+}
+
+// ClearManufacturer clears the value of the "manufacturer" field.
+func (_u *DeviceUpdateOne) ClearManufacturer() *DeviceUpdateOne {
+	_u.mutation.ClearManufacturer()
+	return _u
+}
+
+// SetModel sets the "model" field.
+func (_u *DeviceUpdateOne) SetModel(v string) *DeviceUpdateOne {
+	_u.mutation.SetModel(v)
+	return _u
+}
+
+// SetNillableModel sets the "model" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableModel(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetModel(*v)
+	}
+	return _u
+}
+
+// ClearModel clears the value of the "model" field.
+func (_u *DeviceUpdateOne) ClearModel() *DeviceUpdateOne {
+	_u.mutation.ClearModel()
+	return _u
+}
+
+// SetFirmwareVersion sets the "firmware_version" field.
+func (_u *DeviceUpdateOne) SetFirmwareVersion(v string) *DeviceUpdateOne {
+	_u.mutation.SetFirmwareVersion(v)
+	return _u
+}
+
+// SetNillableFirmwareVersion sets the "firmware_version" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableFirmwareVersion(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetFirmwareVersion(*v)
+	}
+	return _u
+}
+
+// ClearFirmwareVersion clears the value of the "firmware_version" field.
+func (_u *DeviceUpdateOne) ClearFirmwareVersion() *DeviceUpdateOne {
+	_u.mutation.ClearFirmwareVersion()
+	return _u
+}
+
+// SetVendorSpecificConfig sets the "vendor_specific_config" field.
+func (_u *DeviceUpdateOne) SetVendorSpecificConfig(v map[string]interface{}) *DeviceUpdateOne {
+	_u.mutation.SetVendorSpecificConfig(v)
+	return _u
+}
+
+// ClearVendorSpecificConfig clears the value of the "vendor_specific_config" field.
+func (_u *DeviceUpdateOne) ClearVendorSpecificConfig() *DeviceUpdateOne {
+	_u.mutation.ClearVendorSpecificConfig()
+	return _u
+}
+
 // SetGateID sets the "gate_id" field.
 func (_u *DeviceUpdateOne) SetGateID(v string) *DeviceUpdateOne {
 	_u.mutation.SetGateID(v)
@@ -477,6 +1014,232 @@ func (_u *DeviceUpdateOne) SetNillableLastHeartbeat(v *time.Time) *DeviceUpdateO
 // ClearLastHeartbeat clears the value of the "last_heartbeat" field.
 func (_u *DeviceUpdateOne) ClearLastHeartbeat() *DeviceUpdateOne {
 	_u.mutation.ClearLastHeartbeat()
+	return _u
+}
+
+// SetLastOnline sets the "last_online" field.
+func (_u *DeviceUpdateOne) SetLastOnline(v time.Time) *DeviceUpdateOne {
+	_u.mutation.SetLastOnline(v)
+	return _u
+}
+
+// SetNillableLastOnline sets the "last_online" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableLastOnline(v *time.Time) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetLastOnline(*v)
+	}
+	return _u
+}
+
+// ClearLastOnline clears the value of the "last_online" field.
+func (_u *DeviceUpdateOne) ClearLastOnline() *DeviceUpdateOne {
+	_u.mutation.ClearLastOnline()
+	return _u
+}
+
+// SetFaultInfo sets the "fault_info" field.
+func (_u *DeviceUpdateOne) SetFaultInfo(v string) *DeviceUpdateOne {
+	_u.mutation.SetFaultInfo(v)
+	return _u
+}
+
+// SetNillableFaultInfo sets the "fault_info" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableFaultInfo(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetFaultInfo(*v)
+	}
+	return _u
+}
+
+// ClearFaultInfo clears the value of the "fault_info" field.
+func (_u *DeviceUpdateOne) ClearFaultInfo() *DeviceUpdateOne {
+	_u.mutation.ClearFaultInfo()
+	return _u
+}
+
+// SetHeartbeatCount sets the "heartbeat_count" field.
+func (_u *DeviceUpdateOne) SetHeartbeatCount(v int) *DeviceUpdateOne {
+	_u.mutation.ResetHeartbeatCount()
+	_u.mutation.SetHeartbeatCount(v)
+	return _u
+}
+
+// SetNillableHeartbeatCount sets the "heartbeat_count" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableHeartbeatCount(v *int) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetHeartbeatCount(*v)
+	}
+	return _u
+}
+
+// AddHeartbeatCount adds value to the "heartbeat_count" field.
+func (_u *DeviceUpdateOne) AddHeartbeatCount(v int) *DeviceUpdateOne {
+	_u.mutation.AddHeartbeatCount(v)
+	return _u
+}
+
+// SetOfflineCount sets the "offline_count" field.
+func (_u *DeviceUpdateOne) SetOfflineCount(v int) *DeviceUpdateOne {
+	_u.mutation.ResetOfflineCount()
+	_u.mutation.SetOfflineCount(v)
+	return _u
+}
+
+// SetNillableOfflineCount sets the "offline_count" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableOfflineCount(v *int) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetOfflineCount(*v)
+	}
+	return _u
+}
+
+// AddOfflineCount adds value to the "offline_count" field.
+func (_u *DeviceUpdateOne) AddOfflineCount(v int) *DeviceUpdateOne {
+	_u.mutation.AddOfflineCount(v)
+	return _u
+}
+
+// SetHardwareVersion sets the "hardware_version" field.
+func (_u *DeviceUpdateOne) SetHardwareVersion(v string) *DeviceUpdateOne {
+	_u.mutation.SetHardwareVersion(v)
+	return _u
+}
+
+// SetNillableHardwareVersion sets the "hardware_version" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableHardwareVersion(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetHardwareVersion(*v)
+	}
+	return _u
+}
+
+// ClearHardwareVersion clears the value of the "hardware_version" field.
+func (_u *DeviceUpdateOne) ClearHardwareVersion() *DeviceUpdateOne {
+	_u.mutation.ClearHardwareVersion()
+	return _u
+}
+
+// SetDeviceConfig sets the "device_config" field.
+func (_u *DeviceUpdateOne) SetDeviceConfig(v map[string]interface{}) *DeviceUpdateOne {
+	_u.mutation.SetDeviceConfig(v)
+	return _u
+}
+
+// ClearDeviceConfig clears the value of the "device_config" field.
+func (_u *DeviceUpdateOne) ClearDeviceConfig() *DeviceUpdateOne {
+	_u.mutation.ClearDeviceConfig()
+	return _u
+}
+
+// SetDeviceStats sets the "device_stats" field.
+func (_u *DeviceUpdateOne) SetDeviceStats(v map[string]interface{}) *DeviceUpdateOne {
+	_u.mutation.SetDeviceStats(v)
+	return _u
+}
+
+// ClearDeviceStats clears the value of the "device_stats" field.
+func (_u *DeviceUpdateOne) ClearDeviceStats() *DeviceUpdateOne {
+	_u.mutation.ClearDeviceStats()
+	return _u
+}
+
+// SetFaultCode sets the "fault_code" field.
+func (_u *DeviceUpdateOne) SetFaultCode(v string) *DeviceUpdateOne {
+	_u.mutation.SetFaultCode(v)
+	return _u
+}
+
+// SetNillableFaultCode sets the "fault_code" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableFaultCode(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetFaultCode(*v)
+	}
+	return _u
+}
+
+// ClearFaultCode clears the value of the "fault_code" field.
+func (_u *DeviceUpdateOne) ClearFaultCode() *DeviceUpdateOne {
+	_u.mutation.ClearFaultCode()
+	return _u
+}
+
+// SetFaultMessage sets the "fault_message" field.
+func (_u *DeviceUpdateOne) SetFaultMessage(v string) *DeviceUpdateOne {
+	_u.mutation.SetFaultMessage(v)
+	return _u
+}
+
+// SetNillableFaultMessage sets the "fault_message" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableFaultMessage(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetFaultMessage(*v)
+	}
+	return _u
+}
+
+// ClearFaultMessage clears the value of the "fault_message" field.
+func (_u *DeviceUpdateOne) ClearFaultMessage() *DeviceUpdateOne {
+	_u.mutation.ClearFaultMessage()
+	return _u
+}
+
+// SetLastFaultTime sets the "last_fault_time" field.
+func (_u *DeviceUpdateOne) SetLastFaultTime(v time.Time) *DeviceUpdateOne {
+	_u.mutation.SetLastFaultTime(v)
+	return _u
+}
+
+// SetNillableLastFaultTime sets the "last_fault_time" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableLastFaultTime(v *time.Time) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetLastFaultTime(*v)
+	}
+	return _u
+}
+
+// ClearLastFaultTime clears the value of the "last_fault_time" field.
+func (_u *DeviceUpdateOne) ClearLastFaultTime() *DeviceUpdateOne {
+	_u.mutation.ClearLastFaultTime()
+	return _u
+}
+
+// SetLastUpgradeTime sets the "last_upgrade_time" field.
+func (_u *DeviceUpdateOne) SetLastUpgradeTime(v time.Time) *DeviceUpdateOne {
+	_u.mutation.SetLastUpgradeTime(v)
+	return _u
+}
+
+// SetNillableLastUpgradeTime sets the "last_upgrade_time" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableLastUpgradeTime(v *time.Time) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetLastUpgradeTime(*v)
+	}
+	return _u
+}
+
+// ClearLastUpgradeTime clears the value of the "last_upgrade_time" field.
+func (_u *DeviceUpdateOne) ClearLastUpgradeTime() *DeviceUpdateOne {
+	_u.mutation.ClearLastUpgradeTime()
+	return _u
+}
+
+// SetLocation sets the "location" field.
+func (_u *DeviceUpdateOne) SetLocation(v string) *DeviceUpdateOne {
+	_u.mutation.SetLocation(v)
+	return _u
+}
+
+// SetNillableLocation sets the "location" field if the given value is not nil.
+func (_u *DeviceUpdateOne) SetNillableLocation(v *string) *DeviceUpdateOne {
+	if v != nil {
+		_u.SetLocation(*v)
+	}
+	return _u
+}
+
+// ClearLocation clears the value of the "location" field.
+func (_u *DeviceUpdateOne) ClearLocation() *DeviceUpdateOne {
+	_u.mutation.ClearLocation()
 	return _u
 }
 
@@ -557,6 +1320,21 @@ func (_u *DeviceUpdateOne) check() error {
 			return &ValidationError{Name: "device_type", err: fmt.Errorf(`ent: validator failed for field "Device.device_type": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Manufacturer(); ok {
+		if err := device.ManufacturerValidator(v); err != nil {
+			return &ValidationError{Name: "manufacturer", err: fmt.Errorf(`ent: validator failed for field "Device.manufacturer": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Model(); ok {
+		if err := device.ModelValidator(v); err != nil {
+			return &ValidationError{Name: "model", err: fmt.Errorf(`ent: validator failed for field "Device.model": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FirmwareVersion(); ok {
+		if err := device.FirmwareVersionValidator(v); err != nil {
+			return &ValidationError{Name: "firmware_version", err: fmt.Errorf(`ent: validator failed for field "Device.firmware_version": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.GateID(); ok {
 		if err := device.GateIDValidator(v); err != nil {
 			return &ValidationError{Name: "gate_id", err: fmt.Errorf(`ent: validator failed for field "Device.gate_id": %w`, err)}
@@ -565,6 +1343,31 @@ func (_u *DeviceUpdateOne) check() error {
 	if v, ok := _u.mutation.Status(); ok {
 		if err := device.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Device.status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FaultInfo(); ok {
+		if err := device.FaultInfoValidator(v); err != nil {
+			return &ValidationError{Name: "fault_info", err: fmt.Errorf(`ent: validator failed for field "Device.fault_info": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.HardwareVersion(); ok {
+		if err := device.HardwareVersionValidator(v); err != nil {
+			return &ValidationError{Name: "hardware_version", err: fmt.Errorf(`ent: validator failed for field "Device.hardware_version": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FaultCode(); ok {
+		if err := device.FaultCodeValidator(v); err != nil {
+			return &ValidationError{Name: "fault_code", err: fmt.Errorf(`ent: validator failed for field "Device.fault_code": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.FaultMessage(); ok {
+		if err := device.FaultMessageValidator(v); err != nil {
+			return &ValidationError{Name: "fault_message", err: fmt.Errorf(`ent: validator failed for field "Device.fault_message": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Location(); ok {
+		if err := device.LocationValidator(v); err != nil {
+			return &ValidationError{Name: "location", err: fmt.Errorf(`ent: validator failed for field "Device.location": %w`, err)}
 		}
 	}
 	return nil
@@ -599,6 +1402,9 @@ func (_u *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err erro
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(device.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.DeviceID(); ok {
 		_spec.SetField(device.FieldDeviceID, field.TypeString, value)
 	}
@@ -620,6 +1426,30 @@ func (_u *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err erro
 	if value, ok := _u.mutation.DeviceType(); ok {
 		_spec.SetField(device.FieldDeviceType, field.TypeEnum, value)
 	}
+	if value, ok := _u.mutation.Manufacturer(); ok {
+		_spec.SetField(device.FieldManufacturer, field.TypeString, value)
+	}
+	if _u.mutation.ManufacturerCleared() {
+		_spec.ClearField(device.FieldManufacturer, field.TypeString)
+	}
+	if value, ok := _u.mutation.Model(); ok {
+		_spec.SetField(device.FieldModel, field.TypeString, value)
+	}
+	if _u.mutation.ModelCleared() {
+		_spec.ClearField(device.FieldModel, field.TypeString)
+	}
+	if value, ok := _u.mutation.FirmwareVersion(); ok {
+		_spec.SetField(device.FieldFirmwareVersion, field.TypeString, value)
+	}
+	if _u.mutation.FirmwareVersionCleared() {
+		_spec.ClearField(device.FieldFirmwareVersion, field.TypeString)
+	}
+	if value, ok := _u.mutation.VendorSpecificConfig(); ok {
+		_spec.SetField(device.FieldVendorSpecificConfig, field.TypeJSON, value)
+	}
+	if _u.mutation.VendorSpecificConfigCleared() {
+		_spec.ClearField(device.FieldVendorSpecificConfig, field.TypeJSON)
+	}
 	if value, ok := _u.mutation.GateID(); ok {
 		_spec.SetField(device.FieldGateID, field.TypeString, value)
 	}
@@ -637,6 +1467,78 @@ func (_u *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err erro
 	}
 	if _u.mutation.LastHeartbeatCleared() {
 		_spec.ClearField(device.FieldLastHeartbeat, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LastOnline(); ok {
+		_spec.SetField(device.FieldLastOnline, field.TypeTime, value)
+	}
+	if _u.mutation.LastOnlineCleared() {
+		_spec.ClearField(device.FieldLastOnline, field.TypeTime)
+	}
+	if value, ok := _u.mutation.FaultInfo(); ok {
+		_spec.SetField(device.FieldFaultInfo, field.TypeString, value)
+	}
+	if _u.mutation.FaultInfoCleared() {
+		_spec.ClearField(device.FieldFaultInfo, field.TypeString)
+	}
+	if value, ok := _u.mutation.HeartbeatCount(); ok {
+		_spec.SetField(device.FieldHeartbeatCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedHeartbeatCount(); ok {
+		_spec.AddField(device.FieldHeartbeatCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.OfflineCount(); ok {
+		_spec.SetField(device.FieldOfflineCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedOfflineCount(); ok {
+		_spec.AddField(device.FieldOfflineCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.HardwareVersion(); ok {
+		_spec.SetField(device.FieldHardwareVersion, field.TypeString, value)
+	}
+	if _u.mutation.HardwareVersionCleared() {
+		_spec.ClearField(device.FieldHardwareVersion, field.TypeString)
+	}
+	if value, ok := _u.mutation.DeviceConfig(); ok {
+		_spec.SetField(device.FieldDeviceConfig, field.TypeJSON, value)
+	}
+	if _u.mutation.DeviceConfigCleared() {
+		_spec.ClearField(device.FieldDeviceConfig, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.DeviceStats(); ok {
+		_spec.SetField(device.FieldDeviceStats, field.TypeJSON, value)
+	}
+	if _u.mutation.DeviceStatsCleared() {
+		_spec.ClearField(device.FieldDeviceStats, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.FaultCode(); ok {
+		_spec.SetField(device.FieldFaultCode, field.TypeString, value)
+	}
+	if _u.mutation.FaultCodeCleared() {
+		_spec.ClearField(device.FieldFaultCode, field.TypeString)
+	}
+	if value, ok := _u.mutation.FaultMessage(); ok {
+		_spec.SetField(device.FieldFaultMessage, field.TypeString, value)
+	}
+	if _u.mutation.FaultMessageCleared() {
+		_spec.ClearField(device.FieldFaultMessage, field.TypeString)
+	}
+	if value, ok := _u.mutation.LastFaultTime(); ok {
+		_spec.SetField(device.FieldLastFaultTime, field.TypeTime, value)
+	}
+	if _u.mutation.LastFaultTimeCleared() {
+		_spec.ClearField(device.FieldLastFaultTime, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LastUpgradeTime(); ok {
+		_spec.SetField(device.FieldLastUpgradeTime, field.TypeTime, value)
+	}
+	if _u.mutation.LastUpgradeTimeCleared() {
+		_spec.ClearField(device.FieldLastUpgradeTime, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Location(); ok {
+		_spec.SetField(device.FieldLocation, field.TypeString, value)
+	}
+	if _u.mutation.LocationCleared() {
+		_spec.ClearField(device.FieldLocation, field.TypeString)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(device.FieldUpdatedAt, field.TypeTime, value)

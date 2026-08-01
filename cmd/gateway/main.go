@@ -16,6 +16,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/gateway/service"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
 	"github.com/xuanyiying/smart-park/pkg/trace"
+	"github.com/xuanyiying/smart-park/pkg/ws"
 )
 
 var (

@@ -3,8 +3,10 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	v1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
 	"github.com/xuanyiying/smart-park/internal/vehicle/biz"
@@ -14,13 +16,17 @@ import (
 type VehicleService struct {
 	v1.UnimplementedVehicleServiceServer
 
-	entryExitUseCase     *biz.EntryExitUseCase
-	deviceUseCase        *biz.DeviceUseCase
-	manufacturerUseCase  *biz.ManufacturerUseCase
-	vehicleUseCase       *biz.VehicleQueryUseCase
-	commandUseCase       *biz.CommandUseCase
-	recordUseCase        *biz.RecordQueryUseCase
-	log                  *log.Helper
+	entryExitUseCase         *biz.EntryExitUseCase
+	deviceUseCase            *biz.DeviceUseCase
+	manufacturerUseCase      *biz.ManufacturerUseCase
+	firmwareUseCase          *biz.FirmwareUseCase
+	devicePerformanceUseCase *biz.DevicePerformanceUseCase
+	deviceFaultUseCase       *biz.DeviceFaultUseCase
+	deviceStatsUseCase       *biz.DeviceStatsUseCase
+	vehicleUseCase           *biz.VehicleQueryUseCase
+	commandUseCase           *biz.CommandUseCase
+	recordUseCase            *biz.RecordQueryUseCase
+	log                      *log.Helper
 }
 
 // NewVehicleService creates a new VehicleService.
@@ -28,19 +34,27 @@ func NewVehicleService(
 	entryExitUseCase *biz.EntryExitUseCase,
 	deviceUseCase *biz.DeviceUseCase,
 	manufacturerUseCase *biz.ManufacturerUseCase,
+	firmwareUseCase *biz.FirmwareUseCase,
+	devicePerformanceUseCase *biz.DevicePerformanceUseCase,
+	deviceFaultUseCase *biz.DeviceFaultUseCase,
+	deviceStatsUseCase *biz.DeviceStatsUseCase,
 	vehicleUseCase *biz.VehicleQueryUseCase,
 	commandUseCase *biz.CommandUseCase,
 	recordUseCase *biz.RecordQueryUseCase,
 	logger log.Logger,
 ) *VehicleService {
 	return &VehicleService{
-		entryExitUseCase:     entryExitUseCase,
-		deviceUseCase:        deviceUseCase,
-		manufacturerUseCase:  manufacturerUseCase,
-		vehicleUseCase:       vehicleUseCase,
-		commandUseCase:       commandUseCase,
-		recordUseCase:        recordUseCase,
-		log:                  log.NewHelper(logger),
+		entryExitUseCase:         entryExitUseCase,
+		deviceUseCase:            deviceUseCase,
+		manufacturerUseCase:      manufacturerUseCase,
+		firmwareUseCase:          firmwareUseCase,
+		devicePerformanceUseCase: devicePerformanceUseCase,
+		deviceFaultUseCase:       deviceFaultUseCase,
+		deviceStatsUseCase:       deviceStatsUseCase,
+		vehicleUseCase:           vehicleUseCase,
+		commandUseCase:           commandUseCase,
+		recordUseCase:            recordUseCase,
+		log:                      log.NewHelper(logger),
 	}
 }
 
@@ -389,4 +403,255 @@ func (s *VehicleService) DeleteManufacturer(ctx context.Context, req *v1.DeleteM
 		Code:    0,
 		Message: "success",
 	}, nil
+}
+
+// CreateFirmware handles create firmware request.
+func (s *VehicleService) CreateFirmware(ctx context.Context, req *v1.CreateFirmwareRequest) (*v1.CreateFirmwareResponse, error) {
+	firmware, err := s.firmwareUseCase.CreateFirmware(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CreateFirmware failed: %v", err)
+		return &v1.CreateFirmwareResponse{Code: 500, Message: "创建固件失败: " + err.Error()}, nil
+	}
+	return &v1.CreateFirmwareResponse{Code: 0, Message: "success", Data: firmware}, nil
+}
+
+// GetFirmware handles get firmware request.
+func (s *VehicleService) GetFirmware(ctx context.Context, req *v1.GetFirmwareRequest) (*v1.GetFirmwareResponse, error) {
+	firmware, err := s.firmwareUseCase.GetFirmware(ctx, req.Id)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetFirmware failed: %v", err)
+		return &v1.GetFirmwareResponse{Code: 500, Message: "获取固件失败: " + err.Error()}, nil
+	}
+	return &v1.GetFirmwareResponse{Code: 0, Message: "success", Data: firmware}, nil
+}
+
+// GetFirmwareByID handles get firmware by ID request.
+func (s *VehicleService) GetFirmwareByID(ctx context.Context, req *v1.GetFirmwareByIDRequest) (*v1.GetFirmwareByIDResponse, error) {
+	firmware, err := s.firmwareUseCase.GetFirmwareByID(ctx, req.FirmwareId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetFirmwareByID failed: %v", err)
+		return &v1.GetFirmwareByIDResponse{Code: 500, Message: "获取固件失败: " + err.Error()}, nil
+	}
+	return &v1.GetFirmwareByIDResponse{Code: 0, Message: "success", Data: firmware}, nil
+}
+
+// ListFirmwares handles list firmwares request.
+func (s *VehicleService) ListFirmwares(ctx context.Context, req *v1.ListFirmwaresRequest) (*v1.ListFirmwaresResponse, error) {
+	firmwares, total, err := s.firmwareUseCase.ListFirmwares(ctx, req.Manufacturer, req.Model, int(req.Page), int(req.PageSize))
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListFirmwares failed: %v", err)
+		return &v1.ListFirmwaresResponse{Code: 500, Message: "获取固件列表失败"}, nil
+	}
+	return &v1.ListFirmwaresResponse{Code: 0, Message: "success", Data: firmwares, Total: int32(total)}, nil
+}
+
+// UpdateFirmware handles update firmware request.
+func (s *VehicleService) UpdateFirmware(ctx context.Context, req *v1.UpdateFirmwareRequest) (*v1.UpdateFirmwareResponse, error) {
+	firmware, err := s.firmwareUseCase.UpdateFirmware(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateFirmware failed: %v", err)
+		return &v1.UpdateFirmwareResponse{Code: 500, Message: "更新固件失败: " + err.Error()}, nil
+	}
+	return &v1.UpdateFirmwareResponse{Code: 0, Message: "success", Data: firmware}, nil
+}
+
+// DeleteFirmware handles delete firmware request.
+func (s *VehicleService) DeleteFirmware(ctx context.Context, req *v1.DeleteFirmwareRequest) (*v1.DeleteFirmwareResponse, error) {
+	if err := s.firmwareUseCase.DeleteFirmware(ctx, req.Id); err != nil {
+		s.log.WithContext(ctx).Errorf("DeleteFirmware failed: %v", err)
+		return &v1.DeleteFirmwareResponse{Code: 500, Message: "删除固件失败: " + err.Error()}, nil
+	}
+	return &v1.DeleteFirmwareResponse{Code: 0, Message: "success"}, nil
+}
+
+// GetLatestFirmware handles get latest firmware request.
+func (s *VehicleService) GetLatestFirmware(ctx context.Context, req *v1.GetLatestFirmwareRequest) (*v1.GetLatestFirmwareResponse, error) {
+	firmware, err := s.firmwareUseCase.GetLatestFirmware(ctx, req.Manufacturer, req.Model)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetLatestFirmware failed: %v", err)
+		return &v1.GetLatestFirmwareResponse{Code: 500, Message: "获取最新固件失败: " + err.Error()}, nil
+	}
+	return &v1.GetLatestFirmwareResponse{Code: 0, Message: "success", Data: firmware}, nil
+}
+
+// CreateDevicePerformance handles create device performance request.
+func (s *VehicleService) CreateDevicePerformance(ctx context.Context, req *v1.CreateDevicePerformanceRequest) (*v1.CreateDevicePerformanceResponse, error) {
+	if err := s.devicePerformanceUseCase.CreateDevicePerformance(ctx, req); err != nil {
+		s.log.WithContext(ctx).Errorf("CreateDevicePerformance failed: %v", err)
+		return &v1.CreateDevicePerformanceResponse{Code: 500, Message: "创建设备性能数据失败: " + err.Error()}, nil
+	}
+	return &v1.CreateDevicePerformanceResponse{Code: 0, Message: "success"}, nil
+}
+
+// GetDevicePerformance handles get device performance request.
+func (s *VehicleService) GetDevicePerformance(ctx context.Context, req *v1.GetDevicePerformanceRequest) (*v1.GetDevicePerformanceResponse, error) {
+	records, err := s.devicePerformanceUseCase.GetDevicePerformance(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDevicePerformance failed: %v", err)
+		return &v1.GetDevicePerformanceResponse{Code: 500, Message: "获取设备性能数据失败"}, nil
+	}
+	return &v1.GetDevicePerformanceResponse{Code: 0, Message: "success", Data: records}, nil
+}
+
+// GetDevicePerformanceLatest handles get latest device performance request.
+func (s *VehicleService) GetDevicePerformanceLatest(ctx context.Context, req *v1.GetDevicePerformanceLatestRequest) (*v1.GetDevicePerformanceLatestResponse, error) {
+	record, err := s.devicePerformanceUseCase.GetDevicePerformanceLatest(ctx, req.DeviceId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDevicePerformanceLatest failed: %v", err)
+		return &v1.GetDevicePerformanceLatestResponse{Code: 500, Message: "获取最新设备性能数据失败"}, nil
+	}
+	return &v1.GetDevicePerformanceLatestResponse{Code: 0, Message: "success", Data: record}, nil
+}
+
+// CreateDeviceFault handles create device fault request.
+func (s *VehicleService) CreateDeviceFault(ctx context.Context, req *v1.CreateDeviceFaultRequest) (*v1.CreateDeviceFaultResponse, error) {
+	fault, err := s.deviceFaultUseCase.CreateDeviceFault(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CreateDeviceFault failed: %v", err)
+		return &v1.CreateDeviceFaultResponse{Code: 500, Message: "创建设备故障记录失败: " + err.Error()}, nil
+	}
+	return &v1.CreateDeviceFaultResponse{Code: 0, Message: "success", Data: fault}, nil
+}
+
+// GetDeviceFault handles get device fault request.
+func (s *VehicleService) GetDeviceFault(ctx context.Context, req *v1.GetDeviceFaultRequest) (*v1.GetDeviceFaultResponse, error) {
+	fault, err := s.deviceFaultUseCase.GetDeviceFault(ctx, req.Id)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceFault failed: %v", err)
+		return &v1.GetDeviceFaultResponse{Code: 500, Message: "获取设备故障记录失败: " + err.Error()}, nil
+	}
+	return &v1.GetDeviceFaultResponse{Code: 0, Message: "success", Data: fault}, nil
+}
+
+// ListDeviceFaults handles list device faults request.
+func (s *VehicleService) ListDeviceFaults(ctx context.Context, req *v1.ListDeviceFaultsRequest) (*v1.ListDeviceFaultsResponse, error) {
+	faults, total, err := s.deviceFaultUseCase.ListDeviceFaults(ctx, req.DeviceId, req.Status, int(req.Page), int(req.PageSize))
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListDeviceFaults failed: %v", err)
+		return &v1.ListDeviceFaultsResponse{Code: 500, Message: "获取设备故障列表失败"}, nil
+	}
+	return &v1.ListDeviceFaultsResponse{Code: 0, Message: "success", Data: faults, Total: int32(total)}, nil
+}
+
+// ResolveDeviceFault handles resolve device fault request.
+func (s *VehicleService) ResolveDeviceFault(ctx context.Context, req *v1.ResolveDeviceFaultRequest) (*v1.ResolveDeviceFaultResponse, error) {
+	if err := s.deviceFaultUseCase.ResolveDeviceFault(ctx, req.Id); err != nil {
+		s.log.WithContext(ctx).Errorf("ResolveDeviceFault failed: %v", err)
+		return &v1.ResolveDeviceFaultResponse{Code: 500, Message: "解决设备故障失败: " + err.Error()}, nil
+	}
+	return &v1.ResolveDeviceFaultResponse{Code: 0, Message: "success"}, nil
+}
+
+// GetDeviceUsageStats handles get device usage stats request.
+func (s *VehicleService) GetDeviceUsageStats(ctx context.Context, req *v1.GetDeviceUsageStatsRequest) (*v1.GetDeviceUsageStatsResponse, error) {
+	startTime, _ := time.Parse(time.RFC3339, req.StartTime)
+	endTime, _ := time.Parse(time.RFC3339, req.EndTime)
+	stats, err := s.deviceStatsUseCase.GetDeviceUsageStats(ctx, req.DeviceId, startTime, endTime)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceUsageStats failed: %v", err)
+		return &v1.GetDeviceUsageStatsResponse{Code: 500, Message: "获取设备使用统计失败"}, nil
+	}
+	data := mapToStructPB(stats)
+	return &v1.GetDeviceUsageStatsResponse{Code: 0, Message: "success", Data: data}, nil
+}
+
+// GetDeviceFaultStats handles get device fault stats request.
+func (s *VehicleService) GetDeviceFaultStats(ctx context.Context, req *v1.GetDeviceFaultStatsRequest) (*v1.GetDeviceFaultStatsResponse, error) {
+	startTime, _ := time.Parse(time.RFC3339, req.StartTime)
+	endTime, _ := time.Parse(time.RFC3339, req.EndTime)
+	stats, err := s.deviceStatsUseCase.GetDeviceFaultStats(ctx, req.DeviceId, startTime, endTime)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceFaultStats failed: %v", err)
+		return &v1.GetDeviceFaultStatsResponse{Code: 500, Message: "获取设备故障统计失败"}, nil
+	}
+	data := mapToStructPB(stats)
+	return &v1.GetDeviceFaultStatsResponse{Code: 0, Message: "success", Data: data}, nil
+}
+
+// GetDeviceStatsSummary handles get device stats summary request.
+func (s *VehicleService) GetDeviceStatsSummary(ctx context.Context, req *v1.GetDeviceStatsSummaryRequest) (*v1.GetDeviceStatsSummaryResponse, error) {
+	stats, err := s.deviceStatsUseCase.GetDeviceStatsSummary(ctx, req.DeviceId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceStatsSummary failed: %v", err)
+		return &v1.GetDeviceStatsSummaryResponse{Code: 500, Message: "获取设备统计摘要失败"}, nil
+	}
+	data := mapToStructPB(stats)
+	return &v1.GetDeviceStatsSummaryResponse{Code: 0, Message: "success", Data: data}, nil
+}
+
+// UpgradeDevice handles upgrade device request.
+func (s *VehicleService) UpgradeDevice(ctx context.Context, req *v1.UpgradeDeviceRequest) (*v1.UpgradeDeviceResponse, error) {
+	resp, err := s.deviceUseCase.UpgradeDevice(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("UpgradeDevice failed: %v", err)
+		return &v1.UpgradeDeviceResponse{Code: 500, Message: "设备升级失败: " + err.Error()}, nil
+	}
+	return resp, nil
+}
+
+// GetDeviceUpgradeStatus handles get device upgrade status request.
+func (s *VehicleService) GetDeviceUpgradeStatus(ctx context.Context, req *v1.GetDeviceUpgradeStatusRequest) (*v1.UpgradeStatusResponse, error) {
+	resp, err := s.deviceUseCase.GetDeviceUpgradeStatus(ctx, req.UpgradeId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceUpgradeStatus failed: %v", err)
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetDeviceLogs handles get device logs request.
+func (s *VehicleService) GetDeviceLogs(ctx context.Context, req *v1.GetDeviceLogsRequest) (*v1.GetDeviceLogsResponse, error) {
+	logs, total, err := s.deviceUseCase.GetDeviceLogs(ctx, req.DeviceId, int(req.Page), int(req.PageSize))
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceLogs failed: %v", err)
+		return &v1.GetDeviceLogsResponse{Code: 500, Message: "获取设备日志失败"}, nil
+	}
+	return &v1.GetDeviceLogsResponse{Code: 0, Message: "success", Data: logs, Total: int32(total)}, nil
+}
+
+// GetDeviceStats handles get device stats request.
+func (s *VehicleService) GetDeviceStats(ctx context.Context, req *v1.GetDeviceStatsRequest) (*v1.DeviceStatsResponse, error) {
+	// Get device stats summary from repo
+	stats, err := s.deviceStatsUseCase.GetDeviceStatsSummary(ctx, req.DeviceId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceStats failed: %v", err)
+		return &v1.DeviceStatsResponse{Code: 500, Message: "获取设备统计失败"}, nil
+	}
+	totalDevices, _ := stats["total_devices"].(int32)
+	onlineDevices, _ := stats["online_devices"].(int32)
+	faultDevices, _ := stats["fault_devices"].(int32)
+	onlineRate, _ := stats["online_rate"].(float64)
+	return &v1.DeviceStatsResponse{
+		Code:    0,
+		Message: "success",
+		Data: &v1.DeviceStatsData{
+			TotalDevices:  totalDevices,
+			OnlineDevices: onlineDevices,
+			FaultDevices:  faultDevices,
+			OnlineRate:    onlineRate,
+		},
+	}, nil
+}
+
+// UpdateDeviceConfig handles update device config request.
+func (s *VehicleService) UpdateDeviceConfig(ctx context.Context, req *v1.UpdateDeviceConfigRequest) (*v1.UpdateDeviceConfigResponse, error) {
+	_, err := s.deviceUseCase.UpdateDeviceConfig(ctx, req)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateDeviceConfig failed: %v", err)
+		return &v1.UpdateDeviceConfigResponse{Code: 500, Message: "更新设备配置失败: " + err.Error()}, nil
+	}
+	return &v1.UpdateDeviceConfigResponse{Code: 0, Message: "success"}, nil
+}
+
+// mapToStructPB converts map[string]interface{} to map[string]*structpb.Value.
+func mapToStructPB(m map[string]interface{}) map[string]*structpb.Value {
+	result := make(map[string]*structpb.Value, len(m))
+	for k, v := range m {
+		sv, err := structpb.NewValue(v)
+		if err != nil {
+			sv, _ = structpb.NewValue(0)
+		}
+		result[k] = sv
+	}
+	return result
 }

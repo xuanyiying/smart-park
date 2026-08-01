@@ -83,24 +83,24 @@ type ParkingRecord struct {
 
 // Device represents a device entity in business logic.
 type Device struct {
-	ID                  uuid.UUID
-	DeviceID            string
-	LotID               *uuid.UUID
-	LaneID              *uuid.UUID
-	DeviceType          string
-	DeviceSecret        string
-	Manufacturer        string
-	Model               string
-	FirmwareVersion     string
+	ID                   uuid.UUID
+	DeviceID             string
+	LotID                *uuid.UUID
+	LaneID               *uuid.UUID
+	DeviceType           string
+	DeviceSecret         string
+	Manufacturer         string
+	Model                string
+	FirmwareVersion      string
 	VendorSpecificConfig map[string]interface{}
-	GateID              string
-	Enabled             bool
-	Status              string
-	LastHeartbeat       *time.Time
-	LastOnline          *time.Time
-	FaultInfo           string
-	HeartbeatCount      int
-	OfflineCount        int
+	GateID               string
+	Enabled              bool
+	Status               string
+	LastHeartbeat        *time.Time
+	LastOnline           *time.Time
+	FaultInfo            string
+	HeartbeatCount       int
+	OfflineCount         int
 }
 
 // Lane represents a lane entity in business logic.
@@ -126,19 +126,19 @@ type Manufacturer struct {
 
 // Firmware represents a firmware entity in business logic.
 type Firmware struct {
-	ID          uuid.UUID
-	FirmwareID  string
+	ID           uuid.UUID
+	FirmwareID   string
 	Manufacturer string
-	Model       string
-	Version     string
-	URL         string
-	Size        int64
-	MD5         string
-	Description string
-	Status      string
-	ReleaseDate time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Model        string
+	Version      string
+	URL          string
+	Size         int64
+	MD5          string
+	Description  string
+	Status       string
+	ReleaseDate  time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 // DevicePerformance represents device performance metrics.
@@ -169,6 +169,32 @@ type DeviceFault struct {
 	ResolvedAt  *time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+// DeviceLog represents a device log record.
+type DeviceLog struct {
+	ID        uuid.UUID
+	DeviceID  string
+	Level     string
+	LogType   string
+	Message   string
+	Detail    string
+	CreatedAt time.Time
+}
+
+// DeviceUpgrade represents a device upgrade record.
+type DeviceUpgrade struct {
+	ID           uuid.UUID
+	DeviceID     string
+	FromVersion  string
+	ToVersion    string
+	FirmwareURL  string
+	Status       string
+	ErrorMessage string
+	StartTime    time.Time
+	EndTime      *time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 // VehicleRepo defines the repository interface for vehicle operations.
@@ -222,4 +248,14 @@ type VehicleRepo interface {
 	GetDeviceUsageStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error)
 	GetDeviceFaultStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error)
 	GetDeviceStatsSummary(ctx context.Context, deviceID string) (map[string]interface{}, error)
+	// Device management extended
+	UpdateDeviceStatus(ctx context.Context, deviceID string, status string) error
+	UpdateDeviceVersion(ctx context.Context, deviceID string, firmwareVersion string, hardwareVersion string) error
+	UpdateDeviceStats(ctx context.Context, deviceID string, stats map[string]string) error
+	CreateDeviceLog(ctx context.Context, log *DeviceLog) error
+	GetDeviceLogs(ctx context.Context, deviceID string, page, pageSize int) ([]*DeviceLog, int, error)
+	// Device upgrade
+	CreateDeviceUpgrade(ctx context.Context, deviceID string, fromVersion string, toVersion string, firmwareURL string) (uuid.UUID, error)
+	GetDeviceUpgrade(ctx context.Context, id uuid.UUID) (*DeviceUpgrade, error)
+	UpdateDeviceUpgradeStatus(ctx context.Context, id uuid.UUID, status string, errMsg string) error
 }

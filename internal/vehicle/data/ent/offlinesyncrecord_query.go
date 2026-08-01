@@ -263,12 +263,12 @@ func (_q *OfflineSyncRecordQuery) Clone() *OfflineSyncRecordQuery {
 // Example:
 //
 //	var v []struct {
-//		OfflineID string `json:"offline_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.OfflineSyncRecord.Query().
-//		GroupBy(offlinesyncrecord.FieldOfflineID).
+//		GroupBy(offlinesyncrecord.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *OfflineSyncRecordQuery) GroupBy(field string, fields ...string) *OfflineSyncRecordGroupBy {
@@ -286,11 +286,11 @@ func (_q *OfflineSyncRecordQuery) GroupBy(field string, fields ...string) *Offli
 // Example:
 //
 //	var v []struct {
-//		OfflineID string `json:"offline_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.OfflineSyncRecord.Query().
-//		Select(offlinesyncrecord.FieldOfflineID).
+//		Select(offlinesyncrecord.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *OfflineSyncRecordQuery) Select(fields ...string) *OfflineSyncRecordSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

@@ -10,6 +10,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -487,12 +488,17 @@ func (x *ExitData) GetDisplayMessage() string {
 }
 
 type HeartbeatRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
-	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	Timestamp     string                 `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId        string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	Status          string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Timestamp       string                 `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	FaultCode       string                 `protobuf:"bytes,4,opt,name=faultCode,proto3" json:"faultCode,omitempty"`
+	FaultMessage    string                 `protobuf:"bytes,5,opt,name=faultMessage,proto3" json:"faultMessage,omitempty"`
+	Stats           map[string]string      `protobuf:"bytes,6,rep,name=stats,proto3" json:"stats,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	FirmwareVersion string                 `protobuf:"bytes,7,opt,name=firmwareVersion,proto3" json:"firmwareVersion,omitempty"`
+	HardwareVersion string                 `protobuf:"bytes,8,opt,name=hardwareVersion,proto3" json:"hardwareVersion,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *HeartbeatRequest) Reset() {
@@ -542,6 +548,41 @@ func (x *HeartbeatRequest) GetStatus() string {
 func (x *HeartbeatRequest) GetTimestamp() string {
 	if x != nil {
 		return x.Timestamp
+	}
+	return ""
+}
+
+func (x *HeartbeatRequest) GetFaultCode() string {
+	if x != nil {
+		return x.FaultCode
+	}
+	return ""
+}
+
+func (x *HeartbeatRequest) GetFaultMessage() string {
+	if x != nil {
+		return x.FaultMessage
+	}
+	return ""
+}
+
+func (x *HeartbeatRequest) GetStats() map[string]string {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+func (x *HeartbeatRequest) GetFirmwareVersion() string {
+	if x != nil {
+		return x.FirmwareVersion
+	}
+	return ""
+}
+
+func (x *HeartbeatRequest) GetHardwareVersion() string {
+	if x != nil {
+		return x.HardwareVersion
 	}
 	return ""
 }
@@ -1675,19 +1716,27 @@ func (x *ListDevicesResponse) GetTotal() int32 {
 }
 
 type DeviceInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
-	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	LastHeartbeat string                 `protobuf:"bytes,3,opt,name=lastHeartbeat,proto3" json:"lastHeartbeat,omitempty"`
-	Online        bool                   `protobuf:"varint,4,opt,name=online,proto3" json:"online,omitempty"`
-	LaneId        string                 `protobuf:"bytes,5,opt,name=laneId,proto3" json:"laneId,omitempty"`
-	LotId         string                 `protobuf:"bytes,6,opt,name=lotId,proto3" json:"lotId,omitempty"`
-	DeviceType    string                 `protobuf:"bytes,7,opt,name=deviceType,proto3" json:"deviceType,omitempty"`
-	DeviceSecret  string                 `protobuf:"bytes,8,opt,name=deviceSecret,proto3" json:"deviceSecret,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId             string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	Status               string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	LastHeartbeat        string                 `protobuf:"bytes,3,opt,name=lastHeartbeat,proto3" json:"lastHeartbeat,omitempty"`
+	LastOnline           string                 `protobuf:"bytes,15,opt,name=lastOnline,proto3" json:"lastOnline,omitempty"`
+	Online               bool                   `protobuf:"varint,4,opt,name=online,proto3" json:"online,omitempty"`
+	LaneId               string                 `protobuf:"bytes,5,opt,name=laneId,proto3" json:"laneId,omitempty"`
+	LotId                string                 `protobuf:"bytes,6,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	DeviceType           string                 `protobuf:"bytes,7,opt,name=deviceType,proto3" json:"deviceType,omitempty"`
+	DeviceSecret         string                 `protobuf:"bytes,8,opt,name=deviceSecret,proto3" json:"deviceSecret,omitempty"`
+	CreatedAt            string                 `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt            string                 `protobuf:"bytes,10,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	Manufacturer         string                 `protobuf:"bytes,11,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model                string                 `protobuf:"bytes,12,opt,name=model,proto3" json:"model,omitempty"`
+	FirmwareVersion      string                 `protobuf:"bytes,13,opt,name=firmwareVersion,proto3" json:"firmwareVersion,omitempty"`
+	FaultInfo            string                 `protobuf:"bytes,16,opt,name=faultInfo,proto3" json:"faultInfo,omitempty"`
+	HeartbeatCount       int32                  `protobuf:"varint,17,opt,name=heartbeatCount,proto3" json:"heartbeatCount,omitempty"`
+	OfflineCount         int32                  `protobuf:"varint,18,opt,name=offlineCount,proto3" json:"offlineCount,omitempty"`
+	VendorSpecificConfig map[string]string      `protobuf:"bytes,14,rep,name=vendorSpecificConfig,proto3" json:"vendorSpecificConfig,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *DeviceInfo) Reset() {
@@ -1741,6 +1790,13 @@ func (x *DeviceInfo) GetLastHeartbeat() string {
 	return ""
 }
 
+func (x *DeviceInfo) GetLastOnline() string {
+	if x != nil {
+		return x.LastOnline
+	}
+	return ""
+}
+
 func (x *DeviceInfo) GetOnline() bool {
 	if x != nil {
 		return x.Online
@@ -1790,15 +1846,68 @@ func (x *DeviceInfo) GetUpdatedAt() string {
 	return ""
 }
 
+func (x *DeviceInfo) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetFirmwareVersion() string {
+	if x != nil {
+		return x.FirmwareVersion
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetFaultInfo() string {
+	if x != nil {
+		return x.FaultInfo
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetHeartbeatCount() int32 {
+	if x != nil {
+		return x.HeartbeatCount
+	}
+	return 0
+}
+
+func (x *DeviceInfo) GetOfflineCount() int32 {
+	if x != nil {
+		return x.OfflineCount
+	}
+	return 0
+}
+
+func (x *DeviceInfo) GetVendorSpecificConfig() map[string]string {
+	if x != nil {
+		return x.VendorSpecificConfig
+	}
+	return nil
+}
+
 type CreateDeviceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
-	DeviceType    string                 `protobuf:"bytes,2,opt,name=deviceType,proto3" json:"deviceType,omitempty"`
-	LotId         string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
-	LaneId        string                 `protobuf:"bytes,4,opt,name=laneId,proto3" json:"laneId,omitempty"`
-	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId             string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	DeviceType           string                 `protobuf:"bytes,2,opt,name=deviceType,proto3" json:"deviceType,omitempty"`
+	LotId                string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	LaneId               string                 `protobuf:"bytes,4,opt,name=laneId,proto3" json:"laneId,omitempty"`
+	Status               string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Manufacturer         string                 `protobuf:"bytes,6,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model                string                 `protobuf:"bytes,7,opt,name=model,proto3" json:"model,omitempty"`
+	FirmwareVersion      string                 `protobuf:"bytes,8,opt,name=firmwareVersion,proto3" json:"firmwareVersion,omitempty"`
+	VendorSpecificConfig map[string]string      `protobuf:"bytes,9,rep,name=vendorSpecificConfig,proto3" json:"vendorSpecificConfig,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *CreateDeviceRequest) Reset() {
@@ -1864,6 +1973,34 @@ func (x *CreateDeviceRequest) GetStatus() string {
 		return x.Status
 	}
 	return ""
+}
+
+func (x *CreateDeviceRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *CreateDeviceRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *CreateDeviceRequest) GetFirmwareVersion() string {
+	if x != nil {
+		return x.FirmwareVersion
+	}
+	return ""
+}
+
+func (x *CreateDeviceRequest) GetVendorSpecificConfig() map[string]string {
+	if x != nil {
+		return x.VendorSpecificConfig
+	}
+	return nil
 }
 
 type CreateDeviceResponse struct {
@@ -2031,14 +2168,18 @@ func (x *GetDeviceResponse) GetData() *DeviceInfo {
 }
 
 type UpdateDeviceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
-	DeviceType    string                 `protobuf:"bytes,2,opt,name=deviceType,proto3" json:"deviceType,omitempty"`
-	LotId         string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
-	LaneId        string                 `protobuf:"bytes,4,opt,name=laneId,proto3" json:"laneId,omitempty"`
-	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId             string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	DeviceType           string                 `protobuf:"bytes,2,opt,name=deviceType,proto3" json:"deviceType,omitempty"`
+	LotId                string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	LaneId               string                 `protobuf:"bytes,4,opt,name=laneId,proto3" json:"laneId,omitempty"`
+	Status               string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Manufacturer         string                 `protobuf:"bytes,6,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model                string                 `protobuf:"bytes,7,opt,name=model,proto3" json:"model,omitempty"`
+	FirmwareVersion      string                 `protobuf:"bytes,8,opt,name=firmwareVersion,proto3" json:"firmwareVersion,omitempty"`
+	VendorSpecificConfig map[string]string      `protobuf:"bytes,9,rep,name=vendorSpecificConfig,proto3" json:"vendorSpecificConfig,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *UpdateDeviceRequest) Reset() {
@@ -2104,6 +2245,34 @@ func (x *UpdateDeviceRequest) GetStatus() string {
 		return x.Status
 	}
 	return ""
+}
+
+func (x *UpdateDeviceRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *UpdateDeviceRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *UpdateDeviceRequest) GetFirmwareVersion() string {
+	if x != nil {
+		return x.FirmwareVersion
+	}
+	return ""
+}
+
+func (x *UpdateDeviceRequest) GetVendorSpecificConfig() map[string]string {
+	if x != nil {
+		return x.VendorSpecificConfig
+	}
+	return nil
 }
 
 type UpdateDeviceResponse struct {
@@ -2262,11 +2431,3347 @@ func (x *DeleteDeviceResponse) GetMessage() string {
 	return ""
 }
 
+// Firmware messages
+type CreateFirmwareRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FirmwareId    string                 `protobuf:"bytes,1,opt,name=firmwareId,proto3" json:"firmwareId,omitempty"`
+	Manufacturer  string                 `protobuf:"bytes,2,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model         string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	Url           string                 `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
+	Size          int64                  `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`
+	Md5           string                 `protobuf:"bytes,7,opt,name=md5,proto3" json:"md5,omitempty"`
+	Description   string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
+	Status        string                 `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateFirmwareRequest) Reset() {
+	*x = CreateFirmwareRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateFirmwareRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateFirmwareRequest) ProtoMessage() {}
+
+func (x *CreateFirmwareRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateFirmwareRequest.ProtoReflect.Descriptor instead.
+func (*CreateFirmwareRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *CreateFirmwareRequest) GetFirmwareId() string {
+	if x != nil {
+		return x.FirmwareId
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *CreateFirmwareRequest) GetMd5() string {
+	if x != nil {
+		return x.Md5
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateFirmwareRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type CreateFirmwareResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *Firmware              `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateFirmwareResponse) Reset() {
+	*x = CreateFirmwareResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateFirmwareResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateFirmwareResponse) ProtoMessage() {}
+
+func (x *CreateFirmwareResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateFirmwareResponse.ProtoReflect.Descriptor instead.
+func (*CreateFirmwareResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *CreateFirmwareResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *CreateFirmwareResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CreateFirmwareResponse) GetData() *Firmware {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetFirmwareRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFirmwareRequest) Reset() {
+	*x = GetFirmwareRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFirmwareRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFirmwareRequest) ProtoMessage() {}
+
+func (x *GetFirmwareRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFirmwareRequest.ProtoReflect.Descriptor instead.
+func (*GetFirmwareRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GetFirmwareRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetFirmwareResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *Firmware              `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFirmwareResponse) Reset() {
+	*x = GetFirmwareResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFirmwareResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFirmwareResponse) ProtoMessage() {}
+
+func (x *GetFirmwareResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFirmwareResponse.ProtoReflect.Descriptor instead.
+func (*GetFirmwareResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetFirmwareResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetFirmwareResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetFirmwareResponse) GetData() *Firmware {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetFirmwareByIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FirmwareId    string                 `protobuf:"bytes,1,opt,name=firmwareId,proto3" json:"firmwareId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFirmwareByIDRequest) Reset() {
+	*x = GetFirmwareByIDRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFirmwareByIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFirmwareByIDRequest) ProtoMessage() {}
+
+func (x *GetFirmwareByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFirmwareByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetFirmwareByIDRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetFirmwareByIDRequest) GetFirmwareId() string {
+	if x != nil {
+		return x.FirmwareId
+	}
+	return ""
+}
+
+type GetFirmwareByIDResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *Firmware              `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFirmwareByIDResponse) Reset() {
+	*x = GetFirmwareByIDResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFirmwareByIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFirmwareByIDResponse) ProtoMessage() {}
+
+func (x *GetFirmwareByIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFirmwareByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetFirmwareByIDResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *GetFirmwareByIDResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetFirmwareByIDResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetFirmwareByIDResponse) GetData() *Firmware {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type ListFirmwaresRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Manufacturer  string                 `protobuf:"bytes,1,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListFirmwaresRequest) Reset() {
+	*x = ListFirmwaresRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListFirmwaresRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFirmwaresRequest) ProtoMessage() {}
+
+func (x *ListFirmwaresRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListFirmwaresRequest.ProtoReflect.Descriptor instead.
+func (*ListFirmwaresRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *ListFirmwaresRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *ListFirmwaresRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *ListFirmwaresRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListFirmwaresRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type ListFirmwaresResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*Firmware            `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListFirmwaresResponse) Reset() {
+	*x = ListFirmwaresResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListFirmwaresResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListFirmwaresResponse) ProtoMessage() {}
+
+func (x *ListFirmwaresResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListFirmwaresResponse.ProtoReflect.Descriptor instead.
+func (*ListFirmwaresResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *ListFirmwaresResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListFirmwaresResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListFirmwaresResponse) GetData() []*Firmware {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *ListFirmwaresResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type UpdateFirmwareRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	FirmwareId    string                 `protobuf:"bytes,2,opt,name=firmwareId,proto3" json:"firmwareId,omitempty"`
+	Manufacturer  string                 `protobuf:"bytes,3,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model         string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
+	Version       string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
+	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
+	Size          int64                  `protobuf:"varint,7,opt,name=size,proto3" json:"size,omitempty"`
+	Md5           string                 `protobuf:"bytes,8,opt,name=md5,proto3" json:"md5,omitempty"`
+	Description   string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
+	Status        string                 `protobuf:"bytes,10,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFirmwareRequest) Reset() {
+	*x = UpdateFirmwareRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFirmwareRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFirmwareRequest) ProtoMessage() {}
+
+func (x *UpdateFirmwareRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFirmwareRequest.ProtoReflect.Descriptor instead.
+func (*UpdateFirmwareRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *UpdateFirmwareRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetFirmwareId() string {
+	if x != nil {
+		return x.FirmwareId
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *UpdateFirmwareRequest) GetMd5() string {
+	if x != nil {
+		return x.Md5
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type UpdateFirmwareResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *Firmware              `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFirmwareResponse) Reset() {
+	*x = UpdateFirmwareResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFirmwareResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFirmwareResponse) ProtoMessage() {}
+
+func (x *UpdateFirmwareResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFirmwareResponse.ProtoReflect.Descriptor instead.
+func (*UpdateFirmwareResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *UpdateFirmwareResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateFirmwareResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateFirmwareResponse) GetData() *Firmware {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DeleteFirmwareRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteFirmwareRequest) Reset() {
+	*x = DeleteFirmwareRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteFirmwareRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteFirmwareRequest) ProtoMessage() {}
+
+func (x *DeleteFirmwareRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteFirmwareRequest.ProtoReflect.Descriptor instead.
+func (*DeleteFirmwareRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *DeleteFirmwareRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteFirmwareResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteFirmwareResponse) Reset() {
+	*x = DeleteFirmwareResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteFirmwareResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteFirmwareResponse) ProtoMessage() {}
+
+func (x *DeleteFirmwareResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteFirmwareResponse.ProtoReflect.Descriptor instead.
+func (*DeleteFirmwareResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *DeleteFirmwareResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeleteFirmwareResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type GetLatestFirmwareRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Manufacturer  string                 `protobuf:"bytes,1,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLatestFirmwareRequest) Reset() {
+	*x = GetLatestFirmwareRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLatestFirmwareRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLatestFirmwareRequest) ProtoMessage() {}
+
+func (x *GetLatestFirmwareRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLatestFirmwareRequest.ProtoReflect.Descriptor instead.
+func (*GetLatestFirmwareRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *GetLatestFirmwareRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *GetLatestFirmwareRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+type GetLatestFirmwareResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *Firmware              `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLatestFirmwareResponse) Reset() {
+	*x = GetLatestFirmwareResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLatestFirmwareResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLatestFirmwareResponse) ProtoMessage() {}
+
+func (x *GetLatestFirmwareResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLatestFirmwareResponse.ProtoReflect.Descriptor instead.
+func (*GetLatestFirmwareResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *GetLatestFirmwareResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetLatestFirmwareResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetLatestFirmwareResponse) GetData() *Firmware {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type Firmware struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	FirmwareId    string                 `protobuf:"bytes,2,opt,name=firmwareId,proto3" json:"firmwareId,omitempty"`
+	Manufacturer  string                 `protobuf:"bytes,3,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Model         string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
+	Version       string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
+	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
+	Size          int64                  `protobuf:"varint,7,opt,name=size,proto3" json:"size,omitempty"`
+	Md5           string                 `protobuf:"bytes,8,opt,name=md5,proto3" json:"md5,omitempty"`
+	Description   string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
+	Status        string                 `protobuf:"bytes,10,opt,name=status,proto3" json:"status,omitempty"`
+	ReleaseDate   string                 `protobuf:"bytes,11,opt,name=releaseDate,proto3" json:"releaseDate,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,12,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,13,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Firmware) Reset() {
+	*x = Firmware{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Firmware) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Firmware) ProtoMessage() {}
+
+func (x *Firmware) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Firmware.ProtoReflect.Descriptor instead.
+func (*Firmware) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *Firmware) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Firmware) GetFirmwareId() string {
+	if x != nil {
+		return x.FirmwareId
+	}
+	return ""
+}
+
+func (x *Firmware) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *Firmware) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *Firmware) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *Firmware) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *Firmware) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *Firmware) GetMd5() string {
+	if x != nil {
+		return x.Md5
+	}
+	return ""
+}
+
+func (x *Firmware) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Firmware) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Firmware) GetReleaseDate() string {
+	if x != nil {
+		return x.ReleaseDate
+	}
+	return ""
+}
+
+func (x *Firmware) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Firmware) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+// Device performance messages
+type CreateDevicePerformanceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	CpuUsage      float64                `protobuf:"fixed64,2,opt,name=cpuUsage,proto3" json:"cpuUsage,omitempty"`
+	MemoryUsage   float64                `protobuf:"fixed64,3,opt,name=memoryUsage,proto3" json:"memoryUsage,omitempty"`
+	StorageUsage  float64                `protobuf:"fixed64,4,opt,name=storageUsage,proto3" json:"storageUsage,omitempty"`
+	NetworkIn     int64                  `protobuf:"varint,5,opt,name=networkIn,proto3" json:"networkIn,omitempty"`
+	NetworkOut    int64                  `protobuf:"varint,6,opt,name=networkOut,proto3" json:"networkOut,omitempty"`
+	Temperature   float64                `protobuf:"fixed64,7,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	Timestamp     string                 `protobuf:"bytes,8,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDevicePerformanceRequest) Reset() {
+	*x = CreateDevicePerformanceRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDevicePerformanceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDevicePerformanceRequest) ProtoMessage() {}
+
+func (x *CreateDevicePerformanceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDevicePerformanceRequest.ProtoReflect.Descriptor instead.
+func (*CreateDevicePerformanceRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *CreateDevicePerformanceRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *CreateDevicePerformanceRequest) GetCpuUsage() float64 {
+	if x != nil {
+		return x.CpuUsage
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceRequest) GetMemoryUsage() float64 {
+	if x != nil {
+		return x.MemoryUsage
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceRequest) GetStorageUsage() float64 {
+	if x != nil {
+		return x.StorageUsage
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceRequest) GetNetworkIn() int64 {
+	if x != nil {
+		return x.NetworkIn
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceRequest) GetNetworkOut() int64 {
+	if x != nil {
+		return x.NetworkOut
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceRequest) GetTemperature() float64 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceRequest) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+type CreateDevicePerformanceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDevicePerformanceResponse) Reset() {
+	*x = CreateDevicePerformanceResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDevicePerformanceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDevicePerformanceResponse) ProtoMessage() {}
+
+func (x *CreateDevicePerformanceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDevicePerformanceResponse.ProtoReflect.Descriptor instead.
+func (*CreateDevicePerformanceResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *CreateDevicePerformanceResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *CreateDevicePerformanceResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type GetDevicePerformanceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	StartTime     string                 `protobuf:"bytes,2,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,3,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDevicePerformanceRequest) Reset() {
+	*x = GetDevicePerformanceRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDevicePerformanceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDevicePerformanceRequest) ProtoMessage() {}
+
+func (x *GetDevicePerformanceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDevicePerformanceRequest.ProtoReflect.Descriptor instead.
+func (*GetDevicePerformanceRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *GetDevicePerformanceRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *GetDevicePerformanceRequest) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *GetDevicePerformanceRequest) GetEndTime() string {
+	if x != nil {
+		return x.EndTime
+	}
+	return ""
+}
+
+type GetDevicePerformanceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*DevicePerformance   `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDevicePerformanceResponse) Reset() {
+	*x = GetDevicePerformanceResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[52]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDevicePerformanceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDevicePerformanceResponse) ProtoMessage() {}
+
+func (x *GetDevicePerformanceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[52]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDevicePerformanceResponse.ProtoReflect.Descriptor instead.
+func (*GetDevicePerformanceResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{52}
+}
+
+func (x *GetDevicePerformanceResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDevicePerformanceResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDevicePerformanceResponse) GetData() []*DevicePerformance {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetDevicePerformanceLatestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDevicePerformanceLatestRequest) Reset() {
+	*x = GetDevicePerformanceLatestRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDevicePerformanceLatestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDevicePerformanceLatestRequest) ProtoMessage() {}
+
+func (x *GetDevicePerformanceLatestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDevicePerformanceLatestRequest.ProtoReflect.Descriptor instead.
+func (*GetDevicePerformanceLatestRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *GetDevicePerformanceLatestRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+type GetDevicePerformanceLatestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *DevicePerformance     `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDevicePerformanceLatestResponse) Reset() {
+	*x = GetDevicePerformanceLatestResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDevicePerformanceLatestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDevicePerformanceLatestResponse) ProtoMessage() {}
+
+func (x *GetDevicePerformanceLatestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDevicePerformanceLatestResponse.ProtoReflect.Descriptor instead.
+func (*GetDevicePerformanceLatestResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{54}
+}
+
+func (x *GetDevicePerformanceLatestResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDevicePerformanceLatestResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDevicePerformanceLatestResponse) GetData() *DevicePerformance {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DevicePerformance struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	DeviceId      string                 `protobuf:"bytes,2,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	CpuUsage      float64                `protobuf:"fixed64,3,opt,name=cpuUsage,proto3" json:"cpuUsage,omitempty"`
+	MemoryUsage   float64                `protobuf:"fixed64,4,opt,name=memoryUsage,proto3" json:"memoryUsage,omitempty"`
+	StorageUsage  float64                `protobuf:"fixed64,5,opt,name=storageUsage,proto3" json:"storageUsage,omitempty"`
+	NetworkIn     int64                  `protobuf:"varint,6,opt,name=networkIn,proto3" json:"networkIn,omitempty"`
+	NetworkOut    int64                  `protobuf:"varint,7,opt,name=networkOut,proto3" json:"networkOut,omitempty"`
+	Temperature   float64                `protobuf:"fixed64,8,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	Timestamp     string                 `protobuf:"bytes,9,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,10,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DevicePerformance) Reset() {
+	*x = DevicePerformance{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DevicePerformance) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DevicePerformance) ProtoMessage() {}
+
+func (x *DevicePerformance) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DevicePerformance.ProtoReflect.Descriptor instead.
+func (*DevicePerformance) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *DevicePerformance) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DevicePerformance) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *DevicePerformance) GetCpuUsage() float64 {
+	if x != nil {
+		return x.CpuUsage
+	}
+	return 0
+}
+
+func (x *DevicePerformance) GetMemoryUsage() float64 {
+	if x != nil {
+		return x.MemoryUsage
+	}
+	return 0
+}
+
+func (x *DevicePerformance) GetStorageUsage() float64 {
+	if x != nil {
+		return x.StorageUsage
+	}
+	return 0
+}
+
+func (x *DevicePerformance) GetNetworkIn() int64 {
+	if x != nil {
+		return x.NetworkIn
+	}
+	return 0
+}
+
+func (x *DevicePerformance) GetNetworkOut() int64 {
+	if x != nil {
+		return x.NetworkOut
+	}
+	return 0
+}
+
+func (x *DevicePerformance) GetTemperature() float64 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *DevicePerformance) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+func (x *DevicePerformance) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// Device fault messages
+type CreateDeviceFaultRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	FaultType     string                 `protobuf:"bytes,2,opt,name=faultType,proto3" json:"faultType,omitempty"`
+	FaultCode     string                 `protobuf:"bytes,3,opt,name=faultCode,proto3" json:"faultCode,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Severity      string                 `protobuf:"bytes,5,opt,name=severity,proto3" json:"severity,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	Suggestion    string                 `protobuf:"bytes,7,opt,name=suggestion,proto3" json:"suggestion,omitempty"`
+	DetectedAt    string                 `protobuf:"bytes,8,opt,name=detectedAt,proto3" json:"detectedAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDeviceFaultRequest) Reset() {
+	*x = CreateDeviceFaultRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[56]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDeviceFaultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDeviceFaultRequest) ProtoMessage() {}
+
+func (x *CreateDeviceFaultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[56]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDeviceFaultRequest.ProtoReflect.Descriptor instead.
+func (*CreateDeviceFaultRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *CreateDeviceFaultRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetFaultType() string {
+	if x != nil {
+		return x.FaultType
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetFaultCode() string {
+	if x != nil {
+		return x.FaultCode
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetSuggestion() string {
+	if x != nil {
+		return x.Suggestion
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultRequest) GetDetectedAt() string {
+	if x != nil {
+		return x.DetectedAt
+	}
+	return ""
+}
+
+type CreateDeviceFaultResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *DeviceFault           `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDeviceFaultResponse) Reset() {
+	*x = CreateDeviceFaultResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDeviceFaultResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDeviceFaultResponse) ProtoMessage() {}
+
+func (x *CreateDeviceFaultResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDeviceFaultResponse.ProtoReflect.Descriptor instead.
+func (*CreateDeviceFaultResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *CreateDeviceFaultResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *CreateDeviceFaultResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CreateDeviceFaultResponse) GetData() *DeviceFault {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetDeviceFaultRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceFaultRequest) Reset() {
+	*x = GetDeviceFaultRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[58]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceFaultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceFaultRequest) ProtoMessage() {}
+
+func (x *GetDeviceFaultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[58]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceFaultRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceFaultRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *GetDeviceFaultRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetDeviceFaultResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *DeviceFault           `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceFaultResponse) Reset() {
+	*x = GetDeviceFaultResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[59]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceFaultResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceFaultResponse) ProtoMessage() {}
+
+func (x *GetDeviceFaultResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[59]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceFaultResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceFaultResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *GetDeviceFaultResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDeviceFaultResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDeviceFaultResponse) GetData() *DeviceFault {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type ListDeviceFaultsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDeviceFaultsRequest) Reset() {
+	*x = ListDeviceFaultsRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[60]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDeviceFaultsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDeviceFaultsRequest) ProtoMessage() {}
+
+func (x *ListDeviceFaultsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[60]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDeviceFaultsRequest.ProtoReflect.Descriptor instead.
+func (*ListDeviceFaultsRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *ListDeviceFaultsRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *ListDeviceFaultsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ListDeviceFaultsRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListDeviceFaultsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type ListDeviceFaultsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*DeviceFault         `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDeviceFaultsResponse) Reset() {
+	*x = ListDeviceFaultsResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDeviceFaultsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDeviceFaultsResponse) ProtoMessage() {}
+
+func (x *ListDeviceFaultsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDeviceFaultsResponse.ProtoReflect.Descriptor instead.
+func (*ListDeviceFaultsResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *ListDeviceFaultsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListDeviceFaultsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListDeviceFaultsResponse) GetData() []*DeviceFault {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *ListDeviceFaultsResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type ResolveDeviceFaultRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveDeviceFaultRequest) Reset() {
+	*x = ResolveDeviceFaultRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[62]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveDeviceFaultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveDeviceFaultRequest) ProtoMessage() {}
+
+func (x *ResolveDeviceFaultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[62]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveDeviceFaultRequest.ProtoReflect.Descriptor instead.
+func (*ResolveDeviceFaultRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *ResolveDeviceFaultRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ResolveDeviceFaultResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveDeviceFaultResponse) Reset() {
+	*x = ResolveDeviceFaultResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[63]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveDeviceFaultResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveDeviceFaultResponse) ProtoMessage() {}
+
+func (x *ResolveDeviceFaultResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[63]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveDeviceFaultResponse.ProtoReflect.Descriptor instead.
+func (*ResolveDeviceFaultResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{63}
+}
+
+func (x *ResolveDeviceFaultResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ResolveDeviceFaultResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type DeviceFault struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	DeviceId      string                 `protobuf:"bytes,2,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	FaultType     string                 `protobuf:"bytes,3,opt,name=faultType,proto3" json:"faultType,omitempty"`
+	FaultCode     string                 `protobuf:"bytes,4,opt,name=faultCode,proto3" json:"faultCode,omitempty"`
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	Severity      string                 `protobuf:"bytes,6,opt,name=severity,proto3" json:"severity,omitempty"`
+	Status        string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
+	Suggestion    string                 `protobuf:"bytes,8,opt,name=suggestion,proto3" json:"suggestion,omitempty"`
+	DetectedAt    string                 `protobuf:"bytes,9,opt,name=detectedAt,proto3" json:"detectedAt,omitempty"`
+	ResolvedAt    string                 `protobuf:"bytes,10,opt,name=resolvedAt,proto3" json:"resolvedAt,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,11,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,12,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceFault) Reset() {
+	*x = DeviceFault{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[64]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceFault) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceFault) ProtoMessage() {}
+
+func (x *DeviceFault) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[64]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceFault.ProtoReflect.Descriptor instead.
+func (*DeviceFault) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *DeviceFault) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetFaultType() string {
+	if x != nil {
+		return x.FaultType
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetFaultCode() string {
+	if x != nil {
+		return x.FaultCode
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetSuggestion() string {
+	if x != nil {
+		return x.Suggestion
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetDetectedAt() string {
+	if x != nil {
+		return x.DetectedAt
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetResolvedAt() string {
+	if x != nil {
+		return x.ResolvedAt
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *DeviceFault) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+// Device statistics messages
+type GetDeviceUsageStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	StartTime     string                 `protobuf:"bytes,2,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,3,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceUsageStatsRequest) Reset() {
+	*x = GetDeviceUsageStatsRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[65]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceUsageStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceUsageStatsRequest) ProtoMessage() {}
+
+func (x *GetDeviceUsageStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[65]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceUsageStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceUsageStatsRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{65}
+}
+
+func (x *GetDeviceUsageStatsRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *GetDeviceUsageStatsRequest) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *GetDeviceUsageStatsRequest) GetEndTime() string {
+	if x != nil {
+		return x.EndTime
+	}
+	return ""
+}
+
+type GetDeviceUsageStatsResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Code          int32                      `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                     `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          map[string]*structpb.Value `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceUsageStatsResponse) Reset() {
+	*x = GetDeviceUsageStatsResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[66]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceUsageStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceUsageStatsResponse) ProtoMessage() {}
+
+func (x *GetDeviceUsageStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[66]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceUsageStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceUsageStatsResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{66}
+}
+
+func (x *GetDeviceUsageStatsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDeviceUsageStatsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDeviceUsageStatsResponse) GetData() map[string]*structpb.Value {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetDeviceFaultStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	StartTime     string                 `protobuf:"bytes,2,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,3,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceFaultStatsRequest) Reset() {
+	*x = GetDeviceFaultStatsRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[67]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceFaultStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceFaultStatsRequest) ProtoMessage() {}
+
+func (x *GetDeviceFaultStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[67]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceFaultStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceFaultStatsRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{67}
+}
+
+func (x *GetDeviceFaultStatsRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *GetDeviceFaultStatsRequest) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *GetDeviceFaultStatsRequest) GetEndTime() string {
+	if x != nil {
+		return x.EndTime
+	}
+	return ""
+}
+
+type GetDeviceFaultStatsResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Code          int32                      `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                     `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          map[string]*structpb.Value `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceFaultStatsResponse) Reset() {
+	*x = GetDeviceFaultStatsResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceFaultStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceFaultStatsResponse) ProtoMessage() {}
+
+func (x *GetDeviceFaultStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceFaultStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceFaultStatsResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *GetDeviceFaultStatsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDeviceFaultStatsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDeviceFaultStatsResponse) GetData() map[string]*structpb.Value {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetDeviceStatsSummaryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceStatsSummaryRequest) Reset() {
+	*x = GetDeviceStatsSummaryRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceStatsSummaryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceStatsSummaryRequest) ProtoMessage() {}
+
+func (x *GetDeviceStatsSummaryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceStatsSummaryRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceStatsSummaryRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *GetDeviceStatsSummaryRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+type GetDeviceStatsSummaryResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Code          int32                      `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                     `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          map[string]*structpb.Value `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceStatsSummaryResponse) Reset() {
+	*x = GetDeviceStatsSummaryResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceStatsSummaryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceStatsSummaryResponse) ProtoMessage() {}
+
+func (x *GetDeviceStatsSummaryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceStatsSummaryResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceStatsSummaryResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *GetDeviceStatsSummaryResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDeviceStatsSummaryResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDeviceStatsSummaryResponse) GetData() map[string]*structpb.Value {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// Device upgrade messages
+type UpgradeDeviceRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId        string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	FirmwareVersion string                 `protobuf:"bytes,2,opt,name=firmwareVersion,proto3" json:"firmwareVersion,omitempty"`
+	FirmwareUrl     string                 `protobuf:"bytes,3,opt,name=firmwareUrl,proto3" json:"firmwareUrl,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *UpgradeDeviceRequest) Reset() {
+	*x = UpgradeDeviceRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpgradeDeviceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpgradeDeviceRequest) ProtoMessage() {}
+
+func (x *UpgradeDeviceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpgradeDeviceRequest.ProtoReflect.Descriptor instead.
+func (*UpgradeDeviceRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *UpgradeDeviceRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *UpgradeDeviceRequest) GetFirmwareVersion() string {
+	if x != nil {
+		return x.FirmwareVersion
+	}
+	return ""
+}
+
+func (x *UpgradeDeviceRequest) GetFirmwareUrl() string {
+	if x != nil {
+		return x.FirmwareUrl
+	}
+	return ""
+}
+
+type UpgradeDeviceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *UpgradeStatusData     `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpgradeDeviceResponse) Reset() {
+	*x = UpgradeDeviceResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpgradeDeviceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpgradeDeviceResponse) ProtoMessage() {}
+
+func (x *UpgradeDeviceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpgradeDeviceResponse.ProtoReflect.Descriptor instead.
+func (*UpgradeDeviceResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *UpgradeDeviceResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpgradeDeviceResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpgradeDeviceResponse) GetData() *UpgradeStatusData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type UpgradeStatusData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UpgradeId     string                 `protobuf:"bytes,1,opt,name=upgradeId,proto3" json:"upgradeId,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpgradeStatusData) Reset() {
+	*x = UpgradeStatusData{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpgradeStatusData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpgradeStatusData) ProtoMessage() {}
+
+func (x *UpgradeStatusData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpgradeStatusData.ProtoReflect.Descriptor instead.
+func (*UpgradeStatusData) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *UpgradeStatusData) GetUpgradeId() string {
+	if x != nil {
+		return x.UpgradeId
+	}
+	return ""
+}
+
+func (x *UpgradeStatusData) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *UpgradeStatusData) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type GetDeviceUpgradeStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UpgradeId     string                 `protobuf:"bytes,1,opt,name=upgradeId,proto3" json:"upgradeId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceUpgradeStatusRequest) Reset() {
+	*x = GetDeviceUpgradeStatusRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceUpgradeStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceUpgradeStatusRequest) ProtoMessage() {}
+
+func (x *GetDeviceUpgradeStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceUpgradeStatusRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceUpgradeStatusRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{74}
+}
+
+func (x *GetDeviceUpgradeStatusRequest) GetUpgradeId() string {
+	if x != nil {
+		return x.UpgradeId
+	}
+	return ""
+}
+
+type UpgradeStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UpgradeId     string                 `protobuf:"bytes,1,opt,name=upgradeId,proto3" json:"upgradeId,omitempty"`
+	DeviceId      string                 `protobuf:"bytes,2,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	FromVersion   string                 `protobuf:"bytes,3,opt,name=fromVersion,proto3" json:"fromVersion,omitempty"`
+	ToVersion     string                 `protobuf:"bytes,4,opt,name=toVersion,proto3" json:"toVersion,omitempty"`
+	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,6,opt,name=errorMessage,proto3" json:"errorMessage,omitempty"`
+	StartTime     string                 `protobuf:"bytes,7,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime       string                 `protobuf:"bytes,8,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpgradeStatusResponse) Reset() {
+	*x = UpgradeStatusResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[75]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpgradeStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpgradeStatusResponse) ProtoMessage() {}
+
+func (x *UpgradeStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[75]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpgradeStatusResponse.ProtoReflect.Descriptor instead.
+func (*UpgradeStatusResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{75}
+}
+
+func (x *UpgradeStatusResponse) GetUpgradeId() string {
+	if x != nil {
+		return x.UpgradeId
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetFromVersion() string {
+	if x != nil {
+		return x.FromVersion
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetToVersion() string {
+	if x != nil {
+		return x.ToVersion
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *UpgradeStatusResponse) GetEndTime() string {
+	if x != nil {
+		return x.EndTime
+	}
+	return ""
+}
+
+// Device log messages
+type DeviceLog struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	DeviceId      string                 `protobuf:"bytes,2,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	Level         string                 `protobuf:"bytes,3,opt,name=level,proto3" json:"level,omitempty"`
+	LogType       string                 `protobuf:"bytes,4,opt,name=logType,proto3" json:"logType,omitempty"`
+	Message       string                 `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	Detail        string                 `protobuf:"bytes,6,opt,name=detail,proto3" json:"detail,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceLog) Reset() {
+	*x = DeviceLog{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[76]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceLog) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceLog) ProtoMessage() {}
+
+func (x *DeviceLog) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[76]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceLog.ProtoReflect.Descriptor instead.
+func (*DeviceLog) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{76}
+}
+
+func (x *DeviceLog) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeviceLog) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *DeviceLog) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
+}
+
+func (x *DeviceLog) GetLogType() string {
+	if x != nil {
+		return x.LogType
+	}
+	return ""
+}
+
+func (x *DeviceLog) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *DeviceLog) GetDetail() string {
+	if x != nil {
+		return x.Detail
+	}
+	return ""
+}
+
+func (x *DeviceLog) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type GetDeviceLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceLogsRequest) Reset() {
+	*x = GetDeviceLogsRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[77]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceLogsRequest) ProtoMessage() {}
+
+func (x *GetDeviceLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[77]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceLogsRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceLogsRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{77}
+}
+
+func (x *GetDeviceLogsRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *GetDeviceLogsRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetDeviceLogsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type GetDeviceLogsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*DeviceLog           `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceLogsResponse) Reset() {
+	*x = GetDeviceLogsResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[78]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceLogsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceLogsResponse) ProtoMessage() {}
+
+func (x *GetDeviceLogsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[78]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceLogsResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceLogsResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{78}
+}
+
+func (x *GetDeviceLogsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDeviceLogsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDeviceLogsResponse) GetData() []*DeviceLog {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *GetDeviceLogsResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+// Device stats message
+type GetDeviceStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceStatsRequest) Reset() {
+	*x = GetDeviceStatsRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[79]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceStatsRequest) ProtoMessage() {}
+
+func (x *GetDeviceStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[79]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceStatsRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{79}
+}
+
+func (x *GetDeviceStatsRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+type DeviceStatsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *DeviceStatsData       `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceStatsResponse) Reset() {
+	*x = DeviceStatsResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[80]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceStatsResponse) ProtoMessage() {}
+
+func (x *DeviceStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[80]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceStatsResponse.ProtoReflect.Descriptor instead.
+func (*DeviceStatsResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{80}
+}
+
+func (x *DeviceStatsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeviceStatsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *DeviceStatsResponse) GetData() *DeviceStatsData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DeviceStatsData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TotalDevices  int32                  `protobuf:"varint,1,opt,name=totalDevices,proto3" json:"totalDevices,omitempty"`
+	OnlineDevices int32                  `protobuf:"varint,2,opt,name=onlineDevices,proto3" json:"onlineDevices,omitempty"`
+	FaultDevices  int32                  `protobuf:"varint,3,opt,name=faultDevices,proto3" json:"faultDevices,omitempty"`
+	OnlineRate    float64                `protobuf:"fixed64,4,opt,name=onlineRate,proto3" json:"onlineRate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceStatsData) Reset() {
+	*x = DeviceStatsData{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[81]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceStatsData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceStatsData) ProtoMessage() {}
+
+func (x *DeviceStatsData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[81]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceStatsData.ProtoReflect.Descriptor instead.
+func (*DeviceStatsData) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{81}
+}
+
+func (x *DeviceStatsData) GetTotalDevices() int32 {
+	if x != nil {
+		return x.TotalDevices
+	}
+	return 0
+}
+
+func (x *DeviceStatsData) GetOnlineDevices() int32 {
+	if x != nil {
+		return x.OnlineDevices
+	}
+	return 0
+}
+
+func (x *DeviceStatsData) GetFaultDevices() int32 {
+	if x != nil {
+		return x.FaultDevices
+	}
+	return 0
+}
+
+func (x *DeviceStatsData) GetOnlineRate() float64 {
+	if x != nil {
+		return x.OnlineRate
+	}
+	return 0
+}
+
+// Device config messages
+type UpdateDeviceConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=deviceId,proto3" json:"deviceId,omitempty"`
+	Config        map[string]string      `protobuf:"bytes,2,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateDeviceConfigRequest) Reset() {
+	*x = UpdateDeviceConfigRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[82]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateDeviceConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDeviceConfigRequest) ProtoMessage() {}
+
+func (x *UpdateDeviceConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[82]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDeviceConfigRequest.ProtoReflect.Descriptor instead.
+func (*UpdateDeviceConfigRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{82}
+}
+
+func (x *UpdateDeviceConfigRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *UpdateDeviceConfigRequest) GetConfig() map[string]string {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type UpdateDeviceConfigResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *DeviceInfo            `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateDeviceConfigResponse) Reset() {
+	*x = UpdateDeviceConfigResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateDeviceConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDeviceConfigResponse) ProtoMessage() {}
+
+func (x *UpdateDeviceConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDeviceConfigResponse.ProtoReflect.Descriptor instead.
+func (*UpdateDeviceConfigResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{83}
+}
+
+func (x *UpdateDeviceConfigResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateDeviceConfigResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateDeviceConfigResponse) GetData() *DeviceInfo {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_api_vehicle_v1_vehicle_proto protoreflect.FileDescriptor
 
 const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\n" +
-	"\x1capi/vehicle/v1/vehicle.proto\x12\x0eapi.vehicle.v1\x1a\x1cgoogle/api/annotations.proto\"\xd2\x01\n" +
+	"\x1capi/vehicle/v1/vehicle.proto\x12\x0eapi.vehicle.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a!api/vehicle/v1/manufacturer.proto\"\xd2\x01\n" +
 	"\fEntryRequest\x12\x1a\n" +
 	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12 \n" +
 	"\vplateNumber\x18\x02 \x01(\tR\vplateNumber\x12$\n" +
@@ -2307,11 +5812,20 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\vfinalAmount\x18\x06 \x01(\x01R\vfinalAmount\x12\x18\n" +
 	"\aallowed\x18\a \x01(\bR\aallowed\x12\x1a\n" +
 	"\bgateOpen\x18\b \x01(\bR\bgateOpen\x12&\n" +
-	"\x0edisplayMessage\x18\t \x01(\tR\x0edisplayMessage\"d\n" +
+	"\x0edisplayMessage\x18\t \x01(\tR\x0edisplayMessage\"\xf7\x02\n" +
 	"\x10HeartbeatRequest\x12\x1a\n" +
 	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x1c\n" +
-	"\ttimestamp\x18\x03 \x01(\tR\ttimestamp\"A\n" +
+	"\ttimestamp\x18\x03 \x01(\tR\ttimestamp\x12\x1c\n" +
+	"\tfaultCode\x18\x04 \x01(\tR\tfaultCode\x12\"\n" +
+	"\ffaultMessage\x18\x05 \x01(\tR\ffaultMessage\x12A\n" +
+	"\x05stats\x18\x06 \x03(\v2+.api.vehicle.v1.HeartbeatRequest.StatsEntryR\x05stats\x12(\n" +
+	"\x0ffirmwareVersion\x18\a \x01(\tR\x0ffirmwareVersion\x12(\n" +
+	"\x0fhardwareVersion\x18\b \x01(\tR\x0fhardwareVersion\x1a8\n" +
+	"\n" +
+	"StatsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"A\n" +
 	"\x11HeartbeatResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"4\n" +
@@ -2399,12 +5913,15 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
 	"\x04data\x18\x03 \x03(\v2\x1a.api.vehicle.v1.DeviceInfoR\x04data\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x05R\x05total\"\xac\x02\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\"\xcd\x05\n" +
 	"\n" +
 	"DeviceInfo\x12\x1a\n" +
 	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12$\n" +
-	"\rlastHeartbeat\x18\x03 \x01(\tR\rlastHeartbeat\x12\x16\n" +
+	"\rlastHeartbeat\x18\x03 \x01(\tR\rlastHeartbeat\x12\x1e\n" +
+	"\n" +
+	"lastOnline\x18\x0f \x01(\tR\n" +
+	"lastOnline\x12\x16\n" +
 	"\x06online\x18\x04 \x01(\bR\x06online\x12\x16\n" +
 	"\x06laneId\x18\x05 \x01(\tR\x06laneId\x12\x14\n" +
 	"\x05lotId\x18\x06 \x01(\tR\x05lotId\x12\x1e\n" +
@@ -2414,7 +5931,17 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\fdeviceSecret\x18\b \x01(\tR\fdeviceSecret\x12\x1c\n" +
 	"\tcreatedAt\x18\t \x01(\tR\tcreatedAt\x12\x1c\n" +
 	"\tupdatedAt\x18\n" +
-	" \x01(\tR\tupdatedAt\"\x97\x01\n" +
+	" \x01(\tR\tupdatedAt\x12\"\n" +
+	"\fmanufacturer\x18\v \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\f \x01(\tR\x05model\x12(\n" +
+	"\x0ffirmwareVersion\x18\r \x01(\tR\x0ffirmwareVersion\x12\x1c\n" +
+	"\tfaultInfo\x18\x10 \x01(\tR\tfaultInfo\x12&\n" +
+	"\x0eheartbeatCount\x18\x11 \x01(\x05R\x0eheartbeatCount\x12\"\n" +
+	"\fofflineCount\x18\x12 \x01(\x05R\fofflineCount\x12h\n" +
+	"\x14vendorSpecificConfig\x18\x0e \x03(\v24.api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntryR\x14vendorSpecificConfig\x1aG\n" +
+	"\x19VendorSpecificConfigEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb7\x03\n" +
 	"\x13CreateDeviceRequest\x12\x1a\n" +
 	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1e\n" +
 	"\n" +
@@ -2422,7 +5949,14 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"deviceType\x12\x14\n" +
 	"\x05lotId\x18\x03 \x01(\tR\x05lotId\x12\x16\n" +
 	"\x06laneId\x18\x04 \x01(\tR\x06laneId\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\"t\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\"\n" +
+	"\fmanufacturer\x18\x06 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\a \x01(\tR\x05model\x12(\n" +
+	"\x0ffirmwareVersion\x18\b \x01(\tR\x0ffirmwareVersion\x12q\n" +
+	"\x14vendorSpecificConfig\x18\t \x03(\v2=.api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntryR\x14vendorSpecificConfig\x1aG\n" +
+	"\x19VendorSpecificConfigEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"t\n" +
 	"\x14CreateDeviceResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
@@ -2432,7 +5966,7 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\x11GetDeviceResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
-	"\x04data\x18\x03 \x01(\v2\x1a.api.vehicle.v1.DeviceInfoR\x04data\"\x97\x01\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.vehicle.v1.DeviceInfoR\x04data\"\xb7\x03\n" +
 	"\x13UpdateDeviceRequest\x12\x1a\n" +
 	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1e\n" +
 	"\n" +
@@ -2440,7 +5974,14 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"deviceType\x12\x14\n" +
 	"\x05lotId\x18\x03 \x01(\tR\x05lotId\x12\x16\n" +
 	"\x06laneId\x18\x04 \x01(\tR\x06laneId\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\"t\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\"\n" +
+	"\fmanufacturer\x18\x06 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\a \x01(\tR\x05model\x12(\n" +
+	"\x0ffirmwareVersion\x18\b \x01(\tR\x0ffirmwareVersion\x12q\n" +
+	"\x14vendorSpecificConfig\x18\t \x03(\v2=.api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntryR\x14vendorSpecificConfig\x1aG\n" +
+	"\x19VendorSpecificConfigEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"t\n" +
 	"\x14UpdateDeviceResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
@@ -2449,7 +5990,288 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\"D\n" +
 	"\x14DeleteDeviceResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xf3\f\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xfd\x01\n" +
+	"\x15CreateFirmwareRequest\x12\x1e\n" +
+	"\n" +
+	"firmwareId\x18\x01 \x01(\tR\n" +
+	"firmwareId\x12\"\n" +
+	"\fmanufacturer\x18\x02 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\x03 \x01(\tR\x05model\x12\x18\n" +
+	"\aversion\x18\x04 \x01(\tR\aversion\x12\x10\n" +
+	"\x03url\x18\x05 \x01(\tR\x03url\x12\x12\n" +
+	"\x04size\x18\x06 \x01(\x03R\x04size\x12\x10\n" +
+	"\x03md5\x18\a \x01(\tR\x03md5\x12 \n" +
+	"\vdescription\x18\b \x01(\tR\vdescription\x12\x16\n" +
+	"\x06status\x18\t \x01(\tR\x06status\"t\n" +
+	"\x16CreateFirmwareResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.vehicle.v1.FirmwareR\x04data\"$\n" +
+	"\x12GetFirmwareRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"q\n" +
+	"\x13GetFirmwareResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.vehicle.v1.FirmwareR\x04data\"8\n" +
+	"\x16GetFirmwareByIDRequest\x12\x1e\n" +
+	"\n" +
+	"firmwareId\x18\x01 \x01(\tR\n" +
+	"firmwareId\"u\n" +
+	"\x17GetFirmwareByIDResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.vehicle.v1.FirmwareR\x04data\"\x80\x01\n" +
+	"\x14ListFirmwaresRequest\x12\"\n" +
+	"\fmanufacturer\x18\x01 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\x89\x01\n" +
+	"\x15ListFirmwaresResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x03 \x03(\v2\x18.api.vehicle.v1.FirmwareR\x04data\x12\x14\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\"\x8d\x02\n" +
+	"\x15UpdateFirmwareRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
+	"\n" +
+	"firmwareId\x18\x02 \x01(\tR\n" +
+	"firmwareId\x12\"\n" +
+	"\fmanufacturer\x18\x03 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\x04 \x01(\tR\x05model\x12\x18\n" +
+	"\aversion\x18\x05 \x01(\tR\aversion\x12\x10\n" +
+	"\x03url\x18\x06 \x01(\tR\x03url\x12\x12\n" +
+	"\x04size\x18\a \x01(\x03R\x04size\x12\x10\n" +
+	"\x03md5\x18\b \x01(\tR\x03md5\x12 \n" +
+	"\vdescription\x18\t \x01(\tR\vdescription\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\tR\x06status\"t\n" +
+	"\x16UpdateFirmwareResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.vehicle.v1.FirmwareR\x04data\"'\n" +
+	"\x15DeleteFirmwareRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"F\n" +
+	"\x16DeleteFirmwareResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"T\n" +
+	"\x18GetLatestFirmwareRequest\x12\"\n" +
+	"\fmanufacturer\x18\x01 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\"w\n" +
+	"\x19GetLatestFirmwareResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.vehicle.v1.FirmwareR\x04data\"\xde\x02\n" +
+	"\bFirmware\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
+	"\n" +
+	"firmwareId\x18\x02 \x01(\tR\n" +
+	"firmwareId\x12\"\n" +
+	"\fmanufacturer\x18\x03 \x01(\tR\fmanufacturer\x12\x14\n" +
+	"\x05model\x18\x04 \x01(\tR\x05model\x12\x18\n" +
+	"\aversion\x18\x05 \x01(\tR\aversion\x12\x10\n" +
+	"\x03url\x18\x06 \x01(\tR\x03url\x12\x12\n" +
+	"\x04size\x18\a \x01(\x03R\x04size\x12\x10\n" +
+	"\x03md5\x18\b \x01(\tR\x03md5\x12 \n" +
+	"\vdescription\x18\t \x01(\tR\vdescription\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\tR\x06status\x12 \n" +
+	"\vreleaseDate\x18\v \x01(\tR\vreleaseDate\x12\x1c\n" +
+	"\tcreatedAt\x18\f \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\r \x01(\tR\tupdatedAt\"\x9c\x02\n" +
+	"\x1eCreateDevicePerformanceRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1a\n" +
+	"\bcpuUsage\x18\x02 \x01(\x01R\bcpuUsage\x12 \n" +
+	"\vmemoryUsage\x18\x03 \x01(\x01R\vmemoryUsage\x12\"\n" +
+	"\fstorageUsage\x18\x04 \x01(\x01R\fstorageUsage\x12\x1c\n" +
+	"\tnetworkIn\x18\x05 \x01(\x03R\tnetworkIn\x12\x1e\n" +
+	"\n" +
+	"networkOut\x18\x06 \x01(\x03R\n" +
+	"networkOut\x12 \n" +
+	"\vtemperature\x18\a \x01(\x01R\vtemperature\x12\x1c\n" +
+	"\ttimestamp\x18\b \x01(\tR\ttimestamp\"O\n" +
+	"\x1fCreateDevicePerformanceResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"q\n" +
+	"\x1bGetDevicePerformanceRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1c\n" +
+	"\tstartTime\x18\x02 \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\x03 \x01(\tR\aendTime\"\x83\x01\n" +
+	"\x1cGetDevicePerformanceResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
+	"\x04data\x18\x03 \x03(\v2!.api.vehicle.v1.DevicePerformanceR\x04data\"?\n" +
+	"!GetDevicePerformanceLatestRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\"\x89\x01\n" +
+	"\"GetDevicePerformanceLatestResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
+	"\x04data\x18\x03 \x01(\v2!.api.vehicle.v1.DevicePerformanceR\x04data\"\xbd\x02\n" +
+	"\x11DevicePerformance\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bdeviceId\x18\x02 \x01(\tR\bdeviceId\x12\x1a\n" +
+	"\bcpuUsage\x18\x03 \x01(\x01R\bcpuUsage\x12 \n" +
+	"\vmemoryUsage\x18\x04 \x01(\x01R\vmemoryUsage\x12\"\n" +
+	"\fstorageUsage\x18\x05 \x01(\x01R\fstorageUsage\x12\x1c\n" +
+	"\tnetworkIn\x18\x06 \x01(\x03R\tnetworkIn\x12\x1e\n" +
+	"\n" +
+	"networkOut\x18\a \x01(\x03R\n" +
+	"networkOut\x12 \n" +
+	"\vtemperature\x18\b \x01(\x01R\vtemperature\x12\x1c\n" +
+	"\ttimestamp\x18\t \x01(\tR\ttimestamp\x12\x1c\n" +
+	"\tcreatedAt\x18\n" +
+	" \x01(\tR\tcreatedAt\"\x88\x02\n" +
+	"\x18CreateDeviceFaultRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1c\n" +
+	"\tfaultType\x18\x02 \x01(\tR\tfaultType\x12\x1c\n" +
+	"\tfaultCode\x18\x03 \x01(\tR\tfaultCode\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1a\n" +
+	"\bseverity\x18\x05 \x01(\tR\bseverity\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12\x1e\n" +
+	"\n" +
+	"suggestion\x18\a \x01(\tR\n" +
+	"suggestion\x12\x1e\n" +
+	"\n" +
+	"detectedAt\x18\b \x01(\tR\n" +
+	"detectedAt\"z\n" +
+	"\x19CreateDeviceFaultResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.vehicle.v1.DeviceFaultR\x04data\"'\n" +
+	"\x15GetDeviceFaultRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"w\n" +
+	"\x16GetDeviceFaultResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
+	"\x04data\x18\x03 \x01(\v2\x1b.api.vehicle.v1.DeviceFaultR\x04data\"}\n" +
+	"\x17ListDeviceFaultsRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\x8f\x01\n" +
+	"\x18ListDeviceFaultsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
+	"\x04data\x18\x03 \x03(\v2\x1b.api.vehicle.v1.DeviceFaultR\x04data\x12\x14\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\"+\n" +
+	"\x19ResolveDeviceFaultRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"J\n" +
+	"\x1aResolveDeviceFaultResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xe7\x02\n" +
+	"\vDeviceFault\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bdeviceId\x18\x02 \x01(\tR\bdeviceId\x12\x1c\n" +
+	"\tfaultType\x18\x03 \x01(\tR\tfaultType\x12\x1c\n" +
+	"\tfaultCode\x18\x04 \x01(\tR\tfaultCode\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x1a\n" +
+	"\bseverity\x18\x06 \x01(\tR\bseverity\x12\x16\n" +
+	"\x06status\x18\a \x01(\tR\x06status\x12\x1e\n" +
+	"\n" +
+	"suggestion\x18\b \x01(\tR\n" +
+	"suggestion\x12\x1e\n" +
+	"\n" +
+	"detectedAt\x18\t \x01(\tR\n" +
+	"detectedAt\x12\x1e\n" +
+	"\n" +
+	"resolvedAt\x18\n" +
+	" \x01(\tR\n" +
+	"resolvedAt\x12\x1c\n" +
+	"\tcreatedAt\x18\v \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\f \x01(\tR\tupdatedAt\"p\n" +
+	"\x1aGetDeviceUsageStatsRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1c\n" +
+	"\tstartTime\x18\x02 \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\x03 \x01(\tR\aendTime\"\xe7\x01\n" +
+	"\x1bGetDeviceUsageStatsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12I\n" +
+	"\x04data\x18\x03 \x03(\v25.api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntryR\x04data\x1aO\n" +
+	"\tDataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.google.protobuf.ValueR\x05value:\x028\x01\"p\n" +
+	"\x1aGetDeviceFaultStatsRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x1c\n" +
+	"\tstartTime\x18\x02 \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\x03 \x01(\tR\aendTime\"\xe7\x01\n" +
+	"\x1bGetDeviceFaultStatsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12I\n" +
+	"\x04data\x18\x03 \x03(\v25.api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntryR\x04data\x1aO\n" +
+	"\tDataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.google.protobuf.ValueR\x05value:\x028\x01\":\n" +
+	"\x1cGetDeviceStatsSummaryRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\"\xeb\x01\n" +
+	"\x1dGetDeviceStatsSummaryResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12K\n" +
+	"\x04data\x18\x03 \x03(\v27.api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntryR\x04data\x1aO\n" +
+	"\tDataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.google.protobuf.ValueR\x05value:\x028\x01\"~\n" +
+	"\x14UpgradeDeviceRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12(\n" +
+	"\x0ffirmwareVersion\x18\x02 \x01(\tR\x0ffirmwareVersion\x12 \n" +
+	"\vfirmwareUrl\x18\x03 \x01(\tR\vfirmwareUrl\"|\n" +
+	"\x15UpgradeDeviceResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
+	"\x04data\x18\x03 \x01(\v2!.api.vehicle.v1.UpgradeStatusDataR\x04data\"c\n" +
+	"\x11UpgradeStatusData\x12\x1c\n" +
+	"\tupgradeId\x18\x01 \x01(\tR\tupgradeId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"=\n" +
+	"\x1dGetDeviceUpgradeStatusRequest\x12\x1c\n" +
+	"\tupgradeId\x18\x01 \x01(\tR\tupgradeId\"\x85\x02\n" +
+	"\x15UpgradeStatusResponse\x12\x1c\n" +
+	"\tupgradeId\x18\x01 \x01(\tR\tupgradeId\x12\x1a\n" +
+	"\bdeviceId\x18\x02 \x01(\tR\bdeviceId\x12 \n" +
+	"\vfromVersion\x18\x03 \x01(\tR\vfromVersion\x12\x1c\n" +
+	"\ttoVersion\x18\x04 \x01(\tR\ttoVersion\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\"\n" +
+	"\ferrorMessage\x18\x06 \x01(\tR\ferrorMessage\x12\x1c\n" +
+	"\tstartTime\x18\a \x01(\tR\tstartTime\x12\x18\n" +
+	"\aendTime\x18\b \x01(\tR\aendTime\"\xb7\x01\n" +
+	"\tDeviceLog\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bdeviceId\x18\x02 \x01(\tR\bdeviceId\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\tR\x05level\x12\x18\n" +
+	"\alogType\x18\x04 \x01(\tR\alogType\x12\x18\n" +
+	"\amessage\x18\x05 \x01(\tR\amessage\x12\x16\n" +
+	"\x06detail\x18\x06 \x01(\tR\x06detail\x12\x1c\n" +
+	"\tcreatedAt\x18\a \x01(\tR\tcreatedAt\"b\n" +
+	"\x14GetDeviceLogsRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1a\n" +
+	"\bpageSize\x18\x03 \x01(\x05R\bpageSize\"\x8a\x01\n" +
+	"\x15GetDeviceLogsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12-\n" +
+	"\x04data\x18\x03 \x03(\v2\x19.api.vehicle.v1.DeviceLogR\x04data\x12\x14\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\"3\n" +
+	"\x15GetDeviceStatsRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\"x\n" +
+	"\x13DeviceStatsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x123\n" +
+	"\x04data\x18\x03 \x01(\v2\x1f.api.vehicle.v1.DeviceStatsDataR\x04data\"\x9f\x01\n" +
+	"\x0fDeviceStatsData\x12\"\n" +
+	"\ftotalDevices\x18\x01 \x01(\x05R\ftotalDevices\x12$\n" +
+	"\ronlineDevices\x18\x02 \x01(\x05R\ronlineDevices\x12\"\n" +
+	"\ffaultDevices\x18\x03 \x01(\x05R\ffaultDevices\x12\x1e\n" +
+	"\n" +
+	"onlineRate\x18\x04 \x01(\x01R\n" +
+	"onlineRate\"\xc1\x01\n" +
+	"\x19UpdateDeviceConfigRequest\x12\x1a\n" +
+	"\bdeviceId\x18\x01 \x01(\tR\bdeviceId\x12M\n" +
+	"\x06config\x18\x02 \x03(\v25.api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntryR\x06config\x1a9\n" +
+	"\vConfigEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"z\n" +
+	"\x1aUpdateDeviceConfigResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
+	"\x04data\x18\x03 \x01(\v2\x1a.api.vehicle.v1.DeviceInfoR\x04data2\xb7+\n" +
 	"\x0eVehicleService\x12e\n" +
 	"\x05Entry\x12\x1c.api.vehicle.v1.EntryRequest\x1a\x1d.api.vehicle.v1.EntryResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/device/entry\x12a\n" +
 	"\x04Exit\x12\x1b.api.vehicle.v1.ExitRequest\x1a\x1c.api.vehicle.v1.ExitResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/device/exit\x12u\n" +
@@ -2463,7 +6285,34 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\fCreateDevice\x12#.api.vehicle.v1.CreateDeviceRequest\x1a$.api.vehicle.v1.CreateDeviceResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/devices\x12t\n" +
 	"\tGetDevice\x12 .api.vehicle.v1.GetDeviceRequest\x1a!.api.vehicle.v1.GetDeviceResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/devices/{deviceId}\x12\x80\x01\n" +
 	"\fUpdateDevice\x12#.api.vehicle.v1.UpdateDeviceRequest\x1a$.api.vehicle.v1.UpdateDeviceResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\x1a\x1a/api/v1/devices/{deviceId}\x12}\n" +
-	"\fDeleteDevice\x12#.api.vehicle.v1.DeleteDeviceRequest\x1a$.api.vehicle.v1.DeleteDeviceResponse\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/api/v1/devices/{deviceId}B4Z2github.com/xuanyiying/smart-park/api/vehicle/v1;v1b\x06proto3"
+	"\fDeleteDevice\x12#.api.vehicle.v1.DeleteDeviceRequest\x1a$.api.vehicle.v1.DeleteDeviceResponse\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/api/v1/devices/{deviceId}\x12\x8d\x01\n" +
+	"\x12CreateManufacturer\x12).api.vehicle.v1.CreateManufacturerRequest\x1a*.api.vehicle.v1.CreateManufacturerResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/manufacturers\x12\x86\x01\n" +
+	"\x0fGetManufacturer\x12&.api.vehicle.v1.GetManufacturerRequest\x1a'.api.vehicle.v1.GetManufacturerResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/manufacturers/{id}\x12\x87\x01\n" +
+	"\x11ListManufacturers\x12(.api.vehicle.v1.ListManufacturersRequest\x1a).api.vehicle.v1.ListManufacturersResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/manufacturers\x12\x92\x01\n" +
+	"\x12UpdateManufacturer\x12).api.vehicle.v1.UpdateManufacturerRequest\x1a*.api.vehicle.v1.UpdateManufacturerResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\x1a\x1a/api/v1/manufacturers/{id}\x12\x8f\x01\n" +
+	"\x12DeleteManufacturer\x12).api.vehicle.v1.DeleteManufacturerRequest\x1a*.api.vehicle.v1.DeleteManufacturerResponse\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/api/v1/manufacturers/{id}\x12}\n" +
+	"\x0eCreateFirmware\x12%.api.vehicle.v1.CreateFirmwareRequest\x1a&.api.vehicle.v1.CreateFirmwareResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/firmwares\x12v\n" +
+	"\vGetFirmware\x12\".api.vehicle.v1.GetFirmwareRequest\x1a#.api.vehicle.v1.GetFirmwareResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/firmwares/{id}\x12\x90\x01\n" +
+	"\x0fGetFirmwareByID\x12&.api.vehicle.v1.GetFirmwareByIDRequest\x1a'.api.vehicle.v1.GetFirmwareByIDResponse\",\x82\xd3\xe4\x93\x02&\x12$/api/v1/firmwares/by-id/{firmwareId}\x12w\n" +
+	"\rListFirmwares\x12$.api.vehicle.v1.ListFirmwaresRequest\x1a%.api.vehicle.v1.ListFirmwaresResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/firmwares\x12\x82\x01\n" +
+	"\x0eUpdateFirmware\x12%.api.vehicle.v1.UpdateFirmwareRequest\x1a&.api.vehicle.v1.UpdateFirmwareResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\x1a\x16/api/v1/firmwares/{id}\x12\x7f\n" +
+	"\x0eDeleteFirmware\x12%.api.vehicle.v1.DeleteFirmwareRequest\x1a&.api.vehicle.v1.DeleteFirmwareResponse\"\x1e\x82\xd3\xe4\x93\x02\x18*\x16/api/v1/firmwares/{id}\x12\x8a\x01\n" +
+	"\x11GetLatestFirmware\x12(.api.vehicle.v1.GetLatestFirmwareRequest\x1a).api.vehicle.v1.GetLatestFirmwareResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/firmwares/latest\x12\xa1\x01\n" +
+	"\x17CreateDevicePerformance\x12..api.vehicle.v1.CreateDevicePerformanceRequest\x1a/.api.vehicle.v1.CreateDevicePerformanceResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/device/performance\x12\xa0\x01\n" +
+	"\x14GetDevicePerformance\x12+.api.vehicle.v1.GetDevicePerformanceRequest\x1a,.api.vehicle.v1.GetDevicePerformanceResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/device/{deviceId}/performance\x12\xb9\x01\n" +
+	"\x1aGetDevicePerformanceLatest\x121.api.vehicle.v1.GetDevicePerformanceLatestRequest\x1a2.api.vehicle.v1.GetDevicePerformanceLatestResponse\"4\x82\xd3\xe4\x93\x02.\x12,/api/v1/device/{deviceId}/performance/latest\x12\x89\x01\n" +
+	"\x11CreateDeviceFault\x12(.api.vehicle.v1.CreateDeviceFaultRequest\x1a).api.vehicle.v1.CreateDeviceFaultResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/device/fault\x12\x82\x01\n" +
+	"\x0eGetDeviceFault\x12%.api.vehicle.v1.GetDeviceFaultRequest\x1a&.api.vehicle.v1.GetDeviceFaultResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/device/fault/{id}\x12\x84\x01\n" +
+	"\x10ListDeviceFaults\x12'.api.vehicle.v1.ListDeviceFaultsRequest\x1a(.api.vehicle.v1.ListDeviceFaultsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/device/faults\x12\x96\x01\n" +
+	"\x12ResolveDeviceFault\x12).api.vehicle.v1.ResolveDeviceFaultRequest\x1a*.api.vehicle.v1.ResolveDeviceFaultResponse\")\x82\xd3\xe4\x93\x02#\x1a!/api/v1/device/fault/{id}/resolve\x12\x9d\x01\n" +
+	"\x13GetDeviceUsageStats\x12*.api.vehicle.v1.GetDeviceUsageStatsRequest\x1a+.api.vehicle.v1.GetDeviceUsageStatsResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/device/{deviceId}/usage-stats\x12\x9d\x01\n" +
+	"\x13GetDeviceFaultStats\x12*.api.vehicle.v1.GetDeviceFaultStatsRequest\x1a+.api.vehicle.v1.GetDeviceFaultStatsResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/device/{deviceId}/fault-stats\x12\xa5\x01\n" +
+	"\x15GetDeviceStatsSummary\x12,.api.vehicle.v1.GetDeviceStatsSummaryRequest\x1a-.api.vehicle.v1.GetDeviceStatsSummaryResponse\"/\x82\xd3\xe4\x93\x02)\x12'/api/v1/device/{deviceId}/stats-summary\x12\x7f\n" +
+	"\rUpgradeDevice\x12$.api.vehicle.v1.UpgradeDeviceRequest\x1a%.api.vehicle.v1.UpgradeDeviceResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/device/upgrade\x12\x9a\x01\n" +
+	"\x16GetDeviceUpgradeStatus\x12-.api.vehicle.v1.GetDeviceUpgradeStatusRequest\x1a%.api.vehicle.v1.UpgradeStatusResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/device/upgrade/{upgradeId}\x12\x84\x01\n" +
+	"\rGetDeviceLogs\x12$.api.vehicle.v1.GetDeviceLogsRequest\x1a%.api.vehicle.v1.GetDeviceLogsResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/device/{deviceId}/logs\x12\x85\x01\n" +
+	"\x0eGetDeviceStats\x12%.api.vehicle.v1.GetDeviceStatsRequest\x1a#.api.vehicle.v1.DeviceStatsResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/device/{deviceId}/stats\x12\x98\x01\n" +
+	"\x12UpdateDeviceConfig\x12).api.vehicle.v1.UpdateDeviceConfigRequest\x1a*.api.vehicle.v1.UpdateDeviceConfigResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/device/{deviceId}/configB4Z2github.com/xuanyiying/smart-park/api/vehicle/v1;v1b\x06proto3"
 
 var (
 	file_api_vehicle_v1_vehicle_proto_rawDescOnce sync.Once
@@ -2477,89 +6326,238 @@ func file_api_vehicle_v1_vehicle_proto_rawDescGZIP() []byte {
 	return file_api_vehicle_v1_vehicle_proto_rawDescData
 }
 
-var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 93)
 var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
-	(*EntryRequest)(nil),               // 0: api.vehicle.v1.EntryRequest
-	(*EntryResponse)(nil),              // 1: api.vehicle.v1.EntryResponse
-	(*EntryData)(nil),                  // 2: api.vehicle.v1.EntryData
-	(*ExitRequest)(nil),                // 3: api.vehicle.v1.ExitRequest
-	(*ExitResponse)(nil),               // 4: api.vehicle.v1.ExitResponse
-	(*ExitData)(nil),                   // 5: api.vehicle.v1.ExitData
-	(*HeartbeatRequest)(nil),           // 6: api.vehicle.v1.HeartbeatRequest
-	(*HeartbeatResponse)(nil),          // 7: api.vehicle.v1.HeartbeatResponse
-	(*GetDeviceStatusRequest)(nil),     // 8: api.vehicle.v1.GetDeviceStatusRequest
-	(*GetDeviceStatusResponse)(nil),    // 9: api.vehicle.v1.GetDeviceStatusResponse
-	(*DeviceStatus)(nil),               // 10: api.vehicle.v1.DeviceStatus
-	(*SendCommandRequest)(nil),         // 11: api.vehicle.v1.SendCommandRequest
-	(*SendCommandResponse)(nil),        // 12: api.vehicle.v1.SendCommandResponse
-	(*CommandData)(nil),                // 13: api.vehicle.v1.CommandData
-	(*GetVehicleInfoRequest)(nil),      // 14: api.vehicle.v1.GetVehicleInfoRequest
-	(*GetVehicleInfoResponse)(nil),     // 15: api.vehicle.v1.GetVehicleInfoResponse
-	(*VehicleInfo)(nil),                // 16: api.vehicle.v1.VehicleInfo
-	(*ListParkingRecordsRequest)(nil),  // 17: api.vehicle.v1.ListParkingRecordsRequest
-	(*ListParkingRecordsResponse)(nil), // 18: api.vehicle.v1.ListParkingRecordsResponse
-	(*ListParkingRecordsData)(nil),     // 19: api.vehicle.v1.ListParkingRecordsData
-	(*GetParkingRecordRequest)(nil),    // 20: api.vehicle.v1.GetParkingRecordRequest
-	(*GetParkingRecordResponse)(nil),   // 21: api.vehicle.v1.GetParkingRecordResponse
-	(*ParkingRecordInfo)(nil),          // 22: api.vehicle.v1.ParkingRecordInfo
-	(*ListDevicesRequest)(nil),         // 23: api.vehicle.v1.ListDevicesRequest
-	(*ListDevicesResponse)(nil),        // 24: api.vehicle.v1.ListDevicesResponse
-	(*DeviceInfo)(nil),                 // 25: api.vehicle.v1.DeviceInfo
-	(*CreateDeviceRequest)(nil),        // 26: api.vehicle.v1.CreateDeviceRequest
-	(*CreateDeviceResponse)(nil),       // 27: api.vehicle.v1.CreateDeviceResponse
-	(*GetDeviceRequest)(nil),           // 28: api.vehicle.v1.GetDeviceRequest
-	(*GetDeviceResponse)(nil),          // 29: api.vehicle.v1.GetDeviceResponse
-	(*UpdateDeviceRequest)(nil),        // 30: api.vehicle.v1.UpdateDeviceRequest
-	(*UpdateDeviceResponse)(nil),       // 31: api.vehicle.v1.UpdateDeviceResponse
-	(*DeleteDeviceRequest)(nil),        // 32: api.vehicle.v1.DeleteDeviceRequest
-	(*DeleteDeviceResponse)(nil),       // 33: api.vehicle.v1.DeleteDeviceResponse
-	nil,                                // 34: api.vehicle.v1.SendCommandRequest.ParamsEntry
+	(*EntryRequest)(nil),                       // 0: api.vehicle.v1.EntryRequest
+	(*EntryResponse)(nil),                      // 1: api.vehicle.v1.EntryResponse
+	(*EntryData)(nil),                          // 2: api.vehicle.v1.EntryData
+	(*ExitRequest)(nil),                        // 3: api.vehicle.v1.ExitRequest
+	(*ExitResponse)(nil),                       // 4: api.vehicle.v1.ExitResponse
+	(*ExitData)(nil),                           // 5: api.vehicle.v1.ExitData
+	(*HeartbeatRequest)(nil),                   // 6: api.vehicle.v1.HeartbeatRequest
+	(*HeartbeatResponse)(nil),                  // 7: api.vehicle.v1.HeartbeatResponse
+	(*GetDeviceStatusRequest)(nil),             // 8: api.vehicle.v1.GetDeviceStatusRequest
+	(*GetDeviceStatusResponse)(nil),            // 9: api.vehicle.v1.GetDeviceStatusResponse
+	(*DeviceStatus)(nil),                       // 10: api.vehicle.v1.DeviceStatus
+	(*SendCommandRequest)(nil),                 // 11: api.vehicle.v1.SendCommandRequest
+	(*SendCommandResponse)(nil),                // 12: api.vehicle.v1.SendCommandResponse
+	(*CommandData)(nil),                        // 13: api.vehicle.v1.CommandData
+	(*GetVehicleInfoRequest)(nil),              // 14: api.vehicle.v1.GetVehicleInfoRequest
+	(*GetVehicleInfoResponse)(nil),             // 15: api.vehicle.v1.GetVehicleInfoResponse
+	(*VehicleInfo)(nil),                        // 16: api.vehicle.v1.VehicleInfo
+	(*ListParkingRecordsRequest)(nil),          // 17: api.vehicle.v1.ListParkingRecordsRequest
+	(*ListParkingRecordsResponse)(nil),         // 18: api.vehicle.v1.ListParkingRecordsResponse
+	(*ListParkingRecordsData)(nil),             // 19: api.vehicle.v1.ListParkingRecordsData
+	(*GetParkingRecordRequest)(nil),            // 20: api.vehicle.v1.GetParkingRecordRequest
+	(*GetParkingRecordResponse)(nil),           // 21: api.vehicle.v1.GetParkingRecordResponse
+	(*ParkingRecordInfo)(nil),                  // 22: api.vehicle.v1.ParkingRecordInfo
+	(*ListDevicesRequest)(nil),                 // 23: api.vehicle.v1.ListDevicesRequest
+	(*ListDevicesResponse)(nil),                // 24: api.vehicle.v1.ListDevicesResponse
+	(*DeviceInfo)(nil),                         // 25: api.vehicle.v1.DeviceInfo
+	(*CreateDeviceRequest)(nil),                // 26: api.vehicle.v1.CreateDeviceRequest
+	(*CreateDeviceResponse)(nil),               // 27: api.vehicle.v1.CreateDeviceResponse
+	(*GetDeviceRequest)(nil),                   // 28: api.vehicle.v1.GetDeviceRequest
+	(*GetDeviceResponse)(nil),                  // 29: api.vehicle.v1.GetDeviceResponse
+	(*UpdateDeviceRequest)(nil),                // 30: api.vehicle.v1.UpdateDeviceRequest
+	(*UpdateDeviceResponse)(nil),               // 31: api.vehicle.v1.UpdateDeviceResponse
+	(*DeleteDeviceRequest)(nil),                // 32: api.vehicle.v1.DeleteDeviceRequest
+	(*DeleteDeviceResponse)(nil),               // 33: api.vehicle.v1.DeleteDeviceResponse
+	(*CreateFirmwareRequest)(nil),              // 34: api.vehicle.v1.CreateFirmwareRequest
+	(*CreateFirmwareResponse)(nil),             // 35: api.vehicle.v1.CreateFirmwareResponse
+	(*GetFirmwareRequest)(nil),                 // 36: api.vehicle.v1.GetFirmwareRequest
+	(*GetFirmwareResponse)(nil),                // 37: api.vehicle.v1.GetFirmwareResponse
+	(*GetFirmwareByIDRequest)(nil),             // 38: api.vehicle.v1.GetFirmwareByIDRequest
+	(*GetFirmwareByIDResponse)(nil),            // 39: api.vehicle.v1.GetFirmwareByIDResponse
+	(*ListFirmwaresRequest)(nil),               // 40: api.vehicle.v1.ListFirmwaresRequest
+	(*ListFirmwaresResponse)(nil),              // 41: api.vehicle.v1.ListFirmwaresResponse
+	(*UpdateFirmwareRequest)(nil),              // 42: api.vehicle.v1.UpdateFirmwareRequest
+	(*UpdateFirmwareResponse)(nil),             // 43: api.vehicle.v1.UpdateFirmwareResponse
+	(*DeleteFirmwareRequest)(nil),              // 44: api.vehicle.v1.DeleteFirmwareRequest
+	(*DeleteFirmwareResponse)(nil),             // 45: api.vehicle.v1.DeleteFirmwareResponse
+	(*GetLatestFirmwareRequest)(nil),           // 46: api.vehicle.v1.GetLatestFirmwareRequest
+	(*GetLatestFirmwareResponse)(nil),          // 47: api.vehicle.v1.GetLatestFirmwareResponse
+	(*Firmware)(nil),                           // 48: api.vehicle.v1.Firmware
+	(*CreateDevicePerformanceRequest)(nil),     // 49: api.vehicle.v1.CreateDevicePerformanceRequest
+	(*CreateDevicePerformanceResponse)(nil),    // 50: api.vehicle.v1.CreateDevicePerformanceResponse
+	(*GetDevicePerformanceRequest)(nil),        // 51: api.vehicle.v1.GetDevicePerformanceRequest
+	(*GetDevicePerformanceResponse)(nil),       // 52: api.vehicle.v1.GetDevicePerformanceResponse
+	(*GetDevicePerformanceLatestRequest)(nil),  // 53: api.vehicle.v1.GetDevicePerformanceLatestRequest
+	(*GetDevicePerformanceLatestResponse)(nil), // 54: api.vehicle.v1.GetDevicePerformanceLatestResponse
+	(*DevicePerformance)(nil),                  // 55: api.vehicle.v1.DevicePerformance
+	(*CreateDeviceFaultRequest)(nil),           // 56: api.vehicle.v1.CreateDeviceFaultRequest
+	(*CreateDeviceFaultResponse)(nil),          // 57: api.vehicle.v1.CreateDeviceFaultResponse
+	(*GetDeviceFaultRequest)(nil),              // 58: api.vehicle.v1.GetDeviceFaultRequest
+	(*GetDeviceFaultResponse)(nil),             // 59: api.vehicle.v1.GetDeviceFaultResponse
+	(*ListDeviceFaultsRequest)(nil),            // 60: api.vehicle.v1.ListDeviceFaultsRequest
+	(*ListDeviceFaultsResponse)(nil),           // 61: api.vehicle.v1.ListDeviceFaultsResponse
+	(*ResolveDeviceFaultRequest)(nil),          // 62: api.vehicle.v1.ResolveDeviceFaultRequest
+	(*ResolveDeviceFaultResponse)(nil),         // 63: api.vehicle.v1.ResolveDeviceFaultResponse
+	(*DeviceFault)(nil),                        // 64: api.vehicle.v1.DeviceFault
+	(*GetDeviceUsageStatsRequest)(nil),         // 65: api.vehicle.v1.GetDeviceUsageStatsRequest
+	(*GetDeviceUsageStatsResponse)(nil),        // 66: api.vehicle.v1.GetDeviceUsageStatsResponse
+	(*GetDeviceFaultStatsRequest)(nil),         // 67: api.vehicle.v1.GetDeviceFaultStatsRequest
+	(*GetDeviceFaultStatsResponse)(nil),        // 68: api.vehicle.v1.GetDeviceFaultStatsResponse
+	(*GetDeviceStatsSummaryRequest)(nil),       // 69: api.vehicle.v1.GetDeviceStatsSummaryRequest
+	(*GetDeviceStatsSummaryResponse)(nil),      // 70: api.vehicle.v1.GetDeviceStatsSummaryResponse
+	(*UpgradeDeviceRequest)(nil),               // 71: api.vehicle.v1.UpgradeDeviceRequest
+	(*UpgradeDeviceResponse)(nil),              // 72: api.vehicle.v1.UpgradeDeviceResponse
+	(*UpgradeStatusData)(nil),                  // 73: api.vehicle.v1.UpgradeStatusData
+	(*GetDeviceUpgradeStatusRequest)(nil),      // 74: api.vehicle.v1.GetDeviceUpgradeStatusRequest
+	(*UpgradeStatusResponse)(nil),              // 75: api.vehicle.v1.UpgradeStatusResponse
+	(*DeviceLog)(nil),                          // 76: api.vehicle.v1.DeviceLog
+	(*GetDeviceLogsRequest)(nil),               // 77: api.vehicle.v1.GetDeviceLogsRequest
+	(*GetDeviceLogsResponse)(nil),              // 78: api.vehicle.v1.GetDeviceLogsResponse
+	(*GetDeviceStatsRequest)(nil),              // 79: api.vehicle.v1.GetDeviceStatsRequest
+	(*DeviceStatsResponse)(nil),                // 80: api.vehicle.v1.DeviceStatsResponse
+	(*DeviceStatsData)(nil),                    // 81: api.vehicle.v1.DeviceStatsData
+	(*UpdateDeviceConfigRequest)(nil),          // 82: api.vehicle.v1.UpdateDeviceConfigRequest
+	(*UpdateDeviceConfigResponse)(nil),         // 83: api.vehicle.v1.UpdateDeviceConfigResponse
+	nil,                                        // 84: api.vehicle.v1.HeartbeatRequest.StatsEntry
+	nil,                                        // 85: api.vehicle.v1.SendCommandRequest.ParamsEntry
+	nil,                                        // 86: api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
+	nil,                                        // 87: api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
+	nil,                                        // 88: api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
+	nil,                                        // 89: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
+	nil,                                        // 90: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
+	nil,                                        // 91: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
+	nil,                                        // 92: api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
+	(*structpb.Value)(nil),                     // 93: google.protobuf.Value
+	(*CreateManufacturerRequest)(nil),          // 94: api.vehicle.v1.CreateManufacturerRequest
+	(*GetManufacturerRequest)(nil),             // 95: api.vehicle.v1.GetManufacturerRequest
+	(*ListManufacturersRequest)(nil),           // 96: api.vehicle.v1.ListManufacturersRequest
+	(*UpdateManufacturerRequest)(nil),          // 97: api.vehicle.v1.UpdateManufacturerRequest
+	(*DeleteManufacturerRequest)(nil),          // 98: api.vehicle.v1.DeleteManufacturerRequest
+	(*CreateManufacturerResponse)(nil),         // 99: api.vehicle.v1.CreateManufacturerResponse
+	(*GetManufacturerResponse)(nil),            // 100: api.vehicle.v1.GetManufacturerResponse
+	(*ListManufacturersResponse)(nil),          // 101: api.vehicle.v1.ListManufacturersResponse
+	(*UpdateManufacturerResponse)(nil),         // 102: api.vehicle.v1.UpdateManufacturerResponse
+	(*DeleteManufacturerResponse)(nil),         // 103: api.vehicle.v1.DeleteManufacturerResponse
 }
 var file_api_vehicle_v1_vehicle_proto_depIdxs = []int32{
-	2,  // 0: api.vehicle.v1.EntryResponse.data:type_name -> api.vehicle.v1.EntryData
-	5,  // 1: api.vehicle.v1.ExitResponse.data:type_name -> api.vehicle.v1.ExitData
-	10, // 2: api.vehicle.v1.GetDeviceStatusResponse.data:type_name -> api.vehicle.v1.DeviceStatus
-	34, // 3: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
-	13, // 4: api.vehicle.v1.SendCommandResponse.data:type_name -> api.vehicle.v1.CommandData
-	16, // 5: api.vehicle.v1.GetVehicleInfoResponse.data:type_name -> api.vehicle.v1.VehicleInfo
-	19, // 6: api.vehicle.v1.ListParkingRecordsResponse.data:type_name -> api.vehicle.v1.ListParkingRecordsData
-	22, // 7: api.vehicle.v1.ListParkingRecordsData.records:type_name -> api.vehicle.v1.ParkingRecordInfo
-	22, // 8: api.vehicle.v1.GetParkingRecordResponse.data:type_name -> api.vehicle.v1.ParkingRecordInfo
-	25, // 9: api.vehicle.v1.ListDevicesResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	25, // 10: api.vehicle.v1.CreateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	25, // 11: api.vehicle.v1.GetDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	25, // 12: api.vehicle.v1.UpdateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	0,  // 13: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
-	3,  // 14: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
-	6,  // 15: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
-	8,  // 16: api.vehicle.v1.VehicleService.GetDeviceStatus:input_type -> api.vehicle.v1.GetDeviceStatusRequest
-	11, // 17: api.vehicle.v1.VehicleService.SendCommand:input_type -> api.vehicle.v1.SendCommandRequest
-	14, // 18: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
-	17, // 19: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
-	20, // 20: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
-	23, // 21: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
-	26, // 22: api.vehicle.v1.VehicleService.CreateDevice:input_type -> api.vehicle.v1.CreateDeviceRequest
-	28, // 23: api.vehicle.v1.VehicleService.GetDevice:input_type -> api.vehicle.v1.GetDeviceRequest
-	30, // 24: api.vehicle.v1.VehicleService.UpdateDevice:input_type -> api.vehicle.v1.UpdateDeviceRequest
-	32, // 25: api.vehicle.v1.VehicleService.DeleteDevice:input_type -> api.vehicle.v1.DeleteDeviceRequest
-	1,  // 26: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
-	4,  // 27: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
-	7,  // 28: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
-	9,  // 29: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
-	12, // 30: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
-	15, // 31: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
-	18, // 32: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
-	21, // 33: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
-	24, // 34: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
-	27, // 35: api.vehicle.v1.VehicleService.CreateDevice:output_type -> api.vehicle.v1.CreateDeviceResponse
-	29, // 36: api.vehicle.v1.VehicleService.GetDevice:output_type -> api.vehicle.v1.GetDeviceResponse
-	31, // 37: api.vehicle.v1.VehicleService.UpdateDevice:output_type -> api.vehicle.v1.UpdateDeviceResponse
-	33, // 38: api.vehicle.v1.VehicleService.DeleteDevice:output_type -> api.vehicle.v1.DeleteDeviceResponse
-	26, // [26:39] is the sub-list for method output_type
-	13, // [13:26] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	2,   // 0: api.vehicle.v1.EntryResponse.data:type_name -> api.vehicle.v1.EntryData
+	5,   // 1: api.vehicle.v1.ExitResponse.data:type_name -> api.vehicle.v1.ExitData
+	84,  // 2: api.vehicle.v1.HeartbeatRequest.stats:type_name -> api.vehicle.v1.HeartbeatRequest.StatsEntry
+	10,  // 3: api.vehicle.v1.GetDeviceStatusResponse.data:type_name -> api.vehicle.v1.DeviceStatus
+	85,  // 4: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
+	13,  // 5: api.vehicle.v1.SendCommandResponse.data:type_name -> api.vehicle.v1.CommandData
+	16,  // 6: api.vehicle.v1.GetVehicleInfoResponse.data:type_name -> api.vehicle.v1.VehicleInfo
+	19,  // 7: api.vehicle.v1.ListParkingRecordsResponse.data:type_name -> api.vehicle.v1.ListParkingRecordsData
+	22,  // 8: api.vehicle.v1.ListParkingRecordsData.records:type_name -> api.vehicle.v1.ParkingRecordInfo
+	22,  // 9: api.vehicle.v1.GetParkingRecordResponse.data:type_name -> api.vehicle.v1.ParkingRecordInfo
+	25,  // 10: api.vehicle.v1.ListDevicesResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	86,  // 11: api.vehicle.v1.DeviceInfo.vendorSpecificConfig:type_name -> api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
+	87,  // 12: api.vehicle.v1.CreateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
+	25,  // 13: api.vehicle.v1.CreateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	25,  // 14: api.vehicle.v1.GetDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	88,  // 15: api.vehicle.v1.UpdateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
+	25,  // 16: api.vehicle.v1.UpdateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	48,  // 17: api.vehicle.v1.CreateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	48,  // 18: api.vehicle.v1.GetFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	48,  // 19: api.vehicle.v1.GetFirmwareByIDResponse.data:type_name -> api.vehicle.v1.Firmware
+	48,  // 20: api.vehicle.v1.ListFirmwaresResponse.data:type_name -> api.vehicle.v1.Firmware
+	48,  // 21: api.vehicle.v1.UpdateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	48,  // 22: api.vehicle.v1.GetLatestFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	55,  // 23: api.vehicle.v1.GetDevicePerformanceResponse.data:type_name -> api.vehicle.v1.DevicePerformance
+	55,  // 24: api.vehicle.v1.GetDevicePerformanceLatestResponse.data:type_name -> api.vehicle.v1.DevicePerformance
+	64,  // 25: api.vehicle.v1.CreateDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
+	64,  // 26: api.vehicle.v1.GetDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
+	64,  // 27: api.vehicle.v1.ListDeviceFaultsResponse.data:type_name -> api.vehicle.v1.DeviceFault
+	89,  // 28: api.vehicle.v1.GetDeviceUsageStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
+	90,  // 29: api.vehicle.v1.GetDeviceFaultStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
+	91,  // 30: api.vehicle.v1.GetDeviceStatsSummaryResponse.data:type_name -> api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
+	73,  // 31: api.vehicle.v1.UpgradeDeviceResponse.data:type_name -> api.vehicle.v1.UpgradeStatusData
+	76,  // 32: api.vehicle.v1.GetDeviceLogsResponse.data:type_name -> api.vehicle.v1.DeviceLog
+	81,  // 33: api.vehicle.v1.DeviceStatsResponse.data:type_name -> api.vehicle.v1.DeviceStatsData
+	92,  // 34: api.vehicle.v1.UpdateDeviceConfigRequest.config:type_name -> api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
+	25,  // 35: api.vehicle.v1.UpdateDeviceConfigResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	93,  // 36: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
+	93,  // 37: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
+	93,  // 38: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry.value:type_name -> google.protobuf.Value
+	0,   // 39: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
+	3,   // 40: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
+	6,   // 41: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
+	8,   // 42: api.vehicle.v1.VehicleService.GetDeviceStatus:input_type -> api.vehicle.v1.GetDeviceStatusRequest
+	11,  // 43: api.vehicle.v1.VehicleService.SendCommand:input_type -> api.vehicle.v1.SendCommandRequest
+	14,  // 44: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
+	17,  // 45: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
+	20,  // 46: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
+	23,  // 47: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
+	26,  // 48: api.vehicle.v1.VehicleService.CreateDevice:input_type -> api.vehicle.v1.CreateDeviceRequest
+	28,  // 49: api.vehicle.v1.VehicleService.GetDevice:input_type -> api.vehicle.v1.GetDeviceRequest
+	30,  // 50: api.vehicle.v1.VehicleService.UpdateDevice:input_type -> api.vehicle.v1.UpdateDeviceRequest
+	32,  // 51: api.vehicle.v1.VehicleService.DeleteDevice:input_type -> api.vehicle.v1.DeleteDeviceRequest
+	94,  // 52: api.vehicle.v1.VehicleService.CreateManufacturer:input_type -> api.vehicle.v1.CreateManufacturerRequest
+	95,  // 53: api.vehicle.v1.VehicleService.GetManufacturer:input_type -> api.vehicle.v1.GetManufacturerRequest
+	96,  // 54: api.vehicle.v1.VehicleService.ListManufacturers:input_type -> api.vehicle.v1.ListManufacturersRequest
+	97,  // 55: api.vehicle.v1.VehicleService.UpdateManufacturer:input_type -> api.vehicle.v1.UpdateManufacturerRequest
+	98,  // 56: api.vehicle.v1.VehicleService.DeleteManufacturer:input_type -> api.vehicle.v1.DeleteManufacturerRequest
+	34,  // 57: api.vehicle.v1.VehicleService.CreateFirmware:input_type -> api.vehicle.v1.CreateFirmwareRequest
+	36,  // 58: api.vehicle.v1.VehicleService.GetFirmware:input_type -> api.vehicle.v1.GetFirmwareRequest
+	38,  // 59: api.vehicle.v1.VehicleService.GetFirmwareByID:input_type -> api.vehicle.v1.GetFirmwareByIDRequest
+	40,  // 60: api.vehicle.v1.VehicleService.ListFirmwares:input_type -> api.vehicle.v1.ListFirmwaresRequest
+	42,  // 61: api.vehicle.v1.VehicleService.UpdateFirmware:input_type -> api.vehicle.v1.UpdateFirmwareRequest
+	44,  // 62: api.vehicle.v1.VehicleService.DeleteFirmware:input_type -> api.vehicle.v1.DeleteFirmwareRequest
+	46,  // 63: api.vehicle.v1.VehicleService.GetLatestFirmware:input_type -> api.vehicle.v1.GetLatestFirmwareRequest
+	49,  // 64: api.vehicle.v1.VehicleService.CreateDevicePerformance:input_type -> api.vehicle.v1.CreateDevicePerformanceRequest
+	51,  // 65: api.vehicle.v1.VehicleService.GetDevicePerformance:input_type -> api.vehicle.v1.GetDevicePerformanceRequest
+	53,  // 66: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:input_type -> api.vehicle.v1.GetDevicePerformanceLatestRequest
+	56,  // 67: api.vehicle.v1.VehicleService.CreateDeviceFault:input_type -> api.vehicle.v1.CreateDeviceFaultRequest
+	58,  // 68: api.vehicle.v1.VehicleService.GetDeviceFault:input_type -> api.vehicle.v1.GetDeviceFaultRequest
+	60,  // 69: api.vehicle.v1.VehicleService.ListDeviceFaults:input_type -> api.vehicle.v1.ListDeviceFaultsRequest
+	62,  // 70: api.vehicle.v1.VehicleService.ResolveDeviceFault:input_type -> api.vehicle.v1.ResolveDeviceFaultRequest
+	65,  // 71: api.vehicle.v1.VehicleService.GetDeviceUsageStats:input_type -> api.vehicle.v1.GetDeviceUsageStatsRequest
+	67,  // 72: api.vehicle.v1.VehicleService.GetDeviceFaultStats:input_type -> api.vehicle.v1.GetDeviceFaultStatsRequest
+	69,  // 73: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:input_type -> api.vehicle.v1.GetDeviceStatsSummaryRequest
+	71,  // 74: api.vehicle.v1.VehicleService.UpgradeDevice:input_type -> api.vehicle.v1.UpgradeDeviceRequest
+	74,  // 75: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:input_type -> api.vehicle.v1.GetDeviceUpgradeStatusRequest
+	77,  // 76: api.vehicle.v1.VehicleService.GetDeviceLogs:input_type -> api.vehicle.v1.GetDeviceLogsRequest
+	79,  // 77: api.vehicle.v1.VehicleService.GetDeviceStats:input_type -> api.vehicle.v1.GetDeviceStatsRequest
+	82,  // 78: api.vehicle.v1.VehicleService.UpdateDeviceConfig:input_type -> api.vehicle.v1.UpdateDeviceConfigRequest
+	1,   // 79: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
+	4,   // 80: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
+	7,   // 81: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
+	9,   // 82: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
+	12,  // 83: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
+	15,  // 84: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
+	18,  // 85: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
+	21,  // 86: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
+	24,  // 87: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
+	27,  // 88: api.vehicle.v1.VehicleService.CreateDevice:output_type -> api.vehicle.v1.CreateDeviceResponse
+	29,  // 89: api.vehicle.v1.VehicleService.GetDevice:output_type -> api.vehicle.v1.GetDeviceResponse
+	31,  // 90: api.vehicle.v1.VehicleService.UpdateDevice:output_type -> api.vehicle.v1.UpdateDeviceResponse
+	33,  // 91: api.vehicle.v1.VehicleService.DeleteDevice:output_type -> api.vehicle.v1.DeleteDeviceResponse
+	99,  // 92: api.vehicle.v1.VehicleService.CreateManufacturer:output_type -> api.vehicle.v1.CreateManufacturerResponse
+	100, // 93: api.vehicle.v1.VehicleService.GetManufacturer:output_type -> api.vehicle.v1.GetManufacturerResponse
+	101, // 94: api.vehicle.v1.VehicleService.ListManufacturers:output_type -> api.vehicle.v1.ListManufacturersResponse
+	102, // 95: api.vehicle.v1.VehicleService.UpdateManufacturer:output_type -> api.vehicle.v1.UpdateManufacturerResponse
+	103, // 96: api.vehicle.v1.VehicleService.DeleteManufacturer:output_type -> api.vehicle.v1.DeleteManufacturerResponse
+	35,  // 97: api.vehicle.v1.VehicleService.CreateFirmware:output_type -> api.vehicle.v1.CreateFirmwareResponse
+	37,  // 98: api.vehicle.v1.VehicleService.GetFirmware:output_type -> api.vehicle.v1.GetFirmwareResponse
+	39,  // 99: api.vehicle.v1.VehicleService.GetFirmwareByID:output_type -> api.vehicle.v1.GetFirmwareByIDResponse
+	41,  // 100: api.vehicle.v1.VehicleService.ListFirmwares:output_type -> api.vehicle.v1.ListFirmwaresResponse
+	43,  // 101: api.vehicle.v1.VehicleService.UpdateFirmware:output_type -> api.vehicle.v1.UpdateFirmwareResponse
+	45,  // 102: api.vehicle.v1.VehicleService.DeleteFirmware:output_type -> api.vehicle.v1.DeleteFirmwareResponse
+	47,  // 103: api.vehicle.v1.VehicleService.GetLatestFirmware:output_type -> api.vehicle.v1.GetLatestFirmwareResponse
+	50,  // 104: api.vehicle.v1.VehicleService.CreateDevicePerformance:output_type -> api.vehicle.v1.CreateDevicePerformanceResponse
+	52,  // 105: api.vehicle.v1.VehicleService.GetDevicePerformance:output_type -> api.vehicle.v1.GetDevicePerformanceResponse
+	54,  // 106: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:output_type -> api.vehicle.v1.GetDevicePerformanceLatestResponse
+	57,  // 107: api.vehicle.v1.VehicleService.CreateDeviceFault:output_type -> api.vehicle.v1.CreateDeviceFaultResponse
+	59,  // 108: api.vehicle.v1.VehicleService.GetDeviceFault:output_type -> api.vehicle.v1.GetDeviceFaultResponse
+	61,  // 109: api.vehicle.v1.VehicleService.ListDeviceFaults:output_type -> api.vehicle.v1.ListDeviceFaultsResponse
+	63,  // 110: api.vehicle.v1.VehicleService.ResolveDeviceFault:output_type -> api.vehicle.v1.ResolveDeviceFaultResponse
+	66,  // 111: api.vehicle.v1.VehicleService.GetDeviceUsageStats:output_type -> api.vehicle.v1.GetDeviceUsageStatsResponse
+	68,  // 112: api.vehicle.v1.VehicleService.GetDeviceFaultStats:output_type -> api.vehicle.v1.GetDeviceFaultStatsResponse
+	70,  // 113: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:output_type -> api.vehicle.v1.GetDeviceStatsSummaryResponse
+	72,  // 114: api.vehicle.v1.VehicleService.UpgradeDevice:output_type -> api.vehicle.v1.UpgradeDeviceResponse
+	75,  // 115: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:output_type -> api.vehicle.v1.UpgradeStatusResponse
+	78,  // 116: api.vehicle.v1.VehicleService.GetDeviceLogs:output_type -> api.vehicle.v1.GetDeviceLogsResponse
+	80,  // 117: api.vehicle.v1.VehicleService.GetDeviceStats:output_type -> api.vehicle.v1.DeviceStatsResponse
+	83,  // 118: api.vehicle.v1.VehicleService.UpdateDeviceConfig:output_type -> api.vehicle.v1.UpdateDeviceConfigResponse
+	79,  // [79:119] is the sub-list for method output_type
+	39,  // [39:79] is the sub-list for method input_type
+	39,  // [39:39] is the sub-list for extension type_name
+	39,  // [39:39] is the sub-list for extension extendee
+	0,   // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_api_vehicle_v1_vehicle_proto_init() }
@@ -2567,13 +6565,14 @@ func file_api_vehicle_v1_vehicle_proto_init() {
 	if File_api_vehicle_v1_vehicle_proto != nil {
 		return
 	}
+	file_api_vehicle_v1_manufacturer_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_vehicle_v1_vehicle_proto_rawDesc), len(file_api_vehicle_v1_vehicle_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   35,
+			NumMessages:   93,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

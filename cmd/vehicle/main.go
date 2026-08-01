@@ -21,12 +21,13 @@ import (
 	"github.com/xuanyiying/smart-park/internal/vehicle/data"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/mqtt"
+	"github.com/xuanyiying/smart-park/internal/vehicle/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
 	"github.com/xuanyiying/smart-park/pkg/lock"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
-	"github.com/xuanyiying/smart-park/pkg/trace"
 	tenantpkg "github.com/xuanyiying/smart-park/pkg/tenant"
+	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
 var (
@@ -75,16 +76,16 @@ func main() {
 	}
 
 	// Connect to database with read-write separation
-	dbCfg := &database.Config{
+	dbCfg := &database.RWConfig{
 		Primary: struct {
 			Source string
 		}{
-			Source: cfg.Database.Primary.Source,
+			Source: cfg.Database.Source,
 		},
 		Replica: struct {
 			Source string
 		}{
-			Source: cfg.Database.Replica.Source,
+			Source: cfg.Database.Source,
 		},
 	}
 	dbManager, err := database.NewDBManager(dbCfg)
@@ -95,7 +96,7 @@ func main() {
 	defer dbManager.Close()
 
 	// Connect to database using ent
-	dbClient, err := ent.Open("postgres", dbManager.Primary())
+	dbClient, err := ent.Open("postgres", cfg.Database.Source)
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
@@ -169,6 +170,9 @@ func main() {
 	// Initialize distributed lock repository
 	lockRepo := lock.NewRedisLockRepo(redisClient, logger, "smart-park:vehicle")
 
+	// Initialize device adapter factory
+	adapterFactory := device.NewAdapterFactory()
+
 	// Initialize billing service client
 	var billingClient billing.Client
 	if cfg.Billing == nil || cfg.Billing.Endpoint == "" {
@@ -188,14 +192,19 @@ func main() {
 	logHelper.Infof("billing service client connected to %s", cfg.Billing.Endpoint)
 
 	// Initialize business logic layer
-	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, logger)
-	deviceUseCase := biz.NewDeviceUseCase(vehicleRepo, logger)
+	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, adapterFactory, logger)
+	deviceUseCase := biz.NewDeviceUseCase(vehicleRepo, adapterFactory, mqttClient, logger)
+	manufacturerUseCase := biz.NewManufacturerUseCase(vehicleRepo, logger)
+	firmwareUseCase := biz.NewFirmwareUseCase(vehicleRepo, logger)
+	devicePerformanceUseCase := biz.NewDevicePerformanceUseCase(vehicleRepo, logger)
+	deviceFaultUseCase := biz.NewDeviceFaultUseCase(vehicleRepo, logger)
+	deviceStatsUseCase := biz.NewDeviceStatsUseCase(vehicleRepo, logger)
 	vehicleQueryUseCase := biz.NewVehicleQueryUseCase(vehicleRepo, logger)
 	commandUseCase := biz.NewCommandUseCase(vehicleRepo, mqttClient, logger)
 	recordQueryUseCase := biz.NewRecordQueryUseCase(vehicleRepo)
 
 	// Initialize gRPC service
-	vehicleSvc := service.NewVehicleService(entryExitUseCase, deviceUseCase, vehicleQueryUseCase, commandUseCase, recordQueryUseCase, logger)
+	vehicleSvc := service.NewVehicleService(entryExitUseCase, deviceUseCase, manufacturerUseCase, firmwareUseCase, devicePerformanceUseCase, deviceFaultUseCase, deviceStatsUseCase, vehicleQueryUseCase, commandUseCase, recordQueryUseCase, logger)
 
 	multentClient, err := multent.Open("postgres", cfg.Database.Source)
 	if err != nil {

@@ -20,33 +20,96 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationVehicleServiceCreateDevice = "/api.vehicle.v1.VehicleService/CreateDevice"
+const OperationVehicleServiceCreateDeviceFault = "/api.vehicle.v1.VehicleService/CreateDeviceFault"
+const OperationVehicleServiceCreateDevicePerformance = "/api.vehicle.v1.VehicleService/CreateDevicePerformance"
+const OperationVehicleServiceCreateFirmware = "/api.vehicle.v1.VehicleService/CreateFirmware"
+const OperationVehicleServiceCreateManufacturer = "/api.vehicle.v1.VehicleService/CreateManufacturer"
 const OperationVehicleServiceDeleteDevice = "/api.vehicle.v1.VehicleService/DeleteDevice"
+const OperationVehicleServiceDeleteFirmware = "/api.vehicle.v1.VehicleService/DeleteFirmware"
+const OperationVehicleServiceDeleteManufacturer = "/api.vehicle.v1.VehicleService/DeleteManufacturer"
 const OperationVehicleServiceEntry = "/api.vehicle.v1.VehicleService/Entry"
 const OperationVehicleServiceExit = "/api.vehicle.v1.VehicleService/Exit"
 const OperationVehicleServiceGetDevice = "/api.vehicle.v1.VehicleService/GetDevice"
+const OperationVehicleServiceGetDeviceFault = "/api.vehicle.v1.VehicleService/GetDeviceFault"
+const OperationVehicleServiceGetDeviceFaultStats = "/api.vehicle.v1.VehicleService/GetDeviceFaultStats"
+const OperationVehicleServiceGetDeviceLogs = "/api.vehicle.v1.VehicleService/GetDeviceLogs"
+const OperationVehicleServiceGetDevicePerformance = "/api.vehicle.v1.VehicleService/GetDevicePerformance"
+const OperationVehicleServiceGetDevicePerformanceLatest = "/api.vehicle.v1.VehicleService/GetDevicePerformanceLatest"
+const OperationVehicleServiceGetDeviceStats = "/api.vehicle.v1.VehicleService/GetDeviceStats"
+const OperationVehicleServiceGetDeviceStatsSummary = "/api.vehicle.v1.VehicleService/GetDeviceStatsSummary"
 const OperationVehicleServiceGetDeviceStatus = "/api.vehicle.v1.VehicleService/GetDeviceStatus"
+const OperationVehicleServiceGetDeviceUpgradeStatus = "/api.vehicle.v1.VehicleService/GetDeviceUpgradeStatus"
+const OperationVehicleServiceGetDeviceUsageStats = "/api.vehicle.v1.VehicleService/GetDeviceUsageStats"
+const OperationVehicleServiceGetFirmware = "/api.vehicle.v1.VehicleService/GetFirmware"
+const OperationVehicleServiceGetFirmwareByID = "/api.vehicle.v1.VehicleService/GetFirmwareByID"
+const OperationVehicleServiceGetLatestFirmware = "/api.vehicle.v1.VehicleService/GetLatestFirmware"
+const OperationVehicleServiceGetManufacturer = "/api.vehicle.v1.VehicleService/GetManufacturer"
 const OperationVehicleServiceGetParkingRecord = "/api.vehicle.v1.VehicleService/GetParkingRecord"
 const OperationVehicleServiceGetVehicleInfo = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
 const OperationVehicleServiceHeartbeat = "/api.vehicle.v1.VehicleService/Heartbeat"
+const OperationVehicleServiceListDeviceFaults = "/api.vehicle.v1.VehicleService/ListDeviceFaults"
 const OperationVehicleServiceListDevices = "/api.vehicle.v1.VehicleService/ListDevices"
+const OperationVehicleServiceListFirmwares = "/api.vehicle.v1.VehicleService/ListFirmwares"
+const OperationVehicleServiceListManufacturers = "/api.vehicle.v1.VehicleService/ListManufacturers"
 const OperationVehicleServiceListParkingRecords = "/api.vehicle.v1.VehicleService/ListParkingRecords"
+const OperationVehicleServiceResolveDeviceFault = "/api.vehicle.v1.VehicleService/ResolveDeviceFault"
 const OperationVehicleServiceSendCommand = "/api.vehicle.v1.VehicleService/SendCommand"
 const OperationVehicleServiceUpdateDevice = "/api.vehicle.v1.VehicleService/UpdateDevice"
+const OperationVehicleServiceUpdateDeviceConfig = "/api.vehicle.v1.VehicleService/UpdateDeviceConfig"
+const OperationVehicleServiceUpdateFirmware = "/api.vehicle.v1.VehicleService/UpdateFirmware"
+const OperationVehicleServiceUpdateManufacturer = "/api.vehicle.v1.VehicleService/UpdateManufacturer"
+const OperationVehicleServiceUpgradeDevice = "/api.vehicle.v1.VehicleService/UpgradeDevice"
 
 type VehicleServiceHTTPServer interface {
 	CreateDevice(context.Context, *CreateDeviceRequest) (*CreateDeviceResponse, error)
+	// CreateDeviceFault Device fault diagnosis
+	CreateDeviceFault(context.Context, *CreateDeviceFaultRequest) (*CreateDeviceFaultResponse, error)
+	// CreateDevicePerformance Device performance monitoring
+	CreateDevicePerformance(context.Context, *CreateDevicePerformanceRequest) (*CreateDevicePerformanceResponse, error)
+	// CreateFirmware Firmware management
+	CreateFirmware(context.Context, *CreateFirmwareRequest) (*CreateFirmwareResponse, error)
+	// CreateManufacturer Manufacturer management
+	CreateManufacturer(context.Context, *CreateManufacturerRequest) (*CreateManufacturerResponse, error)
 	DeleteDevice(context.Context, *DeleteDeviceRequest) (*DeleteDeviceResponse, error)
+	DeleteFirmware(context.Context, *DeleteFirmwareRequest) (*DeleteFirmwareResponse, error)
+	DeleteManufacturer(context.Context, *DeleteManufacturerRequest) (*DeleteManufacturerResponse, error)
 	Entry(context.Context, *EntryRequest) (*EntryResponse, error)
 	Exit(context.Context, *ExitRequest) (*ExitResponse, error)
 	GetDevice(context.Context, *GetDeviceRequest) (*GetDeviceResponse, error)
+	GetDeviceFault(context.Context, *GetDeviceFaultRequest) (*GetDeviceFaultResponse, error)
+	GetDeviceFaultStats(context.Context, *GetDeviceFaultStatsRequest) (*GetDeviceFaultStatsResponse, error)
+	// GetDeviceLogs Device logs
+	GetDeviceLogs(context.Context, *GetDeviceLogsRequest) (*GetDeviceLogsResponse, error)
+	GetDevicePerformance(context.Context, *GetDevicePerformanceRequest) (*GetDevicePerformanceResponse, error)
+	GetDevicePerformanceLatest(context.Context, *GetDevicePerformanceLatestRequest) (*GetDevicePerformanceLatestResponse, error)
+	// GetDeviceStats Device stats
+	GetDeviceStats(context.Context, *GetDeviceStatsRequest) (*DeviceStatsResponse, error)
+	GetDeviceStatsSummary(context.Context, *GetDeviceStatsSummaryRequest) (*GetDeviceStatsSummaryResponse, error)
 	GetDeviceStatus(context.Context, *GetDeviceStatusRequest) (*GetDeviceStatusResponse, error)
+	GetDeviceUpgradeStatus(context.Context, *GetDeviceUpgradeStatusRequest) (*UpgradeStatusResponse, error)
+	// GetDeviceUsageStats Device statistics
+	GetDeviceUsageStats(context.Context, *GetDeviceUsageStatsRequest) (*GetDeviceUsageStatsResponse, error)
+	GetFirmware(context.Context, *GetFirmwareRequest) (*GetFirmwareResponse, error)
+	GetFirmwareByID(context.Context, *GetFirmwareByIDRequest) (*GetFirmwareByIDResponse, error)
+	GetLatestFirmware(context.Context, *GetLatestFirmwareRequest) (*GetLatestFirmwareResponse, error)
+	GetManufacturer(context.Context, *GetManufacturerRequest) (*GetManufacturerResponse, error)
 	GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error)
 	GetVehicleInfo(context.Context, *GetVehicleInfoRequest) (*GetVehicleInfoResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	ListDeviceFaults(context.Context, *ListDeviceFaultsRequest) (*ListDeviceFaultsResponse, error)
 	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
+	ListFirmwares(context.Context, *ListFirmwaresRequest) (*ListFirmwaresResponse, error)
+	ListManufacturers(context.Context, *ListManufacturersRequest) (*ListManufacturersResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
+	ResolveDeviceFault(context.Context, *ResolveDeviceFaultRequest) (*ResolveDeviceFaultResponse, error)
 	SendCommand(context.Context, *SendCommandRequest) (*SendCommandResponse, error)
 	UpdateDevice(context.Context, *UpdateDeviceRequest) (*UpdateDeviceResponse, error)
+	// UpdateDeviceConfig Device config
+	UpdateDeviceConfig(context.Context, *UpdateDeviceConfigRequest) (*UpdateDeviceConfigResponse, error)
+	UpdateFirmware(context.Context, *UpdateFirmwareRequest) (*UpdateFirmwareResponse, error)
+	UpdateManufacturer(context.Context, *UpdateManufacturerRequest) (*UpdateManufacturerResponse, error)
+	// UpgradeDevice Device upgrade
+	UpgradeDevice(context.Context, *UpgradeDeviceRequest) (*UpgradeDeviceResponse, error)
 }
 
 func RegisterVehicleServiceHTTPServer(s *http.Server, srv VehicleServiceHTTPServer) {
@@ -64,6 +127,33 @@ func RegisterVehicleServiceHTTPServer(s *http.Server, srv VehicleServiceHTTPServ
 	r.GET("/api/v1/devices/{deviceId}", _VehicleService_GetDevice0_HTTP_Handler(srv))
 	r.PUT("/api/v1/devices/{deviceId}", _VehicleService_UpdateDevice0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/devices/{deviceId}", _VehicleService_DeleteDevice0_HTTP_Handler(srv))
+	r.POST("/api/v1/manufacturers", _VehicleService_CreateManufacturer0_HTTP_Handler(srv))
+	r.GET("/api/v1/manufacturers/{id}", _VehicleService_GetManufacturer0_HTTP_Handler(srv))
+	r.GET("/api/v1/manufacturers", _VehicleService_ListManufacturers0_HTTP_Handler(srv))
+	r.PUT("/api/v1/manufacturers/{id}", _VehicleService_UpdateManufacturer0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/manufacturers/{id}", _VehicleService_DeleteManufacturer0_HTTP_Handler(srv))
+	r.POST("/api/v1/firmwares", _VehicleService_CreateFirmware0_HTTP_Handler(srv))
+	r.GET("/api/v1/firmwares/{id}", _VehicleService_GetFirmware0_HTTP_Handler(srv))
+	r.GET("/api/v1/firmwares/by-id/{firmwareId}", _VehicleService_GetFirmwareByID0_HTTP_Handler(srv))
+	r.GET("/api/v1/firmwares", _VehicleService_ListFirmwares0_HTTP_Handler(srv))
+	r.PUT("/api/v1/firmwares/{id}", _VehicleService_UpdateFirmware0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/firmwares/{id}", _VehicleService_DeleteFirmware0_HTTP_Handler(srv))
+	r.GET("/api/v1/firmwares/latest", _VehicleService_GetLatestFirmware0_HTTP_Handler(srv))
+	r.POST("/api/v1/device/performance", _VehicleService_CreateDevicePerformance0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/performance", _VehicleService_GetDevicePerformance0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/performance/latest", _VehicleService_GetDevicePerformanceLatest0_HTTP_Handler(srv))
+	r.POST("/api/v1/device/fault", _VehicleService_CreateDeviceFault0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/fault/{id}", _VehicleService_GetDeviceFault0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/faults", _VehicleService_ListDeviceFaults0_HTTP_Handler(srv))
+	r.PUT("/api/v1/device/fault/{id}/resolve", _VehicleService_ResolveDeviceFault0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/usage-stats", _VehicleService_GetDeviceUsageStats0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/fault-stats", _VehicleService_GetDeviceFaultStats0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/stats-summary", _VehicleService_GetDeviceStatsSummary0_HTTP_Handler(srv))
+	r.POST("/api/v1/device/upgrade", _VehicleService_UpgradeDevice0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/upgrade/{upgradeId}", _VehicleService_GetDeviceUpgradeStatus0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/logs", _VehicleService_GetDeviceLogs0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/stats", _VehicleService_GetDeviceStats0_HTTP_Handler(srv))
+	r.PUT("/api/v1/device/{deviceId}/config", _VehicleService_UpdateDeviceConfig0_HTTP_Handler(srv))
 }
 
 func _VehicleService_Entry0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
@@ -352,20 +442,638 @@ func _VehicleService_DeleteDevice0_HTTP_Handler(srv VehicleServiceHTTPServer) fu
 	}
 }
 
+func _VehicleService_CreateManufacturer0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateManufacturerRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceCreateManufacturer)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateManufacturer(ctx, req.(*CreateManufacturerRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateManufacturerResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetManufacturer0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetManufacturerRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetManufacturer)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetManufacturer(ctx, req.(*GetManufacturerRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetManufacturerResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_ListManufacturers0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListManufacturersRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceListManufacturers)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListManufacturers(ctx, req.(*ListManufacturersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListManufacturersResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_UpdateManufacturer0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateManufacturerRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceUpdateManufacturer)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateManufacturer(ctx, req.(*UpdateManufacturerRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateManufacturerResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_DeleteManufacturer0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteManufacturerRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceDeleteManufacturer)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteManufacturer(ctx, req.(*DeleteManufacturerRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteManufacturerResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_CreateFirmware0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateFirmwareRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceCreateFirmware)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateFirmware(ctx, req.(*CreateFirmwareRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateFirmwareResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetFirmware0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetFirmwareRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetFirmware)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetFirmware(ctx, req.(*GetFirmwareRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetFirmwareResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetFirmwareByID0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetFirmwareByIDRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetFirmwareByID)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetFirmwareByID(ctx, req.(*GetFirmwareByIDRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetFirmwareByIDResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_ListFirmwares0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListFirmwaresRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceListFirmwares)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListFirmwares(ctx, req.(*ListFirmwaresRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListFirmwaresResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_UpdateFirmware0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateFirmwareRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceUpdateFirmware)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateFirmware(ctx, req.(*UpdateFirmwareRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateFirmwareResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_DeleteFirmware0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteFirmwareRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceDeleteFirmware)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteFirmware(ctx, req.(*DeleteFirmwareRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteFirmwareResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetLatestFirmware0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetLatestFirmwareRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetLatestFirmware)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetLatestFirmware(ctx, req.(*GetLatestFirmwareRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetLatestFirmwareResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_CreateDevicePerformance0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateDevicePerformanceRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceCreateDevicePerformance)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateDevicePerformance(ctx, req.(*CreateDevicePerformanceRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateDevicePerformanceResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDevicePerformance0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDevicePerformanceRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDevicePerformance)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDevicePerformance(ctx, req.(*GetDevicePerformanceRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDevicePerformanceResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDevicePerformanceLatest0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDevicePerformanceLatestRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDevicePerformanceLatest)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDevicePerformanceLatest(ctx, req.(*GetDevicePerformanceLatestRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDevicePerformanceLatestResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_CreateDeviceFault0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateDeviceFaultRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceCreateDeviceFault)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateDeviceFault(ctx, req.(*CreateDeviceFaultRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateDeviceFaultResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceFault0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceFaultRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceFault)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceFault(ctx, req.(*GetDeviceFaultRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDeviceFaultResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_ListDeviceFaults0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListDeviceFaultsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceListDeviceFaults)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListDeviceFaults(ctx, req.(*ListDeviceFaultsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListDeviceFaultsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_ResolveDeviceFault0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ResolveDeviceFaultRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceResolveDeviceFault)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ResolveDeviceFault(ctx, req.(*ResolveDeviceFaultRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ResolveDeviceFaultResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceUsageStats0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceUsageStatsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceUsageStats)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceUsageStats(ctx, req.(*GetDeviceUsageStatsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDeviceUsageStatsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceFaultStats0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceFaultStatsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceFaultStats)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceFaultStats(ctx, req.(*GetDeviceFaultStatsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDeviceFaultStatsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceStatsSummary0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceStatsSummaryRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceStatsSummary)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceStatsSummary(ctx, req.(*GetDeviceStatsSummaryRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDeviceStatsSummaryResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_UpgradeDevice0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpgradeDeviceRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceUpgradeDevice)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpgradeDevice(ctx, req.(*UpgradeDeviceRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpgradeDeviceResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceUpgradeStatus0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceUpgradeStatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceUpgradeStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceUpgradeStatus(ctx, req.(*GetDeviceUpgradeStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpgradeStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceLogs0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceLogsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceLogs)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceLogs(ctx, req.(*GetDeviceLogsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDeviceLogsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceStats0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceStatsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceStats)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceStats(ctx, req.(*GetDeviceStatsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeviceStatsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_UpdateDeviceConfig0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateDeviceConfigRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceUpdateDeviceConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateDeviceConfig(ctx, req.(*UpdateDeviceConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateDeviceConfigResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type VehicleServiceHTTPClient interface {
 	CreateDevice(ctx context.Context, req *CreateDeviceRequest, opts ...http.CallOption) (rsp *CreateDeviceResponse, err error)
+	CreateDeviceFault(ctx context.Context, req *CreateDeviceFaultRequest, opts ...http.CallOption) (rsp *CreateDeviceFaultResponse, err error)
+	CreateDevicePerformance(ctx context.Context, req *CreateDevicePerformanceRequest, opts ...http.CallOption) (rsp *CreateDevicePerformanceResponse, err error)
+	CreateFirmware(ctx context.Context, req *CreateFirmwareRequest, opts ...http.CallOption) (rsp *CreateFirmwareResponse, err error)
+	CreateManufacturer(ctx context.Context, req *CreateManufacturerRequest, opts ...http.CallOption) (rsp *CreateManufacturerResponse, err error)
 	DeleteDevice(ctx context.Context, req *DeleteDeviceRequest, opts ...http.CallOption) (rsp *DeleteDeviceResponse, err error)
+	DeleteFirmware(ctx context.Context, req *DeleteFirmwareRequest, opts ...http.CallOption) (rsp *DeleteFirmwareResponse, err error)
+	DeleteManufacturer(ctx context.Context, req *DeleteManufacturerRequest, opts ...http.CallOption) (rsp *DeleteManufacturerResponse, err error)
 	Entry(ctx context.Context, req *EntryRequest, opts ...http.CallOption) (rsp *EntryResponse, err error)
 	Exit(ctx context.Context, req *ExitRequest, opts ...http.CallOption) (rsp *ExitResponse, err error)
 	GetDevice(ctx context.Context, req *GetDeviceRequest, opts ...http.CallOption) (rsp *GetDeviceResponse, err error)
+	GetDeviceFault(ctx context.Context, req *GetDeviceFaultRequest, opts ...http.CallOption) (rsp *GetDeviceFaultResponse, err error)
+	GetDeviceFaultStats(ctx context.Context, req *GetDeviceFaultStatsRequest, opts ...http.CallOption) (rsp *GetDeviceFaultStatsResponse, err error)
+	GetDeviceLogs(ctx context.Context, req *GetDeviceLogsRequest, opts ...http.CallOption) (rsp *GetDeviceLogsResponse, err error)
+	GetDevicePerformance(ctx context.Context, req *GetDevicePerformanceRequest, opts ...http.CallOption) (rsp *GetDevicePerformanceResponse, err error)
+	GetDevicePerformanceLatest(ctx context.Context, req *GetDevicePerformanceLatestRequest, opts ...http.CallOption) (rsp *GetDevicePerformanceLatestResponse, err error)
+	GetDeviceStats(ctx context.Context, req *GetDeviceStatsRequest, opts ...http.CallOption) (rsp *DeviceStatsResponse, err error)
+	GetDeviceStatsSummary(ctx context.Context, req *GetDeviceStatsSummaryRequest, opts ...http.CallOption) (rsp *GetDeviceStatsSummaryResponse, err error)
 	GetDeviceStatus(ctx context.Context, req *GetDeviceStatusRequest, opts ...http.CallOption) (rsp *GetDeviceStatusResponse, err error)
+	GetDeviceUpgradeStatus(ctx context.Context, req *GetDeviceUpgradeStatusRequest, opts ...http.CallOption) (rsp *UpgradeStatusResponse, err error)
+	GetDeviceUsageStats(ctx context.Context, req *GetDeviceUsageStatsRequest, opts ...http.CallOption) (rsp *GetDeviceUsageStatsResponse, err error)
+	GetFirmware(ctx context.Context, req *GetFirmwareRequest, opts ...http.CallOption) (rsp *GetFirmwareResponse, err error)
+	GetFirmwareByID(ctx context.Context, req *GetFirmwareByIDRequest, opts ...http.CallOption) (rsp *GetFirmwareByIDResponse, err error)
+	GetLatestFirmware(ctx context.Context, req *GetLatestFirmwareRequest, opts ...http.CallOption) (rsp *GetLatestFirmwareResponse, err error)
+	GetManufacturer(ctx context.Context, req *GetManufacturerRequest, opts ...http.CallOption) (rsp *GetManufacturerResponse, err error)
 	GetParkingRecord(ctx context.Context, req *GetParkingRecordRequest, opts ...http.CallOption) (rsp *GetParkingRecordResponse, err error)
 	GetVehicleInfo(ctx context.Context, req *GetVehicleInfoRequest, opts ...http.CallOption) (rsp *GetVehicleInfoResponse, err error)
 	Heartbeat(ctx context.Context, req *HeartbeatRequest, opts ...http.CallOption) (rsp *HeartbeatResponse, err error)
+	ListDeviceFaults(ctx context.Context, req *ListDeviceFaultsRequest, opts ...http.CallOption) (rsp *ListDeviceFaultsResponse, err error)
 	ListDevices(ctx context.Context, req *ListDevicesRequest, opts ...http.CallOption) (rsp *ListDevicesResponse, err error)
+	ListFirmwares(ctx context.Context, req *ListFirmwaresRequest, opts ...http.CallOption) (rsp *ListFirmwaresResponse, err error)
+	ListManufacturers(ctx context.Context, req *ListManufacturersRequest, opts ...http.CallOption) (rsp *ListManufacturersResponse, err error)
 	ListParkingRecords(ctx context.Context, req *ListParkingRecordsRequest, opts ...http.CallOption) (rsp *ListParkingRecordsResponse, err error)
+	ResolveDeviceFault(ctx context.Context, req *ResolveDeviceFaultRequest, opts ...http.CallOption) (rsp *ResolveDeviceFaultResponse, err error)
 	SendCommand(ctx context.Context, req *SendCommandRequest, opts ...http.CallOption) (rsp *SendCommandResponse, err error)
 	UpdateDevice(ctx context.Context, req *UpdateDeviceRequest, opts ...http.CallOption) (rsp *UpdateDeviceResponse, err error)
+	UpdateDeviceConfig(ctx context.Context, req *UpdateDeviceConfigRequest, opts ...http.CallOption) (rsp *UpdateDeviceConfigResponse, err error)
+	UpdateFirmware(ctx context.Context, req *UpdateFirmwareRequest, opts ...http.CallOption) (rsp *UpdateFirmwareResponse, err error)
+	UpdateManufacturer(ctx context.Context, req *UpdateManufacturerRequest, opts ...http.CallOption) (rsp *UpdateManufacturerResponse, err error)
+	UpgradeDevice(ctx context.Context, req *UpgradeDeviceRequest, opts ...http.CallOption) (rsp *UpgradeDeviceResponse, err error)
 }
 
 type VehicleServiceHTTPClientImpl struct {
@@ -389,11 +1097,89 @@ func (c *VehicleServiceHTTPClientImpl) CreateDevice(ctx context.Context, in *Cre
 	return &out, nil
 }
 
+func (c *VehicleServiceHTTPClientImpl) CreateDeviceFault(ctx context.Context, in *CreateDeviceFaultRequest, opts ...http.CallOption) (*CreateDeviceFaultResponse, error) {
+	var out CreateDeviceFaultResponse
+	pattern := "/api/v1/device/fault"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceCreateDeviceFault))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) CreateDevicePerformance(ctx context.Context, in *CreateDevicePerformanceRequest, opts ...http.CallOption) (*CreateDevicePerformanceResponse, error) {
+	var out CreateDevicePerformanceResponse
+	pattern := "/api/v1/device/performance"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceCreateDevicePerformance))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) CreateFirmware(ctx context.Context, in *CreateFirmwareRequest, opts ...http.CallOption) (*CreateFirmwareResponse, error) {
+	var out CreateFirmwareResponse
+	pattern := "/api/v1/firmwares"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceCreateFirmware))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) CreateManufacturer(ctx context.Context, in *CreateManufacturerRequest, opts ...http.CallOption) (*CreateManufacturerResponse, error) {
+	var out CreateManufacturerResponse
+	pattern := "/api/v1/manufacturers"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceCreateManufacturer))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *VehicleServiceHTTPClientImpl) DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...http.CallOption) (*DeleteDeviceResponse, error) {
 	var out DeleteDeviceResponse
 	pattern := "/api/v1/devices/{deviceId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationVehicleServiceDeleteDevice))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) DeleteFirmware(ctx context.Context, in *DeleteFirmwareRequest, opts ...http.CallOption) (*DeleteFirmwareResponse, error) {
+	var out DeleteFirmwareResponse
+	pattern := "/api/v1/firmwares/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceDeleteFirmware))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) DeleteManufacturer(ctx context.Context, in *DeleteManufacturerRequest, opts ...http.CallOption) (*DeleteManufacturerResponse, error) {
+	var out DeleteManufacturerResponse
+	pattern := "/api/v1/manufacturers/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceDeleteManufacturer))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
@@ -441,11 +1227,180 @@ func (c *VehicleServiceHTTPClientImpl) GetDevice(ctx context.Context, in *GetDev
 	return &out, nil
 }
 
+func (c *VehicleServiceHTTPClientImpl) GetDeviceFault(ctx context.Context, in *GetDeviceFaultRequest, opts ...http.CallOption) (*GetDeviceFaultResponse, error) {
+	var out GetDeviceFaultResponse
+	pattern := "/api/v1/device/fault/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceFault))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceFaultStats(ctx context.Context, in *GetDeviceFaultStatsRequest, opts ...http.CallOption) (*GetDeviceFaultStatsResponse, error) {
+	var out GetDeviceFaultStatsResponse
+	pattern := "/api/v1/device/{deviceId}/fault-stats"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceFaultStats))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceLogs(ctx context.Context, in *GetDeviceLogsRequest, opts ...http.CallOption) (*GetDeviceLogsResponse, error) {
+	var out GetDeviceLogsResponse
+	pattern := "/api/v1/device/{deviceId}/logs"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceLogs))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDevicePerformance(ctx context.Context, in *GetDevicePerformanceRequest, opts ...http.CallOption) (*GetDevicePerformanceResponse, error) {
+	var out GetDevicePerformanceResponse
+	pattern := "/api/v1/device/{deviceId}/performance"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDevicePerformance))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDevicePerformanceLatest(ctx context.Context, in *GetDevicePerformanceLatestRequest, opts ...http.CallOption) (*GetDevicePerformanceLatestResponse, error) {
+	var out GetDevicePerformanceLatestResponse
+	pattern := "/api/v1/device/{deviceId}/performance/latest"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDevicePerformanceLatest))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceStats(ctx context.Context, in *GetDeviceStatsRequest, opts ...http.CallOption) (*DeviceStatsResponse, error) {
+	var out DeviceStatsResponse
+	pattern := "/api/v1/device/{deviceId}/stats"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceStats))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceStatsSummary(ctx context.Context, in *GetDeviceStatsSummaryRequest, opts ...http.CallOption) (*GetDeviceStatsSummaryResponse, error) {
+	var out GetDeviceStatsSummaryResponse
+	pattern := "/api/v1/device/{deviceId}/stats-summary"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceStatsSummary))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *VehicleServiceHTTPClientImpl) GetDeviceStatus(ctx context.Context, in *GetDeviceStatusRequest, opts ...http.CallOption) (*GetDeviceStatusResponse, error) {
 	var out GetDeviceStatusResponse
 	pattern := "/api/v1/device/{deviceId}/status"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceUpgradeStatus(ctx context.Context, in *GetDeviceUpgradeStatusRequest, opts ...http.CallOption) (*UpgradeStatusResponse, error) {
+	var out UpgradeStatusResponse
+	pattern := "/api/v1/device/upgrade/{upgradeId}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceUpgradeStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceUsageStats(ctx context.Context, in *GetDeviceUsageStatsRequest, opts ...http.CallOption) (*GetDeviceUsageStatsResponse, error) {
+	var out GetDeviceUsageStatsResponse
+	pattern := "/api/v1/device/{deviceId}/usage-stats"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceUsageStats))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetFirmware(ctx context.Context, in *GetFirmwareRequest, opts ...http.CallOption) (*GetFirmwareResponse, error) {
+	var out GetFirmwareResponse
+	pattern := "/api/v1/firmwares/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetFirmware))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetFirmwareByID(ctx context.Context, in *GetFirmwareByIDRequest, opts ...http.CallOption) (*GetFirmwareByIDResponse, error) {
+	var out GetFirmwareByIDResponse
+	pattern := "/api/v1/firmwares/by-id/{firmwareId}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetFirmwareByID))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetLatestFirmware(ctx context.Context, in *GetLatestFirmwareRequest, opts ...http.CallOption) (*GetLatestFirmwareResponse, error) {
+	var out GetLatestFirmwareResponse
+	pattern := "/api/v1/firmwares/latest"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetLatestFirmware))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetManufacturer(ctx context.Context, in *GetManufacturerRequest, opts ...http.CallOption) (*GetManufacturerResponse, error) {
+	var out GetManufacturerResponse
+	pattern := "/api/v1/manufacturers/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetManufacturer))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -493,11 +1448,50 @@ func (c *VehicleServiceHTTPClientImpl) Heartbeat(ctx context.Context, in *Heartb
 	return &out, nil
 }
 
+func (c *VehicleServiceHTTPClientImpl) ListDeviceFaults(ctx context.Context, in *ListDeviceFaultsRequest, opts ...http.CallOption) (*ListDeviceFaultsResponse, error) {
+	var out ListDeviceFaultsResponse
+	pattern := "/api/v1/device/faults"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceListDeviceFaults))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *VehicleServiceHTTPClientImpl) ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...http.CallOption) (*ListDevicesResponse, error) {
 	var out ListDevicesResponse
 	pattern := "/api/v1/devices"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationVehicleServiceListDevices))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) ListFirmwares(ctx context.Context, in *ListFirmwaresRequest, opts ...http.CallOption) (*ListFirmwaresResponse, error) {
+	var out ListFirmwaresResponse
+	pattern := "/api/v1/firmwares"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceListFirmwares))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) ListManufacturers(ctx context.Context, in *ListManufacturersRequest, opts ...http.CallOption) (*ListManufacturersResponse, error) {
+	var out ListManufacturersResponse
+	pattern := "/api/v1/manufacturers"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceListManufacturers))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -513,6 +1507,19 @@ func (c *VehicleServiceHTTPClientImpl) ListParkingRecords(ctx context.Context, i
 	opts = append(opts, http.Operation(OperationVehicleServiceListParkingRecords))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) ResolveDeviceFault(ctx context.Context, in *ResolveDeviceFaultRequest, opts ...http.CallOption) (*ResolveDeviceFaultResponse, error) {
+	var out ResolveDeviceFaultResponse
+	pattern := "/api/v1/device/fault/{id}/resolve"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceResolveDeviceFault))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -539,6 +1546,58 @@ func (c *VehicleServiceHTTPClientImpl) UpdateDevice(ctx context.Context, in *Upd
 	opts = append(opts, http.Operation(OperationVehicleServiceUpdateDevice))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) UpdateDeviceConfig(ctx context.Context, in *UpdateDeviceConfigRequest, opts ...http.CallOption) (*UpdateDeviceConfigResponse, error) {
+	var out UpdateDeviceConfigResponse
+	pattern := "/api/v1/device/{deviceId}/config"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceUpdateDeviceConfig))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) UpdateFirmware(ctx context.Context, in *UpdateFirmwareRequest, opts ...http.CallOption) (*UpdateFirmwareResponse, error) {
+	var out UpdateFirmwareResponse
+	pattern := "/api/v1/firmwares/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceUpdateFirmware))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) UpdateManufacturer(ctx context.Context, in *UpdateManufacturerRequest, opts ...http.CallOption) (*UpdateManufacturerResponse, error) {
+	var out UpdateManufacturerResponse
+	pattern := "/api/v1/manufacturers/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceUpdateManufacturer))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) UpgradeDevice(ctx context.Context, in *UpgradeDeviceRequest, opts ...http.CallOption) (*UpgradeDeviceResponse, error) {
+	var out UpgradeDeviceResponse
+	pattern := "/api/v1/device/upgrade"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceUpgradeDevice))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

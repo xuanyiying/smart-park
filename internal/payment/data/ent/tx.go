@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
+	// Reconciliation is the client for interacting with the Reconciliation builders.
+	Reconciliation *ReconciliationClient
 	// RefundApproval is the client for interacting with the RefundApproval builders.
 	RefundApproval *RefundApprovalClient
 
@@ -148,6 +150,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Order = NewOrderClient(tx.config)
+	tx.Reconciliation = NewReconciliationClient(tx.config)
 	tx.RefundApproval = NewRefundApprovalClient(tx.config)
 }
 

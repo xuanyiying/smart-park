@@ -11,6 +11,7 @@ var (
 	// BillingRulesColumns holds the columns for the "billing_rules" table.
 	BillingRulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "rule_name", Type: field.TypeString, Size: 100},
 		{Name: "rule_type", Type: field.TypeEnum, Enums: []string{"time", "period", "monthly", "coupon", "vip"}},
@@ -29,29 +30,51 @@ var (
 		PrimaryKey: []*schema.Column{BillingRulesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "billingrule_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{BillingRulesColumns[1]},
+			},
+			{
 				Name:    "idx_billing_rules_lot_priority",
 				Unique:  false,
-				Columns: []*schema.Column{BillingRulesColumns[1], BillingRulesColumns[7]},
+				Columns: []*schema.Column{BillingRulesColumns[2], BillingRulesColumns[8]},
 			},
 			{
 				Name:    "billingrule_lot_id_is_active",
 				Unique:  false,
-				Columns: []*schema.Column{BillingRulesColumns[1], BillingRulesColumns[8]},
+				Columns: []*schema.Column{BillingRulesColumns[2], BillingRulesColumns[9]},
 			},
 		},
 	}
 	// DevicesColumns holds the columns for the "devices" table.
 	DevicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "device_id", Type: field.TypeString, Unique: true, Size: 64},
 		{Name: "lot_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "lane_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "device_secret", Type: field.TypeString, Size: 128},
 		{Name: "device_type", Type: field.TypeEnum, Enums: []string{"camera", "gate", "display", "payment_kiosk", "sensor"}},
+		{Name: "manufacturer", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "model", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "firmware_version", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "vendor_specific_config", Type: field.TypeJSON, Nullable: true},
 		{Name: "gate_id", Type: field.TypeString, Nullable: true, Size: 64},
 		{Name: "enabled", Type: field.TypeBool, Default: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "offline", "disabled"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "offline", "disabled", "upgrading", "fault"}, Default: "active"},
 		{Name: "last_heartbeat", Type: field.TypeTime, Nullable: true},
+		{Name: "last_online", Type: field.TypeTime, Nullable: true},
+		{Name: "fault_info", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "heartbeat_count", Type: field.TypeInt, Default: 0},
+		{Name: "offline_count", Type: field.TypeInt, Default: 0},
+		{Name: "hardware_version", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "device_config", Type: field.TypeJSON, Nullable: true},
+		{Name: "device_stats", Type: field.TypeJSON, Nullable: true},
+		{Name: "fault_code", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "fault_message", Type: field.TypeString, Nullable: true, Size: 256},
+		{Name: "last_fault_time", Type: field.TypeTime, Nullable: true},
+		{Name: "last_upgrade_time", Type: field.TypeTime, Nullable: true},
+		{Name: "location", Type: field.TypeString, Nullable: true, Size: 256},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -62,30 +85,236 @@ var (
 		PrimaryKey: []*schema.Column{DevicesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "device_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{DevicesColumns[1]},
+			},
+			{
 				Name:    "idx_device_id",
 				Unique:  true,
-				Columns: []*schema.Column{DevicesColumns[1]},
+				Columns: []*schema.Column{DevicesColumns[2]},
 			},
 			{
 				Name:    "idx_device_lot",
 				Unique:  false,
-				Columns: []*schema.Column{DevicesColumns[2]},
+				Columns: []*schema.Column{DevicesColumns[3]},
 			},
 			{
 				Name:    "device_lane_id",
 				Unique:  false,
-				Columns: []*schema.Column{DevicesColumns[3]},
+				Columns: []*schema.Column{DevicesColumns[4]},
 			},
 			{
 				Name:    "device_status",
 				Unique:  false,
-				Columns: []*schema.Column{DevicesColumns[8]},
+				Columns: []*schema.Column{DevicesColumns[13]},
+			},
+		},
+	}
+	// DeviceFaultsColumns holds the columns for the "device_faults" table.
+	DeviceFaultsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "device_id", Type: field.TypeString, Size: 64},
+		{Name: "fault_type", Type: field.TypeString, Size: 64},
+		{Name: "fault_code", Type: field.TypeString, Size: 32},
+		{Name: "description", Type: field.TypeString, Size: 512},
+		{Name: "severity", Type: field.TypeEnum, Enums: []string{"critical", "error", "warning", "info"}, Default: "error"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"detected", "processing", "resolved"}, Default: "detected"},
+		{Name: "suggestion", Type: field.TypeString, Size: 1024},
+		{Name: "detected_at", Type: field.TypeTime},
+		{Name: "resolved_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// DeviceFaultsTable holds the schema information for the "device_faults" table.
+	DeviceFaultsTable = &schema.Table{
+		Name:       "device_faults",
+		Columns:    DeviceFaultsColumns,
+		PrimaryKey: []*schema.Column{DeviceFaultsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_device_id",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceFaultsColumns[1]},
+			},
+			{
+				Name:    "idx_status",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceFaultsColumns[6]},
+			},
+			{
+				Name:    "idx_severity",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceFaultsColumns[5]},
+			},
+			{
+				Name:    "idx_detected_at",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceFaultsColumns[8]},
+			},
+			{
+				Name:    "idx_device_status",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceFaultsColumns[1], DeviceFaultsColumns[6]},
+			},
+		},
+	}
+	// DeviceLogsColumns holds the columns for the "device_logs" table.
+	DeviceLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "device_id", Type: field.TypeString, Size: 64},
+		{Name: "log_type", Type: field.TypeEnum, Enums: []string{"info", "warning", "error", "debug"}, Default: "info"},
+		{Name: "log_level", Type: field.TypeString, Size: 10, Default: "info"},
+		{Name: "message", Type: field.TypeString, Size: 1024},
+		{Name: "fault_code", Type: field.TypeString, Nullable: true, Size: 32},
+		{Name: "details", Type: field.TypeJSON, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// DeviceLogsTable holds the schema information for the "device_logs" table.
+	DeviceLogsTable = &schema.Table{
+		Name:       "device_logs",
+		Columns:    DeviceLogsColumns,
+		PrimaryKey: []*schema.Column{DeviceLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_device_log_device",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceLogsColumns[1]},
+			},
+			{
+				Name:    "idx_device_log_type",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceLogsColumns[2]},
+			},
+			{
+				Name:    "idx_device_log_time",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceLogsColumns[7]},
+			},
+		},
+	}
+	// DevicePerformancesColumns holds the columns for the "device_performances" table.
+	DevicePerformancesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "device_id", Type: field.TypeString, Size: 64},
+		{Name: "cpu_usage", Type: field.TypeFloat64},
+		{Name: "memory_usage", Type: field.TypeFloat64},
+		{Name: "storage_usage", Type: field.TypeFloat64},
+		{Name: "network_in", Type: field.TypeInt64},
+		{Name: "network_out", Type: field.TypeInt64},
+		{Name: "temperature", Type: field.TypeFloat64},
+		{Name: "timestamp", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// DevicePerformancesTable holds the schema information for the "device_performances" table.
+	DevicePerformancesTable = &schema.Table{
+		Name:       "device_performances",
+		Columns:    DevicePerformancesColumns,
+		PrimaryKey: []*schema.Column{DevicePerformancesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_device_id",
+				Unique:  false,
+				Columns: []*schema.Column{DevicePerformancesColumns[1]},
+			},
+			{
+				Name:    "idx_timestamp",
+				Unique:  false,
+				Columns: []*schema.Column{DevicePerformancesColumns[8]},
+			},
+			{
+				Name:    "idx_device_timestamp",
+				Unique:  false,
+				Columns: []*schema.Column{DevicePerformancesColumns[1], DevicePerformancesColumns[8]},
+			},
+		},
+	}
+	// DeviceUpgradesColumns holds the columns for the "device_upgrades" table.
+	DeviceUpgradesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "device_id", Type: field.TypeString, Size: 64},
+		{Name: "from_version", Type: field.TypeString, Size: 32},
+		{Name: "to_version", Type: field.TypeString, Size: 32},
+		{Name: "firmware_url", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "in_progress", "success", "failed"}, Default: "pending"},
+		{Name: "error_message", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "duration", Type: field.TypeInt64, Nullable: true},
+		{Name: "start_time", Type: field.TypeTime},
+		{Name: "end_time", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// DeviceUpgradesTable holds the schema information for the "device_upgrades" table.
+	DeviceUpgradesTable = &schema.Table{
+		Name:       "device_upgrades",
+		Columns:    DeviceUpgradesColumns,
+		PrimaryKey: []*schema.Column{DeviceUpgradesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_device_upgrade_device",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceUpgradesColumns[1]},
+			},
+			{
+				Name:    "idx_device_upgrade_status",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceUpgradesColumns[5]},
+			},
+			{
+				Name:    "idx_device_upgrade_time",
+				Unique:  false,
+				Columns: []*schema.Column{DeviceUpgradesColumns[8]},
+			},
+		},
+	}
+	// FirmwaresColumns holds the columns for the "firmwares" table.
+	FirmwaresColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "firmware_id", Type: field.TypeString, Unique: true, Size: 64},
+		{Name: "manufacturer", Type: field.TypeString, Size: 64},
+		{Name: "model", Type: field.TypeString, Size: 64},
+		{Name: "version", Type: field.TypeString, Size: 32},
+		{Name: "url", Type: field.TypeString, Size: 512},
+		{Name: "size", Type: field.TypeInt64},
+		{Name: "md5", Type: field.TypeString, Size: 32},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "published", "deprecated"}, Default: "draft"},
+		{Name: "release_date", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// FirmwaresTable holds the schema information for the "firmwares" table.
+	FirmwaresTable = &schema.Table{
+		Name:       "firmwares",
+		Columns:    FirmwaresColumns,
+		PrimaryKey: []*schema.Column{FirmwaresColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_firmware_id",
+				Unique:  true,
+				Columns: []*schema.Column{FirmwaresColumns[1]},
+			},
+			{
+				Name:    "idx_firmware_version",
+				Unique:  true,
+				Columns: []*schema.Column{FirmwaresColumns[2], FirmwaresColumns[3], FirmwaresColumns[4]},
+			},
+			{
+				Name:    "firmware_status",
+				Unique:  false,
+				Columns: []*schema.Column{FirmwaresColumns[9]},
+			},
+			{
+				Name:    "firmware_release_date",
+				Unique:  false,
+				Columns: []*schema.Column{FirmwaresColumns[10]},
 			},
 		},
 	}
 	// LanesColumns holds the columns for the "lanes" table.
 	LanesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "lane_no", Type: field.TypeInt},
 		{Name: "direction", Type: field.TypeEnum, Enums: []string{"entry", "exit"}},
@@ -100,9 +329,33 @@ var (
 		Columns:    LanesColumns,
 		PrimaryKey: []*schema.Column{LanesColumns[0]},
 	}
+	// ManufacturersColumns holds the columns for the "manufacturers" table.
+	ManufacturersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 64},
+		{Name: "website", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "contact_info", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 512},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ManufacturersTable holds the schema information for the "manufacturers" table.
+	ManufacturersTable = &schema.Table{
+		Name:       "manufacturers",
+		Columns:    ManufacturersColumns,
+		PrimaryKey: []*schema.Column{ManufacturersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idx_manufacturer_name",
+				Unique:  true,
+				Columns: []*schema.Column{ManufacturersColumns[1]},
+			},
+		},
+	}
 	// OfflineSyncRecordsColumns holds the columns for the "offline_sync_records" table.
 	OfflineSyncRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "offline_id", Type: field.TypeString, Unique: true, Size: 64},
 		{Name: "record_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "lot_id", Type: field.TypeUUID, Nullable: true},
@@ -123,25 +376,31 @@ var (
 		PrimaryKey: []*schema.Column{OfflineSyncRecordsColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "offlinesyncrecord_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{OfflineSyncRecordsColumns[1]},
+			},
+			{
 				Name:    "idx_offline_id",
 				Unique:  true,
-				Columns: []*schema.Column{OfflineSyncRecordsColumns[1]},
+				Columns: []*schema.Column{OfflineSyncRecordsColumns[2]},
 			},
 			{
 				Name:    "idx_offline_lot_status",
 				Unique:  false,
-				Columns: []*schema.Column{OfflineSyncRecordsColumns[3], OfflineSyncRecordsColumns[8]},
+				Columns: []*schema.Column{OfflineSyncRecordsColumns[4], OfflineSyncRecordsColumns[9]},
 			},
 			{
 				Name:    "idx_offline_status",
 				Unique:  false,
-				Columns: []*schema.Column{OfflineSyncRecordsColumns[8]},
+				Columns: []*schema.Column{OfflineSyncRecordsColumns[9]},
 			},
 		},
 	}
 	// ParkingRecordsColumns holds the columns for the "parking_records" table.
 	ParkingRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "entry_lane_id", Type: field.TypeUUID},
 		{Name: "vehicle_id", Type: field.TypeUUID, Nullable: true},
@@ -168,25 +427,31 @@ var (
 		PrimaryKey: []*schema.Column{ParkingRecordsColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "parkingrecord_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{ParkingRecordsColumns[1]},
+			},
+			{
 				Name:    "idx_parking_records_plate_entry",
 				Unique:  false,
-				Columns: []*schema.Column{ParkingRecordsColumns[4], ParkingRecordsColumns[6]},
+				Columns: []*schema.Column{ParkingRecordsColumns[5], ParkingRecordsColumns[7]},
 			},
 			{
 				Name:    "idx_parking_records_lot_status",
 				Unique:  false,
-				Columns: []*schema.Column{ParkingRecordsColumns[1], ParkingRecordsColumns[8]},
+				Columns: []*schema.Column{ParkingRecordsColumns[2], ParkingRecordsColumns[9]},
 			},
 			{
 				Name:    "idx_parking_records_exit",
 				Unique:  false,
-				Columns: []*schema.Column{ParkingRecordsColumns[9]},
+				Columns: []*schema.Column{ParkingRecordsColumns[10]},
 			},
 		},
 	}
 	// VehiclesColumns holds the columns for the "vehicles" table.
 	VehiclesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "plate_number", Type: field.TypeString, Unique: true, Size: 20},
 		{Name: "vehicle_type", Type: field.TypeEnum, Enums: []string{"temporary", "monthly", "vip"}, Default: "temporary"},
 		{Name: "owner_name", Type: field.TypeString, Nullable: true, Size: 100},
@@ -202,19 +467,24 @@ var (
 		PrimaryKey: []*schema.Column{VehiclesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "vehicle_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{VehiclesColumns[1]},
+			},
+			{
 				Name:    "vehicle_plate_number",
 				Unique:  true,
-				Columns: []*schema.Column{VehiclesColumns[1]},
+				Columns: []*schema.Column{VehiclesColumns[2]},
 			},
 			{
 				Name:    "vehicle_vehicle_type",
 				Unique:  false,
-				Columns: []*schema.Column{VehiclesColumns[2]},
+				Columns: []*schema.Column{VehiclesColumns[3]},
 			},
 			{
 				Name:    "vehicle_monthly_valid_until",
 				Unique:  false,
-				Columns: []*schema.Column{VehiclesColumns[5]},
+				Columns: []*schema.Column{VehiclesColumns[6]},
 			},
 		},
 	}
@@ -222,7 +492,13 @@ var (
 	Tables = []*schema.Table{
 		BillingRulesTable,
 		DevicesTable,
+		DeviceFaultsTable,
+		DeviceLogsTable,
+		DevicePerformancesTable,
+		DeviceUpgradesTable,
+		FirmwaresTable,
 		LanesTable,
+		ManufacturersTable,
 		OfflineSyncRecordsTable,
 		ParkingRecordsTable,
 		VehiclesTable,

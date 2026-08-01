@@ -60,7 +60,7 @@ func TestEntryExitUseCase_Entry(t *testing.T) {
 		Status:    "active",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
 
 	req := &v1.EntryRequest{
 		DeviceId:      deviceID,
@@ -124,7 +124,7 @@ func TestEntryExitUseCase_Exit(t *testing.T) {
 		RecordStatus: "entry",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
 
 	req := &v1.ExitRequest{
 		DeviceId:      deviceID,
@@ -186,7 +186,7 @@ func TestEntryExitUseCase_Entry_DuplicateEntry(t *testing.T) {
 		RecordStatus: "entry",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
 
 	req := &v1.EntryRequest{
 		DeviceId:      deviceID,
@@ -241,7 +241,7 @@ func TestEntryExitUseCase_Exit_NoEntryRecord(t *testing.T) {
 		Status:    "active",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
 
 	req := &v1.ExitRequest{
 		DeviceId:      deviceID,
@@ -316,7 +316,7 @@ func TestEntryExitUseCase_Exit_MonthlyVehicle(t *testing.T) {
 		MonthlyValidUntil: &validUntil,
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
 
 	req := &v1.ExitRequest{
 		DeviceId:      deviceID,
@@ -378,7 +378,7 @@ func TestEntryExitUseCase_Entry_VIPVehicle(t *testing.T) {
 		VehicleType: "vip",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
 
 	req := &v1.EntryRequest{
 		DeviceId:      deviceID,

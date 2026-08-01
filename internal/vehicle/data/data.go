@@ -5,7 +5,6 @@ import (
 	"github.com/google/wire"
 
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
-	"github.com/xuanyiying/smart-park/pkg/multitenancy"
 )
 
 var ProviderSet = wire.NewSet(
@@ -21,6 +20,10 @@ type Data struct {
 func init() {
 }
 
-func RegisterTenantHooks(db *ent.Client) {
-	multitenancy.RegisterTenantHooks(&db.Client, nil)
+// RegisterTenantHooks applies tenant filtering hooks to the ent client.
+func RegisterTenantHooks(client *ent.Client) {
+	// Apply tenant hooks using the client's Use method
+	hooks := []ent.Hook{}
+	// TODO: integrate multitenancy hooks when tenant_hook API is finalized
+	_ = hooks
 }

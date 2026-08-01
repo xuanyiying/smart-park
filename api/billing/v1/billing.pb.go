@@ -906,6 +906,158 @@ func (x *BillingRule) GetCreatedAt() string {
 	return ""
 }
 
+type TestBillingRuleRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	VehicleType    string                 `protobuf:"bytes,1,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
+	EntryTime      int64                  `protobuf:"varint,2,opt,name=entryTime,proto3" json:"entryTime,omitempty"`
+	ExitTime       int64                  `protobuf:"varint,3,opt,name=exitTime,proto3" json:"exitTime,omitempty"`
+	IsHoliday      bool                   `protobuf:"varint,4,opt,name=isHoliday,proto3" json:"isHoliday,omitempty"`
+	ConditionsJson string                 `protobuf:"bytes,5,opt,name=conditionsJson,proto3" json:"conditionsJson,omitempty"`
+	ActionsJson    string                 `protobuf:"bytes,6,opt,name=actionsJson,proto3" json:"actionsJson,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TestBillingRuleRequest) Reset() {
+	*x = TestBillingRuleRequest{}
+	mi := &file_api_billing_v1_billing_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestBillingRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestBillingRuleRequest) ProtoMessage() {}
+
+func (x *TestBillingRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_billing_v1_billing_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestBillingRuleRequest.ProtoReflect.Descriptor instead.
+func (*TestBillingRuleRequest) Descriptor() ([]byte, []int) {
+	return file_api_billing_v1_billing_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *TestBillingRuleRequest) GetVehicleType() string {
+	if x != nil {
+		return x.VehicleType
+	}
+	return ""
+}
+
+func (x *TestBillingRuleRequest) GetEntryTime() int64 {
+	if x != nil {
+		return x.EntryTime
+	}
+	return 0
+}
+
+func (x *TestBillingRuleRequest) GetExitTime() int64 {
+	if x != nil {
+		return x.ExitTime
+	}
+	return 0
+}
+
+func (x *TestBillingRuleRequest) GetIsHoliday() bool {
+	if x != nil {
+		return x.IsHoliday
+	}
+	return false
+}
+
+func (x *TestBillingRuleRequest) GetConditionsJson() string {
+	if x != nil {
+		return x.ConditionsJson
+	}
+	return ""
+}
+
+func (x *TestBillingRuleRequest) GetActionsJson() string {
+	if x != nil {
+		return x.ActionsJson
+	}
+	return ""
+}
+
+type TestBillingRuleResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ConditionMet   bool                   `protobuf:"varint,1,opt,name=conditionMet,proto3" json:"conditionMet,omitempty"`
+	CalculatedFee  float64                `protobuf:"fixed64,2,opt,name=calculatedFee,proto3" json:"calculatedFee,omitempty"`
+	AppliedActions []string               `protobuf:"bytes,3,rep,name=appliedActions,proto3" json:"appliedActions,omitempty"`
+	Duration       float64                `protobuf:"fixed64,4,opt,name=duration,proto3" json:"duration,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TestBillingRuleResponse) Reset() {
+	*x = TestBillingRuleResponse{}
+	mi := &file_api_billing_v1_billing_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestBillingRuleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestBillingRuleResponse) ProtoMessage() {}
+
+func (x *TestBillingRuleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_billing_v1_billing_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestBillingRuleResponse.ProtoReflect.Descriptor instead.
+func (*TestBillingRuleResponse) Descriptor() ([]byte, []int) {
+	return file_api_billing_v1_billing_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *TestBillingRuleResponse) GetConditionMet() bool {
+	if x != nil {
+		return x.ConditionMet
+	}
+	return false
+}
+
+func (x *TestBillingRuleResponse) GetCalculatedFee() float64 {
+	if x != nil {
+		return x.CalculatedFee
+	}
+	return 0
+}
+
+func (x *TestBillingRuleResponse) GetAppliedActions() []string {
+	if x != nil {
+		return x.AppliedActions
+	}
+	return nil
+}
+
+func (x *TestBillingRuleResponse) GetDuration() float64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
 var File_api_billing_v1_billing_proto protoreflect.FileDescriptor
 
 const file_api_billing_v1_billing_proto_rawDesc = "" +
@@ -977,13 +1129,26 @@ const file_api_billing_v1_billing_proto_rawDesc = "" +
 	"\vactionsJson\x18\x06 \x01(\tR\vactionsJson\x12\x1a\n" +
 	"\bpriority\x18\a \x01(\x05R\bpriority\x12\x1a\n" +
 	"\bisActive\x18\b \x01(\bR\bisActive\x12\x1c\n" +
-	"\tcreatedAt\x18\t \x01(\tR\tcreatedAt2\xdb\x05\n" +
+	"\tcreatedAt\x18\t \x01(\tR\tcreatedAt\"\xdc\x01\n" +
+	"\x16TestBillingRuleRequest\x12 \n" +
+	"\vvehicleType\x18\x01 \x01(\tR\vvehicleType\x12\x1c\n" +
+	"\tentryTime\x18\x02 \x01(\x03R\tentryTime\x12\x1a\n" +
+	"\bexitTime\x18\x03 \x01(\x03R\bexitTime\x12\x1c\n" +
+	"\tisHoliday\x18\x04 \x01(\bR\tisHoliday\x12&\n" +
+	"\x0econditionsJson\x18\x05 \x01(\tR\x0econditionsJson\x12 \n" +
+	"\vactionsJson\x18\x06 \x01(\tR\vactionsJson\"\xa7\x01\n" +
+	"\x17TestBillingRuleResponse\x12\"\n" +
+	"\fconditionMet\x18\x01 \x01(\bR\fconditionMet\x12$\n" +
+	"\rcalculatedFee\x18\x02 \x01(\x01R\rcalculatedFee\x12&\n" +
+	"\x0eappliedActions\x18\x03 \x03(\tR\x0eappliedActions\x12\x1a\n" +
+	"\bduration\x18\x04 \x01(\x01R\bduration2\xed\x06\n" +
 	"\x0eBillingService\x12\x7f\n" +
 	"\fCalculateFee\x12#.api.billing.v1.CalculateFeeRequest\x1a$.api.billing.v1.CalculateFeeResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/billing/calculate\x12\x90\x01\n" +
 	"\x11CreateBillingRule\x12(.api.billing.v1.CreateBillingRuleRequest\x1a).api.billing.v1.CreateBillingRuleResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/admin/billing/rules\x12\x95\x01\n" +
 	"\x11UpdateBillingRule\x12(.api.billing.v1.UpdateBillingRuleRequest\x1a).api.billing.v1.UpdateBillingRuleResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/admin/billing/rules/{id}\x12\x92\x01\n" +
 	"\x11DeleteBillingRule\x12(.api.billing.v1.DeleteBillingRuleRequest\x1a).api.billing.v1.DeleteBillingRuleResponse\"(\x82\xd3\xe4\x93\x02\"* /api/v1/admin/billing/rules/{id}\x12\x87\x01\n" +
-	"\x0fGetBillingRules\x12&.api.billing.v1.GetBillingRulesRequest\x1a'.api.billing.v1.GetBillingRulesResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/admin/billing/rulesB4Z2github.com/xuanyiying/smart-park/api/billing/v1;v1b\x06proto3"
+	"\x0fGetBillingRules\x12&.api.billing.v1.GetBillingRulesRequest\x1a'.api.billing.v1.GetBillingRulesResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/admin/billing/rules\x12\x8f\x01\n" +
+	"\x0fTestBillingRule\x12&.api.billing.v1.TestBillingRuleRequest\x1a'.api.billing.v1.TestBillingRuleResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/admin/billing/rules/testB4Z2github.com/xuanyiying/smart-park/api/billing/v1;v1b\x06proto3"
 
 var (
 	file_api_billing_v1_billing_proto_rawDescOnce sync.Once
@@ -997,7 +1162,7 @@ func file_api_billing_v1_billing_proto_rawDescGZIP() []byte {
 	return file_api_billing_v1_billing_proto_rawDescData
 }
 
-var file_api_billing_v1_billing_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_api_billing_v1_billing_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_api_billing_v1_billing_proto_goTypes = []any{
 	(*CalculateFeeRequest)(nil),       // 0: api.billing.v1.CalculateFeeRequest
 	(*CalculateFeeResponse)(nil),      // 1: api.billing.v1.CalculateFeeResponse
@@ -1012,6 +1177,8 @@ var file_api_billing_v1_billing_proto_goTypes = []any{
 	(*GetBillingRulesRequest)(nil),    // 10: api.billing.v1.GetBillingRulesRequest
 	(*GetBillingRulesResponse)(nil),   // 11: api.billing.v1.GetBillingRulesResponse
 	(*BillingRule)(nil),               // 12: api.billing.v1.BillingRule
+	(*TestBillingRuleRequest)(nil),    // 13: api.billing.v1.TestBillingRuleRequest
+	(*TestBillingRuleResponse)(nil),   // 14: api.billing.v1.TestBillingRuleResponse
 }
 var file_api_billing_v1_billing_proto_depIdxs = []int32{
 	2,  // 0: api.billing.v1.CalculateFeeResponse.data:type_name -> api.billing.v1.BillData
@@ -1023,13 +1190,15 @@ var file_api_billing_v1_billing_proto_depIdxs = []int32{
 	6,  // 6: api.billing.v1.BillingService.UpdateBillingRule:input_type -> api.billing.v1.UpdateBillingRuleRequest
 	8,  // 7: api.billing.v1.BillingService.DeleteBillingRule:input_type -> api.billing.v1.DeleteBillingRuleRequest
 	10, // 8: api.billing.v1.BillingService.GetBillingRules:input_type -> api.billing.v1.GetBillingRulesRequest
-	1,  // 9: api.billing.v1.BillingService.CalculateFee:output_type -> api.billing.v1.CalculateFeeResponse
-	5,  // 10: api.billing.v1.BillingService.CreateBillingRule:output_type -> api.billing.v1.CreateBillingRuleResponse
-	7,  // 11: api.billing.v1.BillingService.UpdateBillingRule:output_type -> api.billing.v1.UpdateBillingRuleResponse
-	9,  // 12: api.billing.v1.BillingService.DeleteBillingRule:output_type -> api.billing.v1.DeleteBillingRuleResponse
-	11, // 13: api.billing.v1.BillingService.GetBillingRules:output_type -> api.billing.v1.GetBillingRulesResponse
-	9,  // [9:14] is the sub-list for method output_type
-	4,  // [4:9] is the sub-list for method input_type
+	13, // 9: api.billing.v1.BillingService.TestBillingRule:input_type -> api.billing.v1.TestBillingRuleRequest
+	1,  // 10: api.billing.v1.BillingService.CalculateFee:output_type -> api.billing.v1.CalculateFeeResponse
+	5,  // 11: api.billing.v1.BillingService.CreateBillingRule:output_type -> api.billing.v1.CreateBillingRuleResponse
+	7,  // 12: api.billing.v1.BillingService.UpdateBillingRule:output_type -> api.billing.v1.UpdateBillingRuleResponse
+	9,  // 13: api.billing.v1.BillingService.DeleteBillingRule:output_type -> api.billing.v1.DeleteBillingRuleResponse
+	11, // 14: api.billing.v1.BillingService.GetBillingRules:output_type -> api.billing.v1.GetBillingRulesResponse
+	14, // 15: api.billing.v1.BillingService.TestBillingRule:output_type -> api.billing.v1.TestBillingRuleResponse
+	10, // [10:16] is the sub-list for method output_type
+	4,  // [4:10] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
@@ -1046,7 +1215,7 @@ func file_api_billing_v1_billing_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_billing_v1_billing_proto_rawDesc), len(file_api_billing_v1_billing_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

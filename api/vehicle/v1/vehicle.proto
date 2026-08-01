@@ -235,6 +235,42 @@ service VehicleService {
       get: "/api/v1/device/{deviceId}/stats-summary",
     };
   }
+
+  // Device upgrade
+  rpc UpgradeDevice(UpgradeDeviceRequest) returns (UpgradeDeviceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/device/upgrade",
+      body: "*",
+    };
+  }
+
+  rpc GetDeviceUpgradeStatus(GetDeviceUpgradeStatusRequest) returns (UpgradeStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/upgrade/{upgradeId}",
+    };
+  }
+
+  // Device logs
+  rpc GetDeviceLogs(GetDeviceLogsRequest) returns (GetDeviceLogsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/logs",
+    };
+  }
+
+  // Device stats
+  rpc GetDeviceStats(GetDeviceStatsRequest) returns (DeviceStatsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/stats",
+    };
+  }
+
+  // Device config
+  rpc UpdateDeviceConfig(UpdateDeviceConfigRequest) returns (UpdateDeviceConfigResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/device/{deviceId}/config",
+      body: "*",
+    };
+  }
 }
 
 message EntryRequest {
@@ -287,9 +323,14 @@ message ExitData {
 }
 
 message HeartbeatRequest {
-  string deviceId  = 1;
-  string status    = 2;
-  string timestamp = 3;
+  string              deviceId        = 1;
+  string              status          = 2;
+  string              timestamp       = 3;
+  string              faultCode       = 4;
+  string              faultMessage    = 5;
+  map<string, string> stats           = 6;
+  string              firmwareVersion = 7;
+  string              hardwareVersion = 8;
 }
 
 message HeartbeatResponse {
@@ -741,4 +782,92 @@ message GetDeviceStatsSummaryResponse {
   int32  code    = 1;
   string message = 2;
   map<string, google.protobuf.Value> data = 3;
+}
+
+// Device upgrade messages
+message UpgradeDeviceRequest {
+  string deviceId        = 1;
+  string firmwareVersion = 2;
+  string firmwareUrl     = 3;
+}
+
+message UpgradeDeviceResponse {
+  int32  code    = 1;
+  string message = 2;
+  UpgradeStatusData data = 3;
+}
+
+message UpgradeStatusData {
+  string upgradeId = 1;
+  string status    = 2;
+  string message   = 3;
+}
+
+message GetDeviceUpgradeStatusRequest {
+  string upgradeId = 1;
+}
+
+message UpgradeStatusResponse {
+  string upgradeId     = 1;
+  string deviceId      = 2;
+  string fromVersion   = 3;
+  string toVersion     = 4;
+  string status        = 5;
+  string errorMessage  = 6;
+  string startTime     = 7;
+  string endTime       = 8;
+}
+
+// Device log messages
+message DeviceLog {
+  string id        = 1;
+  string deviceId  = 2;
+  string level     = 3;
+  string logType   = 4;
+  string message   = 5;
+  string detail    = 6;
+  string createdAt = 7;
+}
+
+message GetDeviceLogsRequest {
+  string deviceId = 1;
+  int32  page     = 2;
+  int32  pageSize = 3;
+}
+
+message GetDeviceLogsResponse {
+  int32             code    = 1;
+  string            message = 2;
+  repeated DeviceLog data   = 3;
+  int32             total   = 4;
+}
+
+// Device stats message
+message GetDeviceStatsRequest {
+  string deviceId = 1;
+}
+
+message DeviceStatsResponse {
+  int32  code    = 1;
+  string message = 2;
+  DeviceStatsData data = 3;
+}
+
+message DeviceStatsData {
+  int32  totalDevices   = 1;
+  int32  onlineDevices  = 2;
+  int32  faultDevices   = 3;
+  double onlineRate     = 4;
+}
+
+// Device config messages
+message UpdateDeviceConfigRequest {
+  string              deviceId = 1;
+  map<string, string> config   = 2;
+}
+
+message UpdateDeviceConfigResponse {
+  int32      code    = 1;
+  string     message = 2;
+  DeviceInfo data    = 3;
 }

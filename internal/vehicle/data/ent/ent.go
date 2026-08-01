@@ -14,7 +14,13 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceperformance"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/deviceupgrade"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/firmware"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/manufacturer"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/offlinesyncrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/parkingrecord"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/vehicle"
@@ -80,7 +86,13 @@ func checkColumn(t, c string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			billingrule.Table:       billingrule.ValidColumn,
 			device.Table:            device.ValidColumn,
+			devicefault.Table:       devicefault.ValidColumn,
+			devicelog.Table:         devicelog.ValidColumn,
+			deviceperformance.Table: deviceperformance.ValidColumn,
+			deviceupgrade.Table:     deviceupgrade.ValidColumn,
+			firmware.Table:          firmware.ValidColumn,
 			lane.Table:              lane.ValidColumn,
+			manufacturer.Table:      manufacturer.ValidColumn,
 			offlinesyncrecord.Table: offlinesyncrecord.ValidColumn,
 			parkingrecord.Table:     parkingrecord.ValidColumn,
 			vehicle.Table:           vehicle.ValidColumn,

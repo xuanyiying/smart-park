@@ -71,16 +71,16 @@ func main() {
 	}
 
 	// Connect to database with read-write separation
-	dbCfg := &database.Config{
+	dbCfg := &database.RWConfig{
 		Primary: struct {
 			Source string
 		}{
-			Source: cfg.Database.Primary.Source,
+			Source: cfg.Database.Source,
 		},
 		Replica: struct {
 			Source string
 		}{
-			Source: cfg.Database.Replica.Source,
+			Source: cfg.Database.Source,
 		},
 	}
 	dbManager, err := database.NewDBManager(dbCfg)
@@ -91,7 +91,7 @@ func main() {
 	defer dbManager.Close()
 
 	// Connect to database using ent
-	dbClient, err := ent.Open("postgres", dbManager.Primary())
+	dbClient, err := ent.Open("postgres", cfg.Database.Source)
 	if err != nil {
 		logHelper.Errorf("failed to connect database: %v", err)
 		os.Exit(1)
@@ -122,6 +122,7 @@ func main() {
 
 	// Initialize repositories
 	orderRepo := data.NewOrderRepo(dataLayer)
+	reconciliationRepo := data.NewReconciliationRepo(dataLayer)
 
 	// Initialize payment clients
 	var wechatClient *wechat.Client
@@ -188,7 +189,7 @@ func main() {
 
 	// Initialize business logic
 	paymentUseCase := biz.NewPaymentUseCase(orderRepo, recordRepo, gateClient, paymentConfig, wechatClient, alipayClient, logger)
-	reconciliationUseCase := biz.NewReconciliationUseCase(orderRepo, wechatClient, alipayClient, logger)
+	reconciliationUseCase := biz.NewReconciliationUseCase(orderRepo, reconciliationRepo, wechatClient, alipayClient, logger)
 
 	// Initialize gRPC service
 	paymentSvc := service.NewPaymentService(paymentUseCase, reconciliationUseCase, logger)

@@ -21,14 +21,20 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationPaymentServiceAlipayCallback = "/api.payment.v1.PaymentService/AlipayCallback"
 const OperationPaymentServiceCreatePayment = "/api.payment.v1.PaymentService/CreatePayment"
+const OperationPaymentServiceFixMismatchedOrders = "/api.payment.v1.PaymentService/FixMismatchedOrders"
 const OperationPaymentServiceGetPaymentStatus = "/api.payment.v1.PaymentService/GetPaymentStatus"
+const OperationPaymentServiceGetReconciliationReport = "/api.payment.v1.PaymentService/GetReconciliationReport"
+const OperationPaymentServiceReconcileDaily = "/api.payment.v1.PaymentService/ReconcileDaily"
 const OperationPaymentServiceRefund = "/api.payment.v1.PaymentService/Refund"
 const OperationPaymentServiceWechatCallback = "/api.payment.v1.PaymentService/WechatCallback"
 
 type PaymentServiceHTTPServer interface {
 	AlipayCallback(context.Context, *AlipayCallbackRequest) (*AlipayCallbackResponse, error)
 	CreatePayment(context.Context, *CreatePaymentRequest) (*CreatePaymentResponse, error)
+	FixMismatchedOrders(context.Context, *FixMismatchedOrdersRequest) (*FixMismatchedOrdersResponse, error)
 	GetPaymentStatus(context.Context, *GetPaymentStatusRequest) (*GetPaymentStatusResponse, error)
+	GetReconciliationReport(context.Context, *GetReconciliationReportRequest) (*GetReconciliationReportResponse, error)
+	ReconcileDaily(context.Context, *ReconcileDailyRequest) (*ReconcileDailyResponse, error)
 	Refund(context.Context, *RefundRequest) (*RefundResponse, error)
 	WechatCallback(context.Context, *WechatCallbackRequest) (*WechatCallbackResponse, error)
 }
@@ -40,6 +46,9 @@ func RegisterPaymentServiceHTTPServer(s *http.Server, srv PaymentServiceHTTPServ
 	r.POST("/api/v1/pay/callback/wechat", _PaymentService_WechatCallback0_HTTP_Handler(srv))
 	r.POST("/api/v1/pay/callback/alipay", _PaymentService_AlipayCallback0_HTTP_Handler(srv))
 	r.POST("/api/v1/pay/{orderId}/refund", _PaymentService_Refund0_HTTP_Handler(srv))
+	r.POST("/api/v1/pay/reconcile/daily", _PaymentService_ReconcileDaily0_HTTP_Handler(srv))
+	r.GET("/api/v1/pay/reconcile/report", _PaymentService_GetReconciliationReport0_HTTP_Handler(srv))
+	r.POST("/api/v1/pay/reconcile/fix", _PaymentService_FixMismatchedOrders0_HTTP_Handler(srv))
 }
 
 func _PaymentService_CreatePayment0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx http.Context) error {
@@ -155,10 +164,76 @@ func _PaymentService_Refund0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx
 	}
 }
 
+func _PaymentService_ReconcileDaily0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ReconcileDailyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPaymentServiceReconcileDaily)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ReconcileDaily(ctx, req.(*ReconcileDailyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ReconcileDailyResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PaymentService_GetReconciliationReport0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetReconciliationReportRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPaymentServiceGetReconciliationReport)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetReconciliationReport(ctx, req.(*GetReconciliationReportRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetReconciliationReportResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PaymentService_FixMismatchedOrders0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in FixMismatchedOrdersRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPaymentServiceFixMismatchedOrders)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.FixMismatchedOrders(ctx, req.(*FixMismatchedOrdersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*FixMismatchedOrdersResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type PaymentServiceHTTPClient interface {
 	AlipayCallback(ctx context.Context, req *AlipayCallbackRequest, opts ...http.CallOption) (rsp *AlipayCallbackResponse, err error)
 	CreatePayment(ctx context.Context, req *CreatePaymentRequest, opts ...http.CallOption) (rsp *CreatePaymentResponse, err error)
+	FixMismatchedOrders(ctx context.Context, req *FixMismatchedOrdersRequest, opts ...http.CallOption) (rsp *FixMismatchedOrdersResponse, err error)
 	GetPaymentStatus(ctx context.Context, req *GetPaymentStatusRequest, opts ...http.CallOption) (rsp *GetPaymentStatusResponse, err error)
+	GetReconciliationReport(ctx context.Context, req *GetReconciliationReportRequest, opts ...http.CallOption) (rsp *GetReconciliationReportResponse, err error)
+	ReconcileDaily(ctx context.Context, req *ReconcileDailyRequest, opts ...http.CallOption) (rsp *ReconcileDailyResponse, err error)
 	Refund(ctx context.Context, req *RefundRequest, opts ...http.CallOption) (rsp *RefundResponse, err error)
 	WechatCallback(ctx context.Context, req *WechatCallbackRequest, opts ...http.CallOption) (rsp *WechatCallbackResponse, err error)
 }
@@ -197,6 +272,19 @@ func (c *PaymentServiceHTTPClientImpl) CreatePayment(ctx context.Context, in *Cr
 	return &out, nil
 }
 
+func (c *PaymentServiceHTTPClientImpl) FixMismatchedOrders(ctx context.Context, in *FixMismatchedOrdersRequest, opts ...http.CallOption) (*FixMismatchedOrdersResponse, error) {
+	var out FixMismatchedOrdersResponse
+	pattern := "/api/v1/pay/reconcile/fix"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPaymentServiceFixMismatchedOrders))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *PaymentServiceHTTPClientImpl) GetPaymentStatus(ctx context.Context, in *GetPaymentStatusRequest, opts ...http.CallOption) (*GetPaymentStatusResponse, error) {
 	var out GetPaymentStatusResponse
 	pattern := "/api/v1/pay/{orderId}/status"
@@ -204,6 +292,32 @@ func (c *PaymentServiceHTTPClientImpl) GetPaymentStatus(ctx context.Context, in 
 	opts = append(opts, http.Operation(OperationPaymentServiceGetPaymentStatus))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PaymentServiceHTTPClientImpl) GetReconciliationReport(ctx context.Context, in *GetReconciliationReportRequest, opts ...http.CallOption) (*GetReconciliationReportResponse, error) {
+	var out GetReconciliationReportResponse
+	pattern := "/api/v1/pay/reconcile/report"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPaymentServiceGetReconciliationReport))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PaymentServiceHTTPClientImpl) ReconcileDaily(ctx context.Context, in *ReconcileDailyRequest, opts ...http.CallOption) (*ReconcileDailyResponse, error) {
+	var out ReconcileDailyResponse
+	pattern := "/api/v1/pay/reconcile/daily"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPaymentServiceReconcileDaily))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

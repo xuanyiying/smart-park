@@ -21,6 +21,12 @@ type BillingRuleCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *BillingRuleCreate) SetTenantID(v uuid.UUID) *BillingRuleCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetLotID sets the "lot_id" field.
 func (_c *BillingRuleCreate) SetLotID(v uuid.UUID) *BillingRuleCreate {
 	_c.mutation.SetLotID(v)
@@ -202,6 +208,9 @@ func (_c *BillingRuleCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *BillingRuleCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "BillingRule.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.LotID(); !ok {
 		return &ValidationError{Name: "lot_id", err: errors.New(`ent: missing required field "BillingRule.lot_id"`)}
 	}
@@ -272,6 +281,10 @@ func (_c *BillingRuleCreate) createSpec() (*BillingRule, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(billingrule.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.LotID(); ok {
 		_spec.SetField(billingrule.FieldLotID, field.TypeUUID, value)

@@ -33,6 +33,66 @@ func (f DeviceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeviceMutation", m)
 }
 
+// The DeviceFaultFunc type is an adapter to allow the use of ordinary
+// function as DeviceFault mutator.
+type DeviceFaultFunc func(context.Context, *ent.DeviceFaultMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DeviceFaultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DeviceFaultMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeviceFaultMutation", m)
+}
+
+// The DeviceLogFunc type is an adapter to allow the use of ordinary
+// function as DeviceLog mutator.
+type DeviceLogFunc func(context.Context, *ent.DeviceLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DeviceLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DeviceLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeviceLogMutation", m)
+}
+
+// The DevicePerformanceFunc type is an adapter to allow the use of ordinary
+// function as DevicePerformance mutator.
+type DevicePerformanceFunc func(context.Context, *ent.DevicePerformanceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DevicePerformanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DevicePerformanceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DevicePerformanceMutation", m)
+}
+
+// The DeviceUpgradeFunc type is an adapter to allow the use of ordinary
+// function as DeviceUpgrade mutator.
+type DeviceUpgradeFunc func(context.Context, *ent.DeviceUpgradeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DeviceUpgradeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DeviceUpgradeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeviceUpgradeMutation", m)
+}
+
+// The FirmwareFunc type is an adapter to allow the use of ordinary
+// function as Firmware mutator.
+type FirmwareFunc func(context.Context, *ent.FirmwareMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FirmwareFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FirmwareMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FirmwareMutation", m)
+}
+
 // The LaneFunc type is an adapter to allow the use of ordinary
 // function as Lane mutator.
 type LaneFunc func(context.Context, *ent.LaneMutation) (ent.Value, error)
@@ -43,6 +103,18 @@ func (f LaneFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LaneMutation", m)
+}
+
+// The ManufacturerFunc type is an adapter to allow the use of ordinary
+// function as Manufacturer mutator.
+type ManufacturerFunc func(context.Context, *ent.ManufacturerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ManufacturerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ManufacturerMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ManufacturerMutation", m)
 }
 
 // The OfflineSyncRecordFunc type is an adapter to allow the use of ordinary

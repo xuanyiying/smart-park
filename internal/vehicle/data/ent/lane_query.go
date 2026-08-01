@@ -263,12 +263,12 @@ func (_q *LaneQuery) Clone() *LaneQuery {
 // Example:
 //
 //	var v []struct {
-//		LotID uuid.UUID `json:"lot_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Lane.Query().
-//		GroupBy(lane.FieldLotID).
+//		GroupBy(lane.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *LaneQuery) GroupBy(field string, fields ...string) *LaneGroupBy {
@@ -286,11 +286,11 @@ func (_q *LaneQuery) GroupBy(field string, fields ...string) *LaneGroupBy {
 // Example:
 //
 //	var v []struct {
-//		LotID uuid.UUID `json:"lot_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.Lane.Query().
-//		Select(lane.FieldLotID).
+//		Select(lane.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *LaneQuery) Select(fields ...string) *LaneSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

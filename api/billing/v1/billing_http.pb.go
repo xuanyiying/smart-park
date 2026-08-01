@@ -23,6 +23,7 @@ const OperationBillingServiceCalculateFee = "/api.billing.v1.BillingService/Calc
 const OperationBillingServiceCreateBillingRule = "/api.billing.v1.BillingService/CreateBillingRule"
 const OperationBillingServiceDeleteBillingRule = "/api.billing.v1.BillingService/DeleteBillingRule"
 const OperationBillingServiceGetBillingRules = "/api.billing.v1.BillingService/GetBillingRules"
+const OperationBillingServiceTestBillingRule = "/api.billing.v1.BillingService/TestBillingRule"
 const OperationBillingServiceUpdateBillingRule = "/api.billing.v1.BillingService/UpdateBillingRule"
 
 type BillingServiceHTTPServer interface {
@@ -30,6 +31,7 @@ type BillingServiceHTTPServer interface {
 	CreateBillingRule(context.Context, *CreateBillingRuleRequest) (*CreateBillingRuleResponse, error)
 	DeleteBillingRule(context.Context, *DeleteBillingRuleRequest) (*DeleteBillingRuleResponse, error)
 	GetBillingRules(context.Context, *GetBillingRulesRequest) (*GetBillingRulesResponse, error)
+	TestBillingRule(context.Context, *TestBillingRuleRequest) (*TestBillingRuleResponse, error)
 	UpdateBillingRule(context.Context, *UpdateBillingRuleRequest) (*UpdateBillingRuleResponse, error)
 }
 
@@ -40,6 +42,7 @@ func RegisterBillingServiceHTTPServer(s *http.Server, srv BillingServiceHTTPServ
 	r.PUT("/api/v1/admin/billing/rules/{id}", _BillingService_UpdateBillingRule0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/admin/billing/rules/{id}", _BillingService_DeleteBillingRule0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/billing/rules", _BillingService_GetBillingRules0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/billing/rules/test", _BillingService_TestBillingRule0_HTTP_Handler(srv))
 }
 
 func _BillingService_CalculateFee0_HTTP_Handler(srv BillingServiceHTTPServer) func(ctx http.Context) error {
@@ -152,11 +155,34 @@ func _BillingService_GetBillingRules0_HTTP_Handler(srv BillingServiceHTTPServer)
 	}
 }
 
+func _BillingService_TestBillingRule0_HTTP_Handler(srv BillingServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TestBillingRuleRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationBillingServiceTestBillingRule)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TestBillingRule(ctx, req.(*TestBillingRuleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TestBillingRuleResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type BillingServiceHTTPClient interface {
 	CalculateFee(ctx context.Context, req *CalculateFeeRequest, opts ...http.CallOption) (rsp *CalculateFeeResponse, err error)
 	CreateBillingRule(ctx context.Context, req *CreateBillingRuleRequest, opts ...http.CallOption) (rsp *CreateBillingRuleResponse, err error)
 	DeleteBillingRule(ctx context.Context, req *DeleteBillingRuleRequest, opts ...http.CallOption) (rsp *DeleteBillingRuleResponse, err error)
 	GetBillingRules(ctx context.Context, req *GetBillingRulesRequest, opts ...http.CallOption) (rsp *GetBillingRulesResponse, err error)
+	TestBillingRule(ctx context.Context, req *TestBillingRuleRequest, opts ...http.CallOption) (rsp *TestBillingRuleResponse, err error)
 	UpdateBillingRule(ctx context.Context, req *UpdateBillingRuleRequest, opts ...http.CallOption) (rsp *UpdateBillingRuleResponse, err error)
 }
 
@@ -214,6 +240,19 @@ func (c *BillingServiceHTTPClientImpl) GetBillingRules(ctx context.Context, in *
 	opts = append(opts, http.Operation(OperationBillingServiceGetBillingRules))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *BillingServiceHTTPClientImpl) TestBillingRule(ctx context.Context, in *TestBillingRuleRequest, opts ...http.CallOption) (*TestBillingRuleResponse, error) {
+	var out TestBillingRuleResponse
+	pattern := "/api/v1/admin/billing/rules/test"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationBillingServiceTestBillingRule))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

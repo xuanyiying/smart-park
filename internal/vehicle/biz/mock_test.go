@@ -155,3 +155,52 @@ func (m *MockVehicleRepo) DeleteDevice(ctx context.Context, deviceID string) err
 func (m *MockVehicleRepo) SeedData(ctx context.Context) error {
 	return nil
 }
+
+// Stub implementations for extended VehicleRepo interface
+func (m *MockVehicleRepo) CreateManufacturer(ctx context.Context, manufacturer *Manufacturer) error       { return nil }
+func (m *MockVehicleRepo) GetManufacturer(ctx context.Context, id uuid.UUID) (*Manufacturer, error)      { return nil, nil }
+func (m *MockVehicleRepo) UpdateManufacturer(ctx context.Context, manufacturer *Manufacturer) error      { return nil }
+func (m *MockVehicleRepo) DeleteManufacturer(ctx context.Context, id uuid.UUID) error                    { return nil }
+func (m *MockVehicleRepo) ListManufacturers(ctx context.Context, page, pageSize int) ([]*Manufacturer, int, error) {
+	return nil, 0, nil
+}
+func (m *MockVehicleRepo) CreateFirmware(ctx context.Context, firmware *Firmware) error                  { return nil }
+func (m *MockVehicleRepo) GetFirmware(ctx context.Context, id uuid.UUID) (*Firmware, error)             { return nil, nil }
+func (m *MockVehicleRepo) GetFirmwareByID(ctx context.Context, firmwareID string) (*Firmware, error)     { return nil, nil }
+func (m *MockVehicleRepo) UpdateFirmware(ctx context.Context, firmware *Firmware) error                 { return nil }
+func (m *MockVehicleRepo) DeleteFirmware(ctx context.Context, id uuid.UUID) error                       { return nil }
+func (m *MockVehicleRepo) ListFirmwares(ctx context.Context, manufacturer, model string, page, pageSize int) ([]*Firmware, int, error) {
+	return nil, 0, nil
+}
+func (m *MockVehicleRepo) GetLatestFirmware(ctx context.Context, manufacturer, model string) (*Firmware, error) { return nil, nil }
+func (m *MockVehicleRepo) CreateDevicePerformance(ctx context.Context, performance *DevicePerformance) error { return nil }
+func (m *MockVehicleRepo) GetDevicePerformance(ctx context.Context, deviceID string, startTime, endTime time.Time) ([]*DevicePerformance, error) {
+	return nil, nil
+}
+func (m *MockVehicleRepo) GetDevicePerformanceLatest(ctx context.Context, deviceID string) (*DevicePerformance, error) { return nil, nil }
+func (m *MockVehicleRepo) CreateDeviceFault(ctx context.Context, fault *DeviceFault) error               { return nil }
+func (m *MockVehicleRepo) GetDeviceFault(ctx context.Context, id uuid.UUID) (*DeviceFault, error)        { return nil, nil }
+func (m *MockVehicleRepo) UpdateDeviceFault(ctx context.Context, fault *DeviceFault) error               { return nil }
+func (m *MockVehicleRepo) ListDeviceFaults(ctx context.Context, deviceID, status string, page, pageSize int) ([]*DeviceFault, int, error) {
+	return nil, 0, nil
+}
+func (m *MockVehicleRepo) ResolveDeviceFault(ctx context.Context, id uuid.UUID) error                   { return nil }
+func (m *MockVehicleRepo) GetDeviceUsageStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error) {
+	return nil, nil
+}
+func (m *MockVehicleRepo) GetDeviceFaultStats(ctx context.Context, deviceID string, startTime, endTime time.Time) (map[string]interface{}, error) {
+	return nil, nil
+}
+func (m *MockVehicleRepo) GetDeviceStatsSummary(ctx context.Context, deviceID string) (map[string]interface{}, error) { return nil, nil }
+func (m *MockVehicleRepo) UpdateDeviceStatus(ctx context.Context, deviceID, status string) error         { return nil }
+func (m *MockVehicleRepo) UpdateDeviceVersion(ctx context.Context, deviceID, firmwareVersion, hardwareVersion string) error { return nil }
+func (m *MockVehicleRepo) UpdateDeviceStats(ctx context.Context, deviceID string, stats map[string]string) error { return nil }
+func (m *MockVehicleRepo) CreateDeviceLog(ctx context.Context, log *DeviceLog) error                     { return nil }
+func (m *MockVehicleRepo) GetDeviceLogs(ctx context.Context, deviceID string, page, pageSize int) ([]*DeviceLog, int, error) {
+	return nil, 0, nil
+}
+func (m *MockVehicleRepo) CreateDeviceUpgrade(ctx context.Context, deviceID, fromVersion, toVersion, firmwareURL string) (uuid.UUID, error) {
+	return uuid.New(), nil
+}
+func (m *MockVehicleRepo) GetDeviceUpgrade(ctx context.Context, id uuid.UUID) (*DeviceUpgrade, error)    { return nil, nil }
+func (m *MockVehicleRepo) UpdateDeviceUpgradeStatus(ctx context.Context, id uuid.UUID, status, errMsg string) error { return nil }

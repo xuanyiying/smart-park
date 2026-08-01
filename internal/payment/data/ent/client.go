@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/order"
+	"github.com/xuanyiying/smart-park/internal/payment/data/ent/reconciliation"
 	"github.com/xuanyiying/smart-park/internal/payment/data/ent/refundapproval"
 )
 
@@ -26,6 +27,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
+	// Reconciliation is the client for interacting with the Reconciliation builders.
+	Reconciliation *ReconciliationClient
 	// RefundApproval is the client for interacting with the RefundApproval builders.
 	RefundApproval *RefundApprovalClient
 }
@@ -40,6 +43,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Order = NewOrderClient(c.config)
+	c.Reconciliation = NewReconciliationClient(c.config)
 	c.RefundApproval = NewRefundApprovalClient(c.config)
 }
 
@@ -134,6 +138,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:            ctx,
 		config:         cfg,
 		Order:          NewOrderClient(cfg),
+		Reconciliation: NewReconciliationClient(cfg),
 		RefundApproval: NewRefundApprovalClient(cfg),
 	}, nil
 }
@@ -155,6 +160,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:            ctx,
 		config:         cfg,
 		Order:          NewOrderClient(cfg),
+		Reconciliation: NewReconciliationClient(cfg),
 		RefundApproval: NewRefundApprovalClient(cfg),
 	}, nil
 }
@@ -185,6 +191,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Order.Use(hooks...)
+	c.Reconciliation.Use(hooks...)
 	c.RefundApproval.Use(hooks...)
 }
 
@@ -192,6 +199,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Order.Intercept(interceptors...)
+	c.Reconciliation.Intercept(interceptors...)
 	c.RefundApproval.Intercept(interceptors...)
 }
 
@@ -200,6 +208,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *OrderMutation:
 		return c.Order.mutate(ctx, m)
+	case *ReconciliationMutation:
+		return c.Reconciliation.mutate(ctx, m)
 	case *RefundApprovalMutation:
 		return c.RefundApproval.mutate(ctx, m)
 	default:
@@ -340,6 +350,139 @@ func (c *OrderClient) mutate(ctx context.Context, m *OrderMutation) (Value, erro
 	}
 }
 
+// ReconciliationClient is a client for the Reconciliation schema.
+type ReconciliationClient struct {
+	config
+}
+
+// NewReconciliationClient returns a client for the Reconciliation from the given config.
+func NewReconciliationClient(c config) *ReconciliationClient {
+	return &ReconciliationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `reconciliation.Hooks(f(g(h())))`.
+func (c *ReconciliationClient) Use(hooks ...Hook) {
+	c.hooks.Reconciliation = append(c.hooks.Reconciliation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `reconciliation.Intercept(f(g(h())))`.
+func (c *ReconciliationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Reconciliation = append(c.inters.Reconciliation, interceptors...)
+}
+
+// Create returns a builder for creating a Reconciliation entity.
+func (c *ReconciliationClient) Create() *ReconciliationCreate {
+	mutation := newReconciliationMutation(c.config, OpCreate)
+	return &ReconciliationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Reconciliation entities.
+func (c *ReconciliationClient) CreateBulk(builders ...*ReconciliationCreate) *ReconciliationCreateBulk {
+	return &ReconciliationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ReconciliationClient) MapCreateBulk(slice any, setFunc func(*ReconciliationCreate, int)) *ReconciliationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ReconciliationCreateBulk{err: fmt.Errorf("calling to ReconciliationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ReconciliationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ReconciliationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Reconciliation.
+func (c *ReconciliationClient) Update() *ReconciliationUpdate {
+	mutation := newReconciliationMutation(c.config, OpUpdate)
+	return &ReconciliationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReconciliationClient) UpdateOne(_m *Reconciliation) *ReconciliationUpdateOne {
+	mutation := newReconciliationMutation(c.config, OpUpdateOne, withReconciliation(_m))
+	return &ReconciliationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReconciliationClient) UpdateOneID(id uuid.UUID) *ReconciliationUpdateOne {
+	mutation := newReconciliationMutation(c.config, OpUpdateOne, withReconciliationID(id))
+	return &ReconciliationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Reconciliation.
+func (c *ReconciliationClient) Delete() *ReconciliationDelete {
+	mutation := newReconciliationMutation(c.config, OpDelete)
+	return &ReconciliationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ReconciliationClient) DeleteOne(_m *Reconciliation) *ReconciliationDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ReconciliationClient) DeleteOneID(id uuid.UUID) *ReconciliationDeleteOne {
+	builder := c.Delete().Where(reconciliation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReconciliationDeleteOne{builder}
+}
+
+// Query returns a query builder for Reconciliation.
+func (c *ReconciliationClient) Query() *ReconciliationQuery {
+	return &ReconciliationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeReconciliation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Reconciliation entity by its id.
+func (c *ReconciliationClient) Get(ctx context.Context, id uuid.UUID) (*Reconciliation, error) {
+	return c.Query().Where(reconciliation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReconciliationClient) GetX(ctx context.Context, id uuid.UUID) *Reconciliation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ReconciliationClient) Hooks() []Hook {
+	return c.hooks.Reconciliation
+}
+
+// Interceptors returns the client interceptors.
+func (c *ReconciliationClient) Interceptors() []Interceptor {
+	return c.inters.Reconciliation
+}
+
+func (c *ReconciliationClient) mutate(ctx context.Context, m *ReconciliationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReconciliationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReconciliationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReconciliationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReconciliationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Reconciliation mutation op: %q", m.Op())
+	}
+}
+
 // RefundApprovalClient is a client for the RefundApproval schema.
 type RefundApprovalClient struct {
 	config
@@ -476,9 +619,9 @@ func (c *RefundApprovalClient) mutate(ctx context.Context, m *RefundApprovalMuta
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Order, RefundApproval []ent.Hook
+		Order, Reconciliation, RefundApproval []ent.Hook
 	}
 	inters struct {
-		Order, RefundApproval []ent.Interceptor
+		Order, Reconciliation, RefundApproval []ent.Interceptor
 	}
 )

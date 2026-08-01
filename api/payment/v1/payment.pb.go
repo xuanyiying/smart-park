@@ -874,6 +874,426 @@ func (x *RefundData) GetStatus() string {
 	return ""
 }
 
+type ReconcileDailyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"` // 格式：2006-01-02
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReconcileDailyRequest) Reset() {
+	*x = ReconcileDailyRequest{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReconcileDailyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReconcileDailyRequest) ProtoMessage() {}
+
+func (x *ReconcileDailyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReconcileDailyRequest.ProtoReflect.Descriptor instead.
+func (*ReconcileDailyRequest) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ReconcileDailyRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+type ReconcileDailyResponse struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Code          int32                   `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                  `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*ReconciliationRecord `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReconcileDailyResponse) Reset() {
+	*x = ReconcileDailyResponse{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReconcileDailyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReconcileDailyResponse) ProtoMessage() {}
+
+func (x *ReconcileDailyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReconcileDailyResponse.ProtoReflect.Descriptor instead.
+func (*ReconcileDailyResponse) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ReconcileDailyResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ReconcileDailyResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ReconcileDailyResponse) GetData() []*ReconciliationRecord {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type ReconciliationRecord struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OrderId            string                 `protobuf:"bytes,2,opt,name=orderId,proto3" json:"orderId,omitempty"`
+	PaymentMethod      string                 `protobuf:"bytes,3,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
+	OrderAmount        float64                `protobuf:"fixed64,4,opt,name=orderAmount,proto3" json:"orderAmount,omitempty"`
+	PaidAmount         float64                `protobuf:"fixed64,5,opt,name=paidAmount,proto3" json:"paidAmount,omitempty"`
+	TransactionId      string                 `protobuf:"bytes,6,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
+	ReconciliationTime string                 `protobuf:"bytes,7,opt,name=reconciliationTime,proto3" json:"reconciliationTime,omitempty"`
+	Status             string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	Notes              string                 `protobuf:"bytes,9,opt,name=notes,proto3" json:"notes,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ReconciliationRecord) Reset() {
+	*x = ReconciliationRecord{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReconciliationRecord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReconciliationRecord) ProtoMessage() {}
+
+func (x *ReconciliationRecord) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReconciliationRecord.ProtoReflect.Descriptor instead.
+func (*ReconciliationRecord) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ReconciliationRecord) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ReconciliationRecord) GetOrderId() string {
+	if x != nil {
+		return x.OrderId
+	}
+	return ""
+}
+
+func (x *ReconciliationRecord) GetPaymentMethod() string {
+	if x != nil {
+		return x.PaymentMethod
+	}
+	return ""
+}
+
+func (x *ReconciliationRecord) GetOrderAmount() float64 {
+	if x != nil {
+		return x.OrderAmount
+	}
+	return 0
+}
+
+func (x *ReconciliationRecord) GetPaidAmount() float64 {
+	if x != nil {
+		return x.PaidAmount
+	}
+	return 0
+}
+
+func (x *ReconciliationRecord) GetTransactionId() string {
+	if x != nil {
+		return x.TransactionId
+	}
+	return ""
+}
+
+func (x *ReconciliationRecord) GetReconciliationTime() string {
+	if x != nil {
+		return x.ReconciliationTime
+	}
+	return ""
+}
+
+func (x *ReconciliationRecord) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ReconciliationRecord) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+type GetReconciliationReportRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StartDate     string                 `protobuf:"bytes,1,opt,name=startDate,proto3" json:"startDate,omitempty"` // 格式：2006-01-02
+	EndDate       string                 `protobuf:"bytes,2,opt,name=endDate,proto3" json:"endDate,omitempty"`     // 格式：2006-01-02
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetReconciliationReportRequest) Reset() {
+	*x = GetReconciliationReportRequest{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetReconciliationReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetReconciliationReportRequest) ProtoMessage() {}
+
+func (x *GetReconciliationReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetReconciliationReportRequest.ProtoReflect.Descriptor instead.
+func (*GetReconciliationReportRequest) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetReconciliationReportRequest) GetStartDate() string {
+	if x != nil {
+		return x.StartDate
+	}
+	return ""
+}
+
+func (x *GetReconciliationReportRequest) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
+	}
+	return ""
+}
+
+type GetReconciliationReportResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          map[string]string      `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetReconciliationReportResponse) Reset() {
+	*x = GetReconciliationReportResponse{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetReconciliationReportResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetReconciliationReportResponse) ProtoMessage() {}
+
+func (x *GetReconciliationReportResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetReconciliationReportResponse.ProtoReflect.Descriptor instead.
+func (*GetReconciliationReportResponse) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetReconciliationReportResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetReconciliationReportResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetReconciliationReportResponse) GetData() map[string]string {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type FixMismatchedOrdersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderIds      []string               `protobuf:"bytes,1,rep,name=orderIds,proto3" json:"orderIds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FixMismatchedOrdersRequest) Reset() {
+	*x = FixMismatchedOrdersRequest{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FixMismatchedOrdersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FixMismatchedOrdersRequest) ProtoMessage() {}
+
+func (x *FixMismatchedOrdersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FixMismatchedOrdersRequest.ProtoReflect.Descriptor instead.
+func (*FixMismatchedOrdersRequest) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *FixMismatchedOrdersRequest) GetOrderIds() []string {
+	if x != nil {
+		return x.OrderIds
+	}
+	return nil
+}
+
+type FixMismatchedOrdersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FixMismatchedOrdersResponse) Reset() {
+	*x = FixMismatchedOrdersResponse{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FixMismatchedOrdersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FixMismatchedOrdersResponse) ProtoMessage() {}
+
+func (x *FixMismatchedOrdersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FixMismatchedOrdersResponse.ProtoReflect.Descriptor instead.
+func (*FixMismatchedOrdersResponse) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *FixMismatchedOrdersResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *FixMismatchedOrdersResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_api_payment_v1_payment_proto protoreflect.FileDescriptor
 
 const file_api_payment_v1_payment_proto_rawDesc = "" +
@@ -954,13 +1374,49 @@ const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\n" +
 	"RefundData\x12\x1a\n" +
 	"\brefundId\x18\x01 \x01(\tR\brefundId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2\xa1\x05\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"+\n" +
+	"\x15ReconcileDailyRequest\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\"\x80\x01\n" +
+	"\x16ReconcileDailyResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x128\n" +
+	"\x04data\x18\x03 \x03(\v2$.api.payment.v1.ReconciliationRecordR\x04data\"\xac\x02\n" +
+	"\x14ReconciliationRecord\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
+	"\aorderId\x18\x02 \x01(\tR\aorderId\x12$\n" +
+	"\rpaymentMethod\x18\x03 \x01(\tR\rpaymentMethod\x12 \n" +
+	"\vorderAmount\x18\x04 \x01(\x01R\vorderAmount\x12\x1e\n" +
+	"\n" +
+	"paidAmount\x18\x05 \x01(\x01R\n" +
+	"paidAmount\x12$\n" +
+	"\rtransactionId\x18\x06 \x01(\tR\rtransactionId\x12.\n" +
+	"\x12reconciliationTime\x18\a \x01(\tR\x12reconciliationTime\x12\x16\n" +
+	"\x06status\x18\b \x01(\tR\x06status\x12\x14\n" +
+	"\x05notes\x18\t \x01(\tR\x05notes\"X\n" +
+	"\x1eGetReconciliationReportRequest\x12\x1c\n" +
+	"\tstartDate\x18\x01 \x01(\tR\tstartDate\x12\x18\n" +
+	"\aendDate\x18\x02 \x01(\tR\aendDate\"\xd7\x01\n" +
+	"\x1fGetReconciliationReportResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12M\n" +
+	"\x04data\x18\x03 \x03(\v29.api.payment.v1.GetReconciliationReportResponse.DataEntryR\x04data\x1a7\n" +
+	"\tDataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"8\n" +
+	"\x1aFixMismatchedOrdersRequest\x12\x1a\n" +
+	"\borderIds\x18\x01 \x03(\tR\borderIds\"K\n" +
+	"\x1bFixMismatchedOrdersResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xe5\b\n" +
 	"\x0ePaymentService\x12{\n" +
 	"\rCreatePayment\x12$.api.payment.v1.CreatePaymentRequest\x1a%.api.payment.v1.CreatePaymentResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/pay/create\x12\x8b\x01\n" +
 	"\x10GetPaymentStatus\x12'.api.payment.v1.GetPaymentStatusRequest\x1a(.api.payment.v1.GetPaymentStatusResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/pay/{orderId}/status\x12\x87\x01\n" +
 	"\x0eWechatCallback\x12%.api.payment.v1.WechatCallbackRequest\x1a&.api.payment.v1.WechatCallbackResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/pay/callback/wechat\x12\x87\x01\n" +
 	"\x0eAlipayCallback\x12%.api.payment.v1.AlipayCallbackRequest\x1a&.api.payment.v1.AlipayCallbackResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/pay/callback/alipay\x12p\n" +
-	"\x06Refund\x12\x1d.api.payment.v1.RefundRequest\x1a\x1e.api.payment.v1.RefundResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/pay/{orderId}/refundB4Z2github.com/xuanyiying/smart-park/api/payment/v1;v1b\x06proto3"
+	"\x06Refund\x12\x1d.api.payment.v1.RefundRequest\x1a\x1e.api.payment.v1.RefundResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/pay/{orderId}/refund\x12\x87\x01\n" +
+	"\x0eReconcileDaily\x12%.api.payment.v1.ReconcileDailyRequest\x1a&.api.payment.v1.ReconcileDailyResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/pay/reconcile/daily\x12\xa0\x01\n" +
+	"\x17GetReconciliationReport\x12..api.payment.v1.GetReconciliationReportRequest\x1a/.api.payment.v1.GetReconciliationReportResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/pay/reconcile/report\x12\x94\x01\n" +
+	"\x13FixMismatchedOrders\x12*.api.payment.v1.FixMismatchedOrdersRequest\x1a+.api.payment.v1.FixMismatchedOrdersResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/pay/reconcile/fixB4Z2github.com/xuanyiying/smart-park/api/payment/v1;v1b\x06proto3"
 
 var (
 	file_api_payment_v1_payment_proto_rawDescOnce sync.Once
@@ -974,41 +1430,57 @@ func file_api_payment_v1_payment_proto_rawDescGZIP() []byte {
 	return file_api_payment_v1_payment_proto_rawDescData
 }
 
-var file_api_payment_v1_payment_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_api_payment_v1_payment_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_api_payment_v1_payment_proto_goTypes = []any{
-	(*CreatePaymentRequest)(nil),     // 0: api.payment.v1.CreatePaymentRequest
-	(*CreatePaymentResponse)(nil),    // 1: api.payment.v1.CreatePaymentResponse
-	(*PaymentData)(nil),              // 2: api.payment.v1.PaymentData
-	(*GetPaymentStatusRequest)(nil),  // 3: api.payment.v1.GetPaymentStatusRequest
-	(*GetPaymentStatusResponse)(nil), // 4: api.payment.v1.GetPaymentStatusResponse
-	(*PaymentStatusData)(nil),        // 5: api.payment.v1.PaymentStatusData
-	(*WechatCallbackRequest)(nil),    // 6: api.payment.v1.WechatCallbackRequest
-	(*WechatCallbackResponse)(nil),   // 7: api.payment.v1.WechatCallbackResponse
-	(*AlipayCallbackRequest)(nil),    // 8: api.payment.v1.AlipayCallbackRequest
-	(*AlipayCallbackResponse)(nil),   // 9: api.payment.v1.AlipayCallbackResponse
-	(*RefundRequest)(nil),            // 10: api.payment.v1.RefundRequest
-	(*RefundResponse)(nil),           // 11: api.payment.v1.RefundResponse
-	(*RefundData)(nil),               // 12: api.payment.v1.RefundData
+	(*CreatePaymentRequest)(nil),            // 0: api.payment.v1.CreatePaymentRequest
+	(*CreatePaymentResponse)(nil),           // 1: api.payment.v1.CreatePaymentResponse
+	(*PaymentData)(nil),                     // 2: api.payment.v1.PaymentData
+	(*GetPaymentStatusRequest)(nil),         // 3: api.payment.v1.GetPaymentStatusRequest
+	(*GetPaymentStatusResponse)(nil),        // 4: api.payment.v1.GetPaymentStatusResponse
+	(*PaymentStatusData)(nil),               // 5: api.payment.v1.PaymentStatusData
+	(*WechatCallbackRequest)(nil),           // 6: api.payment.v1.WechatCallbackRequest
+	(*WechatCallbackResponse)(nil),          // 7: api.payment.v1.WechatCallbackResponse
+	(*AlipayCallbackRequest)(nil),           // 8: api.payment.v1.AlipayCallbackRequest
+	(*AlipayCallbackResponse)(nil),          // 9: api.payment.v1.AlipayCallbackResponse
+	(*RefundRequest)(nil),                   // 10: api.payment.v1.RefundRequest
+	(*RefundResponse)(nil),                  // 11: api.payment.v1.RefundResponse
+	(*RefundData)(nil),                      // 12: api.payment.v1.RefundData
+	(*ReconcileDailyRequest)(nil),           // 13: api.payment.v1.ReconcileDailyRequest
+	(*ReconcileDailyResponse)(nil),          // 14: api.payment.v1.ReconcileDailyResponse
+	(*ReconciliationRecord)(nil),            // 15: api.payment.v1.ReconciliationRecord
+	(*GetReconciliationReportRequest)(nil),  // 16: api.payment.v1.GetReconciliationReportRequest
+	(*GetReconciliationReportResponse)(nil), // 17: api.payment.v1.GetReconciliationReportResponse
+	(*FixMismatchedOrdersRequest)(nil),      // 18: api.payment.v1.FixMismatchedOrdersRequest
+	(*FixMismatchedOrdersResponse)(nil),     // 19: api.payment.v1.FixMismatchedOrdersResponse
+	nil,                                     // 20: api.payment.v1.GetReconciliationReportResponse.DataEntry
 }
 var file_api_payment_v1_payment_proto_depIdxs = []int32{
 	2,  // 0: api.payment.v1.CreatePaymentResponse.data:type_name -> api.payment.v1.PaymentData
 	5,  // 1: api.payment.v1.GetPaymentStatusResponse.data:type_name -> api.payment.v1.PaymentStatusData
 	12, // 2: api.payment.v1.RefundResponse.data:type_name -> api.payment.v1.RefundData
-	0,  // 3: api.payment.v1.PaymentService.CreatePayment:input_type -> api.payment.v1.CreatePaymentRequest
-	3,  // 4: api.payment.v1.PaymentService.GetPaymentStatus:input_type -> api.payment.v1.GetPaymentStatusRequest
-	6,  // 5: api.payment.v1.PaymentService.WechatCallback:input_type -> api.payment.v1.WechatCallbackRequest
-	8,  // 6: api.payment.v1.PaymentService.AlipayCallback:input_type -> api.payment.v1.AlipayCallbackRequest
-	10, // 7: api.payment.v1.PaymentService.Refund:input_type -> api.payment.v1.RefundRequest
-	1,  // 8: api.payment.v1.PaymentService.CreatePayment:output_type -> api.payment.v1.CreatePaymentResponse
-	4,  // 9: api.payment.v1.PaymentService.GetPaymentStatus:output_type -> api.payment.v1.GetPaymentStatusResponse
-	7,  // 10: api.payment.v1.PaymentService.WechatCallback:output_type -> api.payment.v1.WechatCallbackResponse
-	9,  // 11: api.payment.v1.PaymentService.AlipayCallback:output_type -> api.payment.v1.AlipayCallbackResponse
-	11, // 12: api.payment.v1.PaymentService.Refund:output_type -> api.payment.v1.RefundResponse
-	8,  // [8:13] is the sub-list for method output_type
-	3,  // [3:8] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	15, // 3: api.payment.v1.ReconcileDailyResponse.data:type_name -> api.payment.v1.ReconciliationRecord
+	20, // 4: api.payment.v1.GetReconciliationReportResponse.data:type_name -> api.payment.v1.GetReconciliationReportResponse.DataEntry
+	0,  // 5: api.payment.v1.PaymentService.CreatePayment:input_type -> api.payment.v1.CreatePaymentRequest
+	3,  // 6: api.payment.v1.PaymentService.GetPaymentStatus:input_type -> api.payment.v1.GetPaymentStatusRequest
+	6,  // 7: api.payment.v1.PaymentService.WechatCallback:input_type -> api.payment.v1.WechatCallbackRequest
+	8,  // 8: api.payment.v1.PaymentService.AlipayCallback:input_type -> api.payment.v1.AlipayCallbackRequest
+	10, // 9: api.payment.v1.PaymentService.Refund:input_type -> api.payment.v1.RefundRequest
+	13, // 10: api.payment.v1.PaymentService.ReconcileDaily:input_type -> api.payment.v1.ReconcileDailyRequest
+	16, // 11: api.payment.v1.PaymentService.GetReconciliationReport:input_type -> api.payment.v1.GetReconciliationReportRequest
+	18, // 12: api.payment.v1.PaymentService.FixMismatchedOrders:input_type -> api.payment.v1.FixMismatchedOrdersRequest
+	1,  // 13: api.payment.v1.PaymentService.CreatePayment:output_type -> api.payment.v1.CreatePaymentResponse
+	4,  // 14: api.payment.v1.PaymentService.GetPaymentStatus:output_type -> api.payment.v1.GetPaymentStatusResponse
+	7,  // 15: api.payment.v1.PaymentService.WechatCallback:output_type -> api.payment.v1.WechatCallbackResponse
+	9,  // 16: api.payment.v1.PaymentService.AlipayCallback:output_type -> api.payment.v1.AlipayCallbackResponse
+	11, // 17: api.payment.v1.PaymentService.Refund:output_type -> api.payment.v1.RefundResponse
+	14, // 18: api.payment.v1.PaymentService.ReconcileDaily:output_type -> api.payment.v1.ReconcileDailyResponse
+	17, // 19: api.payment.v1.PaymentService.GetReconciliationReport:output_type -> api.payment.v1.GetReconciliationReportResponse
+	19, // 20: api.payment.v1.PaymentService.FixMismatchedOrders:output_type -> api.payment.v1.FixMismatchedOrdersResponse
+	13, // [13:21] is the sub-list for method output_type
+	5,  // [5:13] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_api_payment_v1_payment_proto_init() }
@@ -1022,7 +1494,7 @@ func file_api_payment_v1_payment_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_payment_v1_payment_proto_rawDesc), len(file_api_payment_v1_payment_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

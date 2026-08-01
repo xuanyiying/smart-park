@@ -2,7 +2,6 @@ package multitenancy
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -54,18 +53,15 @@ func (h *TenantHook) OnCreate() ent.Hook {
 }
 
 func (h *TenantHook) OnQuery() ent.Hook {
-	return func(next ent.Querier) ent.Querier {
-		return ent.QueryFunc(func(ctx context.Context, q ent.Query) (ent.Value, error) {
+	return func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			tenantID := h.config.GetTenantID(ctx)
-			if tenantID == nil {
-				return next.Query(ctx, q)
+			if tenantID != nil {
+				if wm, ok := m.(interface{ WhereP(...interface{}) }); ok {
+					wm.WhereP(sql.EQ(h.config.TenantIDField, *tenantID))
+				}
 			}
-
-			if sq, ok := q.(interface{ WhereP(...interface{}) }); ok {
-				sq.WhereP(sql.EQ(h.config.TenantIDField, *tenantID))
-			}
-
-			return next.Query(ctx, q)
+			return next.Mutate(ctx, m)
 		})
 	}
 }
@@ -106,7 +102,7 @@ func (h *TenantHook) OnDelete() ent.Hook {
 
 func (h *TenantHook) Hooks() []ent.Hook {
 	return []ent.Hook{
-		ent.HookFunc(func(next ent.Mutator) ent.Mutator {
+		func(next ent.Mutator) ent.Mutator {
 			return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 				switch m.Op() {
 				case ent.OpCreate:
@@ -119,14 +115,14 @@ func (h *TenantHook) Hooks() []ent.Hook {
 					return next.Mutate(ctx, m)
 				}
 			})
-		}),
+		},
 		h.OnQuery(),
 	}
 }
 
-func RegisterTenantHooks(client *ent.Client, config *TenantHookConfig) {
+func RegisterTenantHooks(hooks []ent.Hook, config *TenantHookConfig) []ent.Hook {
 	hook := NewTenantHook(config)
-	client.Use(hook.Hooks()...)
+	return append(hooks, hook.Hooks()...)
 }
 
 type TenantSchemaMixin struct {

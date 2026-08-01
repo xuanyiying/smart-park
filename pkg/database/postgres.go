@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Config struct {
+type RWConfig struct {
 	Primary struct {
 		Source string
 	}
@@ -27,7 +27,7 @@ type DBManager struct {
 	randomMux sync.Mutex
 }
 
-func NewDBManager(cfg *Config) (*DBManager, error) {
+func NewDBManager(cfg *RWConfig) (*DBManager, error) {
 	// Connect to primary database
 	primary, err := sql.Open("postgres", cfg.Primary.Source)
 	if err != nil {

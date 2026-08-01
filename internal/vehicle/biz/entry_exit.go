@@ -266,7 +266,7 @@ func (uc *EntryExitUseCase) handleExitError(ctx context.Context, req *v1.ExitReq
 // sendDeviceCommandWithRetry sends device command with retry mechanism
 func (uc *EntryExitUseCase) sendDeviceCommandWithRetry(ctx context.Context, deviceID, command string, maxRetries int) error {
 	for i := 0; i < maxRetries; i++ {
-		if err := uc.mqttClient.PublishCommand(ctx, deviceID, command); err != nil {
+		if err := uc.mqttClient.PublishCommand(ctx, &mqtt.Command{DeviceID: deviceID, Command: mqtt.CommandType(command)}); err != nil {
 			uc.log.WithContext(ctx).Warnf("[DEVICE] Command attempt %d failed: %v", i+1, err)
 			time.Sleep(time.Duration(i+1) * 100 * time.Millisecond)
 			continue

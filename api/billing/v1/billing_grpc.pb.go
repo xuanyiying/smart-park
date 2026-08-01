@@ -24,6 +24,7 @@ const (
 	BillingService_UpdateBillingRule_FullMethodName = "/api.billing.v1.BillingService/UpdateBillingRule"
 	BillingService_DeleteBillingRule_FullMethodName = "/api.billing.v1.BillingService/DeleteBillingRule"
 	BillingService_GetBillingRules_FullMethodName   = "/api.billing.v1.BillingService/GetBillingRules"
+	BillingService_TestBillingRule_FullMethodName   = "/api.billing.v1.BillingService/TestBillingRule"
 )
 
 // BillingServiceClient is the client API for BillingService service.
@@ -35,6 +36,7 @@ type BillingServiceClient interface {
 	UpdateBillingRule(ctx context.Context, in *UpdateBillingRuleRequest, opts ...grpc.CallOption) (*UpdateBillingRuleResponse, error)
 	DeleteBillingRule(ctx context.Context, in *DeleteBillingRuleRequest, opts ...grpc.CallOption) (*DeleteBillingRuleResponse, error)
 	GetBillingRules(ctx context.Context, in *GetBillingRulesRequest, opts ...grpc.CallOption) (*GetBillingRulesResponse, error)
+	TestBillingRule(ctx context.Context, in *TestBillingRuleRequest, opts ...grpc.CallOption) (*TestBillingRuleResponse, error)
 }
 
 type billingServiceClient struct {
@@ -95,6 +97,16 @@ func (c *billingServiceClient) GetBillingRules(ctx context.Context, in *GetBilli
 	return out, nil
 }
 
+func (c *billingServiceClient) TestBillingRule(ctx context.Context, in *TestBillingRuleRequest, opts ...grpc.CallOption) (*TestBillingRuleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TestBillingRuleResponse)
+	err := c.cc.Invoke(ctx, BillingService_TestBillingRule_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BillingServiceServer is the server API for BillingService service.
 // All implementations must embed UnimplementedBillingServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type BillingServiceServer interface {
 	UpdateBillingRule(context.Context, *UpdateBillingRuleRequest) (*UpdateBillingRuleResponse, error)
 	DeleteBillingRule(context.Context, *DeleteBillingRuleRequest) (*DeleteBillingRuleResponse, error)
 	GetBillingRules(context.Context, *GetBillingRulesRequest) (*GetBillingRulesResponse, error)
+	TestBillingRule(context.Context, *TestBillingRuleRequest) (*TestBillingRuleResponse, error)
 	mustEmbedUnimplementedBillingServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedBillingServiceServer) DeleteBillingRule(context.Context, *Del
 }
 func (UnimplementedBillingServiceServer) GetBillingRules(context.Context, *GetBillingRulesRequest) (*GetBillingRulesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetBillingRules not implemented")
+}
+func (UnimplementedBillingServiceServer) TestBillingRule(context.Context, *TestBillingRuleRequest) (*TestBillingRuleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TestBillingRule not implemented")
 }
 func (UnimplementedBillingServiceServer) mustEmbedUnimplementedBillingServiceServer() {}
 func (UnimplementedBillingServiceServer) testEmbeddedByValue()                        {}
@@ -240,6 +256,24 @@ func _BillingService_GetBillingRules_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BillingService_TestBillingRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TestBillingRuleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BillingServiceServer).TestBillingRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BillingService_TestBillingRule_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BillingServiceServer).TestBillingRule(ctx, req.(*TestBillingRuleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BillingService_ServiceDesc is the grpc.ServiceDesc for BillingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +300,10 @@ var BillingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBillingRules",
 			Handler:    _BillingService_GetBillingRules_Handler,
+		},
+		{
+			MethodName: "TestBillingRule",
+			Handler:    _BillingService_TestBillingRule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
