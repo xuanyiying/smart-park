@@ -57,14 +57,21 @@ type EntryExitUseCase struct {
 }
 
 // NewEntryExitUseCase creates a new EntryExitUseCase.
-func NewEntryExitUseCase(vehicleRepo VehicleRepo, billingClient billing.Client, mqttClient mqtt.Client, lockRepo lock.LockRepo, adapterFactory *device.AdapterFactory, logger log.Logger) *EntryExitUseCase {
+//
+// cfg carries the tunable thresholds (lock TTL, recognition confidence, driver-facing
+// messages). Passing nil falls back to the built-in defaults. It is injected rather than
+// hard-coded so that operations can change behaviour without a rebuild.
+func NewEntryExitUseCase(vehicleRepo VehicleRepo, billingClient billing.Client, mqttClient mqtt.Client, lockRepo lock.LockRepo, adapterFactory *device.AdapterFactory, cfg *Config, logger log.Logger) *EntryExitUseCase {
+	if cfg == nil {
+		cfg = DefaultConfig()
+	}
 	return &EntryExitUseCase{
 		vehicleRepo:    vehicleRepo,
 		billingClient:  billingClient,
 		mqttClient:     mqttClient,
 		lockRepo:       lockRepo,
 		adapterFactory: adapterFactory,
-		config:         DefaultConfig(),
+		config:         cfg,
 		log:            log.NewHelper(logger),
 	}
 }
@@ -99,8 +106,10 @@ func (uc *EntryExitUseCase) Entry(ctx context.Context, req *v1.EntryRequest) (*v
 
 	// Send device command with retry
 	if err := uc.sendDeviceCommandWithRetry(ctx, req.DeviceId, "open_gate", 3); err != nil {
-		uc.log.WithContext(ctx).Warnf("[ENTRY] Failed to send gate open command: %v", err)
-		// Continue processing even if device command fails
+		// The parking record is committed, so the system considers this vehicle admitted
+		// even though the barrier may never have moved. That inconsistency is an incident
+		// staff must be able to find, not a warning to ignore.
+		uc.logManualReview(ctx, "entry_gate_command", req.PlateNumber, req.DeviceId, err)
 	}
 
 	return result, nil
@@ -137,8 +146,7 @@ func (uc *EntryExitUseCase) Exit(ctx context.Context, req *v1.ExitRequest) (*v1.
 	// Send device command with retry only if gate should open
 	if result.GateOpen {
 		if err := uc.sendDeviceCommandWithRetry(ctx, req.DeviceId, "open_gate", 3); err != nil {
-			uc.log.WithContext(ctx).Warnf("[EXIT] Failed to send gate open command: %v", err)
-			// Continue processing even if device command fails
+			uc.logManualReview(ctx, "exit_gate_command", req.PlateNumber, req.DeviceId, err)
 		}
 	}
 
@@ -193,9 +201,8 @@ func (uc *EntryExitUseCase) handleEntryError(ctx context.Context, req *v1.EntryR
 				DisplayMessage: uc.config.Messages.DuplicateEntry,
 			}, nil
 		case ErrTypeDatabase:
-			// Database error - use fallback mechanism
-			uc.log.WithContext(ctx).Warnf("[ENTRY] Database error, using fallback: %v", err)
-			return uc.createFallbackEntryResponse(req), nil
+			// Database error - admit the vehicle but record the incident for staff.
+			return uc.createFallbackEntryResponse(ctx, req, err), nil
 		default:
 			return &v1.EntryData{
 				PlateNumber:    req.PlateNumber,
@@ -216,82 +223,107 @@ func (uc *EntryExitUseCase) handleEntryError(ctx context.Context, req *v1.EntryR
 	}
 }
 
-// handleExitError handles exit errors with fallback mechanisms
+// handleExitError handles exit errors.
+//
+// Exit is the revenue checkpoint of the whole system, so unlike entry it never opens the
+// gate on a technical failure. Releasing a driver because the billing service hiccupped
+// hands out free parking and leaves no trace to reconcile against; keeping the gate
+// closed routes the driver to staff, who can charge manually and still leave an auditable
+// record.
 func (uc *EntryExitUseCase) handleExitError(ctx context.Context, req *v1.ExitRequest, err error) (*v1.ExitData, error) {
+	// Every blocked exit is an operational incident: log it loudly and uniformly so that
+	// monitoring can alert on it and staff can reconcile the affected sessions later.
+	uc.logManualReview(ctx, "exit", req.PlateNumber, req.DeviceId, err)
+
 	switch e := err.(type) {
 	case *EntryExitError:
 		switch e.Type {
 		case ErrTypeValidation:
-			return &v1.ExitData{
-				PlateNumber:    req.PlateNumber,
-				Allowed:        false,
-				GateOpen:       false,
-				DisplayMessage: uc.config.Messages.ValidationError,
-			}, nil
+			return uc.denyExit(req, uc.config.Messages.ValidationError), nil
 		case ErrTypeLock:
-			return &v1.ExitData{
-				PlateNumber:    req.PlateNumber,
-				Allowed:        false,
-				GateOpen:       false,
-				DisplayMessage: uc.config.Messages.DuplicateExit,
-			}, nil
+			return uc.denyExit(req, uc.config.Messages.DuplicateExit), nil
 		case ErrTypeBilling:
-			// Billing error - use fallback for fee calculation
-			uc.log.WithContext(ctx).Warnf("[EXIT] Billing error, using fallback: %v", err)
-			return uc.createFallbackExitResponse(req), nil
+			return uc.denyExit(req, uc.config.Messages.BillingUnavailable), nil
 		case ErrTypeDatabase:
-			// Database error - use fallback mechanism
-			uc.log.WithContext(ctx).Warnf("[EXIT] Database error, using fallback: %v", err)
-			return uc.createFallbackExitResponse(req), nil
+			return uc.denyExit(req, uc.config.Messages.SystemError), nil
 		default:
-			return &v1.ExitData{
-				PlateNumber:    req.PlateNumber,
-				Allowed:        false,
-				GateOpen:       false,
-				DisplayMessage: uc.config.Messages.SystemError,
-			}, nil
+			return uc.denyExit(req, uc.config.Messages.SystemError), nil
 		}
 	default:
-		// Unknown error type
 		uc.log.WithContext(ctx).Errorf("[EXIT] Unknown error: %v", err)
-		return &v1.ExitData{
-			PlateNumber:    req.PlateNumber,
-			Allowed:        false,
-			GateOpen:       false,
-			DisplayMessage: uc.config.Messages.SystemError,
-		}, nil
+		return uc.denyExit(req, uc.config.Messages.SystemError), nil
 	}
 }
 
-// sendDeviceCommandWithRetry sends device command with retry mechanism
-func (uc *EntryExitUseCase) sendDeviceCommandWithRetry(ctx context.Context, deviceID, command string, maxRetries int) error {
-	for i := 0; i < maxRetries; i++ {
-		if err := uc.mqttClient.PublishCommand(ctx, &mqtt.Command{DeviceID: deviceID, Command: mqtt.CommandType(command)}); err != nil {
-			uc.log.WithContext(ctx).Warnf("[DEVICE] Command attempt %d failed: %v", i+1, err)
-			time.Sleep(time.Duration(i+1) * 100 * time.Millisecond)
-			continue
-		}
-		uc.log.WithContext(ctx).Infof("[DEVICE] Command sent successfully: %s to %s", command, deviceID)
-		return nil
-	}
-	return fmt.Errorf("failed to send command after %d attempts", maxRetries)
-}
-
-// createFallbackEntryResponse creates fallback response for entry errors
-func (uc *EntryExitUseCase) createFallbackEntryResponse(req *v1.EntryRequest) *v1.EntryData {
-	// In fallback mode, we allow entry but mark it for manual review
-	return &v1.EntryData{
-		PlateNumber:    req.PlateNumber,
-		Allowed:        true,
-		GateOpen:       true,
-		DisplayMessage: uc.config.Messages.FallbackMode,
-	}
-}
-
-// createFallbackExitResponse creates fallback response for exit errors
-func (uc *EntryExitUseCase) createFallbackExitResponse(req *v1.ExitRequest) *v1.ExitData {
-	// In fallback mode, we allow exit but mark it for manual review
+// denyExit builds a refusal response. The gate stays closed and the driver is told to
+// contact staff rather than being waved through.
+func (uc *EntryExitUseCase) denyExit(req *v1.ExitRequest, message string) *v1.ExitData {
 	return &v1.ExitData{
+		PlateNumber:    req.PlateNumber,
+		Allowed:        false,
+		GateOpen:       false,
+		DisplayMessage: message,
+	}
+}
+
+// logManualReview emits a structured, greppable record for sessions that need a human.
+//
+// The previous code claimed to "mark for manual review" without recording anything, so
+// these incidents were invisible. The marker is what lets operations find them.
+func (uc *EntryExitUseCase) logManualReview(ctx context.Context, phase, plateNumber, deviceID string, err error) {
+	uc.log.WithContext(ctx).Errorf("MANUAL_REVIEW_REQUIRED phase=%s plate=%s device=%s reason=%v",
+		phase, plateNumber, deviceID, err)
+}
+
+// sendDeviceCommandWithRetry delivers a command to a lane device, retrying with
+// exponential backoff.
+//
+// A failure here is reported to the caller instead of being swallowed: the caller has
+// already committed the parking record, so a silently lost "open gate" command leaves the
+// session in a state where the system believes the barrier is up and the driver is still
+// sitting in front of a closed one.
+func (uc *EntryExitUseCase) sendDeviceCommandWithRetry(ctx context.Context, deviceID, command string, maxRetries int) error {
+	if uc.mqttClient == nil {
+		return fmt.Errorf("device command %s could not be delivered: mqtt client is not configured", command)
+	}
+	if deviceID == "" {
+		return fmt.Errorf("device command %s could not be delivered: no device bound to the lane", command)
+	}
+
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		lastErr = uc.mqttClient.PublishCommand(ctx, &mqtt.Command{DeviceID: deviceID, Command: mqtt.CommandType(command)})
+		if lastErr == nil {
+			uc.log.WithContext(ctx).Infof("[DEVICE] Command sent successfully: %s to %s", command, deviceID)
+			return nil
+		}
+
+		uc.log.WithContext(ctx).Warnf("[DEVICE] Command attempt %d/%d failed: %v", attempt+1, maxRetries, lastErr)
+
+		// Exponential backoff bounded by the request context, so a hung broker cannot pin
+		// a request thread for longer than the caller is willing to wait.
+		backoff := time.Duration(1<<uint(attempt)) * 100 * time.Millisecond
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("device command %s aborted: %w", command, ctx.Err())
+		case <-time.After(backoff):
+		}
+	}
+
+	return fmt.Errorf("failed to send command %s to device %s after %d attempts: %w", command, deviceID, maxRetries, lastErr)
+}
+
+// createFallbackEntryResponse builds the degraded-mode response used when the parking
+// record cannot be persisted.
+//
+// Entry is deliberately still allowed: refusing would strand a car in front of the barrier
+// and block the lane. The trade-off is that the session exists without a database record,
+// so the incident is recorded through logManualReview (where the old code only pretended
+// to) and must be reconciled by staff.
+func (uc *EntryExitUseCase) createFallbackEntryResponse(ctx context.Context, req *v1.EntryRequest, err error) *v1.EntryData {
+	uc.logManualReview(ctx, "entry", req.PlateNumber, req.DeviceId, err)
+
+	return &v1.EntryData{
 		PlateNumber:    req.PlateNumber,
 		Allowed:        true,
 		GateOpen:       true,
@@ -358,6 +390,22 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 		}, nil
 	}
 
+	// The driver may already have settled through the mini program or by scanning a code.
+	// The payment service marks the record as paid; releasing the gate here is what makes
+	// pre-payment and frictionless exit work at all.
+	if record.ExitStatus == ExitStatusPaid {
+		uc.log.WithContext(ctx).Infof("[EXIT] Record already paid, releasing gate - RecordID: %s", record.ID)
+		return &v1.ExitData{
+			RecordId:        record.ID.String(),
+			PlateNumber:     req.PlateNumber,
+			ParkingDuration: int32(time.Since(record.EntryTime).Seconds()),
+			FinalAmount:     0,
+			Allowed:         true,
+			GateOpen:        true,
+			DisplayMessage:  uc.config.Messages.FreePass,
+		}, nil
+	}
+
 	exitTime := time.Now()
 	duration := int(exitTime.Sub(record.EntryTime).Seconds())
 
@@ -376,6 +424,13 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 	return uc.buildExitResponse(record, req, duration, amount, discountAmount, finalAmount), nil
 }
 
+// withDistributedLock runs fn while holding a distributed lock, keeping the lock alive
+// for as long as fn is still running.
+//
+// The critical section includes a cross-service billing call, so its duration is not
+// bounded by anything we control. Without renewal the lock can expire mid-transaction and
+// a second request for the same plate enters, which is exactly what the lock exists to
+// prevent; the renewal goroutine extends the lease until fn returns.
 func (uc *EntryExitUseCase) withDistributedLock(ctx context.Context, lockKey string, fn func() error) error {
 	owner := lock.GenerateUniqueOwner()
 	uc.log.WithContext(ctx).Debugf("[LOCK] Acquiring lock - Key: %s, Owner: %s", lockKey, owner)
@@ -390,13 +445,57 @@ func (uc *EntryExitUseCase) withDistributedLock(ctx context.Context, lockKey str
 		return &EntryExitError{Type: ErrTypeLock, Message: "duplicate request in progress"}
 	}
 
+	stopRenewal := uc.startLockRenewal(ctx, lockKey, owner)
 	defer func() {
+		stopRenewal()
 		if err := uc.lockRepo.ReleaseLock(ctx, lockKey, owner); err != nil {
 			uc.log.WithContext(ctx).Warnf("[LOCK] Failed to release lock: %v", err)
 		}
 	}()
 
 	return fn()
+}
+
+// startLockRenewal keeps extending a held lock until the returned stop function is called.
+// The lease top-up runs at a third of the TTL so a single lost renewal still leaves time
+// to retry before expiry.
+func (uc *EntryExitUseCase) startLockRenewal(ctx context.Context, lockKey, owner string) func() {
+	interval := uc.config.LockTTL / 3
+	if interval <= 0 {
+		interval = time.Second
+	}
+
+	stop := make(chan struct{})
+	stopped := make(chan struct{})
+
+	go func() {
+		defer close(stopped)
+
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-stop:
+				return
+			case <-ticker.C:
+				// Detached from the request context: renewal must keep working even if the
+				// caller's deadline has passed, otherwise we would drop the lock while the
+				// critical section is still executing.
+				renewCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), interval)
+				err := uc.lockRepo.ExtendLock(renewCtx, lockKey, owner, uc.config.LockTTL)
+				cancel()
+				if err != nil {
+					uc.log.WithContext(ctx).Warnf("[LOCK] Failed to extend lock %s: %v", lockKey, err)
+				}
+			}
+		}
+	}()
+
+	return func() {
+		close(stop)
+		<-stopped
+	}
 }
 
 func (uc *EntryExitUseCase) createParkingRecord(req *v1.EntryRequest, lane *Lane, vehicle *Vehicle) *ParkingRecord {
@@ -468,7 +567,7 @@ func (uc *EntryExitUseCase) getVehicleInfo(ctx context.Context, plateNumber stri
 	return vehicle, vehicleType
 }
 
-func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *ParkingRecord, lane *Lane, exitTime time.Time, vehicle *Vehicle, vehicleType string) (float64, float64, float64, error) {
+func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *ParkingRecord, lane *Lane, exitTime time.Time, vehicle *Vehicle, vehicleType string) (int64, int64, int64, error) {
 	feeResult, err := uc.billingClient.CalculateFee(ctx, record.ID.String(), lane.LotID.String(),
 		record.EntryTime.Unix(), exitTime.Unix(), vehicleType)
 	if err != nil {
@@ -476,6 +575,7 @@ func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *Parkin
 		return 0, 0, 0, fmt.Errorf("fee calculation failed: %w", err)
 	}
 
+	// Amounts are cents (分) from the billing service.
 	finalAmount := feeResult.FinalAmount
 
 	if vehicle != nil && vehicle.VehicleType == VehicleTypeMonthly {
@@ -499,7 +599,7 @@ func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *Parkin
 	return feeResult.BaseAmount, feeResult.DiscountAmount, finalAmount, nil
 }
 
-func (uc *EntryExitUseCase) buildExitResponse(record *ParkingRecord, req *v1.ExitRequest, duration int, amount, discountAmount, finalAmount float64) *v1.ExitData {
+func (uc *EntryExitUseCase) buildExitResponse(record *ParkingRecord, req *v1.ExitRequest, duration int, amount, discountAmount, finalAmount int64) *v1.ExitData {
 	allowed := finalAmount == 0
 	gateOpen := finalAmount == 0
 	displayMessage := uc.config.Messages.PleasePay

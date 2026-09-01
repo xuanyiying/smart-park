@@ -31,15 +31,15 @@ func (DailyStats) Fields() []ent.Field {
 		field.Int("total_vehicles").
 			Default(0).
 			Comment("在场车辆数"),
-		field.Float("total_amount").
+		field.Int64("total_amount").
 			Default(0).
-			Comment("总收入"),
-		field.Float("total_discount").
+			Comment("总收入(分)"),
+		field.Int64("total_discount").
 			Default(0).
-			Comment("总优惠"),
-		field.Float("net_amount").
+			Comment("总优惠(分)"),
+		field.Int64("net_amount").
 			Default(0).
-			Comment("净收入"),
+			Comment("净收入(分)"),
 		field.Float("avg_duration").
 			Default(0).
 			Comment("平均停车时长(小时)"),

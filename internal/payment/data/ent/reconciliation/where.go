@@ -66,12 +66,12 @@ func PaymentMethod(v string) predicate.Reconciliation {
 }
 
 // OrderAmount applies equality check predicate on the "order_amount" field. It's identical to OrderAmountEQ.
-func OrderAmount(v float64) predicate.Reconciliation {
+func OrderAmount(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldEQ(FieldOrderAmount, v))
 }
 
 // PaidAmount applies equality check predicate on the "paid_amount" field. It's identical to PaidAmountEQ.
-func PaidAmount(v float64) predicate.Reconciliation {
+func PaidAmount(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldEQ(FieldPaidAmount, v))
 }
 
@@ -226,82 +226,82 @@ func PaymentMethodContainsFold(v string) predicate.Reconciliation {
 }
 
 // OrderAmountEQ applies the EQ predicate on the "order_amount" field.
-func OrderAmountEQ(v float64) predicate.Reconciliation {
+func OrderAmountEQ(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldEQ(FieldOrderAmount, v))
 }
 
 // OrderAmountNEQ applies the NEQ predicate on the "order_amount" field.
-func OrderAmountNEQ(v float64) predicate.Reconciliation {
+func OrderAmountNEQ(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldNEQ(FieldOrderAmount, v))
 }
 
 // OrderAmountIn applies the In predicate on the "order_amount" field.
-func OrderAmountIn(vs ...float64) predicate.Reconciliation {
+func OrderAmountIn(vs ...int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldIn(FieldOrderAmount, vs...))
 }
 
 // OrderAmountNotIn applies the NotIn predicate on the "order_amount" field.
-func OrderAmountNotIn(vs ...float64) predicate.Reconciliation {
+func OrderAmountNotIn(vs ...int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldNotIn(FieldOrderAmount, vs...))
 }
 
 // OrderAmountGT applies the GT predicate on the "order_amount" field.
-func OrderAmountGT(v float64) predicate.Reconciliation {
+func OrderAmountGT(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldGT(FieldOrderAmount, v))
 }
 
 // OrderAmountGTE applies the GTE predicate on the "order_amount" field.
-func OrderAmountGTE(v float64) predicate.Reconciliation {
+func OrderAmountGTE(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldGTE(FieldOrderAmount, v))
 }
 
 // OrderAmountLT applies the LT predicate on the "order_amount" field.
-func OrderAmountLT(v float64) predicate.Reconciliation {
+func OrderAmountLT(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldLT(FieldOrderAmount, v))
 }
 
 // OrderAmountLTE applies the LTE predicate on the "order_amount" field.
-func OrderAmountLTE(v float64) predicate.Reconciliation {
+func OrderAmountLTE(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldLTE(FieldOrderAmount, v))
 }
 
 // PaidAmountEQ applies the EQ predicate on the "paid_amount" field.
-func PaidAmountEQ(v float64) predicate.Reconciliation {
+func PaidAmountEQ(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldEQ(FieldPaidAmount, v))
 }
 
 // PaidAmountNEQ applies the NEQ predicate on the "paid_amount" field.
-func PaidAmountNEQ(v float64) predicate.Reconciliation {
+func PaidAmountNEQ(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldNEQ(FieldPaidAmount, v))
 }
 
 // PaidAmountIn applies the In predicate on the "paid_amount" field.
-func PaidAmountIn(vs ...float64) predicate.Reconciliation {
+func PaidAmountIn(vs ...int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldIn(FieldPaidAmount, vs...))
 }
 
 // PaidAmountNotIn applies the NotIn predicate on the "paid_amount" field.
-func PaidAmountNotIn(vs ...float64) predicate.Reconciliation {
+func PaidAmountNotIn(vs ...int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldNotIn(FieldPaidAmount, vs...))
 }
 
 // PaidAmountGT applies the GT predicate on the "paid_amount" field.
-func PaidAmountGT(v float64) predicate.Reconciliation {
+func PaidAmountGT(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldGT(FieldPaidAmount, v))
 }
 
 // PaidAmountGTE applies the GTE predicate on the "paid_amount" field.
-func PaidAmountGTE(v float64) predicate.Reconciliation {
+func PaidAmountGTE(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldGTE(FieldPaidAmount, v))
 }
 
 // PaidAmountLT applies the LT predicate on the "paid_amount" field.
-func PaidAmountLT(v float64) predicate.Reconciliation {
+func PaidAmountLT(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldLT(FieldPaidAmount, v))
 }
 
 // PaidAmountLTE applies the LTE predicate on the "paid_amount" field.
-func PaidAmountLTE(v float64) predicate.Reconciliation {
+func PaidAmountLTE(v int64) predicate.Reconciliation {
 	return predicate.Reconciliation(sql.FieldLTE(FieldPaidAmount, v))
 }
 

@@ -71,7 +71,7 @@ func Approver(v string) predicate.RefundApproval {
 }
 
 // Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
-func Amount(v float64) predicate.RefundApproval {
+func Amount(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldEQ(FieldAmount, v))
 }
 
@@ -276,42 +276,42 @@ func ApproverContainsFold(v string) predicate.RefundApproval {
 }
 
 // AmountEQ applies the EQ predicate on the "amount" field.
-func AmountEQ(v float64) predicate.RefundApproval {
+func AmountEQ(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldEQ(FieldAmount, v))
 }
 
 // AmountNEQ applies the NEQ predicate on the "amount" field.
-func AmountNEQ(v float64) predicate.RefundApproval {
+func AmountNEQ(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldNEQ(FieldAmount, v))
 }
 
 // AmountIn applies the In predicate on the "amount" field.
-func AmountIn(vs ...float64) predicate.RefundApproval {
+func AmountIn(vs ...int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldIn(FieldAmount, vs...))
 }
 
 // AmountNotIn applies the NotIn predicate on the "amount" field.
-func AmountNotIn(vs ...float64) predicate.RefundApproval {
+func AmountNotIn(vs ...int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldNotIn(FieldAmount, vs...))
 }
 
 // AmountGT applies the GT predicate on the "amount" field.
-func AmountGT(v float64) predicate.RefundApproval {
+func AmountGT(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldGT(FieldAmount, v))
 }
 
 // AmountGTE applies the GTE predicate on the "amount" field.
-func AmountGTE(v float64) predicate.RefundApproval {
+func AmountGTE(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldGTE(FieldAmount, v))
 }
 
 // AmountLT applies the LT predicate on the "amount" field.
-func AmountLT(v float64) predicate.RefundApproval {
+func AmountLT(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldLT(FieldAmount, v))
 }
 
 // AmountLTE applies the LTE predicate on the "amount" field.
-func AmountLTE(v float64) predicate.RefundApproval {
+func AmountLTE(v int64) predicate.RefundApproval {
 	return predicate.RefundApproval(sql.FieldLTE(FieldAmount, v))
 }
 

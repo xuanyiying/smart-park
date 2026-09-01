@@ -647,6 +647,10 @@ func init() {
 			return nil
 		}
 	}()
+	// offlinesyncrecordDescSyncAmount is the schema descriptor for sync_amount field.
+	offlinesyncrecordDescSyncAmount := offlinesyncrecordFields[8].Descriptor()
+	// offlinesyncrecord.DefaultSyncAmount holds the default value on creation for the sync_amount field.
+	offlinesyncrecord.DefaultSyncAmount = offlinesyncrecordDescSyncAmount.Default.(int64)
 	// offlinesyncrecordDescRetryCount is the schema descriptor for retry_count field.
 	offlinesyncrecordDescRetryCount := offlinesyncrecordFields[11].Descriptor()
 	// offlinesyncrecord.DefaultRetryCount holds the default value on creation for the retry_count field.

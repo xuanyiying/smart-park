@@ -23,6 +23,8 @@ func (Session) Fields() []ent.Field {
 			StorageKey("id"),
 		field.UUID("tenant_id", uuid.UUID{}).
 			Comment("租户ID"),
+		field.UUID("station_id", uuid.UUID{}).
+			Comment("充电站ID"),
 		field.UUID("connector_id", uuid.UUID{}).
 			Comment("连接器ID"),
 		field.UUID("user_id", uuid.UUID{}).
@@ -47,15 +49,15 @@ func (Session) Fields() []ent.Field {
 		field.Float("charged_energy").
 			Default(0).
 			Comment("充电电量(kWh)"),
-		field.Float("cost").
+		field.Int64("cost").
 			Default(0).
-			Comment("电费"),
-		field.Float("service_fee").
+			Comment("电费(分)"),
+		field.Int64("service_fee").
 			Default(0).
-			Comment("服务费"),
-		field.Float("total_amount").
+			Comment("服务费(分)"),
+		field.Int64("total_amount").
 			Default(0).
-			Comment("总金额"),
+			Comment("总金额(分)"),
 		field.Enum("status").
 			Values("pending", "charging", "completed", "cancelled", "expired").
 			Default("pending").
@@ -100,6 +102,7 @@ func (Session) Edges() []ent.Edge {
 func (Session) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("tenant_id"),
+		index.Fields("station_id"),
 		index.Fields("connector_id"),
 		index.Fields("status"),
 		index.Fields("user_id"),

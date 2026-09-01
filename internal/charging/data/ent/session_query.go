@@ -299,12 +299,12 @@ func (_q *SessionQuery) WithConnector(opts ...func(*ConnectorQuery)) *SessionQue
 // Example:
 //
 //	var v []struct {
-//		StationID uuid.UUID `json:"station_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Session.Query().
-//		GroupBy(session.FieldStationID).
+//		GroupBy(session.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *SessionQuery) GroupBy(field string, fields ...string) *SessionGroupBy {
@@ -322,11 +322,11 @@ func (_q *SessionQuery) GroupBy(field string, fields ...string) *SessionGroupBy 
 // Example:
 //
 //	var v []struct {
-//		StationID uuid.UUID `json:"station_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.Session.Query().
-//		Select(session.FieldStationID).
+//		Select(session.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *SessionQuery) Select(fields ...string) *SessionSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

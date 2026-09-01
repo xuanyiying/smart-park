@@ -16,11 +16,14 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID
-	OpenID    string
-	Nickname  string
-	Avatar    string
-	Phone     string
+	ID       uuid.UUID
+	OpenID   string
+	Nickname string
+	Avatar   string
+	Phone    string
+	// TenantID scopes the user to a tenant; it is embedded in the issued JWT so that
+	// downstream services can enforce data isolation from an authenticated claim.
+	TenantID  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -80,7 +83,9 @@ func (uc *UserUseCase) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Log
 		}
 	}
 
-	token, err := uc.jwtManager.GenerateToken(user.ID.String(), user.OpenID)
+	// TenantID is embedded in the signed token so that downstream services derive tenant
+	// scope from an authenticated claim instead of trusting a client-supplied header.
+	token, err := uc.jwtManager.GenerateToken(user.ID.String(), user.OpenID, user.TenantID)
 	if err != nil {
 		return nil, err
 	}
@@ -193,8 +198,8 @@ func (uc *UserUseCase) ListParkingRecords(ctx context.Context, userID string, pa
 	// 4. 转换为 user service 的响应格式
 	var records []*v1.ParkingRecordInfo
 	for _, r := range vehicleData.Records {
-		// 计算金额（这里简化处理，实际应该从订单获取）
-		var amount float64
+		// 计算金额（这里简化处理，实际应该从订单获取），单位分
+		var amount int64
 		if r.ExitStatus == "paid" {
 			amount = 0 // 已支付，显示0或实际金额
 		}
@@ -246,8 +251,8 @@ func (uc *UserUseCase) GetParkingRecord(ctx context.Context, userID, recordID st
 		return nil, fmt.Errorf("record not found or access denied")
 	}
 
-	// 计算金额（这里简化处理，实际应该从订单获取）
-	var amount float64
+	// 计算金额（这里简化处理，实际应该从订单获取），单位分
+	var amount int64
 	if record.ExitStatus == "paid" {
 		amount = 0 // 已支付，显示0或实际金额
 	}
@@ -289,7 +294,7 @@ func (uc *UserUseCase) ScanPay(ctx context.Context, userID string, req *v1.ScanP
 		return nil, fmt.Errorf("record not found or access denied")
 	}
 
-	payData, err := uc.paymentClient.CreatePayment(ctx, req.RecordId, 0, req.PayMethod, req.OpenId)
+	payData, err := uc.paymentClient.CreatePayment(ctx, req.RecordId, int64(0), req.PayMethod, req.OpenId)
 	if err != nil {
 		return nil, err
 	}
@@ -376,8 +381,9 @@ func (uc *UserUseCase) PurchaseMonthlyCard(ctx context.Context, userID string, r
 		return nil, fmt.Errorf("plate number not bound to user")
 	}
 
-	monthlyPrice := 300.0
-	amount := monthlyPrice * float64(req.Months)
+	// 月卡 300 元/月，统一以分（cents）为单位传递。
+	monthlyPrice := int64(30000)
+	amount := monthlyPrice * int64(req.Months)
 
 	payData, err := uc.paymentClient.CreateMonthlyCardPayment(ctx, req.PlateNumber, req.Months, amount, req.PayMethod, req.OpenId)
 	if err != nil {

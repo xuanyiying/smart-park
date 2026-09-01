@@ -14,6 +14,8 @@ const (
 	Label = "vehicle"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldPlateNumber holds the string denoting the plate_number field in the database.
 	FieldPlateNumber = "plate_number"
 	// FieldVehicleType holds the string denoting the vehicle_type field in the database.
@@ -35,6 +37,7 @@ const (
 // Columns holds all SQL columns for vehicle fields.
 var Columns = []string{
 	FieldID,
+	FieldTenantID,
 	FieldPlateNumber,
 	FieldVehicleType,
 	FieldOwnerName,
@@ -79,6 +82,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByPlateNumber orders the results by the plate_number field.

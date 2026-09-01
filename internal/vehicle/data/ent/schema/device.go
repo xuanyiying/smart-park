@@ -84,10 +84,6 @@ func (Device) Fields() []ent.Field {
 		field.Int("offline_count").
 			Default(0).
 			Comment("离线次数"),
-		field.String("firmware_version").
-			MaxLen(32).
-			Optional().
-			Comment("设备固件版本"),
 		field.String("hardware_version").
 			MaxLen(32).
 			Optional().
@@ -118,14 +114,6 @@ func (Device) Fields() []ent.Field {
 			MaxLen(256).
 			Optional().
 			Comment("设备位置"),
-		field.String("manufacturer").
-			MaxLen(128).
-			Optional().
-			Comment("设备厂商"),
-		field.String("model").
-			MaxLen(128).
-			Optional().
-			Comment("设备型号"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

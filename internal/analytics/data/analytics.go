@@ -54,7 +54,7 @@ func (r *analyticsRepo) GetLotStats(ctx context.Context, lotID uuid.UUID, startD
 		}
 	}
 
-	var totalRevenue float64
+	var totalRevenue int64
 	orders, _ := r.data.db.Order.Query().
 		Where(
 			order.StatusEQ(order.StatusPaid),
@@ -107,7 +107,7 @@ func (r *analyticsRepo) GetRevenueData(ctx context.Context, lotID uuid.UUID, per
 		startOfDay := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 		endOfDay := startOfDay.Add(24 * time.Hour)
 
-		var dailyRevenue float64
+		var dailyRevenue int64
 		var vehicleCount int
 
 		orders, err := r.data.db.Order.Query().

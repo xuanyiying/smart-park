@@ -22,6 +22,12 @@ type SessionCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *SessionCreate) SetTenantID(v uuid.UUID) *SessionCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetStationID sets the "station_id" field.
 func (_c *SessionCreate) SetStationID(v uuid.UUID) *SessionCreate {
 	_c.mutation.SetStationID(v)
@@ -117,13 +123,13 @@ func (_c *SessionCreate) SetNillableChargedEnergy(v *float64) *SessionCreate {
 }
 
 // SetCost sets the "cost" field.
-func (_c *SessionCreate) SetCost(v float64) *SessionCreate {
+func (_c *SessionCreate) SetCost(v int64) *SessionCreate {
 	_c.mutation.SetCost(v)
 	return _c
 }
 
 // SetNillableCost sets the "cost" field if the given value is not nil.
-func (_c *SessionCreate) SetNillableCost(v *float64) *SessionCreate {
+func (_c *SessionCreate) SetNillableCost(v *int64) *SessionCreate {
 	if v != nil {
 		_c.SetCost(*v)
 	}
@@ -131,13 +137,13 @@ func (_c *SessionCreate) SetNillableCost(v *float64) *SessionCreate {
 }
 
 // SetServiceFee sets the "service_fee" field.
-func (_c *SessionCreate) SetServiceFee(v float64) *SessionCreate {
+func (_c *SessionCreate) SetServiceFee(v int64) *SessionCreate {
 	_c.mutation.SetServiceFee(v)
 	return _c
 }
 
 // SetNillableServiceFee sets the "service_fee" field if the given value is not nil.
-func (_c *SessionCreate) SetNillableServiceFee(v *float64) *SessionCreate {
+func (_c *SessionCreate) SetNillableServiceFee(v *int64) *SessionCreate {
 	if v != nil {
 		_c.SetServiceFee(*v)
 	}
@@ -145,13 +151,13 @@ func (_c *SessionCreate) SetNillableServiceFee(v *float64) *SessionCreate {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_c *SessionCreate) SetTotalAmount(v float64) *SessionCreate {
+func (_c *SessionCreate) SetTotalAmount(v int64) *SessionCreate {
 	_c.mutation.SetTotalAmount(v)
 	return _c
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_c *SessionCreate) SetNillableTotalAmount(v *float64) *SessionCreate {
+func (_c *SessionCreate) SetNillableTotalAmount(v *int64) *SessionCreate {
 	if v != nil {
 		_c.SetTotalAmount(*v)
 	}
@@ -362,6 +368,9 @@ func (_c *SessionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *SessionCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Session.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.StationID(); !ok {
 		return &ValidationError{Name: "station_id", err: errors.New(`ent: missing required field "Session.station_id"`)}
 	}
@@ -470,6 +479,10 @@ func (_c *SessionCreate) createSpec() (*Session, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(session.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
+	}
 	if value, ok := _c.mutation.StationID(); ok {
 		_spec.SetField(session.FieldStationID, field.TypeUUID, value)
 		_node.StationID = value
@@ -503,15 +516,15 @@ func (_c *SessionCreate) createSpec() (*Session, *sqlgraph.CreateSpec) {
 		_node.ChargedEnergy = value
 	}
 	if value, ok := _c.mutation.Cost(); ok {
-		_spec.SetField(session.FieldCost, field.TypeFloat64, value)
+		_spec.SetField(session.FieldCost, field.TypeInt64, value)
 		_node.Cost = value
 	}
 	if value, ok := _c.mutation.ServiceFee(); ok {
-		_spec.SetField(session.FieldServiceFee, field.TypeFloat64, value)
+		_spec.SetField(session.FieldServiceFee, field.TypeInt64, value)
 		_node.ServiceFee = value
 	}
 	if value, ok := _c.mutation.TotalAmount(); ok {
-		_spec.SetField(session.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(session.FieldTotalAmount, field.TypeInt64, value)
 		_node.TotalAmount = value
 	}
 	if value, ok := _c.mutation.Status(); ok {

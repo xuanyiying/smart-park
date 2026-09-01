@@ -21,6 +21,12 @@ type UserVehicleCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *UserVehicleCreate) SetTenantID(v uuid.UUID) *UserVehicleCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetUserID sets the "user_id" field.
 func (_c *UserVehicleCreate) SetUserID(v uuid.UUID) *UserVehicleCreate {
 	_c.mutation.SetUserID(v)
@@ -154,6 +160,9 @@ func (_c *UserVehicleCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *UserVehicleCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "UserVehicle.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserVehicle.user_id"`)}
 	}
@@ -215,6 +224,10 @@ func (_c *UserVehicleCreate) createSpec() (*UserVehicle, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(uservehicle.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.UserID(); ok {
 		_spec.SetField(uservehicle.FieldUserID, field.TypeUUID, value)

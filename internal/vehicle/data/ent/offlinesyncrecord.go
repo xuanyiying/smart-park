@@ -32,8 +32,8 @@ type OfflineSyncRecord struct {
 	GateID string `json:"gate_id,omitempty"`
 	// 开闸时间
 	OpenTime time.Time `json:"open_time,omitempty"`
-	// 同步金额
-	SyncAmount float64 `json:"sync_amount,omitempty"`
+	// 同步金额(分)
+	SyncAmount int64 `json:"sync_amount,omitempty"`
 	// 同步状态
 	SyncStatus offlinesyncrecord.SyncStatus `json:"sync_status,omitempty"`
 	// 同步错误信息
@@ -54,9 +54,7 @@ func (*OfflineSyncRecord) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case offlinesyncrecord.FieldRecordID, offlinesyncrecord.FieldLotID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case offlinesyncrecord.FieldSyncAmount:
-			values[i] = new(sql.NullFloat64)
-		case offlinesyncrecord.FieldRetryCount:
+		case offlinesyncrecord.FieldSyncAmount, offlinesyncrecord.FieldRetryCount:
 			values[i] = new(sql.NullInt64)
 		case offlinesyncrecord.FieldOfflineID, offlinesyncrecord.FieldDeviceID, offlinesyncrecord.FieldGateID, offlinesyncrecord.FieldSyncStatus, offlinesyncrecord.FieldSyncError:
 			values[i] = new(sql.NullString)
@@ -130,10 +128,10 @@ func (_m *OfflineSyncRecord) assignValues(columns []string, values []any) error 
 				_m.OpenTime = value.Time
 			}
 		case offlinesyncrecord.FieldSyncAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sync_amount", values[i])
 			} else if value.Valid {
-				_m.SyncAmount = value.Float64
+				_m.SyncAmount = value.Int64
 			}
 		case offlinesyncrecord.FieldSyncStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {

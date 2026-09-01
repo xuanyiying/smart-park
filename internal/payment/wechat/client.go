@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -21,6 +22,18 @@ type Client struct {
 	client     *core.Client
 	config     *Config
 	privateKey *rsa.PrivateKey
+	// platformCert is the WeChat Pay platform certificate used to verify APIv3 callbacks.
+	platformCert *x509.Certificate
+}
+
+// APIv3Key returns the configured APIv3 secret used for callback decryption.
+func (c *Client) APIv3Key() string {
+	return c.config.APIv3Key
+}
+
+// PlatformCertificate returns the platform certificate used for callback verification.
+func (c *Client) PlatformCertificate() *x509.Certificate {
+	return c.platformCert
 }
 
 func (c *Client) CreateNativePay(ctx context.Context, orderID string, amount int64, description string) (string, error) {
@@ -96,10 +109,21 @@ func (c *Client) QueryOrder(ctx context.Context, orderID string) (map[string]int
 		return nil, fmt.Errorf("failed to query order: %w", err)
 	}
 
-	return map[string]interface{}{
+	result := map[string]interface{}{
 		"out_trade_no": *order.OutTradeNo,
 		"trade_state":  *order.TradeState,
-	}, nil
+	}
+	// The channel's transaction id is what reconciliation and settlement records need;
+	// without it a swept order could only be settled with an empty reference.
+	if order.TransactionId != nil {
+		result["transaction_id"] = *order.TransactionId
+	}
+	// The actual amount the channel collected (in cents) lets reconciliation verify that
+	// the collected money matches the order, instead of only comparing local fields.
+	if order.Amount != nil && order.Amount.Total != nil {
+		result["total_fee"] = *order.Amount.Total
+	}
+	return result, nil
 }
 
 func (c *Client) CloseOrder(ctx context.Context, orderID string) error {

@@ -97,6 +97,11 @@ func main() {
 	}
 	defer dbClient.Close()
 
+	// Scope every query and mutation to the tenant carried by the request
+	// context, so an operator only ever sees their own estate. The multitenancy
+	// client below is intentionally left unscoped: it manages tenants themselves.
+	tenantpkg.ApplyTenantScoping(dbClient, data.TenantScopes(), data.TenantTypes())
+
 	// Run migrations
 	if err := dbClient.Schema.Create(context.Background()); err != nil {
 		logHelper.Errorf("failed to migrate database: %v", err)

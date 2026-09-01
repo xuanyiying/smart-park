@@ -81,17 +81,17 @@ func TotalVehicles(v int) predicate.DailyStats {
 }
 
 // TotalAmount applies equality check predicate on the "total_amount" field. It's identical to TotalAmountEQ.
-func TotalAmount(v float64) predicate.DailyStats {
+func TotalAmount(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldEQ(FieldTotalAmount, v))
 }
 
 // TotalDiscount applies equality check predicate on the "total_discount" field. It's identical to TotalDiscountEQ.
-func TotalDiscount(v float64) predicate.DailyStats {
+func TotalDiscount(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldEQ(FieldTotalDiscount, v))
 }
 
 // NetAmount applies equality check predicate on the "net_amount" field. It's identical to NetAmountEQ.
-func NetAmount(v float64) predicate.DailyStats {
+func NetAmount(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldEQ(FieldNetAmount, v))
 }
 
@@ -321,122 +321,122 @@ func TotalVehiclesLTE(v int) predicate.DailyStats {
 }
 
 // TotalAmountEQ applies the EQ predicate on the "total_amount" field.
-func TotalAmountEQ(v float64) predicate.DailyStats {
+func TotalAmountEQ(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldEQ(FieldTotalAmount, v))
 }
 
 // TotalAmountNEQ applies the NEQ predicate on the "total_amount" field.
-func TotalAmountNEQ(v float64) predicate.DailyStats {
+func TotalAmountNEQ(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldNEQ(FieldTotalAmount, v))
 }
 
 // TotalAmountIn applies the In predicate on the "total_amount" field.
-func TotalAmountIn(vs ...float64) predicate.DailyStats {
+func TotalAmountIn(vs ...int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldIn(FieldTotalAmount, vs...))
 }
 
 // TotalAmountNotIn applies the NotIn predicate on the "total_amount" field.
-func TotalAmountNotIn(vs ...float64) predicate.DailyStats {
+func TotalAmountNotIn(vs ...int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldNotIn(FieldTotalAmount, vs...))
 }
 
 // TotalAmountGT applies the GT predicate on the "total_amount" field.
-func TotalAmountGT(v float64) predicate.DailyStats {
+func TotalAmountGT(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldGT(FieldTotalAmount, v))
 }
 
 // TotalAmountGTE applies the GTE predicate on the "total_amount" field.
-func TotalAmountGTE(v float64) predicate.DailyStats {
+func TotalAmountGTE(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldGTE(FieldTotalAmount, v))
 }
 
 // TotalAmountLT applies the LT predicate on the "total_amount" field.
-func TotalAmountLT(v float64) predicate.DailyStats {
+func TotalAmountLT(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldLT(FieldTotalAmount, v))
 }
 
 // TotalAmountLTE applies the LTE predicate on the "total_amount" field.
-func TotalAmountLTE(v float64) predicate.DailyStats {
+func TotalAmountLTE(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldLTE(FieldTotalAmount, v))
 }
 
 // TotalDiscountEQ applies the EQ predicate on the "total_discount" field.
-func TotalDiscountEQ(v float64) predicate.DailyStats {
+func TotalDiscountEQ(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldEQ(FieldTotalDiscount, v))
 }
 
 // TotalDiscountNEQ applies the NEQ predicate on the "total_discount" field.
-func TotalDiscountNEQ(v float64) predicate.DailyStats {
+func TotalDiscountNEQ(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldNEQ(FieldTotalDiscount, v))
 }
 
 // TotalDiscountIn applies the In predicate on the "total_discount" field.
-func TotalDiscountIn(vs ...float64) predicate.DailyStats {
+func TotalDiscountIn(vs ...int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldIn(FieldTotalDiscount, vs...))
 }
 
 // TotalDiscountNotIn applies the NotIn predicate on the "total_discount" field.
-func TotalDiscountNotIn(vs ...float64) predicate.DailyStats {
+func TotalDiscountNotIn(vs ...int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldNotIn(FieldTotalDiscount, vs...))
 }
 
 // TotalDiscountGT applies the GT predicate on the "total_discount" field.
-func TotalDiscountGT(v float64) predicate.DailyStats {
+func TotalDiscountGT(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldGT(FieldTotalDiscount, v))
 }
 
 // TotalDiscountGTE applies the GTE predicate on the "total_discount" field.
-func TotalDiscountGTE(v float64) predicate.DailyStats {
+func TotalDiscountGTE(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldGTE(FieldTotalDiscount, v))
 }
 
 // TotalDiscountLT applies the LT predicate on the "total_discount" field.
-func TotalDiscountLT(v float64) predicate.DailyStats {
+func TotalDiscountLT(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldLT(FieldTotalDiscount, v))
 }
 
 // TotalDiscountLTE applies the LTE predicate on the "total_discount" field.
-func TotalDiscountLTE(v float64) predicate.DailyStats {
+func TotalDiscountLTE(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldLTE(FieldTotalDiscount, v))
 }
 
 // NetAmountEQ applies the EQ predicate on the "net_amount" field.
-func NetAmountEQ(v float64) predicate.DailyStats {
+func NetAmountEQ(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldEQ(FieldNetAmount, v))
 }
 
 // NetAmountNEQ applies the NEQ predicate on the "net_amount" field.
-func NetAmountNEQ(v float64) predicate.DailyStats {
+func NetAmountNEQ(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldNEQ(FieldNetAmount, v))
 }
 
 // NetAmountIn applies the In predicate on the "net_amount" field.
-func NetAmountIn(vs ...float64) predicate.DailyStats {
+func NetAmountIn(vs ...int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldIn(FieldNetAmount, vs...))
 }
 
 // NetAmountNotIn applies the NotIn predicate on the "net_amount" field.
-func NetAmountNotIn(vs ...float64) predicate.DailyStats {
+func NetAmountNotIn(vs ...int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldNotIn(FieldNetAmount, vs...))
 }
 
 // NetAmountGT applies the GT predicate on the "net_amount" field.
-func NetAmountGT(v float64) predicate.DailyStats {
+func NetAmountGT(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldGT(FieldNetAmount, v))
 }
 
 // NetAmountGTE applies the GTE predicate on the "net_amount" field.
-func NetAmountGTE(v float64) predicate.DailyStats {
+func NetAmountGTE(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldGTE(FieldNetAmount, v))
 }
 
 // NetAmountLT applies the LT predicate on the "net_amount" field.
-func NetAmountLT(v float64) predicate.DailyStats {
+func NetAmountLT(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldLT(FieldNetAmount, v))
 }
 
 // NetAmountLTE applies the LTE predicate on the "net_amount" field.
-func NetAmountLTE(v float64) predicate.DailyStats {
+func NetAmountLTE(v int64) predicate.DailyStats {
 	return predicate.DailyStats(sql.FieldLTE(FieldNetAmount, v))
 }
 

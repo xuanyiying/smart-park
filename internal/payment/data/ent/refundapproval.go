@@ -24,8 +24,8 @@ type RefundApproval struct {
 	Applicant string `json:"applicant,omitempty"`
 	// 审批人
 	Approver string `json:"approver,omitempty"`
-	// 退款金额
-	Amount float64 `json:"amount,omitempty"`
+	// 退款金额(分)
+	Amount int64 `json:"amount,omitempty"`
 	// 退款原因
 	Reason string `json:"reason,omitempty"`
 	// 退款方式: 原路返回/人工
@@ -47,7 +47,7 @@ func (*RefundApproval) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case refundapproval.FieldAmount:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.NullInt64)
 		case refundapproval.FieldApplicant, refundapproval.FieldApprover, refundapproval.FieldReason, refundapproval.FieldRefundMethod, refundapproval.FieldStatus, refundapproval.FieldRejectReason:
 			values[i] = new(sql.NullString)
 		case refundapproval.FieldApprovedAt, refundapproval.FieldCreatedAt:
@@ -94,10 +94,10 @@ func (_m *RefundApproval) assignValues(columns []string, values []any) error {
 				_m.Approver = value.String
 			}
 		case refundapproval.FieldAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				_m.Amount = value.Float64
+				_m.Amount = value.Int64
 			}
 		case refundapproval.FieldReason:
 			if value, ok := values[i].(*sql.NullString); !ok {

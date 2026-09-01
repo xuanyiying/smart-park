@@ -2,8 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
+	"fmt"
 	"os"
+	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
@@ -44,6 +49,24 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 		kratos.Logger(logger),
 		kratos.Server(gs, hs),
 	)
+}
+
+// vehicleRepoStateReader adapts the vehicle repository to the contract the device package
+// needs, so adapters can resolve heartbeat-derived device status without depending on the
+// business layer (which would create an import cycle).
+type vehicleRepoStateReader struct {
+	repo biz.VehicleRepo
+}
+
+func (r vehicleRepoStateReader) DeviceState(ctx context.Context, deviceID string) (string, *time.Time, error) {
+	device, err := r.repo.GetDeviceByCode(ctx, deviceID)
+	if err != nil {
+		return "", nil, err
+	}
+	if device == nil {
+		return "", nil, fmt.Errorf("device not found: %s", deviceID)
+	}
+	return device.Status, device.LastHeartbeat, nil
 }
 
 func main() {
@@ -103,6 +126,11 @@ func main() {
 	}
 	defer dbClient.Close()
 
+	// Scope every query and mutation to the tenant carried by the request
+	// context. Device faults, firmware and manufacturers stay global by design;
+	// everything describing a tenant's own estate is filtered automatically.
+	tenantpkg.ApplyTenantScoping(dbClient, data.TenantScopes(), data.TenantTypes())
+
 	// Run migrations
 	if err := dbClient.Schema.Create(context.Background()); err != nil {
 		logHelper.Errorf("failed to migrate database: %v", err)
@@ -120,36 +148,55 @@ func main() {
 	// Initialize repositories
 	vehicleRepo := data.NewVehicleRepo(dataLayer)
 
-	// Seed device data
-	if err := vehicleRepo.SeedData(context.Background()); err != nil {
-		logHelper.Errorf("failed to seed device data: %v", err)
-		// Don't exit, just log the error
+	// Seed device data for the configured parking lot, if any.
+	//
+	// Seeding used to attach demo devices to a hard-coded lot id on every boot. Now an
+	// operator opts in by setting entry_exit.seed_lot_id to the target lot; production
+	// deployments register devices through the device management API instead.
+	seedLotID := uuid.Nil
+	if cfg.EntryExit.SeedLotID != "" {
+		parsed, err := uuid.Parse(cfg.EntryExit.SeedLotID)
+		if err != nil {
+			logHelper.Errorf("invalid entry_exit.seed_lot_id %q: %v", cfg.EntryExit.SeedLotID, err)
+			os.Exit(1)
+		}
+		seedLotID = parsed
+	}
+	if err := vehicleRepo.SeedData(context.Background(), seedLotID); err != nil {
+		if errors.Is(err, data.ErrSeedLotNotConfigured) {
+			logHelper.Info("device seeding skipped: no entry_exit.seed_lot_id configured")
+		} else {
+			logHelper.Errorf("failed to seed device data: %v", err)
+			// Don't exit, just log the error
+		}
 	}
 
-	// Initialize MQTT client
-	var mqttClient mqtt.Client
-	if cfg.MQTT.Broker != "" {
-		mqttCfg := &mqtt.Config{
-			Broker:   cfg.MQTT.Broker,
-			Port:     cfg.MQTT.Port,
-			ClientID: cfg.MQTT.ClientID,
-			Username: cfg.MQTT.Username,
-			Password: cfg.MQTT.Password,
-		}
-		mqttClient = mqtt.NewMQTTClient(mqttCfg)
-		if err := mqttClient.Connect(); err != nil {
-			logHelper.Errorf("failed to connect MQTT client: %v", err)
-			os.Exit(1)
-		}
-		logHelper.Info("mqtt client connected successfully")
-	} else {
-		logHelper.Warn("mqtt config not provided, using mock client")
-		mqttClient = mqtt.NewMockMQTTClient()
-		if err := mqttClient.Connect(); err != nil {
-			logHelper.Errorf("failed to connect mock MQTT client: %v", err)
-			os.Exit(1)
-		}
+	// Initialize MQTT client.
+	//
+	// Gate commands are delivered over MQTT, so an unconfigured broker used to silently
+	// install a mock client that reported every command as "delivered" without sending
+	// anything. The vehicle service is the component that physically opens barriers; if it
+	// cannot talk to devices it must not start, rather than pretending to operate a car
+	// park that nobody can enter or leave.
+	if cfg.MQTT.Broker == "" {
+		logHelper.Error("mqtt broker is not configured: gate commands would never reach devices")
+		os.Exit(1)
 	}
+
+	mqttCfg := &mqtt.Config{
+		Broker:   cfg.MQTT.Broker,
+		Port:     cfg.MQTT.Port,
+		ClientID: cfg.MQTT.ClientID,
+		Username: cfg.MQTT.Username,
+		Password: cfg.MQTT.Password,
+	}
+
+	var mqttClient mqtt.Client = mqtt.NewMQTTClient(mqttCfg)
+	if err := mqttClient.Connect(); err != nil {
+		logHelper.Errorf("failed to connect MQTT broker at %s: %v", cfg.MQTT.Broker, err)
+		os.Exit(1)
+	}
+	logHelper.Info("mqtt client connected successfully")
 	defer mqttClient.Disconnect()
 
 	// Initialize Redis client for distributed lock
@@ -170,8 +217,28 @@ func main() {
 	// Initialize distributed lock repository
 	lockRepo := lock.NewRedisLockRepo(redisClient, logger, "smart-park:vehicle")
 
-	// Initialize device adapter factory
-	adapterFactory := device.NewAdapterFactory()
+	// Entry/exit tunables (lock TTL, plate confidence threshold, device online
+	// threshold) come from configuration so operations can adjust them without a rebuild.
+	entryExitConfig := biz.DefaultConfig()
+	if d, err := time.ParseDuration(cfg.EntryExit.LockTTL); err == nil && d > 0 {
+		entryExitConfig.LockTTL = d
+	}
+	if d, err := time.ParseDuration(cfg.EntryExit.DeviceOnlineThreshold); err == nil && d > 0 {
+		entryExitConfig.DeviceOnlineThreshold = d
+	}
+	if cfg.EntryExit.MinConfidence > 0 {
+		entryExitConfig.MinConfidence = cfg.EntryExit.MinConfidence
+	}
+
+	// Initialize device adapter factory.
+	//
+	// Adapters publish real commands over MQTT and derive device state from heartbeats,
+	// so both dependencies are injected here. Without a transport the adapters refuse to
+	// act instead of reporting success for commands that were never sent.
+	adapterFactory := device.NewAdapterFactory(
+		device.NewMQTTCommandTransport(mqttClient),
+		device.NewRegistryStatusProvider(vehicleRepoStateReader{repo: vehicleRepo}, entryExitConfig.DeviceOnlineThreshold, time.Now),
+	)
 
 	// Initialize billing service client
 	var billingClient billing.Client
@@ -192,7 +259,7 @@ func main() {
 	logHelper.Infof("billing service client connected to %s", cfg.Billing.Endpoint)
 
 	// Initialize business logic layer
-	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, adapterFactory, logger)
+	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, adapterFactory, entryExitConfig, logger)
 	deviceUseCase := biz.NewDeviceUseCase(vehicleRepo, adapterFactory, mqttClient, logger)
 	manufacturerUseCase := biz.NewManufacturerUseCase(vehicleRepo, logger)
 	firmwareUseCase := biz.NewFirmwareUseCase(vehicleRepo, logger)

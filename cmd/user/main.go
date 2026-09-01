@@ -22,6 +22,7 @@ import (
 	userwechat "github.com/xuanyiying/smart-park/internal/user/wechat"
 	"github.com/xuanyiying/smart-park/pkg/auth"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/tenant"
 )
 
 var (
@@ -58,6 +59,10 @@ func main() {
 		os.Exit(1)
 	}
 	defer dbClient.Close()
+
+	// Scope every query and mutation to the tenant carried by the request
+	// context, so one tenant's accounts and plates stay invisible to another.
+	tenant.ApplyTenantScoping(dbClient, data.TenantScopes(), data.TenantTypes())
 
 	if err := dbClient.Schema.Create(context.Background()); err != nil {
 		logHelper.Errorf("failed to migrate database: %v", err)

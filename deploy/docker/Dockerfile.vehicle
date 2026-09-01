@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build vehicle service
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/vehicle-svc ./cmd/vehicle-svc
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/vehicle-svc ./cmd/vehicle
 
 # Final stage
 FROM alpine:latest
@@ -34,4 +34,4 @@ COPY configs/vehicle.yaml /app/configs/vehicle.yaml
 EXPOSE 8001
 
 # Run the binary
-CMD ["./vehicle-svc"]
+CMD ["./vehicle-svc", "-conf", "/app/configs/vehicle.yaml"]

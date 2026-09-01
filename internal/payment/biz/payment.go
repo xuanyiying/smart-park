@@ -12,6 +12,7 @@ import (
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 	"github.com/xuanyiying/smart-park/internal/payment/alipay"
 	"github.com/xuanyiying/smart-park/internal/payment/wechat"
+	"github.com/xuanyiying/smart-park/pkg/outbox"
 )
 
 // PaymentUseCase implements payment business logic.
@@ -24,6 +25,15 @@ type PaymentUseCase struct {
 	bizConfig    *Config
 	wechatClient *wechat.Client
 	alipayClient *alipay.Client
+	// outbox, when attached, receives an order.settled event inside the
+	// settlement transaction; a dispatcher then applies the side effects
+	// (gate opening) with retries. Nil keeps the legacy inline behaviour.
+	outbox outbox.Store
+
+	// queryGateway asks the channel whether an order was paid. Nil means the default
+	// implementation is used; tests replace it with a stub so sweep behaviour can be
+	// scripted without real merchant credentials.
+	queryGateway func(ctx context.Context, order *Order) (paid bool, transactionID string, err error)
 }
 
 // NewPaymentUseCase creates a new PaymentUseCase.
@@ -69,6 +79,8 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 	}
 
 	order, err := uc.createOrder(ctx, recordID, req.Amount)
+	// req.Amount is already in cents (分) from the API boundary; the SDKs below
+	// accept cents directly, so no 元→分 conversion can introduce rounding.
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +121,8 @@ func (uc *PaymentUseCase) buildExistingPaymentResponse(order *Order) *v1.Payment
 	}
 }
 
-// createOrder creates a new order in the repository.
-func (uc *PaymentUseCase) createOrder(ctx context.Context, recordID uuid.UUID, amount float64) (*Order, error) {
+// createOrder creates a new order in the repository. amount is in cents (分).
+func (uc *PaymentUseCase) createOrder(ctx context.Context, recordID uuid.UUID, amount int64) (*Order, error) {
 	order := &Order{
 		ID:             uuid.New(),
 		RecordID:       recordID,
@@ -142,7 +154,9 @@ func (uc *PaymentUseCase) generatePaymentURL(ctx context.Context, order *Order, 
 
 // generateWechatPayment generates WeChat payment URL.
 func (uc *PaymentUseCase) generateWechatPayment(ctx context.Context, order *Order, req *v1.CreatePaymentRequest) (string, string, error) {
-	amountInCents := int64(order.FinalAmount * 100)
+	// order.FinalAmount is already in cents (分); previously it was 元 and the
+	// *100 conversion here was the silent rounding point of the money path.
+	amountInCents := order.FinalAmount
 
 	if uc.wechatClient == nil {
 		uc.log.WithContext(ctx).Error("wechat client not configured, cannot generate payment")
@@ -188,6 +202,8 @@ func (uc *PaymentUseCase) generateAlipayPayment(ctx context.Context, order *Orde
 	}
 
 	qrCode, err := uc.alipayClient.CreateTradePreCreate(ctx, order.ID.String(), order.FinalAmount, uc.bizConfig.DefaultDescription)
+	// order.FinalAmount is cents (分); the alipay client converts to the yuan
+	// string the gateway expects.
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to create alipay precreate: %v", err)
 		return "", "", fmt.Errorf("failed to create alipay precreate: %w", err)
@@ -226,7 +242,7 @@ func formatTime(t *time.Time) string {
 	return t.Format(time.RFC3339)
 }
 
-// Refund handles refund request.
+// Refund handles a full refund request.
 func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*v1.RefundData, error) {
 	id, err := uuid.Parse(orderID)
 	if err != nil {
@@ -246,8 +262,11 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 	}
 
 	refundID := uuid.New().String()
+	// order.FinalAmount is already cents (分).
+	totalCents := order.FinalAmount
 
-	if err := uc.processRefund(ctx, order, refundID); err != nil {
+	transactionID, err := uc.RefundOrder(ctx, order, refundID, totalCents)
+	if err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to process refund: %v", err)
 		return &v1.RefundData{
 			RefundId: "",
@@ -255,50 +274,65 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 		}, nil
 	}
 
+	// Persist the terminal state only after the gateway confirmed the refund.
+	now := time.Now()
+	order.Status = string(StatusRefunded)
+	order.RefundedAt = &now
+	order.RefundTransactionID = refundID
+
 	if err := uc.orderRepo.UpdateOrder(ctx, order); err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to update order for refund: %v", err)
 		return nil, fmt.Errorf("failed to update order: %w", err)
 	}
 
 	return &v1.RefundData{
-		RefundId: refundID,
+		RefundId: transactionID,
 		Status:   "success",
 	}, nil
 }
 
-// processRefund processes the refund for the order.
-func (uc *PaymentUseCase) processRefund(ctx context.Context, order *Order, refundID string) error {
-	refundAmount := order.FinalAmount
+// RefundOrder charges the gateway back by amountCents and returns the gateway transaction
+// identifier. It performs a real API call and only reports success when the gateway
+// confirmed; callers are responsible for persisting the resulting order state.
+//
+// Fabricating a transaction identifier here would make the ledger claim a refund that
+// never happened, which is why this method has no "simulated" path.
+func (uc *PaymentUseCase) RefundOrder(ctx context.Context, order *Order, refundID string, amountCents int64) (string, error) {
+	if order == nil {
+		return "", fmt.Errorf("order is nil")
+	}
+	if amountCents <= 0 {
+		return "", fmt.Errorf("refund amount must be positive, got %d cents", amountCents)
+	}
+
+	totalCents := order.FinalAmount
+	if amountCents > totalCents {
+		return "", fmt.Errorf("refund amount %d cents exceeds order amount %d cents", amountCents, totalCents)
+	}
 
 	switch PayMethod(order.PayMethod) {
 	case MethodWechat:
 		if uc.wechatClient == nil {
-			return fmt.Errorf("wechat client not configured")
+			return "", fmt.Errorf("wechat client not configured")
 		}
-		uc.log.WithContext(ctx).Infof("Processing WeChat refund for order %s, amount: %.2f", order.ID, refundAmount)
-		// Convert to cents
-		totalAmount := int64(order.FinalAmount * 100)
-		refundAmount := int64(refundAmount * 100)
-		if err := uc.wechatClient.Refund(ctx, order.ID.String(), refundID, totalAmount, refundAmount); err != nil {
+		uc.log.WithContext(ctx).Infof("Processing WeChat refund for order %s, amount: %d cents", order.ID, amountCents)
+		if err := uc.wechatClient.Refund(ctx, order.ID.String(), refundID, totalCents, amountCents); err != nil {
 			uc.log.WithContext(ctx).Errorf("WeChat refund failed: %v", err)
-			return fmt.Errorf("wechat refund failed: %w", err)
+			return "", fmt.Errorf("wechat refund failed: %w", err)
 		}
 	case MethodAlipay:
 		if uc.alipayClient == nil {
-			return fmt.Errorf("alipay client not configured")
+			return "", fmt.Errorf("alipay client not configured")
 		}
-		uc.log.WithContext(ctx).Infof("Processing Alipay refund for order %s, amount: %.2f", order.ID, refundAmount)
-		if err := uc.alipayClient.Refund(ctx, order.ID.String(), refundID, refundAmount); err != nil {
+		// The client converts cents to the yuan string Alipay expects.
+		uc.log.WithContext(ctx).Infof("Processing Alipay refund for order %s, amount: %d cents", order.ID, amountCents)
+		if err := uc.alipayClient.Refund(ctx, order.ID.String(), refundID, amountCents); err != nil {
 			uc.log.WithContext(ctx).Errorf("Alipay refund failed: %v", err)
-			return fmt.Errorf("alipay refund failed: %w", err)
+			return "", fmt.Errorf("alipay refund failed: %w", err)
 		}
 	default:
-		return fmt.Errorf("unknown payment method: %s", order.PayMethod)
+		return "", fmt.Errorf("unknown payment method: %s", order.PayMethod)
 	}
 
-	now := time.Now()
-	order.Status = string(StatusRefunded)
-	order.RefundedAt = &now
-	order.RefundTransactionID = refundID
-	return nil
+	return refundID, nil
 }

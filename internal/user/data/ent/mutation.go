@@ -36,6 +36,7 @@ type UserMutation struct {
 	op            Op
 	typ           string
 	id            *uuid.UUID
+	tenant_id     *uuid.UUID
 	open_id       *string
 	nickname      *string
 	avatar        *string
@@ -150,6 +151,42 @@ func (m *UserMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *UserMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *UserMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *UserMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetOpenID sets the "open_id" field.
@@ -441,7 +478,10 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
+	if m.tenant_id != nil {
+		fields = append(fields, user.FieldTenantID)
+	}
 	if m.open_id != nil {
 		fields = append(fields, user.FieldOpenID)
 	}
@@ -468,6 +508,8 @@ func (m *UserMutation) Fields() []string {
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case user.FieldTenantID:
+		return m.TenantID()
 	case user.FieldOpenID:
 		return m.OpenID()
 	case user.FieldNickname:
@@ -489,6 +531,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case user.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case user.FieldOpenID:
 		return m.OldOpenID(ctx)
 	case user.FieldNickname:
@@ -510,6 +554,13 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case user.FieldOpenID:
 		v, ok := value.(string)
 		if !ok {
@@ -622,6 +673,9 @@ func (m *UserMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
 	switch name {
+	case user.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case user.FieldOpenID:
 		m.ResetOpenID()
 		return nil
@@ -698,6 +752,7 @@ type UserVehicleMutation struct {
 	op            Op
 	typ           string
 	id            *uuid.UUID
+	tenant_id     *uuid.UUID
 	user_id       *uuid.UUID
 	plate_number  *string
 	owner_name    *string
@@ -812,6 +867,42 @@ func (m *UserVehicleMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *UserVehicleMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *UserVehicleMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the UserVehicle entity.
+// If the UserVehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserVehicleMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *UserVehicleMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetUserID sets the "user_id" field.
@@ -1090,7 +1181,10 @@ func (m *UserVehicleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserVehicleMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
+	if m.tenant_id != nil {
+		fields = append(fields, uservehicle.FieldTenantID)
+	}
 	if m.user_id != nil {
 		fields = append(fields, uservehicle.FieldUserID)
 	}
@@ -1117,6 +1211,8 @@ func (m *UserVehicleMutation) Fields() []string {
 // schema.
 func (m *UserVehicleMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case uservehicle.FieldTenantID:
+		return m.TenantID()
 	case uservehicle.FieldUserID:
 		return m.UserID()
 	case uservehicle.FieldPlateNumber:
@@ -1138,6 +1234,8 @@ func (m *UserVehicleMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserVehicleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case uservehicle.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case uservehicle.FieldUserID:
 		return m.OldUserID(ctx)
 	case uservehicle.FieldPlateNumber:
@@ -1159,6 +1257,13 @@ func (m *UserVehicleMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *UserVehicleMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case uservehicle.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case uservehicle.FieldUserID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -1265,6 +1370,9 @@ func (m *UserVehicleMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserVehicleMutation) ResetField(name string) error {
 	switch name {
+	case uservehicle.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case uservehicle.FieldUserID:
 		m.ResetUserID()
 		return nil

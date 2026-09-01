@@ -64,7 +64,8 @@ service PaymentService {
 
 message CreatePaymentRequest {
   string recordId  = 1;
-  double amount    = 2;
+  // Amount in cents (分).
+  int64  amount    = 2;
   string payMethod = 3;
   string openId    = 4;
   string notifyUrl = 5;
@@ -80,7 +81,8 @@ message CreatePaymentResponse {
 
 message PaymentData {
   string orderId    = 1;
-  double amount     = 2;
+  // Amount in cents (分).
+  int64  amount     = 2;
   string payUrl     = 3;
   string qrCode     = 4;
   string expireTime = 5;
@@ -163,8 +165,9 @@ message ReconciliationRecord {
   string id                = 1;
   string orderId           = 2;
   string paymentMethod     = 3;
-  double orderAmount       = 4;
-  double paidAmount        = 5;
+  // Amounts in cents (分).
+  int64  orderAmount       = 4;
+  int64  paidAmount        = 5;
   string transactionId     = 6;
   string reconciliationTime = 7;
   string status            = 8;

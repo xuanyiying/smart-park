@@ -203,8 +203,10 @@ docker-compose up -d
 docker-compose ps
 
 # 4. 访问系统
-# 管理后台: http://localhost:3000
-# API 网关: http://localhost:8000
+# API 网关:  http://localhost:8000
+# Grafana 监控: http://localhost:3000 （口令通过 GRAFANA_PASSWORD 注入）
+# 营销官网: site/ 目录（Next.js），注意它是产品介绍页，不是管理后台；
+#           管理后台前端尚未实现，运营操作目前通过 API 完成。
 ```
 
 ### 💻 本地开发

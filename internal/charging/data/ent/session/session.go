@@ -16,6 +16,8 @@ const (
 	Label = "session"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldStationID holds the string denoting the station_id field in the database.
 	FieldStationID = "station_id"
 	// FieldConnectorID holds the string denoting the connector_id field in the database.
@@ -70,6 +72,7 @@ const (
 // Columns holds all SQL columns for session fields.
 var Columns = []string{
 	FieldID,
+	FieldTenantID,
 	FieldStationID,
 	FieldConnectorID,
 	FieldUserID,
@@ -113,11 +116,11 @@ var (
 	// DefaultChargedEnergy holds the default value on creation for the "charged_energy" field.
 	DefaultChargedEnergy float64
 	// DefaultCost holds the default value on creation for the "cost" field.
-	DefaultCost float64
+	DefaultCost int64
 	// DefaultServiceFee holds the default value on creation for the "service_fee" field.
-	DefaultServiceFee float64
+	DefaultServiceFee int64
 	// DefaultTotalAmount holds the default value on creation for the "total_amount" field.
-	DefaultTotalAmount float64
+	DefaultTotalAmount int64
 	// PaymentMethodValidator is a validator for the "payment_method" field. It is called by the builders before save.
 	PaymentMethodValidator func(string) error
 	// TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
@@ -195,6 +198,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByStationID orders the results by the station_id field.

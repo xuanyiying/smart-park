@@ -76,13 +76,13 @@ func (_c *DailyStatsCreate) SetNillableTotalVehicles(v *int) *DailyStatsCreate {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_c *DailyStatsCreate) SetTotalAmount(v float64) *DailyStatsCreate {
+func (_c *DailyStatsCreate) SetTotalAmount(v int64) *DailyStatsCreate {
 	_c.mutation.SetTotalAmount(v)
 	return _c
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_c *DailyStatsCreate) SetNillableTotalAmount(v *float64) *DailyStatsCreate {
+func (_c *DailyStatsCreate) SetNillableTotalAmount(v *int64) *DailyStatsCreate {
 	if v != nil {
 		_c.SetTotalAmount(*v)
 	}
@@ -90,13 +90,13 @@ func (_c *DailyStatsCreate) SetNillableTotalAmount(v *float64) *DailyStatsCreate
 }
 
 // SetTotalDiscount sets the "total_discount" field.
-func (_c *DailyStatsCreate) SetTotalDiscount(v float64) *DailyStatsCreate {
+func (_c *DailyStatsCreate) SetTotalDiscount(v int64) *DailyStatsCreate {
 	_c.mutation.SetTotalDiscount(v)
 	return _c
 }
 
 // SetNillableTotalDiscount sets the "total_discount" field if the given value is not nil.
-func (_c *DailyStatsCreate) SetNillableTotalDiscount(v *float64) *DailyStatsCreate {
+func (_c *DailyStatsCreate) SetNillableTotalDiscount(v *int64) *DailyStatsCreate {
 	if v != nil {
 		_c.SetTotalDiscount(*v)
 	}
@@ -104,13 +104,13 @@ func (_c *DailyStatsCreate) SetNillableTotalDiscount(v *float64) *DailyStatsCrea
 }
 
 // SetNetAmount sets the "net_amount" field.
-func (_c *DailyStatsCreate) SetNetAmount(v float64) *DailyStatsCreate {
+func (_c *DailyStatsCreate) SetNetAmount(v int64) *DailyStatsCreate {
 	_c.mutation.SetNetAmount(v)
 	return _c
 }
 
 // SetNillableNetAmount sets the "net_amount" field if the given value is not nil.
-func (_c *DailyStatsCreate) SetNillableNetAmount(v *float64) *DailyStatsCreate {
+func (_c *DailyStatsCreate) SetNillableNetAmount(v *int64) *DailyStatsCreate {
 	if v != nil {
 		_c.SetNetAmount(*v)
 	}
@@ -383,15 +383,15 @@ func (_c *DailyStatsCreate) createSpec() (*DailyStats, *sqlgraph.CreateSpec) {
 		_node.TotalVehicles = value
 	}
 	if value, ok := _c.mutation.TotalAmount(); ok {
-		_spec.SetField(dailystats.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldTotalAmount, field.TypeInt64, value)
 		_node.TotalAmount = value
 	}
 	if value, ok := _c.mutation.TotalDiscount(); ok {
-		_spec.SetField(dailystats.FieldTotalDiscount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldTotalDiscount, field.TypeInt64, value)
 		_node.TotalDiscount = value
 	}
 	if value, ok := _c.mutation.NetAmount(); ok {
-		_spec.SetField(dailystats.FieldNetAmount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldNetAmount, field.TypeInt64, value)
 		_node.NetAmount = value
 	}
 	if value, ok := _c.mutation.AvgDuration(); ok {

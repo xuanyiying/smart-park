@@ -11,6 +11,7 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "open_id", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Size: 100},
 		{Name: "avatar", Type: field.TypeString, Nullable: true, Size: 500},
@@ -25,15 +26,21 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "user_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[1]},
+			},
+			{
 				Name:    "user_open_id",
 				Unique:  true,
-				Columns: []*schema.Column{UsersColumns[1]},
+				Columns: []*schema.Column{UsersColumns[2]},
 			},
 		},
 	}
 	// UserVehiclesColumns holds the columns for the "user_vehicles" table.
 	UserVehiclesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "user_id", Type: field.TypeUUID},
 		{Name: "plate_number", Type: field.TypeString, Size: 20},
 		{Name: "owner_name", Type: field.TypeString, Nullable: true, Size: 100},
@@ -48,19 +55,24 @@ var (
 		PrimaryKey: []*schema.Column{UserVehiclesColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "uservehicle_user_id",
+				Name:    "uservehicle_tenant_id",
 				Unique:  false,
 				Columns: []*schema.Column{UserVehiclesColumns[1]},
 			},
 			{
-				Name:    "uservehicle_plate_number",
+				Name:    "uservehicle_user_id",
 				Unique:  false,
 				Columns: []*schema.Column{UserVehiclesColumns[2]},
 			},
 			{
+				Name:    "uservehicle_plate_number",
+				Unique:  false,
+				Columns: []*schema.Column{UserVehiclesColumns[3]},
+			},
+			{
 				Name:    "uservehicle_user_id_plate_number",
 				Unique:  true,
-				Columns: []*schema.Column{UserVehiclesColumns[1], UserVehiclesColumns[2]},
+				Columns: []*schema.Column{UserVehiclesColumns[2], UserVehiclesColumns[3]},
 			},
 		},
 	}

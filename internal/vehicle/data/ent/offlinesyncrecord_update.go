@@ -140,14 +140,14 @@ func (_u *OfflineSyncRecordUpdate) SetNillableOpenTime(v *time.Time) *OfflineSyn
 }
 
 // SetSyncAmount sets the "sync_amount" field.
-func (_u *OfflineSyncRecordUpdate) SetSyncAmount(v float64) *OfflineSyncRecordUpdate {
+func (_u *OfflineSyncRecordUpdate) SetSyncAmount(v int64) *OfflineSyncRecordUpdate {
 	_u.mutation.ResetSyncAmount()
 	_u.mutation.SetSyncAmount(v)
 	return _u
 }
 
 // SetNillableSyncAmount sets the "sync_amount" field if the given value is not nil.
-func (_u *OfflineSyncRecordUpdate) SetNillableSyncAmount(v *float64) *OfflineSyncRecordUpdate {
+func (_u *OfflineSyncRecordUpdate) SetNillableSyncAmount(v *int64) *OfflineSyncRecordUpdate {
 	if v != nil {
 		_u.SetSyncAmount(*v)
 	}
@@ -155,7 +155,7 @@ func (_u *OfflineSyncRecordUpdate) SetNillableSyncAmount(v *float64) *OfflineSyn
 }
 
 // AddSyncAmount adds value to the "sync_amount" field.
-func (_u *OfflineSyncRecordUpdate) AddSyncAmount(v float64) *OfflineSyncRecordUpdate {
+func (_u *OfflineSyncRecordUpdate) AddSyncAmount(v int64) *OfflineSyncRecordUpdate {
 	_u.mutation.AddSyncAmount(v)
 	return _u
 }
@@ -343,13 +343,13 @@ func (_u *OfflineSyncRecordUpdate) sqlSave(ctx context.Context) (_node int, err 
 		_spec.SetField(offlinesyncrecord.FieldOpenTime, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.SyncAmount(); ok {
-		_spec.SetField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64, value)
+		_spec.SetField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedSyncAmount(); ok {
-		_spec.AddField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64, value)
+		_spec.AddField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64, value)
 	}
 	if _u.mutation.SyncAmountCleared() {
-		_spec.ClearField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64)
+		_spec.ClearField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.SyncStatus(); ok {
 		_spec.SetField(offlinesyncrecord.FieldSyncStatus, field.TypeEnum, value)
@@ -503,14 +503,14 @@ func (_u *OfflineSyncRecordUpdateOne) SetNillableOpenTime(v *time.Time) *Offline
 }
 
 // SetSyncAmount sets the "sync_amount" field.
-func (_u *OfflineSyncRecordUpdateOne) SetSyncAmount(v float64) *OfflineSyncRecordUpdateOne {
+func (_u *OfflineSyncRecordUpdateOne) SetSyncAmount(v int64) *OfflineSyncRecordUpdateOne {
 	_u.mutation.ResetSyncAmount()
 	_u.mutation.SetSyncAmount(v)
 	return _u
 }
 
 // SetNillableSyncAmount sets the "sync_amount" field if the given value is not nil.
-func (_u *OfflineSyncRecordUpdateOne) SetNillableSyncAmount(v *float64) *OfflineSyncRecordUpdateOne {
+func (_u *OfflineSyncRecordUpdateOne) SetNillableSyncAmount(v *int64) *OfflineSyncRecordUpdateOne {
 	if v != nil {
 		_u.SetSyncAmount(*v)
 	}
@@ -518,7 +518,7 @@ func (_u *OfflineSyncRecordUpdateOne) SetNillableSyncAmount(v *float64) *Offline
 }
 
 // AddSyncAmount adds value to the "sync_amount" field.
-func (_u *OfflineSyncRecordUpdateOne) AddSyncAmount(v float64) *OfflineSyncRecordUpdateOne {
+func (_u *OfflineSyncRecordUpdateOne) AddSyncAmount(v int64) *OfflineSyncRecordUpdateOne {
 	_u.mutation.AddSyncAmount(v)
 	return _u
 }
@@ -736,13 +736,13 @@ func (_u *OfflineSyncRecordUpdateOne) sqlSave(ctx context.Context) (_node *Offli
 		_spec.SetField(offlinesyncrecord.FieldOpenTime, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.SyncAmount(); ok {
-		_spec.SetField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64, value)
+		_spec.SetField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedSyncAmount(); ok {
-		_spec.AddField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64, value)
+		_spec.AddField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64, value)
 	}
 	if _u.mutation.SyncAmountCleared() {
-		_spec.ClearField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64)
+		_spec.ClearField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.SyncStatus(); ok {
 		_spec.SetField(offlinesyncrecord.FieldSyncStatus, field.TypeEnum, value)

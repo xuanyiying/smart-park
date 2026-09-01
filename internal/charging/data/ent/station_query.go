@@ -336,12 +336,12 @@ func (_q *StationQuery) WithPrices(opts ...func(*PriceQuery)) *StationQuery {
 // Example:
 //
 //	var v []struct {
-//		LotID uuid.UUID `json:"lot_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Station.Query().
-//		GroupBy(station.FieldLotID).
+//		GroupBy(station.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *StationQuery) GroupBy(field string, fields ...string) *StationGroupBy {
@@ -359,11 +359,11 @@ func (_q *StationQuery) GroupBy(field string, fields ...string) *StationGroupBy 
 // Example:
 //
 //	var v []struct {
-//		LotID uuid.UUID `json:"lot_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.Station.Query().
-//		Select(station.FieldLotID).
+//		Select(station.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *StationQuery) Select(fields ...string) *StationSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

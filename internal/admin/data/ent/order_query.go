@@ -263,12 +263,12 @@ func (_q *OrderQuery) Clone() *OrderQuery {
 // Example:
 //
 //	var v []struct {
-//		RecordID uuid.UUID `json:"record_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Order.Query().
-//		GroupBy(order.FieldRecordID).
+//		GroupBy(order.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *OrderQuery) GroupBy(field string, fields ...string) *OrderGroupBy {
@@ -286,11 +286,11 @@ func (_q *OrderQuery) GroupBy(field string, fields ...string) *OrderGroupBy {
 // Example:
 //
 //	var v []struct {
-//		RecordID uuid.UUID `json:"record_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.Order.Query().
-//		Select(order.FieldRecordID).
+//		Select(order.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *OrderQuery) Select(fields ...string) *OrderSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

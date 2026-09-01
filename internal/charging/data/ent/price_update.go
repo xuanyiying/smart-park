@@ -30,6 +30,20 @@ func (_u *PriceUpdate) Where(ps ...predicate.Price) *PriceUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *PriceUpdate) SetTenantID(v uuid.UUID) *PriceUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *PriceUpdate) SetNillableTenantID(v *uuid.UUID) *PriceUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetStationID sets the "station_id" field.
 func (_u *PriceUpdate) SetStationID(v uuid.UUID) *PriceUpdate {
 	_u.mutation.SetStationID(v)
@@ -325,6 +339,9 @@ func (_u *PriceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(price.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(price.FieldName, field.TypeString, value)
 	}
@@ -426,6 +443,20 @@ type PriceUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *PriceMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *PriceUpdateOne) SetTenantID(v uuid.UUID) *PriceUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *PriceUpdateOne) SetNillableTenantID(v *uuid.UUID) *PriceUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetStationID sets the "station_id" field.
@@ -752,6 +783,9 @@ func (_u *PriceUpdateOne) sqlSave(ctx context.Context) (_node *Price, err error)
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(price.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(price.FieldName, field.TypeString, value)

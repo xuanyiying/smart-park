@@ -78,14 +78,14 @@ func (_u *RefundApprovalUpdate) ClearApprover() *RefundApprovalUpdate {
 }
 
 // SetAmount sets the "amount" field.
-func (_u *RefundApprovalUpdate) SetAmount(v float64) *RefundApprovalUpdate {
+func (_u *RefundApprovalUpdate) SetAmount(v int64) *RefundApprovalUpdate {
 	_u.mutation.ResetAmount()
 	_u.mutation.SetAmount(v)
 	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (_u *RefundApprovalUpdate) SetNillableAmount(v *float64) *RefundApprovalUpdate {
+func (_u *RefundApprovalUpdate) SetNillableAmount(v *int64) *RefundApprovalUpdate {
 	if v != nil {
 		_u.SetAmount(*v)
 	}
@@ -93,7 +93,7 @@ func (_u *RefundApprovalUpdate) SetNillableAmount(v *float64) *RefundApprovalUpd
 }
 
 // AddAmount adds value to the "amount" field.
-func (_u *RefundApprovalUpdate) AddAmount(v float64) *RefundApprovalUpdate {
+func (_u *RefundApprovalUpdate) AddAmount(v int64) *RefundApprovalUpdate {
 	_u.mutation.AddAmount(v)
 	return _u
 }
@@ -272,10 +272,10 @@ func (_u *RefundApprovalUpdate) sqlSave(ctx context.Context) (_node int, err err
 		_spec.ClearField(refundapproval.FieldApprover, field.TypeString)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
-		_spec.SetField(refundapproval.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(refundapproval.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedAmount(); ok {
-		_spec.AddField(refundapproval.FieldAmount, field.TypeFloat64, value)
+		_spec.AddField(refundapproval.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Reason(); ok {
 		_spec.SetField(refundapproval.FieldReason, field.TypeString, value)
@@ -367,14 +367,14 @@ func (_u *RefundApprovalUpdateOne) ClearApprover() *RefundApprovalUpdateOne {
 }
 
 // SetAmount sets the "amount" field.
-func (_u *RefundApprovalUpdateOne) SetAmount(v float64) *RefundApprovalUpdateOne {
+func (_u *RefundApprovalUpdateOne) SetAmount(v int64) *RefundApprovalUpdateOne {
 	_u.mutation.ResetAmount()
 	_u.mutation.SetAmount(v)
 	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (_u *RefundApprovalUpdateOne) SetNillableAmount(v *float64) *RefundApprovalUpdateOne {
+func (_u *RefundApprovalUpdateOne) SetNillableAmount(v *int64) *RefundApprovalUpdateOne {
 	if v != nil {
 		_u.SetAmount(*v)
 	}
@@ -382,7 +382,7 @@ func (_u *RefundApprovalUpdateOne) SetNillableAmount(v *float64) *RefundApproval
 }
 
 // AddAmount adds value to the "amount" field.
-func (_u *RefundApprovalUpdateOne) AddAmount(v float64) *RefundApprovalUpdateOne {
+func (_u *RefundApprovalUpdateOne) AddAmount(v int64) *RefundApprovalUpdateOne {
 	_u.mutation.AddAmount(v)
 	return _u
 }
@@ -591,10 +591,10 @@ func (_u *RefundApprovalUpdateOne) sqlSave(ctx context.Context) (_node *RefundAp
 		_spec.ClearField(refundapproval.FieldApprover, field.TypeString)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
-		_spec.SetField(refundapproval.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(refundapproval.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedAmount(); ok {
-		_spec.AddField(refundapproval.FieldAmount, field.TypeFloat64, value)
+		_spec.AddField(refundapproval.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Reason(); ok {
 		_spec.SetField(refundapproval.FieldReason, field.TypeString, value)

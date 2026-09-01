@@ -1251,17 +1251,18 @@ func (x *GetOrderResponse) GetData() *Order {
 }
 
 type Order struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	RecordId       string                 `protobuf:"bytes,2,opt,name=recordId,proto3" json:"recordId,omitempty"`
-	LotId          string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
-	PlateNumber    string                 `protobuf:"bytes,4,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
-	Amount         float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	DiscountAmount float64                `protobuf:"fixed64,6,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
-	FinalAmount    float64                `protobuf:"fixed64,7,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
-	Status         string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
-	PayTime        string                 `protobuf:"bytes,9,opt,name=payTime,proto3" json:"payTime,omitempty"`
-	PayMethod      string                 `protobuf:"bytes,10,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	RecordId    string                 `protobuf:"bytes,2,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	LotId       string                 `protobuf:"bytes,3,opt,name=lotId,proto3" json:"lotId,omitempty"`
+	PlateNumber string                 `protobuf:"bytes,4,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	// Amounts in cents (分).
+	Amount         int64  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	DiscountAmount int64  `protobuf:"varint,6,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
+	FinalAmount    int64  `protobuf:"varint,7,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
+	Status         string `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	PayTime        string `protobuf:"bytes,9,opt,name=payTime,proto3" json:"payTime,omitempty"`
+	PayMethod      string `protobuf:"bytes,10,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1324,21 +1325,21 @@ func (x *Order) GetPlateNumber() string {
 	return ""
 }
 
-func (x *Order) GetAmount() float64 {
+func (x *Order) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
 	return 0
 }
 
-func (x *Order) GetDiscountAmount() float64 {
+func (x *Order) GetDiscountAmount() int64 {
 	if x != nil {
 		return x.DiscountAmount
 	}
 	return 0
 }
 
-func (x *Order) GetFinalAmount() float64 {
+func (x *Order) GetFinalAmount() int64 {
 	if x != nil {
 		return x.FinalAmount
 	}
@@ -1901,9 +1902,10 @@ type DailyReport struct {
 	TotalEntries  int32                  `protobuf:"varint,3,opt,name=totalEntries,proto3" json:"totalEntries,omitempty"`
 	TotalExits    int32                  `protobuf:"varint,4,opt,name=totalExits,proto3" json:"totalExits,omitempty"`
 	TotalVehicles int32                  `protobuf:"varint,5,opt,name=totalVehicles,proto3" json:"totalVehicles,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,6,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
-	TotalDiscount float64                `protobuf:"fixed64,7,opt,name=totalDiscount,proto3" json:"totalDiscount,omitempty"`
-	NetAmount     float64                `protobuf:"fixed64,8,opt,name=netAmount,proto3" json:"netAmount,omitempty"`
+	// Amounts in cents (分).
+	TotalAmount   int64 `protobuf:"varint,6,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	TotalDiscount int64 `protobuf:"varint,7,opt,name=totalDiscount,proto3" json:"totalDiscount,omitempty"`
+	NetAmount     int64 `protobuf:"varint,8,opt,name=netAmount,proto3" json:"netAmount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1973,21 +1975,21 @@ func (x *DailyReport) GetTotalVehicles() int32 {
 	return 0
 }
 
-func (x *DailyReport) GetTotalAmount() float64 {
+func (x *DailyReport) GetTotalAmount() int64 {
 	if x != nil {
 		return x.TotalAmount
 	}
 	return 0
 }
 
-func (x *DailyReport) GetTotalDiscount() float64 {
+func (x *DailyReport) GetTotalDiscount() int64 {
 	if x != nil {
 		return x.TotalDiscount
 	}
 	return 0
 }
 
-func (x *DailyReport) GetNetAmount() float64 {
+func (x *DailyReport) GetNetAmount() int64 {
 	if x != nil {
 		return x.NetAmount
 	}
@@ -2122,10 +2124,11 @@ type MonthlyReport struct {
 	TotalEntries  int32                  `protobuf:"varint,4,opt,name=totalEntries,proto3" json:"totalEntries,omitempty"`
 	TotalExits    int32                  `protobuf:"varint,5,opt,name=totalExits,proto3" json:"totalExits,omitempty"`
 	TotalVehicles int32                  `protobuf:"varint,6,opt,name=totalVehicles,proto3" json:"totalVehicles,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,7,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
-	TotalDiscount float64                `protobuf:"fixed64,8,opt,name=totalDiscount,proto3" json:"totalDiscount,omitempty"`
-	NetAmount     float64                `protobuf:"fixed64,9,opt,name=netAmount,proto3" json:"netAmount,omitempty"`
-	DailyReports  []*DailyReport         `protobuf:"bytes,10,rep,name=dailyReports,proto3" json:"dailyReports,omitempty"`
+	// Amounts in cents (分).
+	TotalAmount   int64          `protobuf:"varint,7,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	TotalDiscount int64          `protobuf:"varint,8,opt,name=totalDiscount,proto3" json:"totalDiscount,omitempty"`
+	NetAmount     int64          `protobuf:"varint,9,opt,name=netAmount,proto3" json:"netAmount,omitempty"`
+	DailyReports  []*DailyReport `protobuf:"bytes,10,rep,name=dailyReports,proto3" json:"dailyReports,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2202,21 +2205,21 @@ func (x *MonthlyReport) GetTotalVehicles() int32 {
 	return 0
 }
 
-func (x *MonthlyReport) GetTotalAmount() float64 {
+func (x *MonthlyReport) GetTotalAmount() int64 {
 	if x != nil {
 		return x.TotalAmount
 	}
 	return 0
 }
 
-func (x *MonthlyReport) GetTotalDiscount() float64 {
+func (x *MonthlyReport) GetTotalDiscount() int64 {
 	if x != nil {
 		return x.TotalDiscount
 	}
 	return 0
 }
 
-func (x *MonthlyReport) GetNetAmount() float64 {
+func (x *MonthlyReport) GetNetAmount() int64 {
 	if x != nil {
 		return x.NetAmount
 	}
@@ -3238,9 +3241,9 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\brecordId\x18\x02 \x01(\tR\brecordId\x12\x14\n" +
 	"\x05lotId\x18\x03 \x01(\tR\x05lotId\x12 \n" +
 	"\vplateNumber\x18\x04 \x01(\tR\vplateNumber\x12\x16\n" +
-	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12&\n" +
-	"\x0ediscountAmount\x18\x06 \x01(\x01R\x0ediscountAmount\x12 \n" +
-	"\vfinalAmount\x18\a \x01(\x01R\vfinalAmount\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x03R\x06amount\x12&\n" +
+	"\x0ediscountAmount\x18\x06 \x01(\x03R\x0ediscountAmount\x12 \n" +
+	"\vfinalAmount\x18\a \x01(\x03R\vfinalAmount\x12\x16\n" +
 	"\x06status\x18\b \x01(\tR\x06status\x12\x18\n" +
 	"\apayTime\x18\t \x01(\tR\apayTime\x12\x1c\n" +
 	"\tpayMethod\x18\n" +
@@ -3295,9 +3298,9 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"totalExits\x18\x04 \x01(\x05R\n" +
 	"totalExits\x12$\n" +
 	"\rtotalVehicles\x18\x05 \x01(\x05R\rtotalVehicles\x12 \n" +
-	"\vtotalAmount\x18\x06 \x01(\x01R\vtotalAmount\x12$\n" +
-	"\rtotalDiscount\x18\a \x01(\x01R\rtotalDiscount\x12\x1c\n" +
-	"\tnetAmount\x18\b \x01(\x01R\tnetAmount\"Y\n" +
+	"\vtotalAmount\x18\x06 \x01(\x03R\vtotalAmount\x12$\n" +
+	"\rtotalDiscount\x18\a \x01(\x03R\rtotalDiscount\x12\x1c\n" +
+	"\tnetAmount\x18\b \x01(\x03R\tnetAmount\"Y\n" +
 	"\x17GetMonthlyReportRequest\x12\x14\n" +
 	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +
 	"\x04year\x18\x02 \x01(\x05R\x04year\x12\x14\n" +
@@ -3315,9 +3318,9 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"totalExits\x18\x05 \x01(\x05R\n" +
 	"totalExits\x12$\n" +
 	"\rtotalVehicles\x18\x06 \x01(\x05R\rtotalVehicles\x12 \n" +
-	"\vtotalAmount\x18\a \x01(\x01R\vtotalAmount\x12$\n" +
-	"\rtotalDiscount\x18\b \x01(\x01R\rtotalDiscount\x12\x1c\n" +
-	"\tnetAmount\x18\t \x01(\x01R\tnetAmount\x12=\n" +
+	"\vtotalAmount\x18\a \x01(\x03R\vtotalAmount\x12$\n" +
+	"\rtotalDiscount\x18\b \x01(\x03R\rtotalDiscount\x12\x1c\n" +
+	"\tnetAmount\x18\t \x01(\x03R\tnetAmount\x12=\n" +
 	"\fdailyReports\x18\n" +
 	" \x03(\v2\x19.api.admin.v1.DailyReportR\fdailyReports\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +

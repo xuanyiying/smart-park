@@ -142,14 +142,14 @@ func (_u *HourlyStatsUpdate) AddOccupancyRate(v float64) *HourlyStatsUpdate {
 }
 
 // SetRevenue sets the "revenue" field.
-func (_u *HourlyStatsUpdate) SetRevenue(v float64) *HourlyStatsUpdate {
+func (_u *HourlyStatsUpdate) SetRevenue(v int64) *HourlyStatsUpdate {
 	_u.mutation.ResetRevenue()
 	_u.mutation.SetRevenue(v)
 	return _u
 }
 
 // SetNillableRevenue sets the "revenue" field if the given value is not nil.
-func (_u *HourlyStatsUpdate) SetNillableRevenue(v *float64) *HourlyStatsUpdate {
+func (_u *HourlyStatsUpdate) SetNillableRevenue(v *int64) *HourlyStatsUpdate {
 	if v != nil {
 		_u.SetRevenue(*v)
 	}
@@ -157,7 +157,7 @@ func (_u *HourlyStatsUpdate) SetNillableRevenue(v *float64) *HourlyStatsUpdate {
 }
 
 // AddRevenue adds value to the "revenue" field.
-func (_u *HourlyStatsUpdate) AddRevenue(v float64) *HourlyStatsUpdate {
+func (_u *HourlyStatsUpdate) AddRevenue(v int64) *HourlyStatsUpdate {
 	_u.mutation.AddRevenue(v)
 	return _u
 }
@@ -234,10 +234,10 @@ func (_u *HourlyStatsUpdate) sqlSave(ctx context.Context) (_node int, err error)
 		_spec.AddField(hourlystats.FieldOccupancyRate, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.Revenue(); ok {
-		_spec.SetField(hourlystats.FieldRevenue, field.TypeFloat64, value)
+		_spec.SetField(hourlystats.FieldRevenue, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedRevenue(); ok {
-		_spec.AddField(hourlystats.FieldRevenue, field.TypeFloat64, value)
+		_spec.AddField(hourlystats.FieldRevenue, field.TypeInt64, value)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -372,14 +372,14 @@ func (_u *HourlyStatsUpdateOne) AddOccupancyRate(v float64) *HourlyStatsUpdateOn
 }
 
 // SetRevenue sets the "revenue" field.
-func (_u *HourlyStatsUpdateOne) SetRevenue(v float64) *HourlyStatsUpdateOne {
+func (_u *HourlyStatsUpdateOne) SetRevenue(v int64) *HourlyStatsUpdateOne {
 	_u.mutation.ResetRevenue()
 	_u.mutation.SetRevenue(v)
 	return _u
 }
 
 // SetNillableRevenue sets the "revenue" field if the given value is not nil.
-func (_u *HourlyStatsUpdateOne) SetNillableRevenue(v *float64) *HourlyStatsUpdateOne {
+func (_u *HourlyStatsUpdateOne) SetNillableRevenue(v *int64) *HourlyStatsUpdateOne {
 	if v != nil {
 		_u.SetRevenue(*v)
 	}
@@ -387,7 +387,7 @@ func (_u *HourlyStatsUpdateOne) SetNillableRevenue(v *float64) *HourlyStatsUpdat
 }
 
 // AddRevenue adds value to the "revenue" field.
-func (_u *HourlyStatsUpdateOne) AddRevenue(v float64) *HourlyStatsUpdateOne {
+func (_u *HourlyStatsUpdateOne) AddRevenue(v int64) *HourlyStatsUpdateOne {
 	_u.mutation.AddRevenue(v)
 	return _u
 }
@@ -494,10 +494,10 @@ func (_u *HourlyStatsUpdateOne) sqlSave(ctx context.Context) (_node *HourlyStats
 		_spec.AddField(hourlystats.FieldOccupancyRate, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.Revenue(); ok {
-		_spec.SetField(hourlystats.FieldRevenue, field.TypeFloat64, value)
+		_spec.SetField(hourlystats.FieldRevenue, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedRevenue(); ok {
-		_spec.AddField(hourlystats.FieldRevenue, field.TypeFloat64, value)
+		_spec.AddField(hourlystats.FieldRevenue, field.TypeInt64, value)
 	}
 	_node = &HourlyStats{config: _u.config}
 	_spec.Assign = _node.assignValues

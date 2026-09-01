@@ -80,13 +80,13 @@ func (_c *OfflineSyncRecordCreate) SetOpenTime(v time.Time) *OfflineSyncRecordCr
 }
 
 // SetSyncAmount sets the "sync_amount" field.
-func (_c *OfflineSyncRecordCreate) SetSyncAmount(v float64) *OfflineSyncRecordCreate {
+func (_c *OfflineSyncRecordCreate) SetSyncAmount(v int64) *OfflineSyncRecordCreate {
 	_c.mutation.SetSyncAmount(v)
 	return _c
 }
 
 // SetNillableSyncAmount sets the "sync_amount" field if the given value is not nil.
-func (_c *OfflineSyncRecordCreate) SetNillableSyncAmount(v *float64) *OfflineSyncRecordCreate {
+func (_c *OfflineSyncRecordCreate) SetNillableSyncAmount(v *int64) *OfflineSyncRecordCreate {
 	if v != nil {
 		_c.SetSyncAmount(*v)
 	}
@@ -212,6 +212,10 @@ func (_c *OfflineSyncRecordCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *OfflineSyncRecordCreate) defaults() {
+	if _, ok := _c.mutation.SyncAmount(); !ok {
+		v := offlinesyncrecord.DefaultSyncAmount
+		_c.mutation.SetSyncAmount(v)
+	}
 	if _, ok := _c.mutation.SyncStatus(); !ok {
 		v := offlinesyncrecord.DefaultSyncStatus
 		_c.mutation.SetSyncStatus(v)
@@ -345,7 +349,7 @@ func (_c *OfflineSyncRecordCreate) createSpec() (*OfflineSyncRecord, *sqlgraph.C
 		_node.OpenTime = value
 	}
 	if value, ok := _c.mutation.SyncAmount(); ok {
-		_spec.SetField(offlinesyncrecord.FieldSyncAmount, field.TypeFloat64, value)
+		_spec.SetField(offlinesyncrecord.FieldSyncAmount, field.TypeInt64, value)
 		_node.SyncAmount = value
 	}
 	if value, ok := _c.mutation.SyncStatus(); ok {

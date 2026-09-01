@@ -65,16 +65,18 @@ message CalculateFeeResponse {
 
 message BillData {
   string recordId = 1;
-  double baseAmount = 2;
-  double discountAmount = 3;
-  double finalAmount = 4;
+  // Amounts are in cents (分) to avoid float rounding on the money path.
+  int64 baseAmount = 2;
+  int64 discountAmount = 3;
+  int64 finalAmount = 4;
   repeated AppliedRule appliedRules = 5;
 }
 
 message AppliedRule {
   string ruleId = 1;
   string ruleName = 2;
-  double amount = 3;
+  // Contribution of this rule, in cents (分).
+  int64 amount = 3;
 }
 
 message CreateBillingRuleRequest {
@@ -150,7 +152,8 @@ message TestBillingRuleRequest {
 
 message TestBillingRuleResponse {
   bool     conditionMet   = 1;
-  double   calculatedFee = 2;
+  // Calculated fee in cents (分).
+  int64    calculatedFee = 2;
   repeated string appliedActions = 3;
   double   duration      = 4;
 }

@@ -263,12 +263,12 @@ func (_q *BillingRuleQuery) Clone() *BillingRuleQuery {
 // Example:
 //
 //	var v []struct {
-//		LotID uuid.UUID `json:"lot_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.BillingRule.Query().
-//		GroupBy(billingrule.FieldLotID).
+//		GroupBy(billingrule.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *BillingRuleQuery) GroupBy(field string, fields ...string) *BillingRuleGroupBy {
@@ -286,11 +286,11 @@ func (_q *BillingRuleQuery) GroupBy(field string, fields ...string) *BillingRule
 // Example:
 //
 //	var v []struct {
-//		LotID uuid.UUID `json:"lot_id,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.BillingRule.Query().
-//		Select(billingrule.FieldLotID).
+//		Select(billingrule.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *BillingRuleQuery) Select(fields ...string) *BillingRuleSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

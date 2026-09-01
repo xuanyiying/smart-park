@@ -80,11 +80,11 @@ var (
 	// DefaultTotalVehicles holds the default value on creation for the "total_vehicles" field.
 	DefaultTotalVehicles int
 	// DefaultTotalAmount holds the default value on creation for the "total_amount" field.
-	DefaultTotalAmount float64
+	DefaultTotalAmount int64
 	// DefaultTotalDiscount holds the default value on creation for the "total_discount" field.
-	DefaultTotalDiscount float64
+	DefaultTotalDiscount int64
 	// DefaultNetAmount holds the default value on creation for the "net_amount" field.
-	DefaultNetAmount float64
+	DefaultNetAmount int64
 	// DefaultAvgDuration holds the default value on creation for the "avg_duration" field.
 	DefaultAvgDuration float64
 	// DefaultPeakHour holds the default value on creation for the "peak_hour" field.

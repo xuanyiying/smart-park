@@ -69,8 +69,10 @@ var (
 	ApplicantValidator func(string) error
 	// ApproverValidator is a validator for the "approver" field. It is called by the builders before save.
 	ApproverValidator func(string) error
+	// DefaultAmount holds the default value on creation for the "amount" field.
+	DefaultAmount int64
 	// AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	AmountValidator func(float64) error
+	AmountValidator func(int64) error
 	// ReasonValidator is a validator for the "reason" field. It is called by the builders before save.
 	ReasonValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

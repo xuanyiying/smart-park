@@ -90,13 +90,13 @@ func (_c *HourlyStatsCreate) SetNillableOccupancyRate(v *float64) *HourlyStatsCr
 }
 
 // SetRevenue sets the "revenue" field.
-func (_c *HourlyStatsCreate) SetRevenue(v float64) *HourlyStatsCreate {
+func (_c *HourlyStatsCreate) SetRevenue(v int64) *HourlyStatsCreate {
 	_c.mutation.SetRevenue(v)
 	return _c
 }
 
 // SetNillableRevenue sets the "revenue" field if the given value is not nil.
-func (_c *HourlyStatsCreate) SetNillableRevenue(v *float64) *HourlyStatsCreate {
+func (_c *HourlyStatsCreate) SetNillableRevenue(v *int64) *HourlyStatsCreate {
 	if v != nil {
 		_c.SetRevenue(*v)
 	}
@@ -282,7 +282,7 @@ func (_c *HourlyStatsCreate) createSpec() (*HourlyStats, *sqlgraph.CreateSpec) {
 		_node.OccupancyRate = value
 	}
 	if value, ok := _c.mutation.Revenue(); ok {
-		_spec.SetField(hourlystats.FieldRevenue, field.TypeFloat64, value)
+		_spec.SetField(hourlystats.FieldRevenue, field.TypeInt64, value)
 		_node.Revenue = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {

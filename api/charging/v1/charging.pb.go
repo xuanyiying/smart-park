@@ -1981,16 +1981,17 @@ type Session struct {
 	StartEnergy   float64                `protobuf:"fixed64,8,opt,name=startEnergy,proto3" json:"startEnergy,omitempty"`
 	EndEnergy     float64                `protobuf:"fixed64,9,opt,name=endEnergy,proto3" json:"endEnergy,omitempty"`
 	ChargedEnergy float64                `protobuf:"fixed64,10,opt,name=chargedEnergy,proto3" json:"chargedEnergy,omitempty"`
-	Cost          float64                `protobuf:"fixed64,11,opt,name=cost,proto3" json:"cost,omitempty"`
-	ServiceFee    float64                `protobuf:"fixed64,12,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,13,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
-	Status        string                 `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`               // pending, charging, completed, cancelled, expired
-	PaymentStatus string                 `protobuf:"bytes,15,opt,name=paymentStatus,proto3" json:"paymentStatus,omitempty"` // pending, paid, refunded, failed
-	PayTime       string                 `protobuf:"bytes,16,opt,name=payTime,proto3" json:"payTime,omitempty"`
-	PaymentMethod string                 `protobuf:"bytes,17,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
-	TransactionId string                 `protobuf:"bytes,18,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,19,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,20,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	// Amounts in cents (分).
+	Cost          int64  `protobuf:"varint,11,opt,name=cost,proto3" json:"cost,omitempty"`
+	ServiceFee    int64  `protobuf:"varint,12,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
+	TotalAmount   int64  `protobuf:"varint,13,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	Status        string `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`               // pending, charging, completed, cancelled, expired
+	PaymentStatus string `protobuf:"bytes,15,opt,name=paymentStatus,proto3" json:"paymentStatus,omitempty"` // pending, paid, refunded, failed
+	PayTime       string `protobuf:"bytes,16,opt,name=payTime,proto3" json:"payTime,omitempty"`
+	PaymentMethod string `protobuf:"bytes,17,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
+	TransactionId string `protobuf:"bytes,18,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
+	CreatedAt     string `protobuf:"bytes,19,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     string `protobuf:"bytes,20,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2095,21 +2096,21 @@ func (x *Session) GetChargedEnergy() float64 {
 	return 0
 }
 
-func (x *Session) GetCost() float64 {
+func (x *Session) GetCost() int64 {
 	if x != nil {
 		return x.Cost
 	}
 	return 0
 }
 
-func (x *Session) GetServiceFee() float64 {
+func (x *Session) GetServiceFee() int64 {
 	if x != nil {
 		return x.ServiceFee
 	}
 	return 0
 }
 
-func (x *Session) GetTotalAmount() float64 {
+func (x *Session) GetTotalAmount() int64 {
 	if x != nil {
 		return x.TotalAmount
 	}
@@ -2175,10 +2176,11 @@ type ChargingSummary struct {
 	EndTime       string                 `protobuf:"bytes,6,opt,name=endTime,proto3" json:"endTime,omitempty"`
 	Duration      float64                `protobuf:"fixed64,7,opt,name=duration,proto3" json:"duration,omitempty"` // hours
 	ChargedEnergy float64                `protobuf:"fixed64,8,opt,name=chargedEnergy,proto3" json:"chargedEnergy,omitempty"`
-	Cost          float64                `protobuf:"fixed64,9,opt,name=cost,proto3" json:"cost,omitempty"`
-	ServiceFee    float64                `protobuf:"fixed64,10,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
-	TotalAmount   float64                `protobuf:"fixed64,11,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
-	PaymentStatus string                 `protobuf:"bytes,12,opt,name=paymentStatus,proto3" json:"paymentStatus,omitempty"`
+	// Amounts in cents (分).
+	Cost          int64  `protobuf:"varint,9,opt,name=cost,proto3" json:"cost,omitempty"`
+	ServiceFee    int64  `protobuf:"varint,10,opt,name=serviceFee,proto3" json:"serviceFee,omitempty"`
+	TotalAmount   int64  `protobuf:"varint,11,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	PaymentStatus string `protobuf:"bytes,12,opt,name=paymentStatus,proto3" json:"paymentStatus,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2269,21 +2271,21 @@ func (x *ChargingSummary) GetChargedEnergy() float64 {
 	return 0
 }
 
-func (x *ChargingSummary) GetCost() float64 {
+func (x *ChargingSummary) GetCost() int64 {
 	if x != nil {
 		return x.Cost
 	}
 	return 0
 }
 
-func (x *ChargingSummary) GetServiceFee() float64 {
+func (x *ChargingSummary) GetServiceFee() int64 {
 	if x != nil {
 		return x.ServiceFee
 	}
 	return 0
 }
 
-func (x *ChargingSummary) GetTotalAmount() float64 {
+func (x *ChargingSummary) GetTotalAmount() int64 {
 	if x != nil {
 		return x.TotalAmount
 	}
@@ -2844,7 +2846,8 @@ type ConfirmPaymentRequest struct {
 	SessionId     string                 `protobuf:"bytes,1,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
 	TransactionId string                 `protobuf:"bytes,2,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
 	PaymentMethod string                 `protobuf:"bytes,3,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
-	PaidAmount    float64                `protobuf:"fixed64,4,opt,name=paidAmount,proto3" json:"paidAmount,omitempty"`
+	// Amount in cents (分).
+	PaidAmount    int64 `protobuf:"varint,4,opt,name=paidAmount,proto3" json:"paidAmount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2900,7 +2903,7 @@ func (x *ConfirmPaymentRequest) GetPaymentMethod() string {
 	return ""
 }
 
-func (x *ConfirmPaymentRequest) GetPaidAmount() float64 {
+func (x *ConfirmPaymentRequest) GetPaidAmount() int64 {
 	if x != nil {
 		return x.PaidAmount
 	}
@@ -3124,11 +3127,11 @@ const file_api_charging_v1_charging_proto_rawDesc = "" +
 	"\tendEnergy\x18\t \x01(\x01R\tendEnergy\x12$\n" +
 	"\rchargedEnergy\x18\n" +
 	" \x01(\x01R\rchargedEnergy\x12\x12\n" +
-	"\x04cost\x18\v \x01(\x01R\x04cost\x12\x1e\n" +
+	"\x04cost\x18\v \x01(\x03R\x04cost\x12\x1e\n" +
 	"\n" +
-	"serviceFee\x18\f \x01(\x01R\n" +
+	"serviceFee\x18\f \x01(\x03R\n" +
 	"serviceFee\x12 \n" +
-	"\vtotalAmount\x18\r \x01(\x01R\vtotalAmount\x12\x16\n" +
+	"\vtotalAmount\x18\r \x01(\x03R\vtotalAmount\x12\x16\n" +
 	"\x06status\x18\x0e \x01(\tR\x06status\x12$\n" +
 	"\rpaymentStatus\x18\x0f \x01(\tR\rpaymentStatus\x12\x18\n" +
 	"\apayTime\x18\x10 \x01(\tR\apayTime\x12$\n" +
@@ -3145,12 +3148,12 @@ const file_api_charging_v1_charging_proto_rawDesc = "" +
 	"\aendTime\x18\x06 \x01(\tR\aendTime\x12\x1a\n" +
 	"\bduration\x18\a \x01(\x01R\bduration\x12$\n" +
 	"\rchargedEnergy\x18\b \x01(\x01R\rchargedEnergy\x12\x12\n" +
-	"\x04cost\x18\t \x01(\x01R\x04cost\x12\x1e\n" +
+	"\x04cost\x18\t \x01(\x03R\x04cost\x12\x1e\n" +
 	"\n" +
 	"serviceFee\x18\n" +
-	" \x01(\x01R\n" +
+	" \x01(\x03R\n" +
 	"serviceFee\x12 \n" +
-	"\vtotalAmount\x18\v \x01(\x01R\vtotalAmount\x12$\n" +
+	"\vtotalAmount\x18\v \x01(\x03R\vtotalAmount\x12$\n" +
 	"\rpaymentStatus\x18\f \x01(\tR\rpaymentStatus\"\xe0\x02\n" +
 	"\x12CreatePriceRequest\x12\x1c\n" +
 	"\tstationId\x18\x01 \x01(\tR\tstationId\x12\x12\n" +
@@ -3206,7 +3209,7 @@ const file_api_charging_v1_charging_proto_rawDesc = "" +
 	"\rtransactionId\x18\x02 \x01(\tR\rtransactionId\x12$\n" +
 	"\rpaymentMethod\x18\x03 \x01(\tR\rpaymentMethod\x12\x1e\n" +
 	"\n" +
-	"paidAmount\x18\x04 \x01(\x01R\n" +
+	"paidAmount\x18\x04 \x01(\x03R\n" +
 	"paidAmount\"t\n" +
 	"\x16ConfirmPaymentResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +

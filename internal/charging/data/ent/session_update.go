@@ -30,6 +30,20 @@ func (_u *SessionUpdate) Where(ps ...predicate.Session) *SessionUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *SessionUpdate) SetTenantID(v uuid.UUID) *SessionUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *SessionUpdate) SetNillableTenantID(v *uuid.UUID) *SessionUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetStationID sets the "station_id" field.
 func (_u *SessionUpdate) SetStationID(v uuid.UUID) *SessionUpdate {
 	_u.mutation.SetStationID(v)
@@ -184,14 +198,14 @@ func (_u *SessionUpdate) AddChargedEnergy(v float64) *SessionUpdate {
 }
 
 // SetCost sets the "cost" field.
-func (_u *SessionUpdate) SetCost(v float64) *SessionUpdate {
+func (_u *SessionUpdate) SetCost(v int64) *SessionUpdate {
 	_u.mutation.ResetCost()
 	_u.mutation.SetCost(v)
 	return _u
 }
 
 // SetNillableCost sets the "cost" field if the given value is not nil.
-func (_u *SessionUpdate) SetNillableCost(v *float64) *SessionUpdate {
+func (_u *SessionUpdate) SetNillableCost(v *int64) *SessionUpdate {
 	if v != nil {
 		_u.SetCost(*v)
 	}
@@ -199,20 +213,20 @@ func (_u *SessionUpdate) SetNillableCost(v *float64) *SessionUpdate {
 }
 
 // AddCost adds value to the "cost" field.
-func (_u *SessionUpdate) AddCost(v float64) *SessionUpdate {
+func (_u *SessionUpdate) AddCost(v int64) *SessionUpdate {
 	_u.mutation.AddCost(v)
 	return _u
 }
 
 // SetServiceFee sets the "service_fee" field.
-func (_u *SessionUpdate) SetServiceFee(v float64) *SessionUpdate {
+func (_u *SessionUpdate) SetServiceFee(v int64) *SessionUpdate {
 	_u.mutation.ResetServiceFee()
 	_u.mutation.SetServiceFee(v)
 	return _u
 }
 
 // SetNillableServiceFee sets the "service_fee" field if the given value is not nil.
-func (_u *SessionUpdate) SetNillableServiceFee(v *float64) *SessionUpdate {
+func (_u *SessionUpdate) SetNillableServiceFee(v *int64) *SessionUpdate {
 	if v != nil {
 		_u.SetServiceFee(*v)
 	}
@@ -220,20 +234,20 @@ func (_u *SessionUpdate) SetNillableServiceFee(v *float64) *SessionUpdate {
 }
 
 // AddServiceFee adds value to the "service_fee" field.
-func (_u *SessionUpdate) AddServiceFee(v float64) *SessionUpdate {
+func (_u *SessionUpdate) AddServiceFee(v int64) *SessionUpdate {
 	_u.mutation.AddServiceFee(v)
 	return _u
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_u *SessionUpdate) SetTotalAmount(v float64) *SessionUpdate {
+func (_u *SessionUpdate) SetTotalAmount(v int64) *SessionUpdate {
 	_u.mutation.ResetTotalAmount()
 	_u.mutation.SetTotalAmount(v)
 	return _u
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_u *SessionUpdate) SetNillableTotalAmount(v *float64) *SessionUpdate {
+func (_u *SessionUpdate) SetNillableTotalAmount(v *int64) *SessionUpdate {
 	if v != nil {
 		_u.SetTotalAmount(*v)
 	}
@@ -241,7 +255,7 @@ func (_u *SessionUpdate) SetNillableTotalAmount(v *float64) *SessionUpdate {
 }
 
 // AddTotalAmount adds value to the "total_amount" field.
-func (_u *SessionUpdate) AddTotalAmount(v float64) *SessionUpdate {
+func (_u *SessionUpdate) AddTotalAmount(v int64) *SessionUpdate {
 	_u.mutation.AddTotalAmount(v)
 	return _u
 }
@@ -437,6 +451,9 @@ func (_u *SessionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(session.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.StationID(); ok {
 		_spec.SetField(session.FieldStationID, field.TypeUUID, value)
 	}
@@ -474,22 +491,22 @@ func (_u *SessionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.AddField(session.FieldChargedEnergy, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.Cost(); ok {
-		_spec.SetField(session.FieldCost, field.TypeFloat64, value)
+		_spec.SetField(session.FieldCost, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedCost(); ok {
-		_spec.AddField(session.FieldCost, field.TypeFloat64, value)
+		_spec.AddField(session.FieldCost, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.ServiceFee(); ok {
-		_spec.SetField(session.FieldServiceFee, field.TypeFloat64, value)
+		_spec.SetField(session.FieldServiceFee, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedServiceFee(); ok {
-		_spec.AddField(session.FieldServiceFee, field.TypeFloat64, value)
+		_spec.AddField(session.FieldServiceFee, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TotalAmount(); ok {
-		_spec.SetField(session.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(session.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
-		_spec.AddField(session.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.AddField(session.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(session.FieldStatus, field.TypeEnum, value)
@@ -565,6 +582,20 @@ type SessionUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *SessionMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *SessionUpdateOne) SetTenantID(v uuid.UUID) *SessionUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *SessionUpdateOne) SetNillableTenantID(v *uuid.UUID) *SessionUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetStationID sets the "station_id" field.
@@ -721,14 +752,14 @@ func (_u *SessionUpdateOne) AddChargedEnergy(v float64) *SessionUpdateOne {
 }
 
 // SetCost sets the "cost" field.
-func (_u *SessionUpdateOne) SetCost(v float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) SetCost(v int64) *SessionUpdateOne {
 	_u.mutation.ResetCost()
 	_u.mutation.SetCost(v)
 	return _u
 }
 
 // SetNillableCost sets the "cost" field if the given value is not nil.
-func (_u *SessionUpdateOne) SetNillableCost(v *float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) SetNillableCost(v *int64) *SessionUpdateOne {
 	if v != nil {
 		_u.SetCost(*v)
 	}
@@ -736,20 +767,20 @@ func (_u *SessionUpdateOne) SetNillableCost(v *float64) *SessionUpdateOne {
 }
 
 // AddCost adds value to the "cost" field.
-func (_u *SessionUpdateOne) AddCost(v float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) AddCost(v int64) *SessionUpdateOne {
 	_u.mutation.AddCost(v)
 	return _u
 }
 
 // SetServiceFee sets the "service_fee" field.
-func (_u *SessionUpdateOne) SetServiceFee(v float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) SetServiceFee(v int64) *SessionUpdateOne {
 	_u.mutation.ResetServiceFee()
 	_u.mutation.SetServiceFee(v)
 	return _u
 }
 
 // SetNillableServiceFee sets the "service_fee" field if the given value is not nil.
-func (_u *SessionUpdateOne) SetNillableServiceFee(v *float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) SetNillableServiceFee(v *int64) *SessionUpdateOne {
 	if v != nil {
 		_u.SetServiceFee(*v)
 	}
@@ -757,20 +788,20 @@ func (_u *SessionUpdateOne) SetNillableServiceFee(v *float64) *SessionUpdateOne 
 }
 
 // AddServiceFee adds value to the "service_fee" field.
-func (_u *SessionUpdateOne) AddServiceFee(v float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) AddServiceFee(v int64) *SessionUpdateOne {
 	_u.mutation.AddServiceFee(v)
 	return _u
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_u *SessionUpdateOne) SetTotalAmount(v float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) SetTotalAmount(v int64) *SessionUpdateOne {
 	_u.mutation.ResetTotalAmount()
 	_u.mutation.SetTotalAmount(v)
 	return _u
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_u *SessionUpdateOne) SetNillableTotalAmount(v *float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) SetNillableTotalAmount(v *int64) *SessionUpdateOne {
 	if v != nil {
 		_u.SetTotalAmount(*v)
 	}
@@ -778,7 +809,7 @@ func (_u *SessionUpdateOne) SetNillableTotalAmount(v *float64) *SessionUpdateOne
 }
 
 // AddTotalAmount adds value to the "total_amount" field.
-func (_u *SessionUpdateOne) AddTotalAmount(v float64) *SessionUpdateOne {
+func (_u *SessionUpdateOne) AddTotalAmount(v int64) *SessionUpdateOne {
 	_u.mutation.AddTotalAmount(v)
 	return _u
 }
@@ -1004,6 +1035,9 @@ func (_u *SessionUpdateOne) sqlSave(ctx context.Context) (_node *Session, err er
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(session.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.StationID(); ok {
 		_spec.SetField(session.FieldStationID, field.TypeUUID, value)
 	}
@@ -1041,22 +1075,22 @@ func (_u *SessionUpdateOne) sqlSave(ctx context.Context) (_node *Session, err er
 		_spec.AddField(session.FieldChargedEnergy, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.Cost(); ok {
-		_spec.SetField(session.FieldCost, field.TypeFloat64, value)
+		_spec.SetField(session.FieldCost, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedCost(); ok {
-		_spec.AddField(session.FieldCost, field.TypeFloat64, value)
+		_spec.AddField(session.FieldCost, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.ServiceFee(); ok {
-		_spec.SetField(session.FieldServiceFee, field.TypeFloat64, value)
+		_spec.SetField(session.FieldServiceFee, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedServiceFee(); ok {
-		_spec.AddField(session.FieldServiceFee, field.TypeFloat64, value)
+		_spec.AddField(session.FieldServiceFee, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TotalAmount(); ok {
-		_spec.SetField(session.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(session.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
-		_spec.AddField(session.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.AddField(session.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(session.FieldStatus, field.TypeEnum, value)

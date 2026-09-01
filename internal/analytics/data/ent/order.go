@@ -26,12 +26,12 @@ type Order struct {
 	VehicleID *uuid.UUID `json:"vehicle_id,omitempty"`
 	// 车牌号
 	PlateNumber string `json:"plate_number,omitempty"`
-	// 原始金额
-	Amount float64 `json:"amount,omitempty"`
-	// 优惠金额
-	DiscountAmount float64 `json:"discount_amount,omitempty"`
-	// 实付金额
-	FinalAmount float64 `json:"final_amount,omitempty"`
+	// 原始金额(分)
+	Amount int64 `json:"amount,omitempty"`
+	// 优惠金额(分)
+	DiscountAmount int64 `json:"discount_amount,omitempty"`
+	// 实付金额(分)
+	FinalAmount int64 `json:"final_amount,omitempty"`
 	// 订单状态
 	Status order.Status `json:"status,omitempty"`
 	// 支付时间
@@ -40,8 +40,8 @@ type Order struct {
 	PayMethod order.PayMethod `json:"pay_method,omitempty"`
 	// 支付渠道交易号
 	TransactionID string `json:"transaction_id,omitempty"`
-	// 实际支付金额(回调写入)
-	PaidAmount float64 `json:"paid_amount,omitempty"`
+	// 实际支付金额(分, 回调写入)
+	PaidAmount int64 `json:"paid_amount,omitempty"`
 	// 退款时间
 	RefundedAt *time.Time `json:"refunded_at,omitempty"`
 	// 退款渠道流水号
@@ -61,7 +61,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 		case order.FieldVehicleID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case order.FieldAmount, order.FieldDiscountAmount, order.FieldFinalAmount, order.FieldPaidAmount:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.NullInt64)
 		case order.FieldPlateNumber, order.FieldStatus, order.FieldPayMethod, order.FieldTransactionID, order.FieldRefundTransactionID:
 			values[i] = new(sql.NullString)
 		case order.FieldPayTime, order.FieldRefundedAt, order.FieldCreatedAt, order.FieldUpdatedAt:
@@ -115,22 +115,22 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				_m.PlateNumber = value.String
 			}
 		case order.FieldAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				_m.Amount = value.Float64
+				_m.Amount = value.Int64
 			}
 		case order.FieldDiscountAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field discount_amount", values[i])
 			} else if value.Valid {
-				_m.DiscountAmount = value.Float64
+				_m.DiscountAmount = value.Int64
 			}
 		case order.FieldFinalAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field final_amount", values[i])
 			} else if value.Valid {
-				_m.FinalAmount = value.Float64
+				_m.FinalAmount = value.Int64
 			}
 		case order.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -158,10 +158,10 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				_m.TransactionID = value.String
 			}
 		case order.FieldPaidAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field paid_amount", values[i])
 			} else if value.Valid {
-				_m.PaidAmount = value.Float64
+				_m.PaidAmount = value.Int64
 			}
 		case order.FieldRefundedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

@@ -571,10 +571,10 @@ func TestChargingUseCase_StopCharging(t *testing.T) {
 		t.Error("session.EndTime should not be nil")
 	}
 	if updatedSession.Cost <= 0 {
-		t.Errorf("session.Cost = %f, want > 0", updatedSession.Cost)
+		t.Errorf("session.Cost = %d, want > 0", updatedSession.Cost)
 	}
 	if updatedSession.TotalAmount <= 0 {
-		t.Errorf("session.TotalAmount = %f, want > 0", updatedSession.TotalAmount)
+		t.Errorf("session.TotalAmount = %d, want > 0", updatedSession.TotalAmount)
 	}
 }
 
@@ -713,14 +713,14 @@ func TestChargingUseCase_ConfirmPayment(t *testing.T) {
 		VehiclePlate:  "京A12345",
 		StartTime:     time.Now().Add(-2 * time.Hour),
 		ChargedEnergy: 15.0,
-		Cost:          18.0,
-		ServiceFee:    0.8,
-		TotalAmount:   18.8,
+		Cost:          1800,
+		ServiceFee:    80,
+		TotalAmount:   1880,
 		Status:        SessionStatusCompleted,
 		PaymentStatus: PaymentStatusPending,
 	}
 
-	err := uc.ConfirmPayment(ctx, sessionID, "txn-001", "wechat", 18.8)
+	err := uc.ConfirmPayment(ctx, sessionID, "txn-001", "wechat", 1880)
 	if err != nil {
 		t.Errorf("ConfirmPayment() error: %v", err)
 	}
@@ -749,12 +749,12 @@ func TestChargingUseCase_ConfirmPayment_InsufficientAmount(t *testing.T) {
 		UserID:        uuid.New(),
 		VehiclePlate:  "京A12345",
 		StartTime:     time.Now().Add(-2 * time.Hour),
-		TotalAmount:   18.8,
+		TotalAmount:   1880,
 		Status:        SessionStatusCompleted,
 		PaymentStatus: PaymentStatusPending,
 	}
 
-	err := uc.ConfirmPayment(ctx, sessionID, "txn-002", "alipay", 10.0)
+	err := uc.ConfirmPayment(ctx, sessionID, "txn-002", "alipay", 1000)
 	if err == nil {
 		t.Error("expected error for insufficient payment")
 	}
@@ -772,12 +772,12 @@ func TestChargingUseCase_ConfirmPayment_AlreadyProcessed(t *testing.T) {
 		UserID:        uuid.New(),
 		VehiclePlate:  "京A12345",
 		StartTime:     time.Now().Add(-2 * time.Hour),
-		TotalAmount:   18.8,
+		TotalAmount:   1880,
 		Status:        SessionStatusCompleted,
 		PaymentStatus: PaymentStatusPaid,
 	}
 
-	err := uc.ConfirmPayment(ctx, sessionID, "txn-003", "wechat", 18.8)
+	err := uc.ConfirmPayment(ctx, sessionID, "txn-003", "wechat", 1880)
 	if err == nil {
 		t.Error("expected error for already processed payment")
 	}
@@ -796,7 +796,7 @@ func TestChargingUseCase_RefundPayment(t *testing.T) {
 		UserID:        uuid.New(),
 		VehiclePlate:  "京A12345",
 		StartTime:     time.Now().Add(-2 * time.Hour),
-		TotalAmount:   18.8,
+		TotalAmount:   1880,
 		Status:        SessionStatusCompleted,
 		PaymentStatus: PaymentStatusPaid,
 		PayTime:       &now,
@@ -825,7 +825,7 @@ func TestChargingUseCase_RefundPayment_NotPaid(t *testing.T) {
 		UserID:        uuid.New(),
 		VehiclePlate:  "京A12345",
 		StartTime:     time.Now().Add(-2 * time.Hour),
-		TotalAmount:   18.8,
+		TotalAmount:   1880,
 		Status:        SessionStatusCompleted,
 		PaymentStatus: PaymentStatusPending,
 	}
@@ -843,7 +843,7 @@ func TestChargingUseCase_CalculateEnergyCost(t *testing.T) {
 		name     string
 		energy   float64
 		price    *Price
-		expected float64
+		expected int64
 	}{
 		{
 			name:   "nil price",
@@ -859,7 +859,7 @@ func TestChargingUseCase_CalculateEnergyCost(t *testing.T) {
 				OffPeakLoad: 0.8,
 				IsPeakHours: false,
 			},
-			expected: 20.0,
+			expected: 2000,
 		},
 		{
 			name:   "peak price",
@@ -869,7 +869,7 @@ func TestChargingUseCase_CalculateEnergyCost(t *testing.T) {
 				PeakLoad:    1.5,
 				IsPeakHours: true,
 			},
-			expected: 27.0,
+			expected: 2700,
 		},
 		{
 			name:   "zero energy",

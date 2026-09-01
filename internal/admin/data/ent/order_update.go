@@ -29,6 +29,20 @@ func (_u *OrderUpdate) Where(ps ...predicate.Order) *OrderUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *OrderUpdate) SetTenantID(v uuid.UUID) *OrderUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *OrderUpdate) SetNillableTenantID(v *uuid.UUID) *OrderUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetRecordID sets the "record_id" field.
 func (_u *OrderUpdate) SetRecordID(v uuid.UUID) *OrderUpdate {
 	_u.mutation.SetRecordID(v)
@@ -92,14 +106,14 @@ func (_u *OrderUpdate) SetNillablePlateNumber(v *string) *OrderUpdate {
 }
 
 // SetAmount sets the "amount" field.
-func (_u *OrderUpdate) SetAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) SetAmount(v int64) *OrderUpdate {
 	_u.mutation.ResetAmount()
 	_u.mutation.SetAmount(v)
 	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillableAmount(v *float64) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableAmount(v *int64) *OrderUpdate {
 	if v != nil {
 		_u.SetAmount(*v)
 	}
@@ -107,20 +121,20 @@ func (_u *OrderUpdate) SetNillableAmount(v *float64) *OrderUpdate {
 }
 
 // AddAmount adds value to the "amount" field.
-func (_u *OrderUpdate) AddAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) AddAmount(v int64) *OrderUpdate {
 	_u.mutation.AddAmount(v)
 	return _u
 }
 
 // SetDiscountAmount sets the "discount_amount" field.
-func (_u *OrderUpdate) SetDiscountAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) SetDiscountAmount(v int64) *OrderUpdate {
 	_u.mutation.ResetDiscountAmount()
 	_u.mutation.SetDiscountAmount(v)
 	return _u
 }
 
 // SetNillableDiscountAmount sets the "discount_amount" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillableDiscountAmount(v *float64) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableDiscountAmount(v *int64) *OrderUpdate {
 	if v != nil {
 		_u.SetDiscountAmount(*v)
 	}
@@ -128,20 +142,20 @@ func (_u *OrderUpdate) SetNillableDiscountAmount(v *float64) *OrderUpdate {
 }
 
 // AddDiscountAmount adds value to the "discount_amount" field.
-func (_u *OrderUpdate) AddDiscountAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) AddDiscountAmount(v int64) *OrderUpdate {
 	_u.mutation.AddDiscountAmount(v)
 	return _u
 }
 
 // SetFinalAmount sets the "final_amount" field.
-func (_u *OrderUpdate) SetFinalAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) SetFinalAmount(v int64) *OrderUpdate {
 	_u.mutation.ResetFinalAmount()
 	_u.mutation.SetFinalAmount(v)
 	return _u
 }
 
 // SetNillableFinalAmount sets the "final_amount" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillableFinalAmount(v *float64) *OrderUpdate {
+func (_u *OrderUpdate) SetNillableFinalAmount(v *int64) *OrderUpdate {
 	if v != nil {
 		_u.SetFinalAmount(*v)
 	}
@@ -149,7 +163,7 @@ func (_u *OrderUpdate) SetNillableFinalAmount(v *float64) *OrderUpdate {
 }
 
 // AddFinalAmount adds value to the "final_amount" field.
-func (_u *OrderUpdate) AddFinalAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) AddFinalAmount(v int64) *OrderUpdate {
 	_u.mutation.AddFinalAmount(v)
 	return _u
 }
@@ -229,14 +243,14 @@ func (_u *OrderUpdate) ClearTransactionID() *OrderUpdate {
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (_u *OrderUpdate) SetPaidAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) SetPaidAmount(v int64) *OrderUpdate {
 	_u.mutation.ResetPaidAmount()
 	_u.mutation.SetPaidAmount(v)
 	return _u
 }
 
 // SetNillablePaidAmount sets the "paid_amount" field if the given value is not nil.
-func (_u *OrderUpdate) SetNillablePaidAmount(v *float64) *OrderUpdate {
+func (_u *OrderUpdate) SetNillablePaidAmount(v *int64) *OrderUpdate {
 	if v != nil {
 		_u.SetPaidAmount(*v)
 	}
@@ -244,7 +258,7 @@ func (_u *OrderUpdate) SetNillablePaidAmount(v *float64) *OrderUpdate {
 }
 
 // AddPaidAmount adds value to the "paid_amount" field.
-func (_u *OrderUpdate) AddPaidAmount(v float64) *OrderUpdate {
+func (_u *OrderUpdate) AddPaidAmount(v int64) *OrderUpdate {
 	_u.mutation.AddPaidAmount(v)
 	return _u
 }
@@ -404,6 +418,9 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(order.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.RecordID(); ok {
 		_spec.SetField(order.FieldRecordID, field.TypeUUID, value)
 	}
@@ -420,22 +437,22 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(order.FieldPlateNumber, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
-		_spec.SetField(order.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedAmount(); ok {
-		_spec.AddField(order.FieldAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.DiscountAmount(); ok {
-		_spec.SetField(order.FieldDiscountAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldDiscountAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedDiscountAmount(); ok {
-		_spec.AddField(order.FieldDiscountAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldDiscountAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.FinalAmount(); ok {
-		_spec.SetField(order.FieldFinalAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldFinalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedFinalAmount(); ok {
-		_spec.AddField(order.FieldFinalAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldFinalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
@@ -459,13 +476,13 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(order.FieldTransactionID, field.TypeString)
 	}
 	if value, ok := _u.mutation.PaidAmount(); ok {
-		_spec.SetField(order.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPaidAmount(); ok {
-		_spec.AddField(order.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if _u.mutation.PaidAmountCleared() {
-		_spec.ClearField(order.FieldPaidAmount, field.TypeFloat64)
+		_spec.ClearField(order.FieldPaidAmount, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.RefundedAt(); ok {
 		_spec.SetField(order.FieldRefundedAt, field.TypeTime, value)
@@ -500,6 +517,20 @@ type OrderUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *OrderMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *OrderUpdateOne) SetTenantID(v uuid.UUID) *OrderUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *OrderUpdateOne) SetNillableTenantID(v *uuid.UUID) *OrderUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetRecordID sets the "record_id" field.
@@ -565,14 +596,14 @@ func (_u *OrderUpdateOne) SetNillablePlateNumber(v *string) *OrderUpdateOne {
 }
 
 // SetAmount sets the "amount" field.
-func (_u *OrderUpdateOne) SetAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetAmount(v int64) *OrderUpdateOne {
 	_u.mutation.ResetAmount()
 	_u.mutation.SetAmount(v)
 	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableAmount(v *float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableAmount(v *int64) *OrderUpdateOne {
 	if v != nil {
 		_u.SetAmount(*v)
 	}
@@ -580,20 +611,20 @@ func (_u *OrderUpdateOne) SetNillableAmount(v *float64) *OrderUpdateOne {
 }
 
 // AddAmount adds value to the "amount" field.
-func (_u *OrderUpdateOne) AddAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) AddAmount(v int64) *OrderUpdateOne {
 	_u.mutation.AddAmount(v)
 	return _u
 }
 
 // SetDiscountAmount sets the "discount_amount" field.
-func (_u *OrderUpdateOne) SetDiscountAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetDiscountAmount(v int64) *OrderUpdateOne {
 	_u.mutation.ResetDiscountAmount()
 	_u.mutation.SetDiscountAmount(v)
 	return _u
 }
 
 // SetNillableDiscountAmount sets the "discount_amount" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableDiscountAmount(v *float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableDiscountAmount(v *int64) *OrderUpdateOne {
 	if v != nil {
 		_u.SetDiscountAmount(*v)
 	}
@@ -601,20 +632,20 @@ func (_u *OrderUpdateOne) SetNillableDiscountAmount(v *float64) *OrderUpdateOne 
 }
 
 // AddDiscountAmount adds value to the "discount_amount" field.
-func (_u *OrderUpdateOne) AddDiscountAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) AddDiscountAmount(v int64) *OrderUpdateOne {
 	_u.mutation.AddDiscountAmount(v)
 	return _u
 }
 
 // SetFinalAmount sets the "final_amount" field.
-func (_u *OrderUpdateOne) SetFinalAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetFinalAmount(v int64) *OrderUpdateOne {
 	_u.mutation.ResetFinalAmount()
 	_u.mutation.SetFinalAmount(v)
 	return _u
 }
 
 // SetNillableFinalAmount sets the "final_amount" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillableFinalAmount(v *float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillableFinalAmount(v *int64) *OrderUpdateOne {
 	if v != nil {
 		_u.SetFinalAmount(*v)
 	}
@@ -622,7 +653,7 @@ func (_u *OrderUpdateOne) SetNillableFinalAmount(v *float64) *OrderUpdateOne {
 }
 
 // AddFinalAmount adds value to the "final_amount" field.
-func (_u *OrderUpdateOne) AddFinalAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) AddFinalAmount(v int64) *OrderUpdateOne {
 	_u.mutation.AddFinalAmount(v)
 	return _u
 }
@@ -702,14 +733,14 @@ func (_u *OrderUpdateOne) ClearTransactionID() *OrderUpdateOne {
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (_u *OrderUpdateOne) SetPaidAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetPaidAmount(v int64) *OrderUpdateOne {
 	_u.mutation.ResetPaidAmount()
 	_u.mutation.SetPaidAmount(v)
 	return _u
 }
 
 // SetNillablePaidAmount sets the "paid_amount" field if the given value is not nil.
-func (_u *OrderUpdateOne) SetNillablePaidAmount(v *float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) SetNillablePaidAmount(v *int64) *OrderUpdateOne {
 	if v != nil {
 		_u.SetPaidAmount(*v)
 	}
@@ -717,7 +748,7 @@ func (_u *OrderUpdateOne) SetNillablePaidAmount(v *float64) *OrderUpdateOne {
 }
 
 // AddPaidAmount adds value to the "paid_amount" field.
-func (_u *OrderUpdateOne) AddPaidAmount(v float64) *OrderUpdateOne {
+func (_u *OrderUpdateOne) AddPaidAmount(v int64) *OrderUpdateOne {
 	_u.mutation.AddPaidAmount(v)
 	return _u
 }
@@ -907,6 +938,9 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(order.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.RecordID(); ok {
 		_spec.SetField(order.FieldRecordID, field.TypeUUID, value)
 	}
@@ -923,22 +957,22 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 		_spec.SetField(order.FieldPlateNumber, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
-		_spec.SetField(order.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedAmount(); ok {
-		_spec.AddField(order.FieldAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.DiscountAmount(); ok {
-		_spec.SetField(order.FieldDiscountAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldDiscountAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedDiscountAmount(); ok {
-		_spec.AddField(order.FieldDiscountAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldDiscountAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.FinalAmount(); ok {
-		_spec.SetField(order.FieldFinalAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldFinalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedFinalAmount(); ok {
-		_spec.AddField(order.FieldFinalAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldFinalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
@@ -962,13 +996,13 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 		_spec.ClearField(order.FieldTransactionID, field.TypeString)
 	}
 	if value, ok := _u.mutation.PaidAmount(); ok {
-		_spec.SetField(order.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPaidAmount(); ok {
-		_spec.AddField(order.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.AddField(order.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if _u.mutation.PaidAmountCleared() {
-		_spec.ClearField(order.FieldPaidAmount, field.TypeFloat64)
+		_spec.ClearField(order.FieldPaidAmount, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.RefundedAt(); ok {
 		_spec.SetField(order.FieldRefundedAt, field.TypeTime, value)

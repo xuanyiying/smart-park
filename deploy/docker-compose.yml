@@ -1,5 +1,10 @@
 version: '3.8'
 
+# 说明：
+# - 各服务通过 SP_* 环境变量覆盖 YAML 中的默认连接串（默认值指向 localhost，仅在容器外
+#   裸跑时有效）；容器内必须连 compose 网络中的 postgres/redis/etcd。
+# - 敏感信息（数据库口令、支付密钥）应通过 .env 或部署系统的 secret 机制注入，不要写死。
+
 services:
   postgres:
     image: postgres:15-alpine
@@ -70,8 +75,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # 管理员口令必须通过环境注入，默认 admin/admin 不允许出现在生产。
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD is required}
     restart: always
 
   loki:
@@ -112,23 +118,10 @@ services:
     image: prometheuscommunity/postgres-exporter:v0.14.0
     container_name: smart-park-postgres-exporter
     environment:
-      - DATA_SOURCE_NAME=postgresql://postgres:postgres@postgres:5432/parking?sslmode=disable
+      - DATA_SOURCE_NAME=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/parking?sslmode=disable
     ports:
       - "9187:9187"
     restart: always
-
-  seata-server:
-    image: seataio/seata-server:1.6.1
-    container_name: smart-park-seata
-    environment:
-      - SEATA_IP=seata-server
-      - SEATA_PORT=8091
-      - STORE_MODE=file
-    ports:
-      - "8091:8091"
-      - "7091:7091"
-    volumes:
-      - seata_data:/seata-server/data
 
   gateway:
     build:
@@ -142,7 +135,9 @@ services:
       - redis
       - etcd
     environment:
-      - KRATOS_CONF=../../configs/gateway.yaml
+      - SP_ETCD_ENDPOINTS=etcd:2379
+      - SP_REDIS_ADDR=redis:6379
+    restart: unless-stopped
 
   vehicle:
     build:
@@ -155,7 +150,12 @@ services:
       - postgres
       - redis
     environment:
-      - KRATOS_CONF=../../configs/vehicle.yaml
+      - SP_DATABASE_SOURCE=host=postgres user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=parking port=5432 sslmode=disable
+      - SP_REDIS_ADDR=redis:6379
+      # MQTT broker 必填：未配置时车辆服务拒绝启动（道闸指令依赖它）。
+      - SP_MQTT_BROKER=${SP_MQTT_BROKER:?SP_MQTT_BROKER is required}
+      - SP_MQTT_PORT=${SP_MQTT_PORT:-1883}
+    restart: unless-stopped
 
   billing:
     build:
@@ -167,7 +167,9 @@ services:
     depends_on:
       - postgres
     environment:
-      - KRATOS_CONF=../../configs/billing.yaml
+      - SP_DATABASE_SOURCE=host=postgres user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=parking port=5432 sslmode=disable
+      - SP_REDIS_ADDR=redis:6379
+    restart: unless-stopped
 
   payment:
     build:
@@ -179,7 +181,12 @@ services:
     depends_on:
       - postgres
     environment:
-      - KRATOS_CONF=../../configs/payment.yaml
+      - SP_DATABASE_SOURCE=host=postgres user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=parking port=5432 sslmode=disable
+      - SP_REDIS_ADDR=redis:6379
+      # 支付渠道密钥缺失时服务应拒绝启动，禁止以"能跑起来"为先。
+      - SP_WECHAT_API_KEY=${SP_WECHAT_API_KEY:?SP_WECHAT_API_KEY is required}
+      - SP_JWT_SECRET=${SP_JWT_SECRET:?SP_JWT_SECRET is required}
+    restart: unless-stopped
 
   admin:
     build:
@@ -191,7 +198,9 @@ services:
     depends_on:
       - postgres
     environment:
-      - KRATOS_CONF=../../configs/admin.yaml
+      - SP_DATABASE_SOURCE=host=postgres user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=parking port=5432 sslmode=disable
+      - SP_REDIS_ADDR=redis:6379
+    restart: unless-stopped
 
   charging:
     build:
@@ -205,12 +214,13 @@ services:
       - postgres
       - redis
     environment:
-      - KRATOS_CONF=../../configs/charging.yaml
+      - SP_DATABASE_SOURCE=host=postgres user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=parking port=5432 sslmode=disable
+      - SP_REDIS_ADDR=redis:6379
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
-  seata_data:
   prometheus_data:
   grafana_data:
   loki_data:

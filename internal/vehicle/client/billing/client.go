@@ -13,11 +13,11 @@ type Client interface {
 	CalculateFee(ctx context.Context, recordID string, lotID string, entryTime, exitTime int64, vehicleType string) (*FeeResult, error)
 }
 
-// FeeResult represents the fee calculation result.
+// FeeResult represents the fee calculation result. Amounts are in cents (分).
 type FeeResult struct {
-	BaseAmount     float64
-	DiscountAmount float64
-	FinalAmount    float64
+	BaseAmount     int64
+	DiscountAmount int64
+	FinalAmount    int64
 }
 
 // billingClient implements Client interface.
@@ -53,4 +53,6 @@ func (c *billingClient) CalculateFee(ctx context.Context, recordID string, lotID
 		DiscountAmount: resp.Data.DiscountAmount,
 		FinalAmount:    resp.Data.FinalAmount,
 	}, nil
+	// The billing service already reports cents, so no 元→分 conversion happens
+	// here; resp.Data fields are int64.
 }

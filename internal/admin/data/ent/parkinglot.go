@@ -18,6 +18,8 @@ type ParkingLot struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
 	// 停车场名称
 	Name string `json:"name,omitempty"`
 	// 地址
@@ -44,7 +46,7 @@ func (*ParkingLot) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case parkinglot.FieldCreatedAt, parkinglot.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case parkinglot.FieldID:
+		case parkinglot.FieldID, parkinglot.FieldTenantID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -66,6 +68,12 @@ func (_m *ParkingLot) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case parkinglot.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case parkinglot.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -139,6 +147,9 @@ func (_m *ParkingLot) String() string {
 	var builder strings.Builder
 	builder.WriteString("ParkingLot(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")

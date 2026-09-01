@@ -13,6 +13,8 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/xuanyiying/smart-park/internal/multitenancy/biz"
+	"github.com/xuanyiying/smart-park/pkg/auth"
+	authmiddleware "github.com/xuanyiying/smart-park/pkg/middleware"
 )
 
 type TenantExtractor interface {
@@ -90,6 +92,23 @@ type TenantLoader interface {
 	GetByCode(ctx context.Context, code string) (*biz.Tenant, error)
 }
 
+// tenantFromClaims reads the tenant bound to the authenticated session.
+//
+// It reads the claims the JWT middleware stores under the same context key, so this works
+// whether or not the tenant middleware is chained behind it.
+func tenantFromClaims(ctx context.Context) string {
+	claims, ok := ctx.Value(authmiddleware.JWTClaimsKey).(*auth.Claims)
+	if !ok || claims == nil {
+		return ""
+	}
+	return claims.TenantID
+}
+
+// sameTenant compares two tenant identifiers, tolerating UUID case differences.
+func sameTenant(a, b string) bool {
+	return strings.EqualFold(strings.TrimSpace(a), strings.TrimSpace(b))
+}
+
 func TenantMiddleware(loader TenantLoader, extractor TenantExtractor, logger log.Logger) middleware.Middleware {
 	helper := log.NewHelper(logger)
 	return func(handler middleware.Handler) middleware.Handler {
@@ -101,6 +120,18 @@ func TenantMiddleware(loader TenantLoader, extractor TenantExtractor, logger log
 			}
 			if identifier == "" {
 				return nil, errors.Forbidden("TENANT_REQUIRED", "tenant identifier is required")
+			}
+
+			// The identifier usually comes from a request header, which the client controls.
+			// When the caller is authenticated, the token already binds them to a tenant;
+			// trusting a different header value would let any logged-in user read another
+			// tenant's data, so the two must agree.
+			if authenticatedTenant := tenantFromClaims(ctx); authenticatedTenant != "" {
+				if !sameTenant(authenticatedTenant, identifier) {
+					helper.WithContext(ctx).Warnf("cross-tenant access attempt: token tenant %q vs requested tenant %q",
+						authenticatedTenant, identifier)
+					return nil, errors.Forbidden("TENANT_MISMATCH", "tenant does not match the authenticated session")
+				}
 			}
 
 			var tenant *biz.Tenant

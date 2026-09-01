@@ -55,6 +55,11 @@ func IDLTE(id uuid.UUID) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldLTE(FieldID, id))
 }
 
+// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
+func TenantID(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldTenantID, v))
+}
+
 // PlateNumber applies equality check predicate on the "plate_number" field. It's identical to PlateNumberEQ.
 func PlateNumber(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldPlateNumber, v))
@@ -88,6 +93,46 @@ func CreatedAt(v time.Time) predicate.Vehicle {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
+func TenantIDEQ(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldTenantID, v))
+}
+
+// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
+func TenantIDNEQ(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNEQ(FieldTenantID, v))
+}
+
+// TenantIDIn applies the In predicate on the "tenant_id" field.
+func TenantIDIn(vs ...uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldIn(FieldTenantID, vs...))
+}
+
+// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
+func TenantIDNotIn(vs ...uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNotIn(FieldTenantID, vs...))
+}
+
+// TenantIDGT applies the GT predicate on the "tenant_id" field.
+func TenantIDGT(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGT(FieldTenantID, v))
+}
+
+// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
+func TenantIDGTE(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGTE(FieldTenantID, v))
+}
+
+// TenantIDLT applies the LT predicate on the "tenant_id" field.
+func TenantIDLT(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLT(FieldTenantID, v))
+}
+
+// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
+func TenantIDLTE(v uuid.UUID) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLTE(FieldTenantID, v))
 }
 
 // PlateNumberEQ applies the EQ predicate on the "plate_number" field.

@@ -86,7 +86,7 @@ func OccupancyRate(v float64) predicate.HourlyStats {
 }
 
 // Revenue applies equality check predicate on the "revenue" field. It's identical to RevenueEQ.
-func Revenue(v float64) predicate.HourlyStats {
+func Revenue(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldEQ(FieldRevenue, v))
 }
 
@@ -336,42 +336,42 @@ func OccupancyRateLTE(v float64) predicate.HourlyStats {
 }
 
 // RevenueEQ applies the EQ predicate on the "revenue" field.
-func RevenueEQ(v float64) predicate.HourlyStats {
+func RevenueEQ(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldEQ(FieldRevenue, v))
 }
 
 // RevenueNEQ applies the NEQ predicate on the "revenue" field.
-func RevenueNEQ(v float64) predicate.HourlyStats {
+func RevenueNEQ(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldNEQ(FieldRevenue, v))
 }
 
 // RevenueIn applies the In predicate on the "revenue" field.
-func RevenueIn(vs ...float64) predicate.HourlyStats {
+func RevenueIn(vs ...int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldIn(FieldRevenue, vs...))
 }
 
 // RevenueNotIn applies the NotIn predicate on the "revenue" field.
-func RevenueNotIn(vs ...float64) predicate.HourlyStats {
+func RevenueNotIn(vs ...int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldNotIn(FieldRevenue, vs...))
 }
 
 // RevenueGT applies the GT predicate on the "revenue" field.
-func RevenueGT(v float64) predicate.HourlyStats {
+func RevenueGT(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldGT(FieldRevenue, v))
 }
 
 // RevenueGTE applies the GTE predicate on the "revenue" field.
-func RevenueGTE(v float64) predicate.HourlyStats {
+func RevenueGTE(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldGTE(FieldRevenue, v))
 }
 
 // RevenueLT applies the LT predicate on the "revenue" field.
-func RevenueLT(v float64) predicate.HourlyStats {
+func RevenueLT(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldLT(FieldRevenue, v))
 }
 
 // RevenueLTE applies the LTE predicate on the "revenue" field.
-func RevenueLTE(v float64) predicate.HourlyStats {
+func RevenueLTE(v int64) predicate.HourlyStats {
 	return predicate.HourlyStats(sql.FieldLTE(FieldRevenue, v))
 }
 

@@ -14,7 +14,9 @@ import (
 	"github.com/xuanyiying/smart-park/internal/conf"
 	"github.com/xuanyiying/smart-park/internal/gateway/biz"
 	"github.com/xuanyiying/smart-park/internal/gateway/service"
+	"github.com/xuanyiying/smart-park/pkg/auth"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/middleware"
 	"github.com/xuanyiying/smart-park/pkg/trace"
 	"github.com/xuanyiying/smart-park/pkg/ws"
 )
@@ -76,14 +78,38 @@ func main() {
 
 	gatewaySvc := service.NewGatewayService(routerUseCase, hub, logger)
 
+	// Authentication is mandatory for the gateway.
+	//
+	// The gateway is the single entry point to every backend service, so running it
+	// without verifying tokens exposes the whole system. Previously the JWT section in
+	// gateway.yaml was documentation only: it was parsed into config but never applied,
+	// which made the deployment look protected while every route was open.
+	if cfg.JWT.PublicKeyPath == "" {
+		logHelper.Error("jwt.public_key_path is required: refusing to start an unauthenticated gateway")
+		os.Exit(1)
+	}
+
+	jwtManager, err := auth.NewJWTManager(&auth.JWTConfig{
+		PublicKeyPath: cfg.JWT.PublicKeyPath,
+		TokenDuration: cfg.JWT.TokenDuration,
+	})
+	if err != nil {
+		logHelper.Errorf("failed to create JWT manager: %v", err)
+		os.Exit(1)
+	}
+
+	// Probe and metrics endpoints must stay reachable by the orchestrator and scraper.
+	skipPaths := append([]string{"/health", "/ready", "/metrics"}, cfg.JWT.SkipPaths...)
+	requireAuth := middleware.NewJWTMiddleware(jwtManager, logger, skipPaths).Handler
+
 	hs := khttp.NewServer(
 		khttp.Address(fmt.Sprintf(":%d", cfg.Server.Port)),
 	)
 
-	hs.HandlePrefix("/", gatewaySvc)
+	hs.HandlePrefix("/", requireAuth(gatewaySvc))
 	hs.HandleFunc("/health", gatewaySvc.LivenessProbe)
 	hs.HandleFunc("/ready", gatewaySvc.ReadinessProbe)
-	hs.HandleFunc("/ws", gatewaySvc.HandleWebSocket)
+	hs.Handle("/ws", requireAuth(http.HandlerFunc(gatewaySvc.HandleWebSocket)))
 	hs.HandleFunc("/routes", func(w http.ResponseWriter, r *http.Request) {
 		routes, _ := gatewaySvc.GetRoutes(r.Context())
 		for _, route := range routes {

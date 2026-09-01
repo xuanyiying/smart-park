@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/admin-svc ./cmd/admin-svc
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/admin-svc ./cmd/admin
 
 # Final stage
 FROM alpine:latest
@@ -24,4 +24,4 @@ COPY configs/admin.yaml /app/configs/admin.yaml
 
 EXPOSE 8004
 
-CMD ["./admin-svc"]
+CMD ["./admin-svc", "-conf", "/app/configs/admin.yaml"]

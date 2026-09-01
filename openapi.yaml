@@ -500,14 +500,12 @@ components:
                     type: number
                     format: double
                 cost:
-                    type: number
-                    format: double
+                    type: string
+                    description: Amounts in cents (分).
                 serviceFee:
-                    type: number
-                    format: double
+                    type: string
                 totalAmount:
-                    type: number
-                    format: double
+                    type: string
                 paymentStatus:
                     type: string
         ConfirmPaymentRequest:
@@ -520,8 +518,8 @@ components:
                 paymentMethod:
                     type: string
                 paidAmount:
-                    type: number
-                    format: double
+                    type: string
+                    description: Amount in cents (分).
             description: Payment messages
         ConfirmPaymentResponse:
             type: object
@@ -860,14 +858,12 @@ components:
                     type: number
                     format: double
                 cost:
-                    type: number
-                    format: double
+                    type: string
+                    description: Amounts in cents (分).
                 serviceFee:
-                    type: number
-                    format: double
+                    type: string
                 totalAmount:
-                    type: number
-                    format: double
+                    type: string
                 status:
                     type: string
                 paymentStatus:

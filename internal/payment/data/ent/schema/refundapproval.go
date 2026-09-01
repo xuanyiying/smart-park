@@ -28,9 +28,10 @@ func (RefundApproval) Fields() []ent.Field {
 			MaxLen(64).
 			Optional().
 			Comment("审批人"),
-		field.Float("amount").
+		field.Int64("amount").
+			Default(0).
 			Min(0).
-			Comment("退款金额"),
+			Comment("退款金额(分)"),
 		field.Text("reason").
 			NotEmpty().
 			Comment("退款原因"),

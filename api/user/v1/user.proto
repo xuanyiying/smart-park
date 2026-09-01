@@ -173,7 +173,8 @@ message ParkingRecordInfo {
   string entryTime = 4;
   string exitTime = 5;
   int32 duration = 6;
-  double amount = 7;
+  // Amount in cents (分).
+  int64 amount = 7;
   string status = 8;
 }
 
@@ -201,7 +202,8 @@ message ScanPayResponse {
 
 message ScanPayData {
   string orderId = 1;
-  double amount = 2;
+  // Amount in cents (分).
+  int64 amount = 2;
   string payUrl = 3;
   string qrCode = 4;
   string expireTime = 5;
@@ -239,7 +241,8 @@ message PurchaseMonthlyCardResponse {
 
 message PurchaseMonthlyCardData {
   string orderId = 1;
-  double amount = 2;
+  // Amount in cents (分).
+  int64 amount = 2;
   string payUrl = 3;
   string qrCode = 4;
 }

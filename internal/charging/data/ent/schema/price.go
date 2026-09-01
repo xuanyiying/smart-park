@@ -84,7 +84,7 @@ func (Price) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("tenant_id"),
 		index.Fields("station_id"),
-		index.Fields("is_active"),
-		index.Fields("station_id", "is_active"),
+		index.Fields("is_peak_hours"),
+		index.Fields("station_id", "is_peak_hours"),
 	}
 }

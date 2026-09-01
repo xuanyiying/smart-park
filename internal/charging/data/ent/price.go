@@ -19,7 +19,9 @@ type Price struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// 充电桩ID
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
+	// 充电站ID
 	StationID uuid.UUID `json:"station_id,omitempty"`
 	// 价格名称
 	Name string `json:"name,omitempty"`
@@ -86,7 +88,7 @@ func (*Price) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case price.FieldEffectiveAt, price.FieldExpiresAt, price.FieldCreatedAt, price.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case price.FieldID, price.FieldStationID:
+		case price.FieldID, price.FieldTenantID, price.FieldStationID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -108,6 +110,12 @@ func (_m *Price) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case price.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case price.FieldStationID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -229,6 +237,9 @@ func (_m *Price) String() string {
 	var builder strings.Builder
 	builder.WriteString("Price(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("station_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.StationID))
 	builder.WriteString(", ")

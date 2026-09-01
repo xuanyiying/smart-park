@@ -22,6 +22,12 @@ type PriceCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *PriceCreate) SetTenantID(v uuid.UUID) *PriceCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetStationID sets the "station_id" field.
 func (_c *PriceCreate) SetStationID(v uuid.UUID) *PriceCreate {
 	_c.mutation.SetStationID(v)
@@ -266,6 +272,9 @@ func (_c *PriceCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *PriceCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Price.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.StationID(); !ok {
 		return &ValidationError{Name: "station_id", err: errors.New(`ent: missing required field "Price.station_id"`)}
 	}
@@ -354,6 +363,10 @@ func (_c *PriceCreate) createSpec() (*Price, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(price.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(price.FieldName, field.TypeString, value)

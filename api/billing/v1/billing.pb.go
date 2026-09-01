@@ -167,12 +167,13 @@ func (x *CalculateFeeResponse) GetData() *BillData {
 }
 
 type BillData struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	RecordId       string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
-	BaseAmount     float64                `protobuf:"fixed64,2,opt,name=baseAmount,proto3" json:"baseAmount,omitempty"`
-	DiscountAmount float64                `protobuf:"fixed64,3,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
-	FinalAmount    float64                `protobuf:"fixed64,4,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
-	AppliedRules   []*AppliedRule         `protobuf:"bytes,5,rep,name=appliedRules,proto3" json:"appliedRules,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	RecordId string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	// Amounts are in cents (分) to avoid float rounding on the money path.
+	BaseAmount     int64          `protobuf:"varint,2,opt,name=baseAmount,proto3" json:"baseAmount,omitempty"`
+	DiscountAmount int64          `protobuf:"varint,3,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
+	FinalAmount    int64          `protobuf:"varint,4,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
+	AppliedRules   []*AppliedRule `protobuf:"bytes,5,rep,name=appliedRules,proto3" json:"appliedRules,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -214,21 +215,21 @@ func (x *BillData) GetRecordId() string {
 	return ""
 }
 
-func (x *BillData) GetBaseAmount() float64 {
+func (x *BillData) GetBaseAmount() int64 {
 	if x != nil {
 		return x.BaseAmount
 	}
 	return 0
 }
 
-func (x *BillData) GetDiscountAmount() float64 {
+func (x *BillData) GetDiscountAmount() int64 {
 	if x != nil {
 		return x.DiscountAmount
 	}
 	return 0
 }
 
-func (x *BillData) GetFinalAmount() float64 {
+func (x *BillData) GetFinalAmount() int64 {
 	if x != nil {
 		return x.FinalAmount
 	}
@@ -243,10 +244,11 @@ func (x *BillData) GetAppliedRules() []*AppliedRule {
 }
 
 type AppliedRule struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RuleId        string                 `protobuf:"bytes,1,opt,name=ruleId,proto3" json:"ruleId,omitempty"`
-	RuleName      string                 `protobuf:"bytes,2,opt,name=ruleName,proto3" json:"ruleName,omitempty"`
-	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	RuleId   string                 `protobuf:"bytes,1,opt,name=ruleId,proto3" json:"ruleId,omitempty"`
+	RuleName string                 `protobuf:"bytes,2,opt,name=ruleName,proto3" json:"ruleName,omitempty"`
+	// Contribution of this rule, in cents (分).
+	Amount        int64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -295,7 +297,7 @@ func (x *AppliedRule) GetRuleName() string {
 	return ""
 }
 
-func (x *AppliedRule) GetAmount() float64 {
+func (x *AppliedRule) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -991,11 +993,12 @@ func (x *TestBillingRuleRequest) GetActionsJson() string {
 }
 
 type TestBillingRuleResponse struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	ConditionMet   bool                   `protobuf:"varint,1,opt,name=conditionMet,proto3" json:"conditionMet,omitempty"`
-	CalculatedFee  float64                `protobuf:"fixed64,2,opt,name=calculatedFee,proto3" json:"calculatedFee,omitempty"`
-	AppliedActions []string               `protobuf:"bytes,3,rep,name=appliedActions,proto3" json:"appliedActions,omitempty"`
-	Duration       float64                `protobuf:"fixed64,4,opt,name=duration,proto3" json:"duration,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	ConditionMet bool                   `protobuf:"varint,1,opt,name=conditionMet,proto3" json:"conditionMet,omitempty"`
+	// Calculated fee in cents (分).
+	CalculatedFee  int64    `protobuf:"varint,2,opt,name=calculatedFee,proto3" json:"calculatedFee,omitempty"`
+	AppliedActions []string `protobuf:"bytes,3,rep,name=appliedActions,proto3" json:"appliedActions,omitempty"`
+	Duration       float64  `protobuf:"fixed64,4,opt,name=duration,proto3" json:"duration,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1037,7 +1040,7 @@ func (x *TestBillingRuleResponse) GetConditionMet() bool {
 	return false
 }
 
-func (x *TestBillingRuleResponse) GetCalculatedFee() float64 {
+func (x *TestBillingRuleResponse) GetCalculatedFee() int64 {
 	if x != nil {
 		return x.CalculatedFee
 	}
@@ -1077,15 +1080,15 @@ const file_api_billing_v1_billing_proto_rawDesc = "" +
 	"\bBillData\x12\x1a\n" +
 	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x1e\n" +
 	"\n" +
-	"baseAmount\x18\x02 \x01(\x01R\n" +
+	"baseAmount\x18\x02 \x01(\x03R\n" +
 	"baseAmount\x12&\n" +
-	"\x0ediscountAmount\x18\x03 \x01(\x01R\x0ediscountAmount\x12 \n" +
-	"\vfinalAmount\x18\x04 \x01(\x01R\vfinalAmount\x12?\n" +
+	"\x0ediscountAmount\x18\x03 \x01(\x03R\x0ediscountAmount\x12 \n" +
+	"\vfinalAmount\x18\x04 \x01(\x03R\vfinalAmount\x12?\n" +
 	"\fappliedRules\x18\x05 \x03(\v2\x1b.api.billing.v1.AppliedRuleR\fappliedRules\"Y\n" +
 	"\vAppliedRule\x12\x16\n" +
 	"\x06ruleId\x18\x01 \x01(\tR\x06ruleId\x12\x1a\n" +
 	"\bruleName\x18\x02 \x01(\tR\bruleName\x12\x16\n" +
-	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xea\x01\n" +
+	"\x06amount\x18\x03 \x01(\x03R\x06amount\"\xea\x01\n" +
 	"\x18CreateBillingRuleRequest\x12\x14\n" +
 	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x1a\n" +
 	"\bruleName\x18\x02 \x01(\tR\bruleName\x12\x1a\n" +
@@ -1139,7 +1142,7 @@ const file_api_billing_v1_billing_proto_rawDesc = "" +
 	"\vactionsJson\x18\x06 \x01(\tR\vactionsJson\"\xa7\x01\n" +
 	"\x17TestBillingRuleResponse\x12\"\n" +
 	"\fconditionMet\x18\x01 \x01(\bR\fconditionMet\x12$\n" +
-	"\rcalculatedFee\x18\x02 \x01(\x01R\rcalculatedFee\x12&\n" +
+	"\rcalculatedFee\x18\x02 \x01(\x03R\rcalculatedFee\x12&\n" +
 	"\x0eappliedActions\x18\x03 \x03(\tR\x0eappliedActions\x12\x1a\n" +
 	"\bduration\x18\x04 \x01(\x01R\bduration2\xed\x06\n" +
 	"\x0eBillingService\x12\x7f\n" +

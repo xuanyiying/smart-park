@@ -82,7 +82,7 @@ func TestGenerateAndParseToken(t *testing.T) {
 		t.Fatalf("failed to create manager: %v", err)
 	}
 
-	token, err := manager.GenerateToken("user123", "open123")
+	token, err := manager.GenerateToken("user123", "open123", "tenant-42")
 	if err != nil {
 		t.Fatalf("failed to generate token: %v", err)
 	}
@@ -102,6 +102,53 @@ func TestGenerateAndParseToken(t *testing.T) {
 
 	if claims.OpenID != "open123" {
 		t.Errorf("expected open_id open123, got %s", claims.OpenID)
+	}
+}
+
+// TestTenantClaimRoundTrips guards the tenant binding that multi-tenant isolation relies
+// on: downstream services trust claims.TenantID rather than a client-supplied header, so
+// the claim must survive signing and parsing intact.
+func TestTenantClaimRoundTrips(t *testing.T) {
+	privateKey, publicKey, err := generateRSAKeyPair(2048)
+	if err != nil {
+		t.Fatalf("failed to generate key pair: %v", err)
+	}
+
+	privatePEM, _ := encodePrivateKeyToPEM(privateKey)
+	publicPEM, _ := encodePublicKeyToPEM(publicKey)
+
+	privateFile, _ := os.CreateTemp("", "private*.pem")
+	defer os.Remove(privateFile.Name())
+	privateFile.Write(privatePEM)
+	privateFile.Close()
+
+	publicFile, _ := os.CreateTemp("", "public*.pem")
+	defer os.Remove(publicFile.Name())
+	publicFile.Write(publicPEM)
+	publicFile.Close()
+
+	manager, err := auth.NewJWTManager(&auth.JWTConfig{
+		PrivateKeyPath: privateFile.Name(),
+		PublicKeyPath:  publicFile.Name(),
+		TokenDuration:  time.Hour,
+	})
+	if err != nil {
+		t.Fatalf("failed to create manager: %v", err)
+	}
+
+	tenantID := "11111111-1111-1111-1111-111111111111"
+	token, err := manager.GenerateToken("user123", "open123", tenantID)
+	if err != nil {
+		t.Fatalf("failed to generate token: %v", err)
+	}
+
+	claims, err := manager.ParseToken(token)
+	if err != nil {
+		t.Fatalf("failed to parse token: %v", err)
+	}
+
+	if claims.TenantID != tenantID {
+		t.Errorf("tenant_id = %q, want %q; cross-tenant isolation depends on this claim", claims.TenantID, tenantID)
 	}
 }
 
@@ -135,7 +182,7 @@ func TestExpiredToken(t *testing.T) {
 		t.Fatalf("failed to create manager: %v", err)
 	}
 
-	token, err := manager.GenerateToken("user123", "open123")
+	token, err := manager.GenerateToken("user123", "open123", "tenant-42")
 	if err != nil {
 		t.Fatalf("failed to generate token: %v", err)
 	}
@@ -233,7 +280,7 @@ func TestTokenWithDifferentKeys(t *testing.T) {
 		t.Fatalf("failed to create manager2: %v", err)
 	}
 
-	token, err := manager1.GenerateToken("user123", "open123")
+	token, err := manager1.GenerateToken("user123", "open123", "tenant-42")
 	if err != nil {
 		t.Fatalf("failed to generate token: %v", err)
 	}

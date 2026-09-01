@@ -23,14 +23,15 @@ const (
 )
 
 type CreatePaymentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
-	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayMethod     string                 `protobuf:"bytes,3,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
-	OpenId        string                 `protobuf:"bytes,4,opt,name=openId,proto3" json:"openId,omitempty"`
-	NotifyUrl     string                 `protobuf:"bytes,5,opt,name=notifyUrl,proto3" json:"notifyUrl,omitempty"`
-	OrderType     string                 `protobuf:"bytes,6,opt,name=orderType,proto3" json:"orderType,omitempty"`
-	SessionId     string                 `protobuf:"bytes,7,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	RecordId string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	// Amount in cents (分).
+	Amount        int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	PayMethod     string `protobuf:"bytes,3,opt,name=payMethod,proto3" json:"payMethod,omitempty"`
+	OpenId        string `protobuf:"bytes,4,opt,name=openId,proto3" json:"openId,omitempty"`
+	NotifyUrl     string `protobuf:"bytes,5,opt,name=notifyUrl,proto3" json:"notifyUrl,omitempty"`
+	OrderType     string `protobuf:"bytes,6,opt,name=orderType,proto3" json:"orderType,omitempty"`
+	SessionId     string `protobuf:"bytes,7,opt,name=sessionId,proto3" json:"sessionId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -72,7 +73,7 @@ func (x *CreatePaymentRequest) GetRecordId() string {
 	return ""
 }
 
-func (x *CreatePaymentRequest) GetAmount() float64 {
+func (x *CreatePaymentRequest) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -175,12 +176,13 @@ func (x *CreatePaymentResponse) GetData() *PaymentData {
 }
 
 type PaymentData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
-	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayUrl        string                 `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
-	QrCode        string                 `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
-	ExpireTime    string                 `protobuf:"bytes,5,opt,name=expireTime,proto3" json:"expireTime,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	OrderId string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
+	// Amount in cents (分).
+	Amount        int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	PayUrl        string `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
+	QrCode        string `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
+	ExpireTime    string `protobuf:"bytes,5,opt,name=expireTime,proto3" json:"expireTime,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -222,7 +224,7 @@ func (x *PaymentData) GetOrderId() string {
 	return ""
 }
 
-func (x *PaymentData) GetAmount() float64 {
+func (x *PaymentData) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -979,16 +981,17 @@ func (x *ReconcileDailyResponse) GetData() []*ReconciliationRecord {
 }
 
 type ReconciliationRecord struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	OrderId            string                 `protobuf:"bytes,2,opt,name=orderId,proto3" json:"orderId,omitempty"`
-	PaymentMethod      string                 `protobuf:"bytes,3,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
-	OrderAmount        float64                `protobuf:"fixed64,4,opt,name=orderAmount,proto3" json:"orderAmount,omitempty"`
-	PaidAmount         float64                `protobuf:"fixed64,5,opt,name=paidAmount,proto3" json:"paidAmount,omitempty"`
-	TransactionId      string                 `protobuf:"bytes,6,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
-	ReconciliationTime string                 `protobuf:"bytes,7,opt,name=reconciliationTime,proto3" json:"reconciliationTime,omitempty"`
-	Status             string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
-	Notes              string                 `protobuf:"bytes,9,opt,name=notes,proto3" json:"notes,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,2,opt,name=orderId,proto3" json:"orderId,omitempty"`
+	PaymentMethod string                 `protobuf:"bytes,3,opt,name=paymentMethod,proto3" json:"paymentMethod,omitempty"`
+	// Amounts in cents (分).
+	OrderAmount        int64  `protobuf:"varint,4,opt,name=orderAmount,proto3" json:"orderAmount,omitempty"`
+	PaidAmount         int64  `protobuf:"varint,5,opt,name=paidAmount,proto3" json:"paidAmount,omitempty"`
+	TransactionId      string `protobuf:"bytes,6,opt,name=transactionId,proto3" json:"transactionId,omitempty"`
+	ReconciliationTime string `protobuf:"bytes,7,opt,name=reconciliationTime,proto3" json:"reconciliationTime,omitempty"`
+	Status             string `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	Notes              string `protobuf:"bytes,9,opt,name=notes,proto3" json:"notes,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -1044,14 +1047,14 @@ func (x *ReconciliationRecord) GetPaymentMethod() string {
 	return ""
 }
 
-func (x *ReconciliationRecord) GetOrderAmount() float64 {
+func (x *ReconciliationRecord) GetOrderAmount() int64 {
 	if x != nil {
 		return x.OrderAmount
 	}
 	return 0
 }
 
-func (x *ReconciliationRecord) GetPaidAmount() float64 {
+func (x *ReconciliationRecord) GetPaidAmount() int64 {
 	if x != nil {
 		return x.PaidAmount
 	}
@@ -1301,7 +1304,7 @@ const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\x1capi/payment/v1/payment.proto\x12\x0eapi.payment.v1\x1a\x1cgoogle/api/annotations.proto\"\xda\x01\n" +
 	"\x14CreatePaymentRequest\x12\x1a\n" +
 	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x1c\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12\x1c\n" +
 	"\tpayMethod\x18\x03 \x01(\tR\tpayMethod\x12\x16\n" +
 	"\x06openId\x18\x04 \x01(\tR\x06openId\x12\x1c\n" +
 	"\tnotifyUrl\x18\x05 \x01(\tR\tnotifyUrl\x12\x1c\n" +
@@ -1313,7 +1316,7 @@ const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2\x1b.api.payment.v1.PaymentDataR\x04data\"\x8f\x01\n" +
 	"\vPaymentData\x12\x18\n" +
 	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12\x16\n" +
 	"\x06payUrl\x18\x03 \x01(\tR\x06payUrl\x12\x16\n" +
 	"\x06qrCode\x18\x04 \x01(\tR\x06qrCode\x12\x1e\n" +
 	"\n" +
@@ -1385,9 +1388,9 @@ const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\aorderId\x18\x02 \x01(\tR\aorderId\x12$\n" +
 	"\rpaymentMethod\x18\x03 \x01(\tR\rpaymentMethod\x12 \n" +
-	"\vorderAmount\x18\x04 \x01(\x01R\vorderAmount\x12\x1e\n" +
+	"\vorderAmount\x18\x04 \x01(\x03R\vorderAmount\x12\x1e\n" +
 	"\n" +
-	"paidAmount\x18\x05 \x01(\x01R\n" +
+	"paidAmount\x18\x05 \x01(\x03R\n" +
 	"paidAmount\x12$\n" +
 	"\rtransactionId\x18\x06 \x01(\tR\rtransactionId\x12.\n" +
 	"\x12reconciliationTime\x18\a \x01(\tR\x12reconciliationTime\x12\x16\n" +

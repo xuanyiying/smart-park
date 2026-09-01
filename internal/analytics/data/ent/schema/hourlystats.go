@@ -34,9 +34,9 @@ func (HourlyStats) Fields() []ent.Field {
 		field.Float("occupancy_rate").
 			Default(0).
 			Comment("占用率"),
-		field.Float("revenue").
+		field.Int64("revenue").
 			Default(0).
-			Comment("收入"),
+			Comment("收入(分)"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

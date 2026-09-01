@@ -26,6 +26,9 @@ type Config struct {
 	Wechat    WechatConfig    `mapstructure:"wechat"`
 	Alipay    AlipayConfig    `mapstructure:"alipay"`
 	MQTT      MQTTConfig      `mapstructure:"mqtt"`
+	// EntryExit tunes the vehicle entry/exit pipeline (distributed lock TTL, plate
+	// recognition confidence threshold, device online threshold).
+	EntryExit EntryExitConfig `mapstructure:"entry_exit"`
 	Billing   *BillingConfig  `mapstructure:"billing"`
 	Vehicle   *VehicleConfig  `mapstructure:"vehicle"`
 	Payment   *PaymentConfig  `mapstructure:"payment"`
@@ -108,8 +111,12 @@ type WechatConfig struct {
 	APIKey         string `mapstructure:"api_key"`
 	CertSerialNo   string `mapstructure:"cert_serial_no"`
 	PrivateKeyPath string `mapstructure:"private_key_path"`
-	PublicKeyPath  string `mapstructure:"public_key_path"`
-	NotifyURL      string `mapstructure:"notify_url"`
+	// PublicKeyPath points to the WeChat Pay *platform certificate* (PEM, CERTIFICATE block).
+	// It is required to verify APIv3 callback signatures.
+	PublicKeyPath string `mapstructure:"public_key_path"`
+	// APIv3Key is the 32-char APIv3 secret used to AES-256-GCM decrypt callback resources.
+	APIv3Key  string `mapstructure:"api_v3_key"`
+	NotifyURL string `mapstructure:"notify_url"`
 }
 
 type AlipayConfig struct {
@@ -118,6 +125,9 @@ type AlipayConfig struct {
 	PublicKey    string `mapstructure:"public_key"`
 	NotifyURL    string `mapstructure:"notify_url"`
 	IsProduction bool   `mapstructure:"is_production"`
+	// SignType selects the callback signature algorithm: "RSA" (SHA1) or "RSA2" (SHA256).
+	// Defaults to RSA2 when empty.
+	SignType string `mapstructure:"sign_type"`
 }
 
 type MQTTConfig struct {
@@ -128,9 +138,24 @@ type MQTTConfig struct {
 	Password string `mapstructure:"password"`
 }
 
+// EntryExitConfig holds tunables for the vehicle entry/exit pipeline. Durations are
+// expressed as Go duration strings ("10s", "1m") and zero values fall back to the
+// defaults defined in the business layer.
+type EntryExitConfig struct {
+	LockTTL               string  `mapstructure:"lock_ttl"`
+	DeviceOnlineThreshold string  `mapstructure:"device_online_threshold"`
+	MinConfidence         float64 `mapstructure:"min_confidence"`
+	// SeedLotID opts into provisioning demo lanes/devices for a specific parking lot.
+	// Empty disables seeding entirely, which is the production default.
+	SeedLotID string `mapstructure:"seed_lot_id"`
+}
+
 type BillingConfig struct {
 	Endpoint string `mapstructure:"endpoint"`
 	Timeout  int    `mapstructure:"timeout"`
+	// SeedLotID opts into provisioning starting billing rules for a specific parking lot.
+	// Empty disables seeding entirely, which is the production default.
+	SeedLotID string `mapstructure:"seed_lot_id"`
 }
 
 type VehicleConfig struct {
@@ -141,6 +166,10 @@ type VehicleConfig struct {
 type PaymentConfig struct {
 	Endpoint string `mapstructure:"endpoint"`
 	Timeout  int    `mapstructure:"timeout"`
+	// SweepInterval controls how often pending orders are swept: expired ones are closed,
+	// and gateway-confirmed payments that lost their callback get settled. Zero or
+	// negative falls back to the service default of one minute.
+	SweepInterval time.Duration `mapstructure:"sweep_interval"`
 }
 
 type JWTConfig struct {
@@ -149,6 +178,9 @@ type JWTConfig struct {
 	PrivateKeyPath string        `mapstructure:"private_key_path"`
 	Expiry         int           `mapstructure:"expiry"`
 	TokenDuration  time.Duration `mapstructure:"token_duration"`
+	// SkipPaths lists routes that bypass authentication (health probes, login, etc.).
+	// Only add paths that are genuinely meant to be public.
+	SkipPaths []string `mapstructure:"skip_paths"`
 }
 
 type RouteConfig struct {

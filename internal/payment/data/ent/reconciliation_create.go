@@ -50,14 +50,30 @@ func (_c *ReconciliationCreate) SetNillablePaymentMethod(v *string) *Reconciliat
 }
 
 // SetOrderAmount sets the "order_amount" field.
-func (_c *ReconciliationCreate) SetOrderAmount(v float64) *ReconciliationCreate {
+func (_c *ReconciliationCreate) SetOrderAmount(v int64) *ReconciliationCreate {
 	_c.mutation.SetOrderAmount(v)
 	return _c
 }
 
+// SetNillableOrderAmount sets the "order_amount" field if the given value is not nil.
+func (_c *ReconciliationCreate) SetNillableOrderAmount(v *int64) *ReconciliationCreate {
+	if v != nil {
+		_c.SetOrderAmount(*v)
+	}
+	return _c
+}
+
 // SetPaidAmount sets the "paid_amount" field.
-func (_c *ReconciliationCreate) SetPaidAmount(v float64) *ReconciliationCreate {
+func (_c *ReconciliationCreate) SetPaidAmount(v int64) *ReconciliationCreate {
 	_c.mutation.SetPaidAmount(v)
+	return _c
+}
+
+// SetNillablePaidAmount sets the "paid_amount" field if the given value is not nil.
+func (_c *ReconciliationCreate) SetNillablePaidAmount(v *int64) *ReconciliationCreate {
+	if v != nil {
+		_c.SetPaidAmount(*v)
+	}
 	return _c
 }
 
@@ -194,6 +210,14 @@ func (_c *ReconciliationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ReconciliationCreate) defaults() {
+	if _, ok := _c.mutation.OrderAmount(); !ok {
+		v := reconciliation.DefaultOrderAmount
+		_c.mutation.SetOrderAmount(v)
+	}
+	if _, ok := _c.mutation.PaidAmount(); !ok {
+		v := reconciliation.DefaultPaidAmount
+		_c.mutation.SetPaidAmount(v)
+	}
 	if _, ok := _c.mutation.ReconciliationTime(); !ok {
 		v := reconciliation.DefaultReconciliationTime()
 		_c.mutation.SetReconciliationTime(v)
@@ -310,11 +334,11 @@ func (_c *ReconciliationCreate) createSpec() (*Reconciliation, *sqlgraph.CreateS
 		_node.PaymentMethod = value
 	}
 	if value, ok := _c.mutation.OrderAmount(); ok {
-		_spec.SetField(reconciliation.FieldOrderAmount, field.TypeFloat64, value)
+		_spec.SetField(reconciliation.FieldOrderAmount, field.TypeInt64, value)
 		_node.OrderAmount = value
 	}
 	if value, ok := _c.mutation.PaidAmount(); ok {
-		_spec.SetField(reconciliation.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.SetField(reconciliation.FieldPaidAmount, field.TypeInt64, value)
 		_node.PaidAmount = value
 	}
 	if value, ok := _c.mutation.TransactionID(); ok {

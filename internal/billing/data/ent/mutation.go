@@ -34,6 +34,7 @@ type BillingRuleMutation struct {
 	op              Op
 	typ             string
 	id              *uuid.UUID
+	tenant_id       *uuid.UUID
 	lot_id          *uuid.UUID
 	rule_name       *string
 	rule_type       *billingrule.RuleType
@@ -153,6 +154,42 @@ func (m *BillingRuleMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *BillingRuleMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *BillingRuleMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the BillingRule entity.
+// If the BillingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BillingRuleMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *BillingRuleMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetLotID sets the "lot_id" field.
@@ -608,7 +645,10 @@ func (m *BillingRuleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BillingRuleMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
+	if m.tenant_id != nil {
+		fields = append(fields, billingrule.FieldTenantID)
+	}
 	if m.lot_id != nil {
 		fields = append(fields, billingrule.FieldLotID)
 	}
@@ -647,6 +687,8 @@ func (m *BillingRuleMutation) Fields() []string {
 // schema.
 func (m *BillingRuleMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case billingrule.FieldTenantID:
+		return m.TenantID()
 	case billingrule.FieldLotID:
 		return m.LotID()
 	case billingrule.FieldRuleName:
@@ -676,6 +718,8 @@ func (m *BillingRuleMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *BillingRuleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case billingrule.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case billingrule.FieldLotID:
 		return m.OldLotID(ctx)
 	case billingrule.FieldRuleName:
@@ -705,6 +749,13 @@ func (m *BillingRuleMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *BillingRuleMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case billingrule.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case billingrule.FieldLotID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -860,6 +911,9 @@ func (m *BillingRuleMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *BillingRuleMutation) ResetField(name string) error {
 	switch name {
+	case billingrule.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case billingrule.FieldLotID:
 		m.ResetLotID()
 		return nil

@@ -48,8 +48,16 @@ func (_c *RefundApprovalCreate) SetNillableApprover(v *string) *RefundApprovalCr
 }
 
 // SetAmount sets the "amount" field.
-func (_c *RefundApprovalCreate) SetAmount(v float64) *RefundApprovalCreate {
+func (_c *RefundApprovalCreate) SetAmount(v int64) *RefundApprovalCreate {
 	_c.mutation.SetAmount(v)
+	return _c
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (_c *RefundApprovalCreate) SetNillableAmount(v *int64) *RefundApprovalCreate {
+	if v != nil {
+		_c.SetAmount(*v)
+	}
 	return _c
 }
 
@@ -178,6 +186,10 @@ func (_c *RefundApprovalCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *RefundApprovalCreate) defaults() {
+	if _, ok := _c.mutation.Amount(); !ok {
+		v := refundapproval.DefaultAmount
+		_c.mutation.SetAmount(v)
+	}
 	if _, ok := _c.mutation.RefundMethod(); !ok {
 		v := refundapproval.DefaultRefundMethod
 		_c.mutation.SetRefundMethod(v)
@@ -297,7 +309,7 @@ func (_c *RefundApprovalCreate) createSpec() (*RefundApproval, *sqlgraph.CreateS
 		_node.Approver = value
 	}
 	if value, ok := _c.mutation.Amount(); ok {
-		_spec.SetField(refundapproval.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(refundapproval.FieldAmount, field.TypeInt64, value)
 		_node.Amount = value
 	}
 	if value, ok := _c.mutation.Reason(); ok {

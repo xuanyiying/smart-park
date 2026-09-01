@@ -263,12 +263,12 @@ func (_q *ParkingLotQuery) Clone() *ParkingLotQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ParkingLot.Query().
-//		GroupBy(parkinglot.FieldName).
+//		GroupBy(parkinglot.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ParkingLotQuery) GroupBy(field string, fields ...string) *ParkingLotGroupBy {
@@ -286,11 +286,11 @@ func (_q *ParkingLotQuery) GroupBy(field string, fields ...string) *ParkingLotGr
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		TenantID uuid.UUID `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.ParkingLot.Query().
-//		Select(parkinglot.FieldName).
+//		Select(parkinglot.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *ParkingLotQuery) Select(fields ...string) *ParkingLotSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

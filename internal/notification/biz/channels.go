@@ -8,6 +8,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 )
 
+// InAppNotifier is a no-op delivery step: in-app notifications are persisted by
+// the use case (NotificationUseCase.SendNotification calls the repo), so the
+// "channel" has nothing more to deliver.
 type InAppNotifier struct {
 	log *log.Helper
 }
@@ -19,7 +22,7 @@ func NewInAppNotifier(logger log.Logger) *InAppNotifier {
 }
 
 func (n *InAppNotifier) Send(ctx context.Context, notification *Notification) error {
-	n.log.WithContext(ctx).Infow("msg", "in-app notification sent",
+	n.log.WithContext(ctx).Infow("msg", "in-app notification persisted",
 		"notification_id", notification.ID,
 		"type", notification.Type,
 		"recipient", notification.Recipient,
@@ -27,61 +30,149 @@ func (n *InAppNotifier) Send(ctx context.Context, notification *Notification) er
 	return nil
 }
 
+// EmailNotifier delivers notifications over SMTP.
+//
+// Without credentials it returns ErrChannelNotConfigured instead of logging
+// "queued" and pretending the mail went out: the caller can then record a real
+// failure, and a misconfigured deployment is visible on the very first send.
 type EmailNotifier struct {
-	log *log.Helper
+	config  *EmailConfig
+	resolve RecipientResolver
+	log     *log.Helper
 }
 
-func NewEmailNotifier(logger log.Logger) *EmailNotifier {
+func NewEmailNotifier(config *EmailConfig, resolve RecipientResolver, logger log.Logger) *EmailNotifier {
 	return &EmailNotifier{
-		log: log.NewHelper(logger),
+		config:  config,
+		resolve: resolve,
+		log:     log.NewHelper(logger),
 	}
 }
 
 func (n *EmailNotifier) Send(ctx context.Context, notification *Notification) error {
-	n.log.WithContext(ctx).Infow("msg", "email notification queued",
+	if !n.config.Enabled() {
+		return ErrChannelNotConfigured
+	}
+
+	to, err := n.resolveRecipient(ctx, notification.Recipient)
+	if err != nil {
+		return fmt.Errorf("email: resolve recipient %q: %w", notification.Recipient, err)
+	}
+
+	message := buildMIMEMessage(n.config.From, to, notification.Title, notification.Content)
+	if err := deliverEmail(n.config, to, message); err != nil {
+		return fmt.Errorf("email: deliver to %s: %w", to, err)
+	}
+
+	n.log.WithContext(ctx).Infow("msg", "email notification sent",
 		"notification_id", notification.ID,
 		"type", notification.Type,
-		"recipient", notification.Recipient,
+		"recipient", to,
 	)
 	return nil
 }
 
-type SMSNotifier struct {
-	log *log.Helper
+func (n *EmailNotifier) resolveRecipient(ctx context.Context, recipient string) (string, error) {
+	if n.resolve == nil {
+		return recipient, nil
+	}
+	return n.resolve(ctx, recipient)
 }
 
-func NewSMSNotifier(logger log.Logger) *SMSNotifier {
+// SMSNotifier delivers notifications through a signed SMS gateway request.
+type SMSNotifier struct {
+	config  *SMSConfig
+	resolve RecipientResolver
+	log     *log.Helper
+}
+
+func NewSMSNotifier(config *SMSConfig, resolve RecipientResolver, logger log.Logger) *SMSNotifier {
 	return &SMSNotifier{
-		log: log.NewHelper(logger),
+		config:  config,
+		resolve: resolve,
+		log:     log.NewHelper(logger),
 	}
 }
 
 func (n *SMSNotifier) Send(ctx context.Context, notification *Notification) error {
-	n.log.WithContext(ctx).Infow("msg", "sms notification queued",
+	if !n.config.Enabled() {
+		return ErrChannelNotConfigured
+	}
+
+	phone, err := n.resolveRecipient(ctx, notification.Recipient)
+	if err != nil {
+		return fmt.Errorf("sms: resolve recipient %q: %w", notification.Recipient, err)
+	}
+
+	// Template variables must match the template registered with the provider;
+	// title/content is the lowest common denominator across templates.
+	params := map[string]string{
+		"title":   notification.Title,
+		"content": notification.Content,
+	}
+	if err := sendSMS(ctx, n.config, phone, params); err != nil {
+		return fmt.Errorf("sms: deliver to %s: %w", phone, err)
+	}
+
+	n.log.WithContext(ctx).Infow("msg", "sms notification sent",
 		"notification_id", notification.ID,
 		"type", notification.Type,
-		"recipient", notification.Recipient,
+		"recipient", phone,
 	)
 	return nil
 }
 
-type WechatNotifier struct {
-	log *log.Helper
+func (n *SMSNotifier) resolveRecipient(ctx context.Context, recipient string) (string, error) {
+	if n.resolve == nil {
+		return recipient, nil
+	}
+	return n.resolve(ctx, recipient)
 }
 
-func NewWechatNotifier(logger log.Logger) *WechatNotifier {
+// WechatNotifier delivers template messages through the Official Account API.
+type WechatNotifier struct {
+	config  *WechatConfig
+	resolve RecipientResolver
+	tokens  *wechatTokenCache
+	log     *log.Helper
+}
+
+func NewWechatNotifier(config *WechatConfig, resolve RecipientResolver, logger log.Logger) *WechatNotifier {
 	return &WechatNotifier{
-		log: log.NewHelper(logger),
+		config:  config,
+		resolve: resolve,
+		tokens:  &wechatTokenCache{},
+		log:     log.NewHelper(logger),
 	}
 }
 
 func (n *WechatNotifier) Send(ctx context.Context, notification *Notification) error {
-	n.log.WithContext(ctx).Infow("msg", "wechat notification queued",
+	if !n.config.Enabled() {
+		return ErrChannelNotConfigured
+	}
+
+	openID, err := n.resolveRecipient(ctx, notification.Recipient)
+	if err != nil {
+		return fmt.Errorf("wechat: resolve recipient %q: %w", notification.Recipient, err)
+	}
+
+	if err := sendWechatTemplate(ctx, n.config, n.tokens, openID, notification.Title, notification.Content); err != nil {
+		return fmt.Errorf("wechat: deliver to %s: %w", openID, err)
+	}
+
+	n.log.WithContext(ctx).Infow("msg", "wechat notification sent",
 		"notification_id", notification.ID,
 		"type", notification.Type,
-		"recipient", notification.Recipient,
+		"recipient", openID,
 	)
 	return nil
+}
+
+func (n *WechatNotifier) resolveRecipient(ctx context.Context, recipient string) (string, error) {
+	if n.resolve == nil {
+		return recipient, nil
+	}
+	return n.resolve(ctx, recipient)
 }
 
 type ChannelRoute struct {

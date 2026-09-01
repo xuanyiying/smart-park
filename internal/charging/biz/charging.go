@@ -299,9 +299,9 @@ func (uc *ChargingUseCase) StopCharging(ctx context.Context, sessionID, userID u
 	}
 
 	session.Cost = uc.calculateEnergyCost(chargedEnergy, price)
-	session.ServiceFee = price.ServiceFee
+	session.ServiceFee = int64(math.Round(price.ServiceFee * 100))
 	if session.ServiceFee <= 0 {
-		session.ServiceFee = uc.config.DefaultServiceFee
+		session.ServiceFee = int64(math.Round(uc.config.DefaultServiceFee * 100))
 	}
 	session.TotalAmount = session.Cost + session.ServiceFee
 
@@ -391,8 +391,8 @@ func (uc *ChargingUseCase) GetStationSessions(ctx context.Context, stationID uui
 	return uc.repo.ListStationSessions(ctx, stationID, page, pageSize)
 }
 
-// ConfirmPayment confirms payment for a charging session.
-func (uc *ChargingUseCase) ConfirmPayment(ctx context.Context, sessionID uuid.UUID, transactionID, paymentMethod string, paidAmount float64) error {
+// ConfirmPayment confirms payment for a charging session. paidAmount is in cents (分).
+func (uc *ChargingUseCase) ConfirmPayment(ctx context.Context, sessionID uuid.UUID, transactionID, paymentMethod string, paidAmount int64) error {
 	session, err := uc.repo.GetSession(ctx, sessionID)
 	if err != nil {
 		return ErrSessionNotFound
@@ -523,8 +523,8 @@ func (uc *ChargingUseCase) GetCurrentPrice(ctx context.Context, stationID uuid.U
 	return price, nil
 }
 
-// calculateEnergyCost calculates the energy cost.
-func (uc *ChargingUseCase) calculateEnergyCost(energyKWh float64, price *Price) float64 {
+// calculateEnergyCost calculates the energy cost in cents (分).
+func (uc *ChargingUseCase) calculateEnergyCost(energyKWh float64, price *Price) int64 {
 	if price == nil {
 		return 0
 	}
@@ -536,7 +536,7 @@ func (uc *ChargingUseCase) calculateEnergyCost(energyKWh float64, price *Price) 
 		baseCost += energyKWh * price.OffPeakLoad
 	}
 
-	return math.Round(baseCost*100) / 100
+	return int64(math.Round(baseCost * 100))
 }
 
 // estimateEnergy estimates energy consumption.

@@ -50,12 +50,12 @@ type DailyStatsMutation struct {
 	addtotal_exits    *int
 	total_vehicles    *int
 	addtotal_vehicles *int
-	total_amount      *float64
-	addtotal_amount   *float64
-	total_discount    *float64
-	addtotal_discount *float64
-	net_amount        *float64
-	addnet_amount     *float64
+	total_amount      *int64
+	addtotal_amount   *int64
+	total_discount    *int64
+	addtotal_discount *int64
+	net_amount        *int64
+	addnet_amount     *int64
 	avg_duration      *float64
 	addavg_duration   *float64
 	peak_hour         *int
@@ -415,13 +415,13 @@ func (m *DailyStatsMutation) ResetTotalVehicles() {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (m *DailyStatsMutation) SetTotalAmount(f float64) {
-	m.total_amount = &f
+func (m *DailyStatsMutation) SetTotalAmount(i int64) {
+	m.total_amount = &i
 	m.addtotal_amount = nil
 }
 
 // TotalAmount returns the value of the "total_amount" field in the mutation.
-func (m *DailyStatsMutation) TotalAmount() (r float64, exists bool) {
+func (m *DailyStatsMutation) TotalAmount() (r int64, exists bool) {
 	v := m.total_amount
 	if v == nil {
 		return
@@ -432,7 +432,7 @@ func (m *DailyStatsMutation) TotalAmount() (r float64, exists bool) {
 // OldTotalAmount returns the old "total_amount" field's value of the DailyStats entity.
 // If the DailyStats object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DailyStatsMutation) OldTotalAmount(ctx context.Context) (v float64, err error) {
+func (m *DailyStatsMutation) OldTotalAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotalAmount is only allowed on UpdateOne operations")
 	}
@@ -446,17 +446,17 @@ func (m *DailyStatsMutation) OldTotalAmount(ctx context.Context) (v float64, err
 	return oldValue.TotalAmount, nil
 }
 
-// AddTotalAmount adds f to the "total_amount" field.
-func (m *DailyStatsMutation) AddTotalAmount(f float64) {
+// AddTotalAmount adds i to the "total_amount" field.
+func (m *DailyStatsMutation) AddTotalAmount(i int64) {
 	if m.addtotal_amount != nil {
-		*m.addtotal_amount += f
+		*m.addtotal_amount += i
 	} else {
-		m.addtotal_amount = &f
+		m.addtotal_amount = &i
 	}
 }
 
 // AddedTotalAmount returns the value that was added to the "total_amount" field in this mutation.
-func (m *DailyStatsMutation) AddedTotalAmount() (r float64, exists bool) {
+func (m *DailyStatsMutation) AddedTotalAmount() (r int64, exists bool) {
 	v := m.addtotal_amount
 	if v == nil {
 		return
@@ -471,13 +471,13 @@ func (m *DailyStatsMutation) ResetTotalAmount() {
 }
 
 // SetTotalDiscount sets the "total_discount" field.
-func (m *DailyStatsMutation) SetTotalDiscount(f float64) {
-	m.total_discount = &f
+func (m *DailyStatsMutation) SetTotalDiscount(i int64) {
+	m.total_discount = &i
 	m.addtotal_discount = nil
 }
 
 // TotalDiscount returns the value of the "total_discount" field in the mutation.
-func (m *DailyStatsMutation) TotalDiscount() (r float64, exists bool) {
+func (m *DailyStatsMutation) TotalDiscount() (r int64, exists bool) {
 	v := m.total_discount
 	if v == nil {
 		return
@@ -488,7 +488,7 @@ func (m *DailyStatsMutation) TotalDiscount() (r float64, exists bool) {
 // OldTotalDiscount returns the old "total_discount" field's value of the DailyStats entity.
 // If the DailyStats object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DailyStatsMutation) OldTotalDiscount(ctx context.Context) (v float64, err error) {
+func (m *DailyStatsMutation) OldTotalDiscount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotalDiscount is only allowed on UpdateOne operations")
 	}
@@ -502,17 +502,17 @@ func (m *DailyStatsMutation) OldTotalDiscount(ctx context.Context) (v float64, e
 	return oldValue.TotalDiscount, nil
 }
 
-// AddTotalDiscount adds f to the "total_discount" field.
-func (m *DailyStatsMutation) AddTotalDiscount(f float64) {
+// AddTotalDiscount adds i to the "total_discount" field.
+func (m *DailyStatsMutation) AddTotalDiscount(i int64) {
 	if m.addtotal_discount != nil {
-		*m.addtotal_discount += f
+		*m.addtotal_discount += i
 	} else {
-		m.addtotal_discount = &f
+		m.addtotal_discount = &i
 	}
 }
 
 // AddedTotalDiscount returns the value that was added to the "total_discount" field in this mutation.
-func (m *DailyStatsMutation) AddedTotalDiscount() (r float64, exists bool) {
+func (m *DailyStatsMutation) AddedTotalDiscount() (r int64, exists bool) {
 	v := m.addtotal_discount
 	if v == nil {
 		return
@@ -527,13 +527,13 @@ func (m *DailyStatsMutation) ResetTotalDiscount() {
 }
 
 // SetNetAmount sets the "net_amount" field.
-func (m *DailyStatsMutation) SetNetAmount(f float64) {
-	m.net_amount = &f
+func (m *DailyStatsMutation) SetNetAmount(i int64) {
+	m.net_amount = &i
 	m.addnet_amount = nil
 }
 
 // NetAmount returns the value of the "net_amount" field in the mutation.
-func (m *DailyStatsMutation) NetAmount() (r float64, exists bool) {
+func (m *DailyStatsMutation) NetAmount() (r int64, exists bool) {
 	v := m.net_amount
 	if v == nil {
 		return
@@ -544,7 +544,7 @@ func (m *DailyStatsMutation) NetAmount() (r float64, exists bool) {
 // OldNetAmount returns the old "net_amount" field's value of the DailyStats entity.
 // If the DailyStats object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DailyStatsMutation) OldNetAmount(ctx context.Context) (v float64, err error) {
+func (m *DailyStatsMutation) OldNetAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldNetAmount is only allowed on UpdateOne operations")
 	}
@@ -558,17 +558,17 @@ func (m *DailyStatsMutation) OldNetAmount(ctx context.Context) (v float64, err e
 	return oldValue.NetAmount, nil
 }
 
-// AddNetAmount adds f to the "net_amount" field.
-func (m *DailyStatsMutation) AddNetAmount(f float64) {
+// AddNetAmount adds i to the "net_amount" field.
+func (m *DailyStatsMutation) AddNetAmount(i int64) {
 	if m.addnet_amount != nil {
-		*m.addnet_amount += f
+		*m.addnet_amount += i
 	} else {
-		m.addnet_amount = &f
+		m.addnet_amount = &i
 	}
 }
 
 // AddedNetAmount returns the value that was added to the "net_amount" field in this mutation.
-func (m *DailyStatsMutation) AddedNetAmount() (r float64, exists bool) {
+func (m *DailyStatsMutation) AddedNetAmount() (r int64, exists bool) {
 	v := m.addnet_amount
 	if v == nil {
 		return
@@ -1010,21 +1010,21 @@ func (m *DailyStatsMutation) SetField(name string, value ent.Value) error {
 		m.SetTotalVehicles(v)
 		return nil
 	case dailystats.FieldTotalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotalAmount(v)
 		return nil
 	case dailystats.FieldTotalDiscount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotalDiscount(v)
 		return nil
 	case dailystats.FieldNetAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1157,21 +1157,21 @@ func (m *DailyStatsMutation) AddField(name string, value ent.Value) error {
 		m.AddTotalVehicles(v)
 		return nil
 	case dailystats.FieldTotalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTotalAmount(v)
 		return nil
 	case dailystats.FieldTotalDiscount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTotalDiscount(v)
 		return nil
 	case dailystats.FieldNetAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1332,8 +1332,8 @@ type HourlyStatsMutation struct {
 	addoccupied_spaces *int
 	occupancy_rate     *float64
 	addoccupancy_rate  *float64
-	revenue            *float64
-	addrevenue         *float64
+	revenue            *int64
+	addrevenue         *int64
 	created_at         *time.Time
 	clearedFields      map[string]struct{}
 	done               bool
@@ -1742,13 +1742,13 @@ func (m *HourlyStatsMutation) ResetOccupancyRate() {
 }
 
 // SetRevenue sets the "revenue" field.
-func (m *HourlyStatsMutation) SetRevenue(f float64) {
-	m.revenue = &f
+func (m *HourlyStatsMutation) SetRevenue(i int64) {
+	m.revenue = &i
 	m.addrevenue = nil
 }
 
 // Revenue returns the value of the "revenue" field in the mutation.
-func (m *HourlyStatsMutation) Revenue() (r float64, exists bool) {
+func (m *HourlyStatsMutation) Revenue() (r int64, exists bool) {
 	v := m.revenue
 	if v == nil {
 		return
@@ -1759,7 +1759,7 @@ func (m *HourlyStatsMutation) Revenue() (r float64, exists bool) {
 // OldRevenue returns the old "revenue" field's value of the HourlyStats entity.
 // If the HourlyStats object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *HourlyStatsMutation) OldRevenue(ctx context.Context) (v float64, err error) {
+func (m *HourlyStatsMutation) OldRevenue(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRevenue is only allowed on UpdateOne operations")
 	}
@@ -1773,17 +1773,17 @@ func (m *HourlyStatsMutation) OldRevenue(ctx context.Context) (v float64, err er
 	return oldValue.Revenue, nil
 }
 
-// AddRevenue adds f to the "revenue" field.
-func (m *HourlyStatsMutation) AddRevenue(f float64) {
+// AddRevenue adds i to the "revenue" field.
+func (m *HourlyStatsMutation) AddRevenue(i int64) {
 	if m.addrevenue != nil {
-		*m.addrevenue += f
+		*m.addrevenue += i
 	} else {
-		m.addrevenue = &f
+		m.addrevenue = &i
 	}
 }
 
 // AddedRevenue returns the value that was added to the "revenue" field in this mutation.
-func (m *HourlyStatsMutation) AddedRevenue() (r float64, exists bool) {
+func (m *HourlyStatsMutation) AddedRevenue() (r int64, exists bool) {
 	v := m.addrevenue
 	if v == nil {
 		return
@@ -1993,7 +1993,7 @@ func (m *HourlyStatsMutation) SetField(name string, value ent.Value) error {
 		m.SetOccupancyRate(v)
 		return nil
 	case hourlystats.FieldRevenue:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2085,7 +2085,7 @@ func (m *HourlyStatsMutation) AddField(name string, value ent.Value) error {
 		m.AddOccupancyRate(v)
 		return nil
 	case hourlystats.FieldRevenue:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2204,18 +2204,18 @@ type OrderMutation struct {
 	lot_id                *uuid.UUID
 	vehicle_id            *uuid.UUID
 	plate_number          *string
-	amount                *float64
-	addamount             *float64
-	discount_amount       *float64
-	adddiscount_amount    *float64
-	final_amount          *float64
-	addfinal_amount       *float64
+	amount                *int64
+	addamount             *int64
+	discount_amount       *int64
+	adddiscount_amount    *int64
+	final_amount          *int64
+	addfinal_amount       *int64
 	status                *order.Status
 	pay_time              *time.Time
 	pay_method            *order.PayMethod
 	transaction_id        *string
-	paid_amount           *float64
-	addpaid_amount        *float64
+	paid_amount           *int64
+	addpaid_amount        *int64
 	refunded_at           *time.Time
 	refund_transaction_id *string
 	created_at            *time.Time
@@ -2488,13 +2488,13 @@ func (m *OrderMutation) ResetPlateNumber() {
 }
 
 // SetAmount sets the "amount" field.
-func (m *OrderMutation) SetAmount(f float64) {
-	m.amount = &f
+func (m *OrderMutation) SetAmount(i int64) {
+	m.amount = &i
 	m.addamount = nil
 }
 
 // Amount returns the value of the "amount" field in the mutation.
-func (m *OrderMutation) Amount() (r float64, exists bool) {
+func (m *OrderMutation) Amount() (r int64, exists bool) {
 	v := m.amount
 	if v == nil {
 		return
@@ -2505,7 +2505,7 @@ func (m *OrderMutation) Amount() (r float64, exists bool) {
 // OldAmount returns the old "amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
 	}
@@ -2519,17 +2519,17 @@ func (m *OrderMutation) OldAmount(ctx context.Context) (v float64, err error) {
 	return oldValue.Amount, nil
 }
 
-// AddAmount adds f to the "amount" field.
-func (m *OrderMutation) AddAmount(f float64) {
+// AddAmount adds i to the "amount" field.
+func (m *OrderMutation) AddAmount(i int64) {
 	if m.addamount != nil {
-		*m.addamount += f
+		*m.addamount += i
 	} else {
-		m.addamount = &f
+		m.addamount = &i
 	}
 }
 
 // AddedAmount returns the value that was added to the "amount" field in this mutation.
-func (m *OrderMutation) AddedAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedAmount() (r int64, exists bool) {
 	v := m.addamount
 	if v == nil {
 		return
@@ -2544,13 +2544,13 @@ func (m *OrderMutation) ResetAmount() {
 }
 
 // SetDiscountAmount sets the "discount_amount" field.
-func (m *OrderMutation) SetDiscountAmount(f float64) {
-	m.discount_amount = &f
+func (m *OrderMutation) SetDiscountAmount(i int64) {
+	m.discount_amount = &i
 	m.adddiscount_amount = nil
 }
 
 // DiscountAmount returns the value of the "discount_amount" field in the mutation.
-func (m *OrderMutation) DiscountAmount() (r float64, exists bool) {
+func (m *OrderMutation) DiscountAmount() (r int64, exists bool) {
 	v := m.discount_amount
 	if v == nil {
 		return
@@ -2561,7 +2561,7 @@ func (m *OrderMutation) DiscountAmount() (r float64, exists bool) {
 // OldDiscountAmount returns the old "discount_amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldDiscountAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldDiscountAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDiscountAmount is only allowed on UpdateOne operations")
 	}
@@ -2575,17 +2575,17 @@ func (m *OrderMutation) OldDiscountAmount(ctx context.Context) (v float64, err e
 	return oldValue.DiscountAmount, nil
 }
 
-// AddDiscountAmount adds f to the "discount_amount" field.
-func (m *OrderMutation) AddDiscountAmount(f float64) {
+// AddDiscountAmount adds i to the "discount_amount" field.
+func (m *OrderMutation) AddDiscountAmount(i int64) {
 	if m.adddiscount_amount != nil {
-		*m.adddiscount_amount += f
+		*m.adddiscount_amount += i
 	} else {
-		m.adddiscount_amount = &f
+		m.adddiscount_amount = &i
 	}
 }
 
 // AddedDiscountAmount returns the value that was added to the "discount_amount" field in this mutation.
-func (m *OrderMutation) AddedDiscountAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedDiscountAmount() (r int64, exists bool) {
 	v := m.adddiscount_amount
 	if v == nil {
 		return
@@ -2600,13 +2600,13 @@ func (m *OrderMutation) ResetDiscountAmount() {
 }
 
 // SetFinalAmount sets the "final_amount" field.
-func (m *OrderMutation) SetFinalAmount(f float64) {
-	m.final_amount = &f
+func (m *OrderMutation) SetFinalAmount(i int64) {
+	m.final_amount = &i
 	m.addfinal_amount = nil
 }
 
 // FinalAmount returns the value of the "final_amount" field in the mutation.
-func (m *OrderMutation) FinalAmount() (r float64, exists bool) {
+func (m *OrderMutation) FinalAmount() (r int64, exists bool) {
 	v := m.final_amount
 	if v == nil {
 		return
@@ -2617,7 +2617,7 @@ func (m *OrderMutation) FinalAmount() (r float64, exists bool) {
 // OldFinalAmount returns the old "final_amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldFinalAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldFinalAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldFinalAmount is only allowed on UpdateOne operations")
 	}
@@ -2631,17 +2631,17 @@ func (m *OrderMutation) OldFinalAmount(ctx context.Context) (v float64, err erro
 	return oldValue.FinalAmount, nil
 }
 
-// AddFinalAmount adds f to the "final_amount" field.
-func (m *OrderMutation) AddFinalAmount(f float64) {
+// AddFinalAmount adds i to the "final_amount" field.
+func (m *OrderMutation) AddFinalAmount(i int64) {
 	if m.addfinal_amount != nil {
-		*m.addfinal_amount += f
+		*m.addfinal_amount += i
 	} else {
-		m.addfinal_amount = &f
+		m.addfinal_amount = &i
 	}
 }
 
 // AddedFinalAmount returns the value that was added to the "final_amount" field in this mutation.
-func (m *OrderMutation) AddedFinalAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedFinalAmount() (r int64, exists bool) {
 	v := m.addfinal_amount
 	if v == nil {
 		return
@@ -2839,13 +2839,13 @@ func (m *OrderMutation) ResetTransactionID() {
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (m *OrderMutation) SetPaidAmount(f float64) {
-	m.paid_amount = &f
+func (m *OrderMutation) SetPaidAmount(i int64) {
+	m.paid_amount = &i
 	m.addpaid_amount = nil
 }
 
 // PaidAmount returns the value of the "paid_amount" field in the mutation.
-func (m *OrderMutation) PaidAmount() (r float64, exists bool) {
+func (m *OrderMutation) PaidAmount() (r int64, exists bool) {
 	v := m.paid_amount
 	if v == nil {
 		return
@@ -2856,7 +2856,7 @@ func (m *OrderMutation) PaidAmount() (r float64, exists bool) {
 // OldPaidAmount returns the old "paid_amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldPaidAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldPaidAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPaidAmount is only allowed on UpdateOne operations")
 	}
@@ -2870,17 +2870,17 @@ func (m *OrderMutation) OldPaidAmount(ctx context.Context) (v float64, err error
 	return oldValue.PaidAmount, nil
 }
 
-// AddPaidAmount adds f to the "paid_amount" field.
-func (m *OrderMutation) AddPaidAmount(f float64) {
+// AddPaidAmount adds i to the "paid_amount" field.
+func (m *OrderMutation) AddPaidAmount(i int64) {
 	if m.addpaid_amount != nil {
-		*m.addpaid_amount += f
+		*m.addpaid_amount += i
 	} else {
-		m.addpaid_amount = &f
+		m.addpaid_amount = &i
 	}
 }
 
 // AddedPaidAmount returns the value that was added to the "paid_amount" field in this mutation.
-func (m *OrderMutation) AddedPaidAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedPaidAmount() (r int64, exists bool) {
 	v := m.addpaid_amount
 	if v == nil {
 		return
@@ -3280,21 +3280,21 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		m.SetPlateNumber(v)
 		return nil
 	case order.FieldAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAmount(v)
 		return nil
 	case order.FieldDiscountAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDiscountAmount(v)
 		return nil
 	case order.FieldFinalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3329,7 +3329,7 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		m.SetTransactionID(v)
 		return nil
 	case order.FieldPaidAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3409,28 +3409,28 @@ func (m *OrderMutation) AddedField(name string) (ent.Value, bool) {
 func (m *OrderMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case order.FieldAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddAmount(v)
 		return nil
 	case order.FieldDiscountAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDiscountAmount(v)
 		return nil
 	case order.FieldFinalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFinalAmount(v)
 		return nil
 	case order.FieldPaidAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -91,7 +91,7 @@ func OpenTime(v time.Time) predicate.OfflineSyncRecord {
 }
 
 // SyncAmount applies equality check predicate on the "sync_amount" field. It's identical to SyncAmountEQ.
-func SyncAmount(v float64) predicate.OfflineSyncRecord {
+func SyncAmount(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldEQ(FieldSyncAmount, v))
 }
 
@@ -491,42 +491,42 @@ func OpenTimeLTE(v time.Time) predicate.OfflineSyncRecord {
 }
 
 // SyncAmountEQ applies the EQ predicate on the "sync_amount" field.
-func SyncAmountEQ(v float64) predicate.OfflineSyncRecord {
+func SyncAmountEQ(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldEQ(FieldSyncAmount, v))
 }
 
 // SyncAmountNEQ applies the NEQ predicate on the "sync_amount" field.
-func SyncAmountNEQ(v float64) predicate.OfflineSyncRecord {
+func SyncAmountNEQ(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldNEQ(FieldSyncAmount, v))
 }
 
 // SyncAmountIn applies the In predicate on the "sync_amount" field.
-func SyncAmountIn(vs ...float64) predicate.OfflineSyncRecord {
+func SyncAmountIn(vs ...int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldIn(FieldSyncAmount, vs...))
 }
 
 // SyncAmountNotIn applies the NotIn predicate on the "sync_amount" field.
-func SyncAmountNotIn(vs ...float64) predicate.OfflineSyncRecord {
+func SyncAmountNotIn(vs ...int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldNotIn(FieldSyncAmount, vs...))
 }
 
 // SyncAmountGT applies the GT predicate on the "sync_amount" field.
-func SyncAmountGT(v float64) predicate.OfflineSyncRecord {
+func SyncAmountGT(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldGT(FieldSyncAmount, v))
 }
 
 // SyncAmountGTE applies the GTE predicate on the "sync_amount" field.
-func SyncAmountGTE(v float64) predicate.OfflineSyncRecord {
+func SyncAmountGTE(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldGTE(FieldSyncAmount, v))
 }
 
 // SyncAmountLT applies the LT predicate on the "sync_amount" field.
-func SyncAmountLT(v float64) predicate.OfflineSyncRecord {
+func SyncAmountLT(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldLT(FieldSyncAmount, v))
 }
 
 // SyncAmountLTE applies the LTE predicate on the "sync_amount" field.
-func SyncAmountLTE(v float64) predicate.OfflineSyncRecord {
+func SyncAmountLTE(v int64) predicate.OfflineSyncRecord {
 	return predicate.OfflineSyncRecord(sql.FieldLTE(FieldSyncAmount, v))
 }
 

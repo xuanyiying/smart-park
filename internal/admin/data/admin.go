@@ -333,7 +333,7 @@ func (r *adminRepo) GetDailyReport(ctx context.Context, lotID uuid.UUID, date st
 		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计订单失败")
 	}
 
-	var totalAmount, totalDiscount float64
+	var totalAmount, totalDiscount int64
 	for _, o := range orders {
 		totalAmount += o.Amount
 		totalDiscount += o.DiscountAmount
@@ -380,7 +380,7 @@ func (r *adminRepo) GetMonthlyReport(ctx context.Context, lotID uuid.UUID, year,
 		return nil, apperrors.Wrapf(err, apperrors.CodeInternal, "统计月度订单失败")
 	}
 
-	var totalAmount, totalDiscount float64
+	var totalAmount, totalDiscount int64
 	for _, o := range orders {
 		totalAmount += o.Amount
 		totalDiscount += o.DiscountAmount
@@ -487,17 +487,29 @@ func (r *adminRepo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	return nil
 }
 
+// SeedData provisions a starting parking lot for development.
+//
+// It is idempotent: the seed only runs while the table is empty. The previous version had
+// no such guard, so every service restart inserted another "测试停车场" row into
+// production and the parking-lot list silently filled with junk.
 func (r *adminRepo) SeedData(ctx context.Context) error {
+	count, err := r.clientFromCtx(ctx).ParkingLot.Query().Count(ctx)
+	if err != nil {
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "检查停车场数据失败")
+	}
+	if count > 0 {
+		// Parking lots already exist, skip seeding.
+		return nil
+	}
+
 	lotID := uuid.New()
-	_, err := r.clientFromCtx(ctx).ParkingLot.Create().
+	if _, err := r.clientFromCtx(ctx).ParkingLot.Create().
 		SetID(lotID).
 		SetName("测试停车场").
 		SetAddress("测试地址").
 		SetLanes(4).
 		SetStatus("active").
-		Save(ctx)
-
-	if err != nil {
+		Save(ctx); err != nil {
 		r.data.log.WithContext(ctx).Errorf("failed to seed parking lot: %v", err)
 		return apperrors.Wrapf(err, apperrors.CodeInternal, "初始化停车场数据失败")
 	}

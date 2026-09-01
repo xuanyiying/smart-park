@@ -340,9 +340,10 @@ message Session {
   double startEnergy   = 8;
   double endEnergy     = 9;
   double chargedEnergy = 10;
-  double cost          = 11;
-  double serviceFee    = 12;
-  double totalAmount   = 13;
+  // Amounts in cents (分).
+  int64  cost          = 11;
+  int64  serviceFee    = 12;
+  int64  totalAmount   = 13;
   string status        = 14; // pending, charging, completed, cancelled, expired
   string paymentStatus = 15; // pending, paid, refunded, failed
   string payTime       = 16;
@@ -361,9 +362,10 @@ message ChargingSummary {
   string endTime       = 6;
   double duration      = 7; // hours
   double chargedEnergy = 8;
-  double cost          = 9;
-  double serviceFee    = 10;
-  double totalAmount   = 11;
+  // Amounts in cents (分).
+  int64  cost          = 9;
+  int64  serviceFee    = 10;
+  int64  totalAmount   = 11;
   string paymentStatus = 12;
 }
 
@@ -430,7 +432,8 @@ message ConfirmPaymentRequest {
   string sessionId     = 1;
   string transactionId = 2;
   string paymentMethod = 3;
-  double paidAmount    = 4;
+  // Amount in cents (分).
+  int64  paidAmount    = 4;
 }
 
 message ConfirmPaymentResponse {

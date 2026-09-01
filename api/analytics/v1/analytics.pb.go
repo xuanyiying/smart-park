@@ -147,12 +147,13 @@ type LotAnalyticsData struct {
 	LotId         string                 `protobuf:"bytes,1,opt,name=lotId,proto3" json:"lotId,omitempty"`
 	LotName       string                 `protobuf:"bytes,2,opt,name=lotName,proto3" json:"lotName,omitempty"`
 	TotalVehicles int32                  `protobuf:"varint,3,opt,name=totalVehicles,proto3" json:"totalVehicles,omitempty"`
-	TotalRevenue  float64                `protobuf:"fixed64,4,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
-	AvgDuration   float64                `protobuf:"fixed64,5,opt,name=avgDuration,proto3" json:"avgDuration,omitempty"`
-	OccupancyRate float64                `protobuf:"fixed64,6,opt,name=occupancyRate,proto3" json:"occupancyRate,omitempty"`
-	PeakHour      int32                  `protobuf:"varint,7,opt,name=peakHour,proto3" json:"peakHour,omitempty"`
-	HourlyStats   []*HourlyStats         `protobuf:"bytes,8,rep,name=hourlyStats,proto3" json:"hourlyStats,omitempty"`
-	DailyStats    []*DailyStats          `protobuf:"bytes,9,rep,name=dailyStats,proto3" json:"dailyStats,omitempty"`
+	// Amount in cents (分).
+	TotalRevenue  int64          `protobuf:"varint,4,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
+	AvgDuration   float64        `protobuf:"fixed64,5,opt,name=avgDuration,proto3" json:"avgDuration,omitempty"`
+	OccupancyRate float64        `protobuf:"fixed64,6,opt,name=occupancyRate,proto3" json:"occupancyRate,omitempty"`
+	PeakHour      int32          `protobuf:"varint,7,opt,name=peakHour,proto3" json:"peakHour,omitempty"`
+	HourlyStats   []*HourlyStats `protobuf:"bytes,8,rep,name=hourlyStats,proto3" json:"hourlyStats,omitempty"`
+	DailyStats    []*DailyStats  `protobuf:"bytes,9,rep,name=dailyStats,proto3" json:"dailyStats,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -208,7 +209,7 @@ func (x *LotAnalyticsData) GetTotalVehicles() int32 {
 	return 0
 }
 
-func (x *LotAnalyticsData) GetTotalRevenue() float64 {
+func (x *LotAnalyticsData) GetTotalRevenue() int64 {
 	if x != nil {
 		return x.TotalRevenue
 	}
@@ -251,10 +252,11 @@ func (x *LotAnalyticsData) GetDailyStats() []*DailyStats {
 }
 
 type HourlyStats struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Hour          int32                  `protobuf:"varint,1,opt,name=hour,proto3" json:"hour,omitempty"`
-	VehicleCount  int32                  `protobuf:"varint,2,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
-	Revenue       float64                `protobuf:"fixed64,3,opt,name=revenue,proto3" json:"revenue,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Hour         int32                  `protobuf:"varint,1,opt,name=hour,proto3" json:"hour,omitempty"`
+	VehicleCount int32                  `protobuf:"varint,2,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
+	// Amount in cents (分).
+	Revenue       int64 `protobuf:"varint,3,opt,name=revenue,proto3" json:"revenue,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -303,7 +305,7 @@ func (x *HourlyStats) GetVehicleCount() int32 {
 	return 0
 }
 
-func (x *HourlyStats) GetRevenue() float64 {
+func (x *HourlyStats) GetRevenue() int64 {
 	if x != nil {
 		return x.Revenue
 	}
@@ -311,11 +313,12 @@ func (x *HourlyStats) GetRevenue() float64 {
 }
 
 type DailyStats struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	VehicleCount  int32                  `protobuf:"varint,2,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
-	Revenue       float64                `protobuf:"fixed64,3,opt,name=revenue,proto3" json:"revenue,omitempty"`
-	OccupancyRate float64                `protobuf:"fixed64,4,opt,name=occupancyRate,proto3" json:"occupancyRate,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Date         string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	VehicleCount int32                  `protobuf:"varint,2,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
+	// Amount in cents (分).
+	Revenue       int64   `protobuf:"varint,3,opt,name=revenue,proto3" json:"revenue,omitempty"`
+	OccupancyRate float64 `protobuf:"fixed64,4,opt,name=occupancyRate,proto3" json:"occupancyRate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -364,7 +367,7 @@ func (x *DailyStats) GetVehicleCount() int32 {
 	return 0
 }
 
-func (x *DailyStats) GetRevenue() float64 {
+func (x *DailyStats) GetRevenue() int64 {
 	if x != nil {
 		return x.Revenue
 	}
@@ -499,11 +502,12 @@ func (x *GetRevenueTrendResponse) GetData() *RevenueTrendData {
 }
 
 type RevenueTrendData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Points        []*RevenuePoint        `protobuf:"bytes,1,rep,name=points,proto3" json:"points,omitempty"`
-	TotalRevenue  float64                `protobuf:"fixed64,2,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
-	AvgRevenue    float64                `protobuf:"fixed64,3,opt,name=avgRevenue,proto3" json:"avgRevenue,omitempty"`
-	GrowthRate    float64                `protobuf:"fixed64,4,opt,name=growthRate,proto3" json:"growthRate,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Points []*RevenuePoint        `protobuf:"bytes,1,rep,name=points,proto3" json:"points,omitempty"`
+	// Amounts in cents (分).
+	TotalRevenue  int64   `protobuf:"varint,2,opt,name=totalRevenue,proto3" json:"totalRevenue,omitempty"`
+	AvgRevenue    int64   `protobuf:"varint,3,opt,name=avgRevenue,proto3" json:"avgRevenue,omitempty"`
+	GrowthRate    float64 `protobuf:"fixed64,4,opt,name=growthRate,proto3" json:"growthRate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -545,14 +549,14 @@ func (x *RevenueTrendData) GetPoints() []*RevenuePoint {
 	return nil
 }
 
-func (x *RevenueTrendData) GetTotalRevenue() float64 {
+func (x *RevenueTrendData) GetTotalRevenue() int64 {
 	if x != nil {
 		return x.TotalRevenue
 	}
 	return 0
 }
 
-func (x *RevenueTrendData) GetAvgRevenue() float64 {
+func (x *RevenueTrendData) GetAvgRevenue() int64 {
 	if x != nil {
 		return x.AvgRevenue
 	}
@@ -567,10 +571,11 @@ func (x *RevenueTrendData) GetGrowthRate() float64 {
 }
 
 type RevenuePoint struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	Revenue       float64                `protobuf:"fixed64,2,opt,name=revenue,proto3" json:"revenue,omitempty"`
-	VehicleCount  int32                  `protobuf:"varint,3,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Date  string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	// Amount in cents (分).
+	Revenue       int64 `protobuf:"varint,2,opt,name=revenue,proto3" json:"revenue,omitempty"`
+	VehicleCount  int32 `protobuf:"varint,3,opt,name=vehicleCount,proto3" json:"vehicleCount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -612,7 +617,7 @@ func (x *RevenuePoint) GetDate() string {
 	return ""
 }
 
-func (x *RevenuePoint) GetRevenue() float64 {
+func (x *RevenuePoint) GetRevenue() int64 {
 	if x != nil {
 		return x.Revenue
 	}
@@ -1427,7 +1432,7 @@ const file_api_analytics_v1_analytics_proto_rawDesc = "" +
 	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x18\n" +
 	"\alotName\x18\x02 \x01(\tR\alotName\x12$\n" +
 	"\rtotalVehicles\x18\x03 \x01(\x05R\rtotalVehicles\x12\"\n" +
-	"\ftotalRevenue\x18\x04 \x01(\x01R\ftotalRevenue\x12 \n" +
+	"\ftotalRevenue\x18\x04 \x01(\x03R\ftotalRevenue\x12 \n" +
 	"\vavgDuration\x18\x05 \x01(\x01R\vavgDuration\x12$\n" +
 	"\roccupancyRate\x18\x06 \x01(\x01R\roccupancyRate\x12\x1a\n" +
 	"\bpeakHour\x18\a \x01(\x05R\bpeakHour\x12?\n" +
@@ -1438,12 +1443,12 @@ const file_api_analytics_v1_analytics_proto_rawDesc = "" +
 	"\vHourlyStats\x12\x12\n" +
 	"\x04hour\x18\x01 \x01(\x05R\x04hour\x12\"\n" +
 	"\fvehicleCount\x18\x02 \x01(\x05R\fvehicleCount\x12\x18\n" +
-	"\arevenue\x18\x03 \x01(\x01R\arevenue\"\x84\x01\n" +
+	"\arevenue\x18\x03 \x01(\x03R\arevenue\"\x84\x01\n" +
 	"\n" +
 	"DailyStats\x12\x12\n" +
 	"\x04date\x18\x01 \x01(\tR\x04date\x12\"\n" +
 	"\fvehicleCount\x18\x02 \x01(\x05R\fvehicleCount\x12\x18\n" +
-	"\arevenue\x18\x03 \x01(\x01R\arevenue\x12$\n" +
+	"\arevenue\x18\x03 \x01(\x03R\arevenue\x12$\n" +
 	"\roccupancyRate\x18\x04 \x01(\x01R\roccupancyRate\"\\\n" +
 	"\x16GetRevenueTrendRequest\x12\x14\n" +
 	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x16\n" +
@@ -1455,16 +1460,16 @@ const file_api_analytics_v1_analytics_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2\".api.analytics.v1.RevenueTrendDataR\x04data\"\xae\x01\n" +
 	"\x10RevenueTrendData\x126\n" +
 	"\x06points\x18\x01 \x03(\v2\x1e.api.analytics.v1.RevenuePointR\x06points\x12\"\n" +
-	"\ftotalRevenue\x18\x02 \x01(\x01R\ftotalRevenue\x12\x1e\n" +
+	"\ftotalRevenue\x18\x02 \x01(\x03R\ftotalRevenue\x12\x1e\n" +
 	"\n" +
-	"avgRevenue\x18\x03 \x01(\x01R\n" +
+	"avgRevenue\x18\x03 \x01(\x03R\n" +
 	"avgRevenue\x12\x1e\n" +
 	"\n" +
 	"growthRate\x18\x04 \x01(\x01R\n" +
 	"growthRate\"`\n" +
 	"\fRevenuePoint\x12\x12\n" +
 	"\x04date\x18\x01 \x01(\tR\x04date\x12\x18\n" +
-	"\arevenue\x18\x02 \x01(\x01R\arevenue\x12\"\n" +
+	"\arevenue\x18\x02 \x01(\x03R\arevenue\x12\"\n" +
 	"\fvehicleCount\x18\x03 \x01(\x05R\fvehicleCount\"C\n" +
 	"\x17PredictPeakHoursRequest\x12\x14\n" +
 	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x12\n" +

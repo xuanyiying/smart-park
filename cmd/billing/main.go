@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"os"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/pkg/database"
 
 	v1 "github.com/xuanyiying/smart-park/api/billing/v1"
@@ -18,6 +20,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/billing/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
 	"github.com/xuanyiying/smart-park/pkg/metrics"
+	"github.com/xuanyiying/smart-park/pkg/tenant"
 	"github.com/xuanyiying/smart-park/pkg/trace"
 )
 
@@ -94,6 +97,11 @@ func main() {
 	}
 	defer dbClient.Close()
 
+	// Scope every query and mutation to the tenant carried by the request
+	// context. Without this, a repository that forgets to filter by tenant
+	// silently returns and rewrites other tenants' billing rules.
+	tenant.ApplyTenantScoping(dbClient, data.TenantScopes(), data.TenantTypes())
+
 	// Run migrations
 	if err := dbClient.Schema.Create(context.Background()); err != nil {
 		logHelper.Errorf("failed to migrate database: %v", err)
@@ -111,10 +119,27 @@ func main() {
 	// Initialize repositories
 	billingRepo := data.NewBillingRuleRepo(dataLayer)
 
-	// Seed billing rules data
-	if err := billingRepo.SeedData(context.Background()); err != nil {
-		logHelper.Errorf("failed to seed billing rules: %v", err)
-		// Don't exit, just log the error
+	// Seed billing rules for the configured parking lot, if any.
+	//
+	// Rules used to be attached to a hard-coded lot id on every boot, which meant real
+	// deployments silently ran on the engine's hard-coded fallback tariff. Operators opt
+	// in by configuring billing.seed_lot_id; otherwise seeding is skipped.
+	seedLotID := uuid.Nil
+	if cfg.Billing.SeedLotID != "" {
+		parsed, err := uuid.Parse(cfg.Billing.SeedLotID)
+		if err != nil {
+			logHelper.Errorf("invalid billing.seed_lot_id %q: %v", cfg.Billing.SeedLotID, err)
+			os.Exit(1)
+		}
+		seedLotID = parsed
+	}
+	if err := billingRepo.SeedData(context.Background(), seedLotID); err != nil {
+		if errors.Is(err, data.ErrSeedLotNotConfigured) {
+			logHelper.Info("billing rule seeding skipped: no billing.seed_lot_id configured")
+		} else {
+			logHelper.Errorf("failed to seed billing rules: %v", err)
+			// Don't exit, just log the error
+		}
 	}
 
 	// Initialize business logic

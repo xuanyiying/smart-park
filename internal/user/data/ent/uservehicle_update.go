@@ -29,6 +29,20 @@ func (_u *UserVehicleUpdate) Where(ps ...predicate.UserVehicle) *UserVehicleUpda
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *UserVehicleUpdate) SetTenantID(v uuid.UUID) *UserVehicleUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *UserVehicleUpdate) SetNillableTenantID(v *uuid.UUID) *UserVehicleUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetUserID sets the "user_id" field.
 func (_u *UserVehicleUpdate) SetUserID(v uuid.UUID) *UserVehicleUpdate {
 	_u.mutation.SetUserID(v)
@@ -176,6 +190,9 @@ func (_u *UserVehicleUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(uservehicle.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(uservehicle.FieldUserID, field.TypeUUID, value)
 	}
@@ -215,6 +232,20 @@ type UserVehicleUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *UserVehicleMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *UserVehicleUpdateOne) SetTenantID(v uuid.UUID) *UserVehicleUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *UserVehicleUpdateOne) SetNillableTenantID(v *uuid.UUID) *UserVehicleUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
@@ -393,6 +424,9 @@ func (_u *UserVehicleUpdateOne) sqlSave(ctx context.Context) (_node *UserVehicle
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(uservehicle.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(uservehicle.FieldUserID, field.TypeUUID, value)

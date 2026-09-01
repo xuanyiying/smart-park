@@ -28,12 +28,12 @@ type DailyStats struct {
 	TotalExits int `json:"total_exits,omitempty"`
 	// 在场车辆数
 	TotalVehicles int `json:"total_vehicles,omitempty"`
-	// 总收入
-	TotalAmount float64 `json:"total_amount,omitempty"`
-	// 总优惠
-	TotalDiscount float64 `json:"total_discount,omitempty"`
-	// 净收入
-	NetAmount float64 `json:"net_amount,omitempty"`
+	// 总收入(分)
+	TotalAmount int64 `json:"total_amount,omitempty"`
+	// 总优惠(分)
+	TotalDiscount int64 `json:"total_discount,omitempty"`
+	// 净收入(分)
+	NetAmount int64 `json:"net_amount,omitempty"`
 	// 平均停车时长(小时)
 	AvgDuration float64 `json:"avg_duration,omitempty"`
 	// 高峰小时
@@ -52,9 +52,9 @@ func (*DailyStats) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case dailystats.FieldTotalAmount, dailystats.FieldTotalDiscount, dailystats.FieldNetAmount, dailystats.FieldAvgDuration:
+		case dailystats.FieldAvgDuration:
 			values[i] = new(sql.NullFloat64)
-		case dailystats.FieldTotalEntries, dailystats.FieldTotalExits, dailystats.FieldTotalVehicles, dailystats.FieldPeakHour, dailystats.FieldPeakVehicles:
+		case dailystats.FieldTotalEntries, dailystats.FieldTotalExits, dailystats.FieldTotalVehicles, dailystats.FieldTotalAmount, dailystats.FieldTotalDiscount, dailystats.FieldNetAmount, dailystats.FieldPeakHour, dailystats.FieldPeakVehicles:
 			values[i] = new(sql.NullInt64)
 		case dailystats.FieldStatDate, dailystats.FieldCreatedAt, dailystats.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -112,22 +112,22 @@ func (_m *DailyStats) assignValues(columns []string, values []any) error {
 				_m.TotalVehicles = int(value.Int64)
 			}
 		case dailystats.FieldTotalAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_amount", values[i])
 			} else if value.Valid {
-				_m.TotalAmount = value.Float64
+				_m.TotalAmount = value.Int64
 			}
 		case dailystats.FieldTotalDiscount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_discount", values[i])
 			} else if value.Valid {
-				_m.TotalDiscount = value.Float64
+				_m.TotalDiscount = value.Int64
 			}
 		case dailystats.FieldNetAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field net_amount", values[i])
 			} else if value.Valid {
-				_m.NetAmount = value.Float64
+				_m.NetAmount = value.Int64
 			}
 		case dailystats.FieldAvgDuration:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {

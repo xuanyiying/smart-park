@@ -167,7 +167,7 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 			return false
 		}
 		hour := float64(ctx.ExitTime.Hour()) + float64(ctx.ExitTime.Minute())/60.0
-		return hour >= start && hour <= end
+		return hourInRange(hour, start, end)
 
 	case "entry_time_range":
 		valueMap, ok := cond.Value.(map[string]interface{})
@@ -180,7 +180,7 @@ func EvaluateCondition(cond *Condition, ctx *BillingContext) bool {
 			return false
 		}
 		hour := float64(ctx.EntryTime.Hour()) + float64(ctx.EntryTime.Minute())/60.0
-		return hour >= start && hour <= end
+		return hourInRange(hour, start, end)
 
 	case "day_of_week":
 		days, ok := cond.Value.([]interface{})
@@ -269,7 +269,9 @@ type BillingRuleRepo interface {
 	UpdateBillingRule(ctx context.Context, rule *BillingRule) error
 	DeleteBillingRule(ctx context.Context, ruleID uuid.UUID) error
 	ListBillingRules(ctx context.Context, lotID uuid.UUID, page, pageSize int) ([]*BillingRule, int64, error)
-	SeedData(ctx context.Context) error
+	// SeedData provisions starting rules for the given parking lot. Passing uuid.Nil
+	// skips seeding, which is the correct production default.
+	SeedData(ctx context.Context, lotID uuid.UUID) error
 	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
@@ -346,7 +348,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 			appliedRules = append(appliedRules, &v1.AppliedRule{
 				RuleId:   rule.ID.String(),
 				RuleName: rule.RuleName,
-				Amount:   ruleAmount,
+				Amount:   yuanToCents(ruleAmount),
 			})
 			appliedRuleSet[rule.ID.String()] = true
 		}
@@ -381,9 +383,9 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 
 	return &v1.BillData{
 		RecordId:       req.RecordId,
-		BaseAmount:     baseAmount,
-		DiscountAmount: discountAmount,
-		FinalAmount:    finalAmount,
+		BaseAmount:     yuanToCents(baseAmount),
+		DiscountAmount: yuanToCents(discountAmount),
+		FinalAmount:    yuanToCents(finalAmount),
 		AppliedRules:   appliedRules,
 	}, nil
 }
@@ -431,11 +433,45 @@ func (uc *BillingUseCase) TestBillingRule(ctx context.Context, req *v1.TestBilli
 	}
 
 	return &v1.TestBillingRuleResponse{
-		ConditionMet:  conditionMet,
-		CalculatedFee: ruleAmount,
+		ConditionMet:   conditionMet,
+		CalculatedFee:  yuanToCents(ruleAmount),
 		AppliedActions: appliedActions,
-		Duration:      duration.Seconds(),
+		Duration:       duration.Seconds(),
 	}, nil
+}
+
+// toFloat coerces a rule parameter to float64.
+//
+// Values decoded from JSON arrive as float64, but rules constructed in Go code carry int
+// literals; accepting both prevents a silent zero that would make thresholds like free
+// durations never trigger.
+func toFloat(v interface{}) (float64, bool) {
+	switch x := v.(type) {
+	case float64:
+		return x, true
+	case float32:
+		return float64(x), true
+	case int:
+		return float64(x), true
+	case int32:
+		return float64(x), true
+	case int64:
+		return float64(x), true
+	default:
+		return 0, false
+	}
+}
+
+// hourInRange reports whether hour falls inside [start, end].
+//
+// Ranges that wrap midnight (start > end, e.g. 22:00 through 06:00) are supported: the
+// comparison wraps around 24h. Without this, a night discount covering 22:00-06:00 could
+// never match anything, because no hour is simultaneously >= 22 and <= 6.
+func hourInRange(hour, start, end float64) bool {
+	if start <= end {
+		return hour >= start && hour <= end
+	}
+	return hour >= start || hour <= end
 }
 
 // sortRulesByPriority sorts rules by priority in descending order.
@@ -486,26 +522,25 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 				amount = a.Amount
 			}
 		case "free_duration":
-				freeMinutes, _ := a.Value.(float64)
-				if duration.Minutes() <= freeMinutes {
-					amount = 0
-				} else {
-					// 扣除免费时长后计算费用
-					remainingMinutes := duration.Minutes() - freeMinutes
-					amount = (remainingMinutes / 60) * a.Amount
-				}
+			// Value is expressed in seconds. A stay within the free window is free; once it
+			// exceeds the window the full computed amount stands. The window therefore acts
+			// as a threshold rather than a deduction, and crucially it must not wipe out
+			// the amount the preceding actions have already computed.
+			freeSeconds, ok := toFloat(a.Value)
+			if ok && duration.Seconds() <= freeSeconds {
+				amount = 0
+			}
 		case "night_discount":
 			hour := exitTime.Hour()
 			if hour >= 22 || hour < 8 {
 				amount = amount * (1 - a.Amount/100)
 			}
 		case "first_hour_free":
+			// Threshold semantics, mirroring free_duration: the first hour is free only
+			// while the whole stay fits inside it. Beyond that the computed amount stands,
+			// so this action must never overwrite what came before it.
 			if hours <= 1 {
 				amount = 0
-			} else {
-				// 第一小时免费，超过部分计费
-				remainingHours := hours - 1
-				amount = remainingHours * a.Amount
 			}
 		case "tiered":
 			// 阶梯计费
@@ -603,6 +638,15 @@ func ceilToDecimal(amount float64, decimals int) float64 {
 		m *= 10
 	}
 	return float64(int(amount*float64(m)+0.999999)) / float64(m)
+}
+
+// yuanToCents converts a yuan-denominated amount to integer cents.
+//
+// The engine computes in yuan because rates and durations are fractional; the
+// conversion to cents happens exactly once, at the API boundary, so no money
+// decision downstream sees a float.
+func yuanToCents(yuan float64) int64 {
+	return int64(math.Round(yuan * 100))
 }
 
 // CreateBillingRule creates a new billing rule.

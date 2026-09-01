@@ -33,7 +33,8 @@ type OfflineSyncRecord struct {
 	DeviceID   string
 	GateID     string
 	OpenTime   time.Time
-	SyncAmount float64
+	// SyncAmount in cents (分).
+	SyncAmount int64
 	SyncStatus string
 	SyncError  string
 	RetryCount int
@@ -44,6 +45,10 @@ type OfflineSyncRecord struct {
 const (
 	RecordStatusExiting = "exiting"
 	ExitStatusUnpaid    = "unpaid"
+	// ExitStatusPaid is set by the payment service once the order for this parking record
+	// has been settled. Exit uses it to release a driver who already paid remotely, which
+	// is what makes scan-to-pay and frictionless exit actually work.
+	ExitStatusPaid = "paid"
 )
 
 // Vehicle represents a vehicle entity in business logic.
@@ -219,7 +224,9 @@ type VehicleRepo interface {
 	CreateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error
 	GetPendingSyncRecords(ctx context.Context, limit int) ([]*OfflineSyncRecord, error)
 	UpdateOfflineSyncRecord(ctx context.Context, record *OfflineSyncRecord) error
-	SeedData(ctx context.Context) error
+	// SeedData provisions lanes and devices for the given parking lot. Passing
+	// uuid.Nil skips seeding, which is the correct production default.
+	SeedData(ctx context.Context, lotID uuid.UUID) error
 	// Manufacturer management
 	CreateManufacturer(ctx context.Context, manufacturer *Manufacturer) error
 	GetManufacturer(ctx context.Context, id uuid.UUID) (*Manufacturer, error)

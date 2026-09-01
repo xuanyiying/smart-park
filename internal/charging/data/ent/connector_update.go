@@ -31,6 +31,20 @@ func (_u *ConnectorUpdate) Where(ps ...predicate.Connector) *ConnectorUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ConnectorUpdate) SetTenantID(v uuid.UUID) *ConnectorUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ConnectorUpdate) SetNillableTenantID(v *uuid.UUID) *ConnectorUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetStationID sets the "station_id" field.
 func (_u *ConnectorUpdate) SetStationID(v uuid.UUID) *ConnectorUpdate {
 	_u.mutation.SetStationID(v)
@@ -311,6 +325,9 @@ func (_u *ConnectorUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(connector.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.Number(); ok {
 		_spec.SetField(connector.FieldNumber, field.TypeInt, value)
 	}
@@ -442,6 +459,20 @@ type ConnectorUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ConnectorMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ConnectorUpdateOne) SetTenantID(v uuid.UUID) *ConnectorUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ConnectorUpdateOne) SetNillableTenantID(v *uuid.UUID) *ConnectorUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetStationID sets the "station_id" field.
@@ -753,6 +784,9 @@ func (_u *ConnectorUpdateOne) sqlSave(ctx context.Context) (_node *Connector, er
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(connector.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.Number(); ok {
 		_spec.SetField(connector.FieldNumber, field.TypeInt, value)

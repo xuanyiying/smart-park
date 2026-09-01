@@ -18,6 +18,8 @@ type UserVehicle struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
 	// 用户ID
 	UserID uuid.UUID `json:"user_id,omitempty"`
 	// 车牌号
@@ -42,7 +44,7 @@ func (*UserVehicle) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case uservehicle.FieldCreatedAt, uservehicle.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case uservehicle.FieldID, uservehicle.FieldUserID:
+		case uservehicle.FieldID, uservehicle.FieldTenantID, uservehicle.FieldUserID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -64,6 +66,12 @@ func (_m *UserVehicle) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case uservehicle.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case uservehicle.FieldUserID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -137,6 +145,9 @@ func (_m *UserVehicle) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserVehicle(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")

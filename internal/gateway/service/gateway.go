@@ -13,6 +13,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/xuanyiying/smart-park/internal/gateway/biz"
+	"github.com/xuanyiying/smart-park/pkg/middleware"
 	"github.com/xuanyiying/smart-park/pkg/ws"
 )
 
@@ -173,13 +174,23 @@ func (s *GatewayService) StreamProxy(w http.ResponseWriter, r *http.Request) {
 	proxy.ServeHTTP(w, r)
 }
 
+// HandleWebSocket upgrades a connection for an authenticated client.
+//
+// Identity is taken from the JWT claims established by the auth middleware. It is
+// deliberately not read from the query string: a URL parameter is attacker controlled, so
+// the previous implementation let anyone subscribe to any user's or tenant's events simply
+// by typing a different id.
 func (s *GatewayService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	tenantID := r.URL.Query().Get("tenant_id")
+	claims, err := middleware.GetClaimsFromContext(r.Context())
+	if err != nil || claims == nil {
+		s.log.Warnf("websocket upgrade rejected: %v", err)
+		http.Error(w, "Unauthorized: valid token required", http.StatusUnauthorized)
+		return
+	}
 
 	opts := ws.UpgradeOptions{
-		UserID:   userID,
-		TenantID: tenantID,
+		UserID:   claims.UserID,
+		TenantID: claims.TenantID,
 	}
 
 	if err := ws.UpgradeHTTP(w, r, s.hub, opts, s.logger); err != nil {
@@ -187,7 +198,7 @@ func (s *GatewayService) HandleWebSocket(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	s.log.Infof("websocket connection established: user=%s, tenant=%s", userID, tenantID)
+	s.log.Infof("websocket connection established: user=%s, tenant=%s", claims.UserID, claims.TenantID)
 }
 
 func (s *GatewayService) Hub() *ws.Hub {

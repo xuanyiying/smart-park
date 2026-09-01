@@ -9193,8 +9193,8 @@ type OfflineSyncRecordMutation struct {
 	device_id      *string
 	gate_id        *string
 	open_time      *time.Time
-	sync_amount    *float64
-	addsync_amount *float64
+	sync_amount    *int64
+	addsync_amount *int64
 	sync_status    *offlinesyncrecord.SyncStatus
 	sync_error     *string
 	retry_count    *int
@@ -9590,13 +9590,13 @@ func (m *OfflineSyncRecordMutation) ResetOpenTime() {
 }
 
 // SetSyncAmount sets the "sync_amount" field.
-func (m *OfflineSyncRecordMutation) SetSyncAmount(f float64) {
-	m.sync_amount = &f
+func (m *OfflineSyncRecordMutation) SetSyncAmount(i int64) {
+	m.sync_amount = &i
 	m.addsync_amount = nil
 }
 
 // SyncAmount returns the value of the "sync_amount" field in the mutation.
-func (m *OfflineSyncRecordMutation) SyncAmount() (r float64, exists bool) {
+func (m *OfflineSyncRecordMutation) SyncAmount() (r int64, exists bool) {
 	v := m.sync_amount
 	if v == nil {
 		return
@@ -9607,7 +9607,7 @@ func (m *OfflineSyncRecordMutation) SyncAmount() (r float64, exists bool) {
 // OldSyncAmount returns the old "sync_amount" field's value of the OfflineSyncRecord entity.
 // If the OfflineSyncRecord object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OfflineSyncRecordMutation) OldSyncAmount(ctx context.Context) (v float64, err error) {
+func (m *OfflineSyncRecordMutation) OldSyncAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSyncAmount is only allowed on UpdateOne operations")
 	}
@@ -9621,17 +9621,17 @@ func (m *OfflineSyncRecordMutation) OldSyncAmount(ctx context.Context) (v float6
 	return oldValue.SyncAmount, nil
 }
 
-// AddSyncAmount adds f to the "sync_amount" field.
-func (m *OfflineSyncRecordMutation) AddSyncAmount(f float64) {
+// AddSyncAmount adds i to the "sync_amount" field.
+func (m *OfflineSyncRecordMutation) AddSyncAmount(i int64) {
 	if m.addsync_amount != nil {
-		*m.addsync_amount += f
+		*m.addsync_amount += i
 	} else {
-		m.addsync_amount = &f
+		m.addsync_amount = &i
 	}
 }
 
 // AddedSyncAmount returns the value that was added to the "sync_amount" field in this mutation.
-func (m *OfflineSyncRecordMutation) AddedSyncAmount() (r float64, exists bool) {
+func (m *OfflineSyncRecordMutation) AddedSyncAmount() (r int64, exists bool) {
 	v := m.addsync_amount
 	if v == nil {
 		return
@@ -10087,7 +10087,7 @@ func (m *OfflineSyncRecordMutation) SetField(name string, value ent.Value) error
 		m.SetOpenTime(v)
 		return nil
 	case offlinesyncrecord.FieldSyncAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -10164,7 +10164,7 @@ func (m *OfflineSyncRecordMutation) AddedField(name string) (ent.Value, bool) {
 func (m *OfflineSyncRecordMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case offlinesyncrecord.FieldSyncAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

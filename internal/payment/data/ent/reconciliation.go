@@ -22,10 +22,10 @@ type Reconciliation struct {
 	OrderID *uuid.UUID `json:"order_id,omitempty"`
 	// 支付方式
 	PaymentMethod string `json:"payment_method,omitempty"`
-	// 订单金额
-	OrderAmount float64 `json:"order_amount,omitempty"`
-	// 实付金额
-	PaidAmount float64 `json:"paid_amount,omitempty"`
+	// 订单金额(分)
+	OrderAmount int64 `json:"order_amount,omitempty"`
+	// 实付金额(分)
+	PaidAmount int64 `json:"paid_amount,omitempty"`
 	// 支付渠道交易号
 	TransactionID string `json:"transaction_id,omitempty"`
 	// 对账时间
@@ -49,7 +49,7 @@ func (*Reconciliation) scanValues(columns []string) ([]any, error) {
 		case reconciliation.FieldOrderID:
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case reconciliation.FieldOrderAmount, reconciliation.FieldPaidAmount:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.NullInt64)
 		case reconciliation.FieldPaymentMethod, reconciliation.FieldTransactionID, reconciliation.FieldStatus, reconciliation.FieldNotes:
 			values[i] = new(sql.NullString)
 		case reconciliation.FieldReconciliationTime, reconciliation.FieldCreatedAt, reconciliation.FieldUpdatedAt:
@@ -91,16 +91,16 @@ func (_m *Reconciliation) assignValues(columns []string, values []any) error {
 				_m.PaymentMethod = value.String
 			}
 		case reconciliation.FieldOrderAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field order_amount", values[i])
 			} else if value.Valid {
-				_m.OrderAmount = value.Float64
+				_m.OrderAmount = value.Int64
 			}
 		case reconciliation.FieldPaidAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field paid_amount", values[i])
 			} else if value.Valid {
-				_m.PaidAmount = value.Float64
+				_m.PaidAmount = value.Int64
 			}
 		case reconciliation.FieldTransactionID:
 			if value, ok := values[i].(*sql.NullString); !ok {

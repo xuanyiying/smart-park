@@ -73,6 +73,47 @@ func (m *MockOrderRepo) GetOrdersByTimeRange(ctx context.Context, startTime, end
 	return []*Order{}, nil
 }
 
+// MarkOrderPaid mirrors the conditional update of the real repository: it only flips an
+// order that is still pending, and reports false otherwise. Tests rely on this to prove
+// that duplicate callbacks do not settle an order twice. paidAmount is in cents (分).
+func (m *MockOrderRepo) MarkOrderPaid(ctx context.Context, orderID uuid.UUID, method, transactionID string, paidAmount int64, paidAt time.Time) (bool, error) {
+	order, ok := m.Orders[orderID]
+	if !ok || order.Status != string(StatusPending) {
+		return false, nil
+	}
+	order.Status = string(StatusPaid)
+	order.PayMethod = method
+	order.TransactionID = transactionID
+	order.PaidAmount = paidAmount
+	order.PayTime = &paidAt
+	return true, nil
+}
+
+// MarkOrderClosed mirrors the repository's conditional pending→failed transition.
+func (m *MockOrderRepo) MarkOrderClosed(ctx context.Context, orderID uuid.UUID, closedAt time.Time) (bool, error) {
+	order, ok := m.Orders[orderID]
+	if !ok || order.Status != string(StatusPending) {
+		return false, nil
+	}
+	order.Status = string(StatusFailed)
+	order.UpdatedAt = closedAt
+	return true, nil
+}
+
+func (m *MockOrderRepo) ListOrdersByStatus(ctx context.Context, status string, cutoff time.Time, limit int) ([]*Order, error) {
+	var result []*Order
+	for _, order := range m.Orders {
+		if order.Status != status {
+			continue
+		}
+		if !order.CreatedAt.Before(cutoff) {
+			continue
+		}
+		result = append(result, order)
+	}
+	return result, nil
+}
+
 type MockRecordRepo struct{}
 
 func NewMockRecordRepo() *MockRecordRepo {
@@ -108,7 +149,7 @@ func TestPaymentUseCase_CreatePayment(t *testing.T) {
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
-		Amount:    10.50,
+		Amount:    1050, // 10.50 元 expressed in cents
 		PayMethod: "alipay",
 		NotifyUrl: "http://example.com/notify",
 	}
@@ -125,8 +166,8 @@ func TestPaymentUseCase_CreatePayment(t *testing.T) {
 		t.Fatal("Expected non-nil response")
 	}
 
-	if data.Amount != 10.50 {
-		t.Errorf("Expected amount 10.50, got %f", data.Amount)
+	if data.Amount != 1050 {
+		t.Errorf("Expected amount 1050, got %d", data.Amount)
 	}
 
 	if data.OrderId == "" {
@@ -145,7 +186,7 @@ func TestPaymentUseCase_CreatePayment_InvalidAmount(t *testing.T) {
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
-		Amount:    -10.50,
+		Amount:    -1050,
 		PayMethod: "wechat",
 	}
 
@@ -166,7 +207,7 @@ func TestPaymentUseCase_CreatePayment_InvalidMethod(t *testing.T) {
 
 	req := &v1.CreatePaymentRequest{
 		RecordId:  uuid.New().String(),
-		Amount:    10.50,
+		Amount:    1050,
 		PayMethod: "invalid",
 	}
 

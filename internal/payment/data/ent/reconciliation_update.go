@@ -70,14 +70,14 @@ func (_u *ReconciliationUpdate) ClearPaymentMethod() *ReconciliationUpdate {
 }
 
 // SetOrderAmount sets the "order_amount" field.
-func (_u *ReconciliationUpdate) SetOrderAmount(v float64) *ReconciliationUpdate {
+func (_u *ReconciliationUpdate) SetOrderAmount(v int64) *ReconciliationUpdate {
 	_u.mutation.ResetOrderAmount()
 	_u.mutation.SetOrderAmount(v)
 	return _u
 }
 
 // SetNillableOrderAmount sets the "order_amount" field if the given value is not nil.
-func (_u *ReconciliationUpdate) SetNillableOrderAmount(v *float64) *ReconciliationUpdate {
+func (_u *ReconciliationUpdate) SetNillableOrderAmount(v *int64) *ReconciliationUpdate {
 	if v != nil {
 		_u.SetOrderAmount(*v)
 	}
@@ -85,20 +85,20 @@ func (_u *ReconciliationUpdate) SetNillableOrderAmount(v *float64) *Reconciliati
 }
 
 // AddOrderAmount adds value to the "order_amount" field.
-func (_u *ReconciliationUpdate) AddOrderAmount(v float64) *ReconciliationUpdate {
+func (_u *ReconciliationUpdate) AddOrderAmount(v int64) *ReconciliationUpdate {
 	_u.mutation.AddOrderAmount(v)
 	return _u
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (_u *ReconciliationUpdate) SetPaidAmount(v float64) *ReconciliationUpdate {
+func (_u *ReconciliationUpdate) SetPaidAmount(v int64) *ReconciliationUpdate {
 	_u.mutation.ResetPaidAmount()
 	_u.mutation.SetPaidAmount(v)
 	return _u
 }
 
 // SetNillablePaidAmount sets the "paid_amount" field if the given value is not nil.
-func (_u *ReconciliationUpdate) SetNillablePaidAmount(v *float64) *ReconciliationUpdate {
+func (_u *ReconciliationUpdate) SetNillablePaidAmount(v *int64) *ReconciliationUpdate {
 	if v != nil {
 		_u.SetPaidAmount(*v)
 	}
@@ -106,7 +106,7 @@ func (_u *ReconciliationUpdate) SetNillablePaidAmount(v *float64) *Reconciliatio
 }
 
 // AddPaidAmount adds value to the "paid_amount" field.
-func (_u *ReconciliationUpdate) AddPaidAmount(v float64) *ReconciliationUpdate {
+func (_u *ReconciliationUpdate) AddPaidAmount(v int64) *ReconciliationUpdate {
 	_u.mutation.AddPaidAmount(v)
 	return _u
 }
@@ -286,16 +286,16 @@ func (_u *ReconciliationUpdate) sqlSave(ctx context.Context) (_node int, err err
 		_spec.ClearField(reconciliation.FieldPaymentMethod, field.TypeString)
 	}
 	if value, ok := _u.mutation.OrderAmount(); ok {
-		_spec.SetField(reconciliation.FieldOrderAmount, field.TypeFloat64, value)
+		_spec.SetField(reconciliation.FieldOrderAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedOrderAmount(); ok {
-		_spec.AddField(reconciliation.FieldOrderAmount, field.TypeFloat64, value)
+		_spec.AddField(reconciliation.FieldOrderAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.PaidAmount(); ok {
-		_spec.SetField(reconciliation.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.SetField(reconciliation.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPaidAmount(); ok {
-		_spec.AddField(reconciliation.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.AddField(reconciliation.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TransactionID(); ok {
 		_spec.SetField(reconciliation.FieldTransactionID, field.TypeString, value)
@@ -379,14 +379,14 @@ func (_u *ReconciliationUpdateOne) ClearPaymentMethod() *ReconciliationUpdateOne
 }
 
 // SetOrderAmount sets the "order_amount" field.
-func (_u *ReconciliationUpdateOne) SetOrderAmount(v float64) *ReconciliationUpdateOne {
+func (_u *ReconciliationUpdateOne) SetOrderAmount(v int64) *ReconciliationUpdateOne {
 	_u.mutation.ResetOrderAmount()
 	_u.mutation.SetOrderAmount(v)
 	return _u
 }
 
 // SetNillableOrderAmount sets the "order_amount" field if the given value is not nil.
-func (_u *ReconciliationUpdateOne) SetNillableOrderAmount(v *float64) *ReconciliationUpdateOne {
+func (_u *ReconciliationUpdateOne) SetNillableOrderAmount(v *int64) *ReconciliationUpdateOne {
 	if v != nil {
 		_u.SetOrderAmount(*v)
 	}
@@ -394,20 +394,20 @@ func (_u *ReconciliationUpdateOne) SetNillableOrderAmount(v *float64) *Reconcili
 }
 
 // AddOrderAmount adds value to the "order_amount" field.
-func (_u *ReconciliationUpdateOne) AddOrderAmount(v float64) *ReconciliationUpdateOne {
+func (_u *ReconciliationUpdateOne) AddOrderAmount(v int64) *ReconciliationUpdateOne {
 	_u.mutation.AddOrderAmount(v)
 	return _u
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (_u *ReconciliationUpdateOne) SetPaidAmount(v float64) *ReconciliationUpdateOne {
+func (_u *ReconciliationUpdateOne) SetPaidAmount(v int64) *ReconciliationUpdateOne {
 	_u.mutation.ResetPaidAmount()
 	_u.mutation.SetPaidAmount(v)
 	return _u
 }
 
 // SetNillablePaidAmount sets the "paid_amount" field if the given value is not nil.
-func (_u *ReconciliationUpdateOne) SetNillablePaidAmount(v *float64) *ReconciliationUpdateOne {
+func (_u *ReconciliationUpdateOne) SetNillablePaidAmount(v *int64) *ReconciliationUpdateOne {
 	if v != nil {
 		_u.SetPaidAmount(*v)
 	}
@@ -415,7 +415,7 @@ func (_u *ReconciliationUpdateOne) SetNillablePaidAmount(v *float64) *Reconcilia
 }
 
 // AddPaidAmount adds value to the "paid_amount" field.
-func (_u *ReconciliationUpdateOne) AddPaidAmount(v float64) *ReconciliationUpdateOne {
+func (_u *ReconciliationUpdateOne) AddPaidAmount(v int64) *ReconciliationUpdateOne {
 	_u.mutation.AddPaidAmount(v)
 	return _u
 }
@@ -625,16 +625,16 @@ func (_u *ReconciliationUpdateOne) sqlSave(ctx context.Context) (_node *Reconcil
 		_spec.ClearField(reconciliation.FieldPaymentMethod, field.TypeString)
 	}
 	if value, ok := _u.mutation.OrderAmount(); ok {
-		_spec.SetField(reconciliation.FieldOrderAmount, field.TypeFloat64, value)
+		_spec.SetField(reconciliation.FieldOrderAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedOrderAmount(); ok {
-		_spec.AddField(reconciliation.FieldOrderAmount, field.TypeFloat64, value)
+		_spec.AddField(reconciliation.FieldOrderAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.PaidAmount(); ok {
-		_spec.SetField(reconciliation.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.SetField(reconciliation.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedPaidAmount(); ok {
-		_spec.AddField(reconciliation.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.AddField(reconciliation.FieldPaidAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TransactionID(); ok {
 		_spec.SetField(reconciliation.FieldTransactionID, field.TypeString, value)

@@ -11,18 +11,19 @@ var (
 	// OrdersColumns holds the columns for the "orders" table.
 	OrdersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "record_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "vehicle_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "plate_number", Type: field.TypeString, Size: 20},
-		{Name: "amount", Type: field.TypeFloat64},
-		{Name: "discount_amount", Type: field.TypeFloat64, Default: 0},
-		{Name: "final_amount", Type: field.TypeFloat64},
+		{Name: "amount", Type: field.TypeInt64, Default: 0},
+		{Name: "discount_amount", Type: field.TypeInt64, Default: 0},
+		{Name: "final_amount", Type: field.TypeInt64, Default: 0},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "paid", "refunding", "refunded", "failed"}, Default: "pending"},
 		{Name: "pay_time", Type: field.TypeTime, Nullable: true},
 		{Name: "pay_method", Type: field.TypeEnum, Nullable: true, Enums: []string{"wechat", "alipay", "cash"}},
 		{Name: "transaction_id", Type: field.TypeString, Nullable: true, Size: 64},
-		{Name: "paid_amount", Type: field.TypeFloat64, Nullable: true},
+		{Name: "paid_amount", Type: field.TypeInt64, Nullable: true, Default: 0},
 		{Name: "refunded_at", Type: field.TypeTime, Nullable: true},
 		{Name: "refund_transaction_id", Type: field.TypeString, Nullable: true, Size: 64},
 		{Name: "created_at", Type: field.TypeTime},
@@ -35,30 +36,36 @@ var (
 		PrimaryKey: []*schema.Column{OrdersColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "idx_orders_status",
+				Name:    "order_tenant_id",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[8]},
+				Columns: []*schema.Column{OrdersColumns[1]},
 			},
 			{
-				Name:    "idx_orders_pay_time",
+				Name:    "idx_orders_status",
 				Unique:  false,
 				Columns: []*schema.Column{OrdersColumns[9]},
 			},
 			{
+				Name:    "idx_orders_pay_time",
+				Unique:  false,
+				Columns: []*schema.Column{OrdersColumns[10]},
+			},
+			{
 				Name:    "idx_orders_transaction",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[11]},
+				Columns: []*schema.Column{OrdersColumns[12]},
 			},
 			{
 				Name:    "order_lot_id_status",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[2], OrdersColumns[8]},
+				Columns: []*schema.Column{OrdersColumns[3], OrdersColumns[9]},
 			},
 		},
 	}
 	// ParkingLotsColumns holds the columns for the "parking_lots" table.
 	ParkingLotsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString, Size: 100},
 		{Name: "address", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "lanes", Type: field.TypeInt, Default: 1},
@@ -75,6 +82,7 @@ var (
 	// ParkingRecordsColumns holds the columns for the "parking_records" table.
 	ParkingRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "entry_lane_id", Type: field.TypeUUID},
 		{Name: "vehicle_id", Type: field.TypeUUID, Nullable: true},
@@ -103,23 +111,24 @@ var (
 			{
 				Name:    "idx_parking_records_plate_entry",
 				Unique:  false,
-				Columns: []*schema.Column{ParkingRecordsColumns[4], ParkingRecordsColumns[6]},
+				Columns: []*schema.Column{ParkingRecordsColumns[5], ParkingRecordsColumns[7]},
 			},
 			{
 				Name:    "idx_parking_records_lot_status",
 				Unique:  false,
-				Columns: []*schema.Column{ParkingRecordsColumns[1], ParkingRecordsColumns[8]},
+				Columns: []*schema.Column{ParkingRecordsColumns[2], ParkingRecordsColumns[9]},
 			},
 			{
 				Name:    "idx_parking_records_exit",
 				Unique:  false,
-				Columns: []*schema.Column{ParkingRecordsColumns[9]},
+				Columns: []*schema.Column{ParkingRecordsColumns[10]},
 			},
 		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
@@ -137,6 +146,7 @@ var (
 	// VehiclesColumns holds the columns for the "vehicles" table.
 	VehiclesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "plate_number", Type: field.TypeString, Unique: true, Size: 20},
 		{Name: "vehicle_type", Type: field.TypeString, Default: "temporary"},
 		{Name: "owner_name", Type: field.TypeString, Nullable: true, Size: 100},
@@ -154,17 +164,17 @@ var (
 			{
 				Name:    "vehicle_plate_number",
 				Unique:  true,
-				Columns: []*schema.Column{VehiclesColumns[1]},
+				Columns: []*schema.Column{VehiclesColumns[2]},
 			},
 			{
 				Name:    "vehicle_vehicle_type",
 				Unique:  false,
-				Columns: []*schema.Column{VehiclesColumns[2]},
+				Columns: []*schema.Column{VehiclesColumns[3]},
 			},
 			{
 				Name:    "vehicle_monthly_valid_until",
 				Unique:  false,
-				Columns: []*schema.Column{VehiclesColumns[5]},
+				Columns: []*schema.Column{VehiclesColumns[6]},
 			},
 		},
 	}

@@ -987,15 +987,16 @@ func (x *ListParkingRecordsData) GetTotal() int32 {
 }
 
 type ParkingRecordInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordId      string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
-	PlateNumber   string                 `protobuf:"bytes,2,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
-	LotName       string                 `protobuf:"bytes,3,opt,name=lotName,proto3" json:"lotName,omitempty"`
-	EntryTime     string                 `protobuf:"bytes,4,opt,name=entryTime,proto3" json:"entryTime,omitempty"`
-	ExitTime      string                 `protobuf:"bytes,5,opt,name=exitTime,proto3" json:"exitTime,omitempty"`
-	Duration      int32                  `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty"`
-	Amount        float64                `protobuf:"fixed64,7,opt,name=amount,proto3" json:"amount,omitempty"`
-	Status        string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	RecordId    string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	PlateNumber string                 `protobuf:"bytes,2,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	LotName     string                 `protobuf:"bytes,3,opt,name=lotName,proto3" json:"lotName,omitempty"`
+	EntryTime   string                 `protobuf:"bytes,4,opt,name=entryTime,proto3" json:"entryTime,omitempty"`
+	ExitTime    string                 `protobuf:"bytes,5,opt,name=exitTime,proto3" json:"exitTime,omitempty"`
+	Duration    int32                  `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty"`
+	// Amount in cents (分).
+	Amount        int64  `protobuf:"varint,7,opt,name=amount,proto3" json:"amount,omitempty"`
+	Status        string `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1072,7 +1073,7 @@ func (x *ParkingRecordInfo) GetDuration() int32 {
 	return 0
 }
 
-func (x *ParkingRecordInfo) GetAmount() float64 {
+func (x *ParkingRecordInfo) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -1311,12 +1312,13 @@ func (x *ScanPayResponse) GetData() *ScanPayData {
 }
 
 type ScanPayData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
-	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayUrl        string                 `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
-	QrCode        string                 `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
-	ExpireTime    string                 `protobuf:"bytes,5,opt,name=expireTime,proto3" json:"expireTime,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	OrderId string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
+	// Amount in cents (分).
+	Amount        int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	PayUrl        string `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
+	QrCode        string `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
+	ExpireTime    string `protobuf:"bytes,5,opt,name=expireTime,proto3" json:"expireTime,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1358,7 +1360,7 @@ func (x *ScanPayData) GetOrderId() string {
 	return ""
 }
 
-func (x *ScanPayData) GetAmount() float64 {
+func (x *ScanPayData) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -1687,11 +1689,12 @@ func (x *PurchaseMonthlyCardResponse) GetData() *PurchaseMonthlyCardData {
 }
 
 type PurchaseMonthlyCardData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderId       string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
-	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PayUrl        string                 `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
-	QrCode        string                 `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	OrderId string                 `protobuf:"bytes,1,opt,name=orderId,proto3" json:"orderId,omitempty"`
+	// Amount in cents (分).
+	Amount        int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	PayUrl        string `protobuf:"bytes,3,opt,name=payUrl,proto3" json:"payUrl,omitempty"`
+	QrCode        string `protobuf:"bytes,4,opt,name=qrCode,proto3" json:"qrCode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1733,7 +1736,7 @@ func (x *PurchaseMonthlyCardData) GetOrderId() string {
 	return ""
 }
 
-func (x *PurchaseMonthlyCardData) GetAmount() float64 {
+func (x *PurchaseMonthlyCardData) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -1831,7 +1834,7 @@ const file_api_user_v1_user_proto_rawDesc = "" +
 	"\tentryTime\x18\x04 \x01(\tR\tentryTime\x12\x1a\n" +
 	"\bexitTime\x18\x05 \x01(\tR\bexitTime\x12\x1a\n" +
 	"\bduration\x18\x06 \x01(\x05R\bduration\x12\x16\n" +
-	"\x06amount\x18\a \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06amount\x18\a \x01(\x03R\x06amount\x12\x16\n" +
 	"\x06status\x18\b \x01(\tR\x06status\"5\n" +
 	"\x17GetParkingRecordRequest\x12\x1a\n" +
 	"\brecordId\x18\x01 \x01(\tR\brecordId\"|\n" +
@@ -1849,7 +1852,7 @@ const file_api_user_v1_user_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2\x18.api.user.v1.ScanPayDataR\x04data\"\x8f\x01\n" +
 	"\vScanPayData\x12\x18\n" +
 	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12\x16\n" +
 	"\x06payUrl\x18\x03 \x01(\tR\x06payUrl\x12\x16\n" +
 	"\x06qrCode\x18\x04 \x01(\tR\x06qrCode\x12\x1e\n" +
 	"\n" +
@@ -1879,7 +1882,7 @@ const file_api_user_v1_user_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2$.api.user.v1.PurchaseMonthlyCardDataR\x04data\"{\n" +
 	"\x17PurchaseMonthlyCardData\x12\x18\n" +
 	"\aorderId\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12\x16\n" +
 	"\x06payUrl\x18\x03 \x01(\tR\x06payUrl\x12\x16\n" +
 	"\x06qrCode\x18\x04 \x01(\tR\x06qrCode2\xd5\t\n" +
 	"\vUserService\x12]\n" +

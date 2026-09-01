@@ -11,6 +11,7 @@ var (
 	// ConnectorsColumns holds the columns for the "connectors" table.
 	ConnectorsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "number", Type: field.TypeInt},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"ac", "dc", "fast_dc"}, Default: "ac"},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"available", "charging", "faulted", "offline"}, Default: "available"},
@@ -30,32 +31,38 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "connectors_stations_connectors",
-				Columns:    []*schema.Column{ConnectorsColumns[10]},
+				Columns:    []*schema.Column{ConnectorsColumns[11]},
 				RefColumns: []*schema.Column{StationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
+				Name:    "connector_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{ConnectorsColumns[1]},
+			},
+			{
 				Name:    "connector_station_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConnectorsColumns[10]},
+				Columns: []*schema.Column{ConnectorsColumns[11]},
 			},
 			{
 				Name:    "connector_status",
 				Unique:  false,
-				Columns: []*schema.Column{ConnectorsColumns[3]},
+				Columns: []*schema.Column{ConnectorsColumns[4]},
 			},
 			{
-				Name:    "connector_station_id_number",
-				Unique:  true,
-				Columns: []*schema.Column{ConnectorsColumns[10], ConnectorsColumns[1]},
+				Name:    "connector_station_id_status",
+				Unique:  false,
+				Columns: []*schema.Column{ConnectorsColumns[11], ConnectorsColumns[4]},
 			},
 		},
 	}
 	// PricesColumns holds the columns for the "prices" table.
 	PricesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString, Size: 100},
 		{Name: "start_hour", Type: field.TypeInt},
 		{Name: "end_hour", Type: field.TypeInt},
@@ -78,32 +85,38 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "prices_stations_prices",
-				Columns:    []*schema.Column{PricesColumns[13]},
+				Columns:    []*schema.Column{PricesColumns[14]},
 				RefColumns: []*schema.Column{StationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "price_station_id",
+				Name:    "price_tenant_id",
 				Unique:  false,
-				Columns: []*schema.Column{PricesColumns[13]},
+				Columns: []*schema.Column{PricesColumns[1]},
 			},
 			{
-				Name:    "price_effective_at_expires_at",
+				Name:    "price_station_id",
 				Unique:  false,
-				Columns: []*schema.Column{PricesColumns[9], PricesColumns[10]},
+				Columns: []*schema.Column{PricesColumns[14]},
+			},
+			{
+				Name:    "price_is_peak_hours",
+				Unique:  false,
+				Columns: []*schema.Column{PricesColumns[9]},
 			},
 			{
 				Name:    "price_station_id_is_peak_hours",
 				Unique:  false,
-				Columns: []*schema.Column{PricesColumns[13], PricesColumns[8]},
+				Columns: []*schema.Column{PricesColumns[14], PricesColumns[9]},
 			},
 		},
 	}
 	// SessionsColumns holds the columns for the "sessions" table.
 	SessionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "station_id", Type: field.TypeUUID},
 		{Name: "user_id", Type: field.TypeUUID},
 		{Name: "vehicle_plate", Type: field.TypeString, Size: 20},
@@ -112,9 +125,9 @@ var (
 		{Name: "start_energy", Type: field.TypeFloat64, Default: 0},
 		{Name: "end_energy", Type: field.TypeFloat64, Default: 0},
 		{Name: "charged_energy", Type: field.TypeFloat64, Default: 0},
-		{Name: "cost", Type: field.TypeFloat64, Default: 0},
-		{Name: "service_fee", Type: field.TypeFloat64, Default: 0},
-		{Name: "total_amount", Type: field.TypeFloat64, Default: 0},
+		{Name: "cost", Type: field.TypeInt64, Default: 0},
+		{Name: "service_fee", Type: field.TypeInt64, Default: 0},
+		{Name: "total_amount", Type: field.TypeInt64, Default: 0},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "charging", "completed", "cancelled", "expired"}, Default: "pending"},
 		{Name: "payment_status", Type: field.TypeEnum, Enums: []string{"pending", "paid", "refunded", "failed"}, Default: "pending"},
 		{Name: "pay_time", Type: field.TypeTime, Nullable: true},
@@ -132,47 +145,58 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "sessions_connectors_sessions",
-				Columns:    []*schema.Column{SessionsColumns[19]},
+				Columns:    []*schema.Column{SessionsColumns[20]},
 				RefColumns: []*schema.Column{ConnectorsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "session_station_id",
+				Name:    "session_tenant_id",
 				Unique:  false,
 				Columns: []*schema.Column{SessionsColumns[1]},
 			},
 			{
-				Name:    "session_connector_id",
-				Unique:  false,
-				Columns: []*schema.Column{SessionsColumns[19]},
-			},
-			{
-				Name:    "session_user_id",
+				Name:    "session_station_id",
 				Unique:  false,
 				Columns: []*schema.Column{SessionsColumns[2]},
 			},
 			{
-				Name:    "session_status",
+				Name:    "session_connector_id",
 				Unique:  false,
-				Columns: []*schema.Column{SessionsColumns[12]},
+				Columns: []*schema.Column{SessionsColumns[20]},
 			},
 			{
-				Name:    "session_payment_status",
+				Name:    "session_status",
 				Unique:  false,
 				Columns: []*schema.Column{SessionsColumns[13]},
 			},
 			{
+				Name:    "session_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{SessionsColumns[3]},
+			},
+			{
+				Name:    "session_start_time",
+				Unique:  false,
+				Columns: []*schema.Column{SessionsColumns[5]},
+			},
+			{
+				Name:    "session_end_time",
+				Unique:  false,
+				Columns: []*schema.Column{SessionsColumns[6]},
+			},
+			{
 				Name:    "session_user_id_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{SessionsColumns[2], SessionsColumns[17]},
+				Columns: []*schema.Column{SessionsColumns[3], SessionsColumns[18]},
 			},
 		},
 	}
 	// StationsColumns holds the columns for the "stations" table.
 	StationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString, Size: 100},
 		{Name: "station_type", Type: field.TypeEnum, Enums: []string{"ac", "dc", "fast_dc"}, Default: "ac"},
@@ -194,19 +218,24 @@ var (
 		PrimaryKey: []*schema.Column{StationsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "station_lot_id",
+				Name:    "station_tenant_id",
 				Unique:  false,
 				Columns: []*schema.Column{StationsColumns[1]},
 			},
 			{
+				Name:    "station_lot_id",
+				Unique:  false,
+				Columns: []*schema.Column{StationsColumns[2]},
+			},
+			{
 				Name:    "station_status",
 				Unique:  false,
-				Columns: []*schema.Column{StationsColumns[4]},
+				Columns: []*schema.Column{StationsColumns[5]},
 			},
 			{
 				Name:    "station_lot_id_status",
 				Unique:  false,
-				Columns: []*schema.Column{StationsColumns[1], StationsColumns[4]},
+				Columns: []*schema.Column{StationsColumns[2], StationsColumns[5]},
 			},
 		},
 	}

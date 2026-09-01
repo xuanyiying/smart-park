@@ -54,7 +54,8 @@ message LotAnalyticsData {
   string               lotId         = 1;
   string               lotName       = 2;
   int32                totalVehicles = 3;
-  double               totalRevenue  = 4;
+  // Amount in cents (分).
+  int64                totalRevenue  = 4;
   double               avgDuration   = 5;
   double               occupancyRate = 6;
   int32                peakHour      = 7;
@@ -65,13 +66,15 @@ message LotAnalyticsData {
 message HourlyStats {
   int32  hour         = 1;
   int32  vehicleCount = 2;
-  double revenue      = 3;
+  // Amount in cents (分).
+  int64  revenue      = 3;
 }
 
 message DailyStats {
   string date          = 1;
   int32  vehicleCount  = 2;
-  double revenue       = 3;
+  // Amount in cents (分).
+  int64  revenue       = 3;
   double occupancyRate = 4;
 }
 
@@ -89,14 +92,16 @@ message GetRevenueTrendResponse {
 
 message RevenueTrendData {
   repeated RevenuePoint points       = 1;
-  double                totalRevenue = 2;
-  double                avgRevenue   = 3;
+  // Amounts in cents (分).
+  int64                 totalRevenue = 2;
+  int64                 avgRevenue   = 3;
   double                growthRate   = 4;
 }
 
 message RevenuePoint {
   string date         = 1;
-  double revenue      = 2;
+  // Amount in cents (分).
+  int64  revenue      = 2;
   int32  vehicleCount = 3;
 }
 

@@ -27,12 +27,14 @@ func (Reconciliation) Fields() []ent.Field {
 			MaxLen(20).
 			Optional().
 			Comment("支付方式"),
-		field.Float("order_amount").
+		field.Int64("order_amount").
+			Default(0).
 			Min(0).
-			Comment("订单金额"),
-		field.Float("paid_amount").
+			Comment("订单金额(分)"),
+		field.Int64("paid_amount").
+			Default(0).
 			Min(0).
-			Comment("实付金额"),
+			Comment("实付金额(分)"),
 		field.String("transaction_id").
 			MaxLen(64).
 			Optional().

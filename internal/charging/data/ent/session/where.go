@@ -56,6 +56,11 @@ func IDLTE(id uuid.UUID) predicate.Session {
 	return predicate.Session(sql.FieldLTE(FieldID, id))
 }
 
+// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
+func TenantID(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldEQ(FieldTenantID, v))
+}
+
 // StationID applies equality check predicate on the "station_id" field. It's identical to StationIDEQ.
 func StationID(v uuid.UUID) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldStationID, v))
@@ -102,17 +107,17 @@ func ChargedEnergy(v float64) predicate.Session {
 }
 
 // Cost applies equality check predicate on the "cost" field. It's identical to CostEQ.
-func Cost(v float64) predicate.Session {
+func Cost(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldCost, v))
 }
 
 // ServiceFee applies equality check predicate on the "service_fee" field. It's identical to ServiceFeeEQ.
-func ServiceFee(v float64) predicate.Session {
+func ServiceFee(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldServiceFee, v))
 }
 
 // TotalAmount applies equality check predicate on the "total_amount" field. It's identical to TotalAmountEQ.
-func TotalAmount(v float64) predicate.Session {
+func TotalAmount(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldTotalAmount, v))
 }
 
@@ -139,6 +144,46 @@ func CreatedAt(v time.Time) predicate.Session {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
+func TenantIDEQ(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldEQ(FieldTenantID, v))
+}
+
+// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
+func TenantIDNEQ(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldNEQ(FieldTenantID, v))
+}
+
+// TenantIDIn applies the In predicate on the "tenant_id" field.
+func TenantIDIn(vs ...uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldIn(FieldTenantID, vs...))
+}
+
+// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
+func TenantIDNotIn(vs ...uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldNotIn(FieldTenantID, vs...))
+}
+
+// TenantIDGT applies the GT predicate on the "tenant_id" field.
+func TenantIDGT(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldGT(FieldTenantID, v))
+}
+
+// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
+func TenantIDGTE(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldGTE(FieldTenantID, v))
+}
+
+// TenantIDLT applies the LT predicate on the "tenant_id" field.
+func TenantIDLT(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldLT(FieldTenantID, v))
+}
+
+// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
+func TenantIDLTE(v uuid.UUID) predicate.Session {
+	return predicate.Session(sql.FieldLTE(FieldTenantID, v))
 }
 
 // StationIDEQ applies the EQ predicate on the "station_id" field.
@@ -517,122 +562,122 @@ func ChargedEnergyLTE(v float64) predicate.Session {
 }
 
 // CostEQ applies the EQ predicate on the "cost" field.
-func CostEQ(v float64) predicate.Session {
+func CostEQ(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldCost, v))
 }
 
 // CostNEQ applies the NEQ predicate on the "cost" field.
-func CostNEQ(v float64) predicate.Session {
+func CostNEQ(v int64) predicate.Session {
 	return predicate.Session(sql.FieldNEQ(FieldCost, v))
 }
 
 // CostIn applies the In predicate on the "cost" field.
-func CostIn(vs ...float64) predicate.Session {
+func CostIn(vs ...int64) predicate.Session {
 	return predicate.Session(sql.FieldIn(FieldCost, vs...))
 }
 
 // CostNotIn applies the NotIn predicate on the "cost" field.
-func CostNotIn(vs ...float64) predicate.Session {
+func CostNotIn(vs ...int64) predicate.Session {
 	return predicate.Session(sql.FieldNotIn(FieldCost, vs...))
 }
 
 // CostGT applies the GT predicate on the "cost" field.
-func CostGT(v float64) predicate.Session {
+func CostGT(v int64) predicate.Session {
 	return predicate.Session(sql.FieldGT(FieldCost, v))
 }
 
 // CostGTE applies the GTE predicate on the "cost" field.
-func CostGTE(v float64) predicate.Session {
+func CostGTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldGTE(FieldCost, v))
 }
 
 // CostLT applies the LT predicate on the "cost" field.
-func CostLT(v float64) predicate.Session {
+func CostLT(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLT(FieldCost, v))
 }
 
 // CostLTE applies the LTE predicate on the "cost" field.
-func CostLTE(v float64) predicate.Session {
+func CostLTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLTE(FieldCost, v))
 }
 
 // ServiceFeeEQ applies the EQ predicate on the "service_fee" field.
-func ServiceFeeEQ(v float64) predicate.Session {
+func ServiceFeeEQ(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldServiceFee, v))
 }
 
 // ServiceFeeNEQ applies the NEQ predicate on the "service_fee" field.
-func ServiceFeeNEQ(v float64) predicate.Session {
+func ServiceFeeNEQ(v int64) predicate.Session {
 	return predicate.Session(sql.FieldNEQ(FieldServiceFee, v))
 }
 
 // ServiceFeeIn applies the In predicate on the "service_fee" field.
-func ServiceFeeIn(vs ...float64) predicate.Session {
+func ServiceFeeIn(vs ...int64) predicate.Session {
 	return predicate.Session(sql.FieldIn(FieldServiceFee, vs...))
 }
 
 // ServiceFeeNotIn applies the NotIn predicate on the "service_fee" field.
-func ServiceFeeNotIn(vs ...float64) predicate.Session {
+func ServiceFeeNotIn(vs ...int64) predicate.Session {
 	return predicate.Session(sql.FieldNotIn(FieldServiceFee, vs...))
 }
 
 // ServiceFeeGT applies the GT predicate on the "service_fee" field.
-func ServiceFeeGT(v float64) predicate.Session {
+func ServiceFeeGT(v int64) predicate.Session {
 	return predicate.Session(sql.FieldGT(FieldServiceFee, v))
 }
 
 // ServiceFeeGTE applies the GTE predicate on the "service_fee" field.
-func ServiceFeeGTE(v float64) predicate.Session {
+func ServiceFeeGTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldGTE(FieldServiceFee, v))
 }
 
 // ServiceFeeLT applies the LT predicate on the "service_fee" field.
-func ServiceFeeLT(v float64) predicate.Session {
+func ServiceFeeLT(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLT(FieldServiceFee, v))
 }
 
 // ServiceFeeLTE applies the LTE predicate on the "service_fee" field.
-func ServiceFeeLTE(v float64) predicate.Session {
+func ServiceFeeLTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLTE(FieldServiceFee, v))
 }
 
 // TotalAmountEQ applies the EQ predicate on the "total_amount" field.
-func TotalAmountEQ(v float64) predicate.Session {
+func TotalAmountEQ(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldTotalAmount, v))
 }
 
 // TotalAmountNEQ applies the NEQ predicate on the "total_amount" field.
-func TotalAmountNEQ(v float64) predicate.Session {
+func TotalAmountNEQ(v int64) predicate.Session {
 	return predicate.Session(sql.FieldNEQ(FieldTotalAmount, v))
 }
 
 // TotalAmountIn applies the In predicate on the "total_amount" field.
-func TotalAmountIn(vs ...float64) predicate.Session {
+func TotalAmountIn(vs ...int64) predicate.Session {
 	return predicate.Session(sql.FieldIn(FieldTotalAmount, vs...))
 }
 
 // TotalAmountNotIn applies the NotIn predicate on the "total_amount" field.
-func TotalAmountNotIn(vs ...float64) predicate.Session {
+func TotalAmountNotIn(vs ...int64) predicate.Session {
 	return predicate.Session(sql.FieldNotIn(FieldTotalAmount, vs...))
 }
 
 // TotalAmountGT applies the GT predicate on the "total_amount" field.
-func TotalAmountGT(v float64) predicate.Session {
+func TotalAmountGT(v int64) predicate.Session {
 	return predicate.Session(sql.FieldGT(FieldTotalAmount, v))
 }
 
 // TotalAmountGTE applies the GTE predicate on the "total_amount" field.
-func TotalAmountGTE(v float64) predicate.Session {
+func TotalAmountGTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldGTE(FieldTotalAmount, v))
 }
 
 // TotalAmountLT applies the LT predicate on the "total_amount" field.
-func TotalAmountLT(v float64) predicate.Session {
+func TotalAmountLT(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLT(FieldTotalAmount, v))
 }
 
 // TotalAmountLTE applies the LTE predicate on the "total_amount" field.
-func TotalAmountLTE(v float64) predicate.Session {
+func TotalAmountLTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLTE(FieldTotalAmount, v))
 }
 

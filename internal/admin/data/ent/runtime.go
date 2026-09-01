@@ -21,7 +21,7 @@ func init() {
 	orderFields := schema.Order{}.Fields()
 	_ = orderFields
 	// orderDescPlateNumber is the schema descriptor for plate_number field.
-	orderDescPlateNumber := orderFields[4].Descriptor()
+	orderDescPlateNumber := orderFields[5].Descriptor()
 	// order.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	order.PlateNumberValidator = func() func(string) error {
 		validators := orderDescPlateNumber.Validators
@@ -39,37 +39,43 @@ func init() {
 		}
 	}()
 	// orderDescAmount is the schema descriptor for amount field.
-	orderDescAmount := orderFields[5].Descriptor()
+	orderDescAmount := orderFields[6].Descriptor()
+	// order.DefaultAmount holds the default value on creation for the amount field.
+	order.DefaultAmount = orderDescAmount.Default.(int64)
 	// order.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	order.AmountValidator = orderDescAmount.Validators[0].(func(float64) error)
+	order.AmountValidator = orderDescAmount.Validators[0].(func(int64) error)
 	// orderDescDiscountAmount is the schema descriptor for discount_amount field.
-	orderDescDiscountAmount := orderFields[6].Descriptor()
+	orderDescDiscountAmount := orderFields[7].Descriptor()
 	// order.DefaultDiscountAmount holds the default value on creation for the discount_amount field.
-	order.DefaultDiscountAmount = orderDescDiscountAmount.Default.(float64)
+	order.DefaultDiscountAmount = orderDescDiscountAmount.Default.(int64)
 	// order.DiscountAmountValidator is a validator for the "discount_amount" field. It is called by the builders before save.
-	order.DiscountAmountValidator = orderDescDiscountAmount.Validators[0].(func(float64) error)
+	order.DiscountAmountValidator = orderDescDiscountAmount.Validators[0].(func(int64) error)
 	// orderDescFinalAmount is the schema descriptor for final_amount field.
-	orderDescFinalAmount := orderFields[7].Descriptor()
+	orderDescFinalAmount := orderFields[8].Descriptor()
+	// order.DefaultFinalAmount holds the default value on creation for the final_amount field.
+	order.DefaultFinalAmount = orderDescFinalAmount.Default.(int64)
 	// order.FinalAmountValidator is a validator for the "final_amount" field. It is called by the builders before save.
-	order.FinalAmountValidator = orderDescFinalAmount.Validators[0].(func(float64) error)
+	order.FinalAmountValidator = orderDescFinalAmount.Validators[0].(func(int64) error)
 	// orderDescTransactionID is the schema descriptor for transaction_id field.
-	orderDescTransactionID := orderFields[11].Descriptor()
+	orderDescTransactionID := orderFields[12].Descriptor()
 	// order.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	order.TransactionIDValidator = orderDescTransactionID.Validators[0].(func(string) error)
 	// orderDescPaidAmount is the schema descriptor for paid_amount field.
-	orderDescPaidAmount := orderFields[12].Descriptor()
+	orderDescPaidAmount := orderFields[13].Descriptor()
+	// order.DefaultPaidAmount holds the default value on creation for the paid_amount field.
+	order.DefaultPaidAmount = orderDescPaidAmount.Default.(int64)
 	// order.PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
-	order.PaidAmountValidator = orderDescPaidAmount.Validators[0].(func(float64) error)
+	order.PaidAmountValidator = orderDescPaidAmount.Validators[0].(func(int64) error)
 	// orderDescRefundTransactionID is the schema descriptor for refund_transaction_id field.
-	orderDescRefundTransactionID := orderFields[14].Descriptor()
+	orderDescRefundTransactionID := orderFields[15].Descriptor()
 	// order.RefundTransactionIDValidator is a validator for the "refund_transaction_id" field. It is called by the builders before save.
 	order.RefundTransactionIDValidator = orderDescRefundTransactionID.Validators[0].(func(string) error)
 	// orderDescCreatedAt is the schema descriptor for created_at field.
-	orderDescCreatedAt := orderFields[15].Descriptor()
+	orderDescCreatedAt := orderFields[16].Descriptor()
 	// order.DefaultCreatedAt holds the default value on creation for the created_at field.
 	order.DefaultCreatedAt = orderDescCreatedAt.Default.(func() time.Time)
 	// orderDescUpdatedAt is the schema descriptor for updated_at field.
-	orderDescUpdatedAt := orderFields[16].Descriptor()
+	orderDescUpdatedAt := orderFields[17].Descriptor()
 	// order.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	order.DefaultUpdatedAt = orderDescUpdatedAt.Default.(func() time.Time)
 	// order.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -81,7 +87,7 @@ func init() {
 	parkinglotFields := schema.ParkingLot{}.Fields()
 	_ = parkinglotFields
 	// parkinglotDescName is the schema descriptor for name field.
-	parkinglotDescName := parkinglotFields[1].Descriptor()
+	parkinglotDescName := parkinglotFields[2].Descriptor()
 	// parkinglot.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	parkinglot.NameValidator = func() func(string) error {
 		validators := parkinglotDescName.Validators
@@ -99,25 +105,25 @@ func init() {
 		}
 	}()
 	// parkinglotDescAddress is the schema descriptor for address field.
-	parkinglotDescAddress := parkinglotFields[2].Descriptor()
+	parkinglotDescAddress := parkinglotFields[3].Descriptor()
 	// parkinglot.AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	parkinglot.AddressValidator = parkinglotDescAddress.Validators[0].(func(string) error)
 	// parkinglotDescLanes is the schema descriptor for lanes field.
-	parkinglotDescLanes := parkinglotFields[3].Descriptor()
+	parkinglotDescLanes := parkinglotFields[4].Descriptor()
 	// parkinglot.DefaultLanes holds the default value on creation for the lanes field.
 	parkinglot.DefaultLanes = parkinglotDescLanes.Default.(int)
 	// parkinglot.LanesValidator is a validator for the "lanes" field. It is called by the builders before save.
 	parkinglot.LanesValidator = parkinglotDescLanes.Validators[0].(func(int) error)
 	// parkinglotDescStatus is the schema descriptor for status field.
-	parkinglotDescStatus := parkinglotFields[4].Descriptor()
+	parkinglotDescStatus := parkinglotFields[5].Descriptor()
 	// parkinglot.DefaultStatus holds the default value on creation for the status field.
 	parkinglot.DefaultStatus = parkinglotDescStatus.Default.(string)
 	// parkinglotDescCreatedAt is the schema descriptor for created_at field.
-	parkinglotDescCreatedAt := parkinglotFields[5].Descriptor()
+	parkinglotDescCreatedAt := parkinglotFields[6].Descriptor()
 	// parkinglot.DefaultCreatedAt holds the default value on creation for the created_at field.
 	parkinglot.DefaultCreatedAt = parkinglotDescCreatedAt.Default.(func() time.Time)
 	// parkinglotDescUpdatedAt is the schema descriptor for updated_at field.
-	parkinglotDescUpdatedAt := parkinglotFields[6].Descriptor()
+	parkinglotDescUpdatedAt := parkinglotFields[7].Descriptor()
 	// parkinglot.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	parkinglot.DefaultUpdatedAt = parkinglotDescUpdatedAt.Default.(func() time.Time)
 	// parkinglot.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -129,35 +135,35 @@ func init() {
 	parkingrecordFields := schema.ParkingRecord{}.Fields()
 	_ = parkingrecordFields
 	// parkingrecordDescPlateNumber is the schema descriptor for plate_number field.
-	parkingrecordDescPlateNumber := parkingrecordFields[4].Descriptor()
+	parkingrecordDescPlateNumber := parkingrecordFields[5].Descriptor()
 	// parkingrecord.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	parkingrecord.PlateNumberValidator = parkingrecordDescPlateNumber.Validators[0].(func(string) error)
 	// parkingrecordDescEntryImageURL is the schema descriptor for entry_image_url field.
-	parkingrecordDescEntryImageURL := parkingrecordFields[7].Descriptor()
+	parkingrecordDescEntryImageURL := parkingrecordFields[8].Descriptor()
 	// parkingrecord.EntryImageURLValidator is a validator for the "entry_image_url" field. It is called by the builders before save.
 	parkingrecord.EntryImageURLValidator = parkingrecordDescEntryImageURL.Validators[0].(func(string) error)
 	// parkingrecordDescExitImageURL is the schema descriptor for exit_image_url field.
-	parkingrecordDescExitImageURL := parkingrecordFields[10].Descriptor()
+	parkingrecordDescExitImageURL := parkingrecordFields[11].Descriptor()
 	// parkingrecord.ExitImageURLValidator is a validator for the "exit_image_url" field. It is called by the builders before save.
 	parkingrecord.ExitImageURLValidator = parkingrecordDescExitImageURL.Validators[0].(func(string) error)
 	// parkingrecordDescExitDeviceID is the schema descriptor for exit_device_id field.
-	parkingrecordDescExitDeviceID := parkingrecordFields[12].Descriptor()
+	parkingrecordDescExitDeviceID := parkingrecordFields[13].Descriptor()
 	// parkingrecord.ExitDeviceIDValidator is a validator for the "exit_device_id" field. It is called by the builders before save.
 	parkingrecord.ExitDeviceIDValidator = parkingrecordDescExitDeviceID.Validators[0].(func(string) error)
 	// parkingrecordDescParkingDuration is the schema descriptor for parking_duration field.
-	parkingrecordDescParkingDuration := parkingrecordFields[13].Descriptor()
+	parkingrecordDescParkingDuration := parkingrecordFields[14].Descriptor()
 	// parkingrecord.DefaultParkingDuration holds the default value on creation for the parking_duration field.
 	parkingrecord.DefaultParkingDuration = parkingrecordDescParkingDuration.Default.(int)
 	// parkingrecordDescPaymentLock is the schema descriptor for payment_lock field.
-	parkingrecordDescPaymentLock := parkingrecordFields[15].Descriptor()
+	parkingrecordDescPaymentLock := parkingrecordFields[16].Descriptor()
 	// parkingrecord.DefaultPaymentLock holds the default value on creation for the payment_lock field.
 	parkingrecord.DefaultPaymentLock = parkingrecordDescPaymentLock.Default.(int)
 	// parkingrecordDescCreatedAt is the schema descriptor for created_at field.
-	parkingrecordDescCreatedAt := parkingrecordFields[17].Descriptor()
+	parkingrecordDescCreatedAt := parkingrecordFields[18].Descriptor()
 	// parkingrecord.DefaultCreatedAt holds the default value on creation for the created_at field.
 	parkingrecord.DefaultCreatedAt = parkingrecordDescCreatedAt.Default.(func() time.Time)
 	// parkingrecordDescUpdatedAt is the schema descriptor for updated_at field.
-	parkingrecordDescUpdatedAt := parkingrecordFields[18].Descriptor()
+	parkingrecordDescUpdatedAt := parkingrecordFields[19].Descriptor()
 	// parkingrecord.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	parkingrecord.DefaultUpdatedAt = parkingrecordDescUpdatedAt.Default.(func() time.Time)
 	// parkingrecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -169,15 +175,15 @@ func init() {
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescRole is the schema descriptor for role field.
-	userDescRole := userFields[4].Descriptor()
+	userDescRole := userFields[5].Descriptor()
 	// user.DefaultRole holds the default value on creation for the role field.
 	user.DefaultRole = userDescRole.Default.(string)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[6].Descriptor()
+	userDescCreatedAt := userFields[7].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userFields[7].Descriptor()
+	userDescUpdatedAt := userFields[8].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -189,27 +195,27 @@ func init() {
 	vehicleFields := schema.Vehicle{}.Fields()
 	_ = vehicleFields
 	// vehicleDescPlateNumber is the schema descriptor for plate_number field.
-	vehicleDescPlateNumber := vehicleFields[1].Descriptor()
+	vehicleDescPlateNumber := vehicleFields[2].Descriptor()
 	// vehicle.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	vehicle.PlateNumberValidator = vehicleDescPlateNumber.Validators[0].(func(string) error)
 	// vehicleDescVehicleType is the schema descriptor for vehicle_type field.
-	vehicleDescVehicleType := vehicleFields[2].Descriptor()
+	vehicleDescVehicleType := vehicleFields[3].Descriptor()
 	// vehicle.DefaultVehicleType holds the default value on creation for the vehicle_type field.
 	vehicle.DefaultVehicleType = vehicleDescVehicleType.Default.(string)
 	// vehicleDescOwnerName is the schema descriptor for owner_name field.
-	vehicleDescOwnerName := vehicleFields[3].Descriptor()
+	vehicleDescOwnerName := vehicleFields[4].Descriptor()
 	// vehicle.OwnerNameValidator is a validator for the "owner_name" field. It is called by the builders before save.
 	vehicle.OwnerNameValidator = vehicleDescOwnerName.Validators[0].(func(string) error)
 	// vehicleDescOwnerPhone is the schema descriptor for owner_phone field.
-	vehicleDescOwnerPhone := vehicleFields[4].Descriptor()
+	vehicleDescOwnerPhone := vehicleFields[5].Descriptor()
 	// vehicle.OwnerPhoneValidator is a validator for the "owner_phone" field. It is called by the builders before save.
 	vehicle.OwnerPhoneValidator = vehicleDescOwnerPhone.Validators[0].(func(string) error)
 	// vehicleDescCreatedAt is the schema descriptor for created_at field.
-	vehicleDescCreatedAt := vehicleFields[6].Descriptor()
+	vehicleDescCreatedAt := vehicleFields[7].Descriptor()
 	// vehicle.DefaultCreatedAt holds the default value on creation for the created_at field.
 	vehicle.DefaultCreatedAt = vehicleDescCreatedAt.Default.(func() time.Time)
 	// vehicleDescUpdatedAt is the schema descriptor for updated_at field.
-	vehicleDescUpdatedAt := vehicleFields[7].Descriptor()
+	vehicleDescUpdatedAt := vehicleFields[8].Descriptor()
 	// vehicle.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	vehicle.DefaultUpdatedAt = vehicleDescUpdatedAt.Default.(func() time.Time)
 	// vehicle.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

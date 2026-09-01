@@ -152,7 +152,7 @@ func (m *MockVehicleRepo) DeleteDevice(ctx context.Context, deviceID string) err
 	return nil
 }
 
-func (m *MockVehicleRepo) SeedData(ctx context.Context) error {
+func (m *MockVehicleRepo) SeedData(ctx context.Context, lotID uuid.UUID) error {
 	return nil
 }
 

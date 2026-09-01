@@ -38,7 +38,10 @@ mq:
     stream: "parking"
 
 mqtt:
+  # Broker host is required: gate commands are delivered over MQTT, so the service
+  # refuses to start without it rather than silently dropping every barrier command.
   broker: ""
+  port: 1883
   client_id: "vehicle-service"
   username: ""
   password: ""
@@ -46,6 +49,15 @@ mqtt:
     command: "parking/device/{device_id}/command"
     status: "parking/device/{device_id}/status"
     heartbeat: "parking/device/{device_id}/heartbeat"
+
+# 入场/出场流水线可调参数（未设置时使用代码内默认值）
+entry_exit:
+  # 分布式锁租约；临界区内包含跨服务计费调用，续期协程会按 TTL/3 自动续租
+  lock_ttl: "10s"
+  # 超过该时间未收到心跳即视为设备离线
+  device_online_threshold: "5m"
+  # 车牌识别置信度下限，低于该值拒绝入场/出场
+  min_confidence: 0.7
 
 log:
   level: info

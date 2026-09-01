@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
 	"github.com/xuanyiying/smart-park/internal/admin/data/ent/predicate"
 )
@@ -25,6 +26,20 @@ type ParkingLotUpdate struct {
 // Where appends a list predicates to the ParkingLotUpdate builder.
 func (_u *ParkingLotUpdate) Where(ps ...predicate.ParkingLot) *ParkingLotUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ParkingLotUpdate) SetTenantID(v uuid.UUID) *ParkingLotUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ParkingLotUpdate) SetNillableTenantID(v *uuid.UUID) *ParkingLotUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
 	return _u
 }
 
@@ -176,6 +191,9 @@ func (_u *ParkingLotUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(parkinglot.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(parkinglot.FieldName, field.TypeString, value)
 	}
@@ -215,6 +233,20 @@ type ParkingLotUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ParkingLotMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ParkingLotUpdateOne) SetTenantID(v uuid.UUID) *ParkingLotUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ParkingLotUpdateOne) SetNillableTenantID(v *uuid.UUID) *ParkingLotUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetName sets the "name" field.
@@ -394,6 +426,9 @@ func (_u *ParkingLotUpdateOne) sqlSave(ctx context.Context) (_node *ParkingLot, 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(parkinglot.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(parkinglot.FieldName, field.TypeString, value)

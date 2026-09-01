@@ -43,9 +43,10 @@ func (OfflineSyncRecord) Fields() []ent.Field {
 			Comment("闸机ID"),
 		field.Time("open_time").
 			Comment("开闸时间"),
-		field.Float("sync_amount").
+		field.Int64("sync_amount").
 			Optional().
-			Comment("同步金额"),
+			Default(0).
+			Comment("同步金额(分)"),
 		field.Enum("sync_status").
 			Values("pending_sync", "synced", "sync_failed").
 			Default("pending_sync").

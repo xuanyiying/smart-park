@@ -23,6 +23,12 @@ type ConnectorCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *ConnectorCreate) SetTenantID(v uuid.UUID) *ConnectorCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetStationID sets the "station_id" field.
 func (_c *ConnectorCreate) SetStationID(v uuid.UUID) *ConnectorCreate {
 	_c.mutation.SetStationID(v)
@@ -252,6 +258,9 @@ func (_c *ConnectorCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ConnectorCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Connector.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.StationID(); !ok {
 		return &ValidationError{Name: "station_id", err: errors.New(`ent: missing required field "Connector.station_id"`)}
 	}
@@ -336,6 +345,10 @@ func (_c *ConnectorCreate) createSpec() (*Connector, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(connector.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Number(); ok {
 		_spec.SetField(connector.FieldNumber, field.TypeInt, value)

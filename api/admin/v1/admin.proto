@@ -247,9 +247,10 @@ message Order {
   string recordId       = 2;
   string lotId          = 3;
   string plateNumber    = 4;
-  double amount         = 5;
-  double discountAmount = 6;
-  double finalAmount    = 7;
+  // Amounts in cents (分).
+  int64  amount         = 5;
+  int64  discountAmount = 6;
+  int64  finalAmount    = 7;
   string status         = 8;
   string payTime        = 9;
   string payMethod      = 10;
@@ -315,9 +316,10 @@ message DailyReport {
   int32  totalEntries  = 3;
   int32  totalExits    = 4;
   int32  totalVehicles = 5;
-  double totalAmount   = 6;
-  double totalDiscount = 7;
-  double netAmount     = 8;
+  // Amounts in cents (分).
+  int64  totalAmount   = 6;
+  int64  totalDiscount = 7;
+  int64  netAmount     = 8;
 }
 
 message GetMonthlyReportRequest {
@@ -339,9 +341,10 @@ message MonthlyReport {
   int32                totalEntries  = 4;
   int32                totalExits    = 5;
   int32                totalVehicles = 6;
-  double               totalAmount   = 7;
-  double               totalDiscount = 8;
-  double               netAmount     = 9;
+  // Amounts in cents (分).
+  int64                totalAmount   = 7;
+  int64                totalDiscount = 8;
+  int64                netAmount     = 9;
   repeated DailyReport dailyReports  = 10;
 }
 

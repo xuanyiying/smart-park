@@ -21,6 +21,12 @@ type UserCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *UserCreate) SetTenantID(v uuid.UUID) *UserCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetOpenID sets the "open_id" field.
 func (_c *UserCreate) SetOpenID(v string) *UserCreate {
 	_c.mutation.SetOpenID(v)
@@ -162,6 +168,9 @@ func (_c *UserCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *UserCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "User.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.OpenID(); !ok {
 		return &ValidationError{Name: "open_id", err: errors.New(`ent: missing required field "User.open_id"`)}
 	}
@@ -225,6 +234,10 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(user.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.OpenID(); ok {
 		_spec.SetField(user.FieldOpenID, field.TypeString, value)

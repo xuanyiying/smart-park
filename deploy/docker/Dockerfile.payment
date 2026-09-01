@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/payment-svc ./cmd/payment-svc
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/payment-svc ./cmd/payment
 
 # Final stage
 FROM alpine:latest
@@ -24,4 +24,4 @@ COPY configs/payment.yaml /app/configs/payment.yaml
 
 EXPOSE 8003
 
-CMD ["./payment-svc"]
+CMD ["./payment-svc", "-conf", "/app/configs/payment.yaml"]

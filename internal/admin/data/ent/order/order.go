@@ -15,6 +15,8 @@ const (
 	Label = "order"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldRecordID holds the string denoting the record_id field in the database.
 	FieldRecordID = "record_id"
 	// FieldLotID holds the string denoting the lot_id field in the database.
@@ -54,6 +56,7 @@ const (
 // Columns holds all SQL columns for order fields.
 var Columns = []string{
 	FieldID,
+	FieldTenantID,
 	FieldRecordID,
 	FieldLotID,
 	FieldVehicleID,
@@ -85,18 +88,24 @@ func ValidColumn(column string) bool {
 var (
 	// PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	PlateNumberValidator func(string) error
+	// DefaultAmount holds the default value on creation for the "amount" field.
+	DefaultAmount int64
 	// AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	AmountValidator func(float64) error
+	AmountValidator func(int64) error
 	// DefaultDiscountAmount holds the default value on creation for the "discount_amount" field.
-	DefaultDiscountAmount float64
+	DefaultDiscountAmount int64
 	// DiscountAmountValidator is a validator for the "discount_amount" field. It is called by the builders before save.
-	DiscountAmountValidator func(float64) error
+	DiscountAmountValidator func(int64) error
+	// DefaultFinalAmount holds the default value on creation for the "final_amount" field.
+	DefaultFinalAmount int64
 	// FinalAmountValidator is a validator for the "final_amount" field. It is called by the builders before save.
-	FinalAmountValidator func(float64) error
+	FinalAmountValidator func(int64) error
 	// TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	TransactionIDValidator func(string) error
+	// DefaultPaidAmount holds the default value on creation for the "paid_amount" field.
+	DefaultPaidAmount int64
 	// PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
-	PaidAmountValidator func(float64) error
+	PaidAmountValidator func(int64) error
 	// RefundTransactionIDValidator is a validator for the "refund_transaction_id" field. It is called by the builders before save.
 	RefundTransactionIDValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -168,6 +177,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByRecordID orders the results by the record_id field.

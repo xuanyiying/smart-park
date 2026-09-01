@@ -42,22 +42,23 @@ type OrderMutation struct {
 	op                    Op
 	typ                   string
 	id                    *uuid.UUID
+	tenant_id             *uuid.UUID
 	record_id             *uuid.UUID
 	lot_id                *uuid.UUID
 	vehicle_id            *uuid.UUID
 	plate_number          *string
-	amount                *float64
-	addamount             *float64
-	discount_amount       *float64
-	adddiscount_amount    *float64
-	final_amount          *float64
-	addfinal_amount       *float64
+	amount                *int64
+	addamount             *int64
+	discount_amount       *int64
+	adddiscount_amount    *int64
+	final_amount          *int64
+	addfinal_amount       *int64
 	status                *order.Status
 	pay_time              *time.Time
 	pay_method            *order.PayMethod
 	transaction_id        *string
-	paid_amount           *float64
-	addpaid_amount        *float64
+	paid_amount           *int64
+	addpaid_amount        *int64
 	refunded_at           *time.Time
 	refund_transaction_id *string
 	created_at            *time.Time
@@ -170,6 +171,42 @@ func (m *OrderMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *OrderMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *OrderMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *OrderMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetRecordID sets the "record_id" field.
@@ -330,13 +367,13 @@ func (m *OrderMutation) ResetPlateNumber() {
 }
 
 // SetAmount sets the "amount" field.
-func (m *OrderMutation) SetAmount(f float64) {
-	m.amount = &f
+func (m *OrderMutation) SetAmount(i int64) {
+	m.amount = &i
 	m.addamount = nil
 }
 
 // Amount returns the value of the "amount" field in the mutation.
-func (m *OrderMutation) Amount() (r float64, exists bool) {
+func (m *OrderMutation) Amount() (r int64, exists bool) {
 	v := m.amount
 	if v == nil {
 		return
@@ -347,7 +384,7 @@ func (m *OrderMutation) Amount() (r float64, exists bool) {
 // OldAmount returns the old "amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
 	}
@@ -361,17 +398,17 @@ func (m *OrderMutation) OldAmount(ctx context.Context) (v float64, err error) {
 	return oldValue.Amount, nil
 }
 
-// AddAmount adds f to the "amount" field.
-func (m *OrderMutation) AddAmount(f float64) {
+// AddAmount adds i to the "amount" field.
+func (m *OrderMutation) AddAmount(i int64) {
 	if m.addamount != nil {
-		*m.addamount += f
+		*m.addamount += i
 	} else {
-		m.addamount = &f
+		m.addamount = &i
 	}
 }
 
 // AddedAmount returns the value that was added to the "amount" field in this mutation.
-func (m *OrderMutation) AddedAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedAmount() (r int64, exists bool) {
 	v := m.addamount
 	if v == nil {
 		return
@@ -386,13 +423,13 @@ func (m *OrderMutation) ResetAmount() {
 }
 
 // SetDiscountAmount sets the "discount_amount" field.
-func (m *OrderMutation) SetDiscountAmount(f float64) {
-	m.discount_amount = &f
+func (m *OrderMutation) SetDiscountAmount(i int64) {
+	m.discount_amount = &i
 	m.adddiscount_amount = nil
 }
 
 // DiscountAmount returns the value of the "discount_amount" field in the mutation.
-func (m *OrderMutation) DiscountAmount() (r float64, exists bool) {
+func (m *OrderMutation) DiscountAmount() (r int64, exists bool) {
 	v := m.discount_amount
 	if v == nil {
 		return
@@ -403,7 +440,7 @@ func (m *OrderMutation) DiscountAmount() (r float64, exists bool) {
 // OldDiscountAmount returns the old "discount_amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldDiscountAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldDiscountAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDiscountAmount is only allowed on UpdateOne operations")
 	}
@@ -417,17 +454,17 @@ func (m *OrderMutation) OldDiscountAmount(ctx context.Context) (v float64, err e
 	return oldValue.DiscountAmount, nil
 }
 
-// AddDiscountAmount adds f to the "discount_amount" field.
-func (m *OrderMutation) AddDiscountAmount(f float64) {
+// AddDiscountAmount adds i to the "discount_amount" field.
+func (m *OrderMutation) AddDiscountAmount(i int64) {
 	if m.adddiscount_amount != nil {
-		*m.adddiscount_amount += f
+		*m.adddiscount_amount += i
 	} else {
-		m.adddiscount_amount = &f
+		m.adddiscount_amount = &i
 	}
 }
 
 // AddedDiscountAmount returns the value that was added to the "discount_amount" field in this mutation.
-func (m *OrderMutation) AddedDiscountAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedDiscountAmount() (r int64, exists bool) {
 	v := m.adddiscount_amount
 	if v == nil {
 		return
@@ -442,13 +479,13 @@ func (m *OrderMutation) ResetDiscountAmount() {
 }
 
 // SetFinalAmount sets the "final_amount" field.
-func (m *OrderMutation) SetFinalAmount(f float64) {
-	m.final_amount = &f
+func (m *OrderMutation) SetFinalAmount(i int64) {
+	m.final_amount = &i
 	m.addfinal_amount = nil
 }
 
 // FinalAmount returns the value of the "final_amount" field in the mutation.
-func (m *OrderMutation) FinalAmount() (r float64, exists bool) {
+func (m *OrderMutation) FinalAmount() (r int64, exists bool) {
 	v := m.final_amount
 	if v == nil {
 		return
@@ -459,7 +496,7 @@ func (m *OrderMutation) FinalAmount() (r float64, exists bool) {
 // OldFinalAmount returns the old "final_amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldFinalAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldFinalAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldFinalAmount is only allowed on UpdateOne operations")
 	}
@@ -473,17 +510,17 @@ func (m *OrderMutation) OldFinalAmount(ctx context.Context) (v float64, err erro
 	return oldValue.FinalAmount, nil
 }
 
-// AddFinalAmount adds f to the "final_amount" field.
-func (m *OrderMutation) AddFinalAmount(f float64) {
+// AddFinalAmount adds i to the "final_amount" field.
+func (m *OrderMutation) AddFinalAmount(i int64) {
 	if m.addfinal_amount != nil {
-		*m.addfinal_amount += f
+		*m.addfinal_amount += i
 	} else {
-		m.addfinal_amount = &f
+		m.addfinal_amount = &i
 	}
 }
 
 // AddedFinalAmount returns the value that was added to the "final_amount" field in this mutation.
-func (m *OrderMutation) AddedFinalAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedFinalAmount() (r int64, exists bool) {
 	v := m.addfinal_amount
 	if v == nil {
 		return
@@ -681,13 +718,13 @@ func (m *OrderMutation) ResetTransactionID() {
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (m *OrderMutation) SetPaidAmount(f float64) {
-	m.paid_amount = &f
+func (m *OrderMutation) SetPaidAmount(i int64) {
+	m.paid_amount = &i
 	m.addpaid_amount = nil
 }
 
 // PaidAmount returns the value of the "paid_amount" field in the mutation.
-func (m *OrderMutation) PaidAmount() (r float64, exists bool) {
+func (m *OrderMutation) PaidAmount() (r int64, exists bool) {
 	v := m.paid_amount
 	if v == nil {
 		return
@@ -698,7 +735,7 @@ func (m *OrderMutation) PaidAmount() (r float64, exists bool) {
 // OldPaidAmount returns the old "paid_amount" field's value of the Order entity.
 // If the Order object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrderMutation) OldPaidAmount(ctx context.Context) (v float64, err error) {
+func (m *OrderMutation) OldPaidAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPaidAmount is only allowed on UpdateOne operations")
 	}
@@ -712,17 +749,17 @@ func (m *OrderMutation) OldPaidAmount(ctx context.Context) (v float64, err error
 	return oldValue.PaidAmount, nil
 }
 
-// AddPaidAmount adds f to the "paid_amount" field.
-func (m *OrderMutation) AddPaidAmount(f float64) {
+// AddPaidAmount adds i to the "paid_amount" field.
+func (m *OrderMutation) AddPaidAmount(i int64) {
 	if m.addpaid_amount != nil {
-		*m.addpaid_amount += f
+		*m.addpaid_amount += i
 	} else {
-		m.addpaid_amount = &f
+		m.addpaid_amount = &i
 	}
 }
 
 // AddedPaidAmount returns the value that was added to the "paid_amount" field in this mutation.
-func (m *OrderMutation) AddedPaidAmount() (r float64, exists bool) {
+func (m *OrderMutation) AddedPaidAmount() (r int64, exists bool) {
 	v := m.addpaid_amount
 	if v == nil {
 		return
@@ -954,7 +991,10 @@ func (m *OrderMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
+	if m.tenant_id != nil {
+		fields = append(fields, order.FieldTenantID)
+	}
 	if m.record_id != nil {
 		fields = append(fields, order.FieldRecordID)
 	}
@@ -1011,6 +1051,8 @@ func (m *OrderMutation) Fields() []string {
 // schema.
 func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case order.FieldTenantID:
+		return m.TenantID()
 	case order.FieldRecordID:
 		return m.RecordID()
 	case order.FieldLotID:
@@ -1052,6 +1094,8 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case order.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case order.FieldRecordID:
 		return m.OldRecordID(ctx)
 	case order.FieldLotID:
@@ -1093,6 +1137,13 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *OrderMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case order.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case order.FieldRecordID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -1122,21 +1173,21 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		m.SetPlateNumber(v)
 		return nil
 	case order.FieldAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAmount(v)
 		return nil
 	case order.FieldDiscountAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDiscountAmount(v)
 		return nil
 	case order.FieldFinalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1171,7 +1222,7 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 		m.SetTransactionID(v)
 		return nil
 	case order.FieldPaidAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1251,28 +1302,28 @@ func (m *OrderMutation) AddedField(name string) (ent.Value, bool) {
 func (m *OrderMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case order.FieldAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddAmount(v)
 		return nil
 	case order.FieldDiscountAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDiscountAmount(v)
 		return nil
 	case order.FieldFinalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFinalAmount(v)
 		return nil
 	case order.FieldPaidAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1350,6 +1401,9 @@ func (m *OrderMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *OrderMutation) ResetField(name string) error {
 	switch name {
+	case order.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case order.FieldRecordID:
 		m.ResetRecordID()
 		return nil
@@ -1456,6 +1510,7 @@ type ParkingLotMutation struct {
 	op            Op
 	typ           string
 	id            *uuid.UUID
+	tenant_id     *uuid.UUID
 	name          *string
 	address       *string
 	lanes         *int
@@ -1571,6 +1626,42 @@ func (m *ParkingLotMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ParkingLotMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ParkingLotMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the ParkingLot entity.
+// If the ParkingLot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ParkingLotMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ParkingLotMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetName sets the "name" field.
@@ -1856,7 +1947,10 @@ func (m *ParkingLotMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ParkingLotMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
+	if m.tenant_id != nil {
+		fields = append(fields, parkinglot.FieldTenantID)
+	}
 	if m.name != nil {
 		fields = append(fields, parkinglot.FieldName)
 	}
@@ -1883,6 +1977,8 @@ func (m *ParkingLotMutation) Fields() []string {
 // schema.
 func (m *ParkingLotMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case parkinglot.FieldTenantID:
+		return m.TenantID()
 	case parkinglot.FieldName:
 		return m.Name()
 	case parkinglot.FieldAddress:
@@ -1904,6 +2000,8 @@ func (m *ParkingLotMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ParkingLotMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case parkinglot.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case parkinglot.FieldName:
 		return m.OldName(ctx)
 	case parkinglot.FieldAddress:
@@ -1925,6 +2023,13 @@ func (m *ParkingLotMutation) OldField(ctx context.Context, name string) (ent.Val
 // type.
 func (m *ParkingLotMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case parkinglot.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case parkinglot.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -2040,6 +2145,9 @@ func (m *ParkingLotMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ParkingLotMutation) ResetField(name string) error {
 	switch name {
+	case parkinglot.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case parkinglot.FieldName:
 		m.ResetName()
 		return nil
@@ -2116,6 +2224,7 @@ type ParkingRecordMutation struct {
 	op                  Op
 	typ                 string
 	id                  *uuid.UUID
+	tenant_id           *uuid.UUID
 	lot_id              *uuid.UUID
 	entry_lane_id       *uuid.UUID
 	vehicle_id          *uuid.UUID
@@ -2244,6 +2353,42 @@ func (m *ParkingRecordMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ParkingRecordMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ParkingRecordMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the ParkingRecord entity.
+// If the ParkingRecord object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ParkingRecordMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ParkingRecordMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetLotID sets the "lot_id" field.
@@ -3099,7 +3244,10 @@ func (m *ParkingRecordMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ParkingRecordMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 19)
+	if m.tenant_id != nil {
+		fields = append(fields, parkingrecord.FieldTenantID)
+	}
 	if m.lot_id != nil {
 		fields = append(fields, parkingrecord.FieldLotID)
 	}
@@ -3162,6 +3310,8 @@ func (m *ParkingRecordMutation) Fields() []string {
 // schema.
 func (m *ParkingRecordMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case parkingrecord.FieldTenantID:
+		return m.TenantID()
 	case parkingrecord.FieldLotID:
 		return m.LotID()
 	case parkingrecord.FieldEntryLaneID:
@@ -3207,6 +3357,8 @@ func (m *ParkingRecordMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ParkingRecordMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case parkingrecord.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case parkingrecord.FieldLotID:
 		return m.OldLotID(ctx)
 	case parkingrecord.FieldEntryLaneID:
@@ -3252,6 +3404,13 @@ func (m *ParkingRecordMutation) OldField(ctx context.Context, name string) (ent.
 // type.
 func (m *ParkingRecordMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case parkingrecord.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case parkingrecord.FieldLotID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -3517,6 +3676,9 @@ func (m *ParkingRecordMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ParkingRecordMutation) ResetField(name string) error {
 	switch name {
+	case parkingrecord.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case parkingrecord.FieldLotID:
 		m.ResetLotID()
 		return nil
@@ -3629,6 +3791,7 @@ type UserMutation struct {
 	op            Op
 	typ           string
 	id            *uuid.UUID
+	tenant_id     *uuid.UUID
 	username      *string
 	password      *string
 	name          *string
@@ -3744,6 +3907,42 @@ func (m *UserMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *UserMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *UserMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *UserMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetUsername sets the "username" field.
@@ -4045,7 +4244,10 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
+	if m.tenant_id != nil {
+		fields = append(fields, user.FieldTenantID)
+	}
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
@@ -4075,6 +4277,8 @@ func (m *UserMutation) Fields() []string {
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case user.FieldTenantID:
+		return m.TenantID()
 	case user.FieldUsername:
 		return m.Username()
 	case user.FieldPassword:
@@ -4098,6 +4302,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case user.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case user.FieldUsername:
 		return m.OldUsername(ctx)
 	case user.FieldPassword:
@@ -4121,6 +4327,13 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case user.FieldUsername:
 		v, ok := value.(string)
 		if !ok {
@@ -4228,6 +4441,9 @@ func (m *UserMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
 	switch name {
+	case user.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case user.FieldUsername:
 		m.ResetUsername()
 		return nil
@@ -4307,6 +4523,7 @@ type VehicleMutation struct {
 	op                  Op
 	typ                 string
 	id                  *uuid.UUID
+	tenant_id           *uuid.UUID
 	plate_number        *string
 	vehicle_type        *string
 	owner_name          *string
@@ -4422,6 +4639,42 @@ func (m *VehicleMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *VehicleMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *VehicleMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Vehicle entity.
+// If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *VehicleMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetPlateNumber sets the "plate_number" field.
@@ -4749,7 +5002,10 @@ func (m *VehicleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VehicleMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
+	if m.tenant_id != nil {
+		fields = append(fields, vehicle.FieldTenantID)
+	}
 	if m.plate_number != nil {
 		fields = append(fields, vehicle.FieldPlateNumber)
 	}
@@ -4779,6 +5035,8 @@ func (m *VehicleMutation) Fields() []string {
 // schema.
 func (m *VehicleMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case vehicle.FieldTenantID:
+		return m.TenantID()
 	case vehicle.FieldPlateNumber:
 		return m.PlateNumber()
 	case vehicle.FieldVehicleType:
@@ -4802,6 +5060,8 @@ func (m *VehicleMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *VehicleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case vehicle.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case vehicle.FieldPlateNumber:
 		return m.OldPlateNumber(ctx)
 	case vehicle.FieldVehicleType:
@@ -4825,6 +5085,13 @@ func (m *VehicleMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *VehicleMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case vehicle.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case vehicle.FieldPlateNumber:
 		v, ok := value.(string)
 		if !ok {
@@ -4944,6 +5211,9 @@ func (m *VehicleMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *VehicleMutation) ResetField(name string) error {
 	switch name {
+	case vehicle.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case vehicle.FieldPlateNumber:
 		m.ResetPlateNumber()
 		return nil

@@ -37,11 +37,12 @@ func NewTracerProvider(cfg *Config) (*TracerProvider, error) {
 	var exporter sdktrace.SpanExporter
 	var err error
 
-	if cfg.Endpoint == "" {
+	switch cfg.Endpoint {
+	case "":
 		exporter, err = stdouttrace.New(stdouttrace.WithPrettyPrint())
-	} else if cfg.Endpoint == "jaeger" {
+	case "jaeger":
 		exporter, err = jaeger.New(jaeger.WithAgentEndpoint())
-	} else {
+	default:
 		exporter, err = otlptracegrpc.New(context.Background(),
 			otlptracegrpc.WithEndpoint(cfg.Endpoint),
 			otlptracegrpc.WithInsecure(),

@@ -121,14 +121,14 @@ func (_u *DailyStatsUpdate) AddTotalVehicles(v int) *DailyStatsUpdate {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_u *DailyStatsUpdate) SetTotalAmount(v float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) SetTotalAmount(v int64) *DailyStatsUpdate {
 	_u.mutation.ResetTotalAmount()
 	_u.mutation.SetTotalAmount(v)
 	return _u
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_u *DailyStatsUpdate) SetNillableTotalAmount(v *float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) SetNillableTotalAmount(v *int64) *DailyStatsUpdate {
 	if v != nil {
 		_u.SetTotalAmount(*v)
 	}
@@ -136,20 +136,20 @@ func (_u *DailyStatsUpdate) SetNillableTotalAmount(v *float64) *DailyStatsUpdate
 }
 
 // AddTotalAmount adds value to the "total_amount" field.
-func (_u *DailyStatsUpdate) AddTotalAmount(v float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) AddTotalAmount(v int64) *DailyStatsUpdate {
 	_u.mutation.AddTotalAmount(v)
 	return _u
 }
 
 // SetTotalDiscount sets the "total_discount" field.
-func (_u *DailyStatsUpdate) SetTotalDiscount(v float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) SetTotalDiscount(v int64) *DailyStatsUpdate {
 	_u.mutation.ResetTotalDiscount()
 	_u.mutation.SetTotalDiscount(v)
 	return _u
 }
 
 // SetNillableTotalDiscount sets the "total_discount" field if the given value is not nil.
-func (_u *DailyStatsUpdate) SetNillableTotalDiscount(v *float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) SetNillableTotalDiscount(v *int64) *DailyStatsUpdate {
 	if v != nil {
 		_u.SetTotalDiscount(*v)
 	}
@@ -157,20 +157,20 @@ func (_u *DailyStatsUpdate) SetNillableTotalDiscount(v *float64) *DailyStatsUpda
 }
 
 // AddTotalDiscount adds value to the "total_discount" field.
-func (_u *DailyStatsUpdate) AddTotalDiscount(v float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) AddTotalDiscount(v int64) *DailyStatsUpdate {
 	_u.mutation.AddTotalDiscount(v)
 	return _u
 }
 
 // SetNetAmount sets the "net_amount" field.
-func (_u *DailyStatsUpdate) SetNetAmount(v float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) SetNetAmount(v int64) *DailyStatsUpdate {
 	_u.mutation.ResetNetAmount()
 	_u.mutation.SetNetAmount(v)
 	return _u
 }
 
 // SetNillableNetAmount sets the "net_amount" field if the given value is not nil.
-func (_u *DailyStatsUpdate) SetNillableNetAmount(v *float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) SetNillableNetAmount(v *int64) *DailyStatsUpdate {
 	if v != nil {
 		_u.SetNetAmount(*v)
 	}
@@ -178,7 +178,7 @@ func (_u *DailyStatsUpdate) SetNillableNetAmount(v *float64) *DailyStatsUpdate {
 }
 
 // AddNetAmount adds value to the "net_amount" field.
-func (_u *DailyStatsUpdate) AddNetAmount(v float64) *DailyStatsUpdate {
+func (_u *DailyStatsUpdate) AddNetAmount(v int64) *DailyStatsUpdate {
 	_u.mutation.AddNetAmount(v)
 	return _u
 }
@@ -327,22 +327,22 @@ func (_u *DailyStatsUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		_spec.AddField(dailystats.FieldTotalVehicles, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.TotalAmount(); ok {
-		_spec.SetField(dailystats.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
-		_spec.AddField(dailystats.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.AddField(dailystats.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TotalDiscount(); ok {
-		_spec.SetField(dailystats.FieldTotalDiscount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldTotalDiscount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalDiscount(); ok {
-		_spec.AddField(dailystats.FieldTotalDiscount, field.TypeFloat64, value)
+		_spec.AddField(dailystats.FieldTotalDiscount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.NetAmount(); ok {
-		_spec.SetField(dailystats.FieldNetAmount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldNetAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedNetAmount(); ok {
-		_spec.AddField(dailystats.FieldNetAmount, field.TypeFloat64, value)
+		_spec.AddField(dailystats.FieldNetAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AvgDuration(); ok {
 		_spec.SetField(dailystats.FieldAvgDuration, field.TypeFloat64, value)
@@ -477,14 +477,14 @@ func (_u *DailyStatsUpdateOne) AddTotalVehicles(v int) *DailyStatsUpdateOne {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (_u *DailyStatsUpdateOne) SetTotalAmount(v float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) SetTotalAmount(v int64) *DailyStatsUpdateOne {
 	_u.mutation.ResetTotalAmount()
 	_u.mutation.SetTotalAmount(v)
 	return _u
 }
 
 // SetNillableTotalAmount sets the "total_amount" field if the given value is not nil.
-func (_u *DailyStatsUpdateOne) SetNillableTotalAmount(v *float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) SetNillableTotalAmount(v *int64) *DailyStatsUpdateOne {
 	if v != nil {
 		_u.SetTotalAmount(*v)
 	}
@@ -492,20 +492,20 @@ func (_u *DailyStatsUpdateOne) SetNillableTotalAmount(v *float64) *DailyStatsUpd
 }
 
 // AddTotalAmount adds value to the "total_amount" field.
-func (_u *DailyStatsUpdateOne) AddTotalAmount(v float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) AddTotalAmount(v int64) *DailyStatsUpdateOne {
 	_u.mutation.AddTotalAmount(v)
 	return _u
 }
 
 // SetTotalDiscount sets the "total_discount" field.
-func (_u *DailyStatsUpdateOne) SetTotalDiscount(v float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) SetTotalDiscount(v int64) *DailyStatsUpdateOne {
 	_u.mutation.ResetTotalDiscount()
 	_u.mutation.SetTotalDiscount(v)
 	return _u
 }
 
 // SetNillableTotalDiscount sets the "total_discount" field if the given value is not nil.
-func (_u *DailyStatsUpdateOne) SetNillableTotalDiscount(v *float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) SetNillableTotalDiscount(v *int64) *DailyStatsUpdateOne {
 	if v != nil {
 		_u.SetTotalDiscount(*v)
 	}
@@ -513,20 +513,20 @@ func (_u *DailyStatsUpdateOne) SetNillableTotalDiscount(v *float64) *DailyStatsU
 }
 
 // AddTotalDiscount adds value to the "total_discount" field.
-func (_u *DailyStatsUpdateOne) AddTotalDiscount(v float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) AddTotalDiscount(v int64) *DailyStatsUpdateOne {
 	_u.mutation.AddTotalDiscount(v)
 	return _u
 }
 
 // SetNetAmount sets the "net_amount" field.
-func (_u *DailyStatsUpdateOne) SetNetAmount(v float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) SetNetAmount(v int64) *DailyStatsUpdateOne {
 	_u.mutation.ResetNetAmount()
 	_u.mutation.SetNetAmount(v)
 	return _u
 }
 
 // SetNillableNetAmount sets the "net_amount" field if the given value is not nil.
-func (_u *DailyStatsUpdateOne) SetNillableNetAmount(v *float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) SetNillableNetAmount(v *int64) *DailyStatsUpdateOne {
 	if v != nil {
 		_u.SetNetAmount(*v)
 	}
@@ -534,7 +534,7 @@ func (_u *DailyStatsUpdateOne) SetNillableNetAmount(v *float64) *DailyStatsUpdat
 }
 
 // AddNetAmount adds value to the "net_amount" field.
-func (_u *DailyStatsUpdateOne) AddNetAmount(v float64) *DailyStatsUpdateOne {
+func (_u *DailyStatsUpdateOne) AddNetAmount(v int64) *DailyStatsUpdateOne {
 	_u.mutation.AddNetAmount(v)
 	return _u
 }
@@ -713,22 +713,22 @@ func (_u *DailyStatsUpdateOne) sqlSave(ctx context.Context) (_node *DailyStats, 
 		_spec.AddField(dailystats.FieldTotalVehicles, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.TotalAmount(); ok {
-		_spec.SetField(dailystats.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalAmount(); ok {
-		_spec.AddField(dailystats.FieldTotalAmount, field.TypeFloat64, value)
+		_spec.AddField(dailystats.FieldTotalAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TotalDiscount(); ok {
-		_spec.SetField(dailystats.FieldTotalDiscount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldTotalDiscount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTotalDiscount(); ok {
-		_spec.AddField(dailystats.FieldTotalDiscount, field.TypeFloat64, value)
+		_spec.AddField(dailystats.FieldTotalDiscount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.NetAmount(); ok {
-		_spec.SetField(dailystats.FieldNetAmount, field.TypeFloat64, value)
+		_spec.SetField(dailystats.FieldNetAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedNetAmount(); ok {
-		_spec.AddField(dailystats.FieldNetAmount, field.TypeFloat64, value)
+		_spec.AddField(dailystats.FieldNetAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AvgDuration(); ok {
 		_spec.SetField(dailystats.FieldAvgDuration, field.TypeFloat64, value)

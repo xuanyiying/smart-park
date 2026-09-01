@@ -32,16 +32,18 @@ func (Order) Fields() []ent.Field {
 			MaxLen(20).
 			NotEmpty().
 			Comment("车牌号"),
-		field.Float("amount").
-			Min(0).
-			Comment("原始金额"),
-		field.Float("discount_amount").
+		field.Int64("amount").
 			Default(0).
 			Min(0).
-			Comment("优惠金额"),
-		field.Float("final_amount").
+			Comment("原始金额(分)"),
+		field.Int64("discount_amount").
+			Default(0).
 			Min(0).
-			Comment("实付金额"),
+			Comment("优惠金额(分)"),
+		field.Int64("final_amount").
+			Default(0).
+			Min(0).
+			Comment("实付金额(分)"),
 		field.Enum("status").
 			Values("pending", "paid", "refunding", "refunded", "failed").
 			Default("pending").
@@ -58,10 +60,11 @@ func (Order) Fields() []ent.Field {
 			MaxLen(64).
 			Optional().
 			Comment("支付渠道交易号"),
-		field.Float("paid_amount").
+		field.Int64("paid_amount").
 			Optional().
+			Default(0).
 			Min(0).
-			Comment("实际支付金额(回调写入)"),
+			Comment("实际支付金额(分, 回调写入)"),
 		field.Time("refunded_at").
 			Optional().
 			Nillable().

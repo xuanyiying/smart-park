@@ -314,9 +314,10 @@ message ExitData {
   string recordId        = 1;
   string plateNumber     = 2;
   int32  parkingDuration = 3;
-  double amount          = 4;
-  double discountAmount  = 5;
-  double finalAmount     = 6;
+  // Amounts in cents (分).
+  int64  amount          = 4;
+  int64  discountAmount  = 5;
+  int64  finalAmount     = 6;
   bool   allowed         = 7;
   bool   gateOpen        = 8;
   string displayMessage  = 9;

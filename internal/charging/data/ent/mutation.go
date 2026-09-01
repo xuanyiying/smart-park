@@ -40,6 +40,7 @@ type ConnectorMutation struct {
 	op              Op
 	typ             string
 	id              *uuid.UUID
+	tenant_id       *uuid.UUID
 	number          *int
 	addnumber       *int
 	_type           *connector.Type
@@ -166,6 +167,42 @@ func (m *ConnectorMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ConnectorMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ConnectorMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Connector entity.
+// If the Connector object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConnectorMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ConnectorMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetStationID sets the "station_id" field.
@@ -736,7 +773,10 @@ func (m *ConnectorMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConnectorMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
+	if m.tenant_id != nil {
+		fields = append(fields, connector.FieldTenantID)
+	}
 	if m.station != nil {
 		fields = append(fields, connector.FieldStationID)
 	}
@@ -775,6 +815,8 @@ func (m *ConnectorMutation) Fields() []string {
 // schema.
 func (m *ConnectorMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case connector.FieldTenantID:
+		return m.TenantID()
 	case connector.FieldStationID:
 		return m.StationID()
 	case connector.FieldNumber:
@@ -804,6 +846,8 @@ func (m *ConnectorMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ConnectorMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case connector.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case connector.FieldStationID:
 		return m.OldStationID(ctx)
 	case connector.FieldNumber:
@@ -833,6 +877,13 @@ func (m *ConnectorMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *ConnectorMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case connector.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case connector.FieldStationID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -1012,6 +1063,9 @@ func (m *ConnectorMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ConnectorMutation) ResetField(name string) error {
 	switch name {
+	case connector.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case connector.FieldStationID:
 		m.ResetStationID()
 		return nil
@@ -1154,6 +1208,7 @@ type PriceMutation struct {
 	op               Op
 	typ              string
 	id               *uuid.UUID
+	tenant_id        *uuid.UUID
 	name             *string
 	start_hour       *int
 	addstart_hour    *int
@@ -1282,6 +1337,42 @@ func (m *PriceMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *PriceMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *PriceMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Price entity.
+// If the Price object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PriceMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *PriceMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetStationID sets the "station_id" field.
@@ -1946,7 +2037,10 @@ func (m *PriceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PriceMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
+	if m.tenant_id != nil {
+		fields = append(fields, price.FieldTenantID)
+	}
 	if m.station != nil {
 		fields = append(fields, price.FieldStationID)
 	}
@@ -1994,6 +2088,8 @@ func (m *PriceMutation) Fields() []string {
 // schema.
 func (m *PriceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case price.FieldTenantID:
+		return m.TenantID()
 	case price.FieldStationID:
 		return m.StationID()
 	case price.FieldName:
@@ -2029,6 +2125,8 @@ func (m *PriceMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *PriceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case price.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case price.FieldStationID:
 		return m.OldStationID(ctx)
 	case price.FieldName:
@@ -2064,6 +2162,13 @@ func (m *PriceMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *PriceMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case price.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case price.FieldStationID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -2288,6 +2393,9 @@ func (m *PriceMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *PriceMutation) ResetField(name string) error {
 	switch name {
+	case price.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case price.FieldStationID:
 		m.ResetStationID()
 		return nil
@@ -2411,6 +2519,7 @@ type SessionMutation struct {
 	op                Op
 	typ               string
 	id                *uuid.UUID
+	tenant_id         *uuid.UUID
 	station_id        *uuid.UUID
 	user_id           *uuid.UUID
 	vehicle_plate     *string
@@ -2422,12 +2531,12 @@ type SessionMutation struct {
 	addend_energy     *float64
 	charged_energy    *float64
 	addcharged_energy *float64
-	cost              *float64
-	addcost           *float64
-	service_fee       *float64
-	addservice_fee    *float64
-	total_amount      *float64
-	addtotal_amount   *float64
+	cost              *int64
+	addcost           *int64
+	service_fee       *int64
+	addservice_fee    *int64
+	total_amount      *int64
+	addtotal_amount   *int64
 	status            *session.Status
 	payment_status    *session.PaymentStatus
 	pay_time          *time.Time
@@ -2545,6 +2654,42 @@ func (m *SessionMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *SessionMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *SessionMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *SessionMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetStationID sets the "station_id" field.
@@ -2945,13 +3090,13 @@ func (m *SessionMutation) ResetChargedEnergy() {
 }
 
 // SetCost sets the "cost" field.
-func (m *SessionMutation) SetCost(f float64) {
-	m.cost = &f
+func (m *SessionMutation) SetCost(i int64) {
+	m.cost = &i
 	m.addcost = nil
 }
 
 // Cost returns the value of the "cost" field in the mutation.
-func (m *SessionMutation) Cost() (r float64, exists bool) {
+func (m *SessionMutation) Cost() (r int64, exists bool) {
 	v := m.cost
 	if v == nil {
 		return
@@ -2962,7 +3107,7 @@ func (m *SessionMutation) Cost() (r float64, exists bool) {
 // OldCost returns the old "cost" field's value of the Session entity.
 // If the Session object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SessionMutation) OldCost(ctx context.Context) (v float64, err error) {
+func (m *SessionMutation) OldCost(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCost is only allowed on UpdateOne operations")
 	}
@@ -2976,17 +3121,17 @@ func (m *SessionMutation) OldCost(ctx context.Context) (v float64, err error) {
 	return oldValue.Cost, nil
 }
 
-// AddCost adds f to the "cost" field.
-func (m *SessionMutation) AddCost(f float64) {
+// AddCost adds i to the "cost" field.
+func (m *SessionMutation) AddCost(i int64) {
 	if m.addcost != nil {
-		*m.addcost += f
+		*m.addcost += i
 	} else {
-		m.addcost = &f
+		m.addcost = &i
 	}
 }
 
 // AddedCost returns the value that was added to the "cost" field in this mutation.
-func (m *SessionMutation) AddedCost() (r float64, exists bool) {
+func (m *SessionMutation) AddedCost() (r int64, exists bool) {
 	v := m.addcost
 	if v == nil {
 		return
@@ -3001,13 +3146,13 @@ func (m *SessionMutation) ResetCost() {
 }
 
 // SetServiceFee sets the "service_fee" field.
-func (m *SessionMutation) SetServiceFee(f float64) {
-	m.service_fee = &f
+func (m *SessionMutation) SetServiceFee(i int64) {
+	m.service_fee = &i
 	m.addservice_fee = nil
 }
 
 // ServiceFee returns the value of the "service_fee" field in the mutation.
-func (m *SessionMutation) ServiceFee() (r float64, exists bool) {
+func (m *SessionMutation) ServiceFee() (r int64, exists bool) {
 	v := m.service_fee
 	if v == nil {
 		return
@@ -3018,7 +3163,7 @@ func (m *SessionMutation) ServiceFee() (r float64, exists bool) {
 // OldServiceFee returns the old "service_fee" field's value of the Session entity.
 // If the Session object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SessionMutation) OldServiceFee(ctx context.Context) (v float64, err error) {
+func (m *SessionMutation) OldServiceFee(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldServiceFee is only allowed on UpdateOne operations")
 	}
@@ -3032,17 +3177,17 @@ func (m *SessionMutation) OldServiceFee(ctx context.Context) (v float64, err err
 	return oldValue.ServiceFee, nil
 }
 
-// AddServiceFee adds f to the "service_fee" field.
-func (m *SessionMutation) AddServiceFee(f float64) {
+// AddServiceFee adds i to the "service_fee" field.
+func (m *SessionMutation) AddServiceFee(i int64) {
 	if m.addservice_fee != nil {
-		*m.addservice_fee += f
+		*m.addservice_fee += i
 	} else {
-		m.addservice_fee = &f
+		m.addservice_fee = &i
 	}
 }
 
 // AddedServiceFee returns the value that was added to the "service_fee" field in this mutation.
-func (m *SessionMutation) AddedServiceFee() (r float64, exists bool) {
+func (m *SessionMutation) AddedServiceFee() (r int64, exists bool) {
 	v := m.addservice_fee
 	if v == nil {
 		return
@@ -3057,13 +3202,13 @@ func (m *SessionMutation) ResetServiceFee() {
 }
 
 // SetTotalAmount sets the "total_amount" field.
-func (m *SessionMutation) SetTotalAmount(f float64) {
-	m.total_amount = &f
+func (m *SessionMutation) SetTotalAmount(i int64) {
+	m.total_amount = &i
 	m.addtotal_amount = nil
 }
 
 // TotalAmount returns the value of the "total_amount" field in the mutation.
-func (m *SessionMutation) TotalAmount() (r float64, exists bool) {
+func (m *SessionMutation) TotalAmount() (r int64, exists bool) {
 	v := m.total_amount
 	if v == nil {
 		return
@@ -3074,7 +3219,7 @@ func (m *SessionMutation) TotalAmount() (r float64, exists bool) {
 // OldTotalAmount returns the old "total_amount" field's value of the Session entity.
 // If the Session object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SessionMutation) OldTotalAmount(ctx context.Context) (v float64, err error) {
+func (m *SessionMutation) OldTotalAmount(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotalAmount is only allowed on UpdateOne operations")
 	}
@@ -3088,17 +3233,17 @@ func (m *SessionMutation) OldTotalAmount(ctx context.Context) (v float64, err er
 	return oldValue.TotalAmount, nil
 }
 
-// AddTotalAmount adds f to the "total_amount" field.
-func (m *SessionMutation) AddTotalAmount(f float64) {
+// AddTotalAmount adds i to the "total_amount" field.
+func (m *SessionMutation) AddTotalAmount(i int64) {
 	if m.addtotal_amount != nil {
-		*m.addtotal_amount += f
+		*m.addtotal_amount += i
 	} else {
-		m.addtotal_amount = &f
+		m.addtotal_amount = &i
 	}
 }
 
 // AddedTotalAmount returns the value that was added to the "total_amount" field in this mutation.
-func (m *SessionMutation) AddedTotalAmount() (r float64, exists bool) {
+func (m *SessionMutation) AddedTotalAmount() (r int64, exists bool) {
 	v := m.addtotal_amount
 	if v == nil {
 		return
@@ -3464,7 +3609,10 @@ func (m *SessionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SessionMutation) Fields() []string {
-	fields := make([]string, 0, 19)
+	fields := make([]string, 0, 20)
+	if m.tenant_id != nil {
+		fields = append(fields, session.FieldTenantID)
+	}
 	if m.station_id != nil {
 		fields = append(fields, session.FieldStationID)
 	}
@@ -3530,6 +3678,8 @@ func (m *SessionMutation) Fields() []string {
 // schema.
 func (m *SessionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case session.FieldTenantID:
+		return m.TenantID()
 	case session.FieldStationID:
 		return m.StationID()
 	case session.FieldConnectorID:
@@ -3577,6 +3727,8 @@ func (m *SessionMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *SessionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case session.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case session.FieldStationID:
 		return m.OldStationID(ctx)
 	case session.FieldConnectorID:
@@ -3624,6 +3776,13 @@ func (m *SessionMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *SessionMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case session.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case session.FieldStationID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -3688,21 +3847,21 @@ func (m *SessionMutation) SetField(name string, value ent.Value) error {
 		m.SetChargedEnergy(v)
 		return nil
 	case session.FieldCost:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCost(v)
 		return nil
 	case session.FieldServiceFee:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetServiceFee(v)
 		return nil
 	case session.FieldTotalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3834,21 +3993,21 @@ func (m *SessionMutation) AddField(name string, value ent.Value) error {
 		m.AddChargedEnergy(v)
 		return nil
 	case session.FieldCost:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCost(v)
 		return nil
 	case session.FieldServiceFee:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddServiceFee(v)
 		return nil
 	case session.FieldTotalAmount:
-		v, ok := value.(float64)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3908,6 +4067,9 @@ func (m *SessionMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *SessionMutation) ResetField(name string) error {
 	switch name {
+	case session.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case session.FieldStationID:
 		m.ResetStationID()
 		return nil
@@ -4049,6 +4211,7 @@ type StationMutation struct {
 	op                      Op
 	typ                     string
 	id                      *uuid.UUID
+	tenant_id               *uuid.UUID
 	lot_id                  *uuid.UUID
 	name                    *string
 	station_type            *station.StationType
@@ -4180,6 +4343,42 @@ func (m *StationMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *StationMutation) SetTenantID(u uuid.UUID) {
+	m.tenant_id = &u
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *StationMutation) TenantID() (r uuid.UUID, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Station entity.
+// If the Station object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StationMutation) OldTenantID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *StationMutation) ResetTenantID() {
+	m.tenant_id = nil
 }
 
 // SetLotID sets the "lot_id" field.
@@ -4898,7 +5097,10 @@ func (m *StationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StationMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
+	if m.tenant_id != nil {
+		fields = append(fields, station.FieldTenantID)
+	}
 	if m.lot_id != nil {
 		fields = append(fields, station.FieldLotID)
 	}
@@ -4946,6 +5148,8 @@ func (m *StationMutation) Fields() []string {
 // schema.
 func (m *StationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case station.FieldTenantID:
+		return m.TenantID()
 	case station.FieldLotID:
 		return m.LotID()
 	case station.FieldName:
@@ -4981,6 +5185,8 @@ func (m *StationMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *StationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case station.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case station.FieldLotID:
 		return m.OldLotID(ctx)
 	case station.FieldName:
@@ -5016,6 +5222,13 @@ func (m *StationMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *StationMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case station.FieldTenantID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
 	case station.FieldLotID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
@@ -5222,6 +5435,9 @@ func (m *StationMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *StationMutation) ResetField(name string) error {
 	switch name {
+	case station.FieldTenantID:
+		m.ResetTenantID()
+		return nil
 	case station.FieldLotID:
 		m.ResetLotID()
 		return nil

@@ -80,6 +80,8 @@ var (
 	DeviceIDValidator func(string) error
 	// GateIDValidator is a validator for the "gate_id" field. It is called by the builders before save.
 	GateIDValidator func(string) error
+	// DefaultSyncAmount holds the default value on creation for the "sync_amount" field.
+	DefaultSyncAmount int64
 	// DefaultRetryCount holds the default value on creation for the "retry_count" field.
 	DefaultRetryCount int
 	// RetryCountValidator is a validator for the "retry_count" field. It is called by the builders before save.

@@ -24,4 +24,4 @@ COPY configs/gateway.yaml /app/configs/gateway.yaml
 
 EXPOSE 8000
 
-CMD ["./gateway"]
+CMD ["./gateway", "-conf", "/app/configs/gateway.yaml"]

@@ -29,6 +29,20 @@ func (_u *BillingRuleUpdate) Where(ps ...predicate.BillingRule) *BillingRuleUpda
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *BillingRuleUpdate) SetTenantID(v uuid.UUID) *BillingRuleUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *BillingRuleUpdate) SetNillableTenantID(v *uuid.UUID) *BillingRuleUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
 // SetLotID sets the "lot_id" field.
 func (_u *BillingRuleUpdate) SetLotID(v uuid.UUID) *BillingRuleUpdate {
 	_u.mutation.SetLotID(v)
@@ -237,6 +251,9 @@ func (_u *BillingRuleUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(billingrule.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(billingrule.FieldLotID, field.TypeUUID, value)
 	}
@@ -294,6 +311,20 @@ type BillingRuleUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *BillingRuleMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *BillingRuleUpdateOne) SetTenantID(v uuid.UUID) *BillingRuleUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *BillingRuleUpdateOne) SetNillableTenantID(v *uuid.UUID) *BillingRuleUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetLotID sets the "lot_id" field.
@@ -533,6 +564,9 @@ func (_u *BillingRuleUpdateOne) sqlSave(ctx context.Context) (_node *BillingRule
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(billingrule.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(billingrule.FieldLotID, field.TypeUUID, value)

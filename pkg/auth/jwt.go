@@ -16,6 +16,10 @@ import (
 type Claims struct {
 	UserID string `json:"user_id"`
 	OpenID string `json:"open_id"`
+	// TenantID scopes the token to a tenant. Downstream services must trust this value
+	// rather than a client-supplied X-Tenant-ID header, otherwise any authenticated user
+	// could read another tenant's data by changing a header.
+	TenantID string `json:"tenant_id"`
 	jwt.RegisteredClaims
 }
 
@@ -104,14 +108,19 @@ func loadPrivateKey(path string) (*rsa.PrivateKey, error) {
 	return rsaPriv, nil
 }
 
-func (m *JWTManager) GenerateToken(userID, openID string) (string, error) {
+// GenerateToken issues a signed token for a user.
+//
+// tenantID binds the session to a tenant. It is carried inside the signed token so that
+// it cannot be tampered with, unlike a plain request header.
+func (m *JWTManager) GenerateToken(userID, openID, tenantID string) (string, error) {
 	if m.privateKey == nil {
 		return "", errors.New("private key not configured")
 	}
 
 	claims := &Claims{
-		UserID: userID,
-		OpenID: openID,
+		UserID:   userID,
+		OpenID:   openID,
+		TenantID: tenantID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(m.config.TokenDuration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

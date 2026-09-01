@@ -11,6 +11,7 @@ var (
 	// BillingRulesColumns holds the columns for the "billing_rules" table.
 	BillingRulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "rule_name", Type: field.TypeString, Size: 100},
 		{Name: "rule_type", Type: field.TypeEnum, Enums: []string{"time", "period", "monthly", "coupon", "vip"}},
@@ -29,14 +30,19 @@ var (
 		PrimaryKey: []*schema.Column{BillingRulesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "billingrule_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{BillingRulesColumns[1]},
+			},
+			{
 				Name:    "idx_billing_rules_lot_priority",
 				Unique:  false,
-				Columns: []*schema.Column{BillingRulesColumns[1], BillingRulesColumns[7]},
+				Columns: []*schema.Column{BillingRulesColumns[2], BillingRulesColumns[8]},
 			},
 			{
 				Name:    "billingrule_lot_id_is_active",
 				Unique:  false,
-				Columns: []*schema.Column{BillingRulesColumns[1], BillingRulesColumns[8]},
+				Columns: []*schema.Column{BillingRulesColumns[2], BillingRulesColumns[9]},
 			},
 		},
 	}

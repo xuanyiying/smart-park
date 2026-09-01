@@ -18,27 +18,27 @@ func init() {
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescOpenID is the schema descriptor for open_id field.
-	userDescOpenID := userFields[1].Descriptor()
+	userDescOpenID := userFields[2].Descriptor()
 	// user.OpenIDValidator is a validator for the "open_id" field. It is called by the builders before save.
 	user.OpenIDValidator = userDescOpenID.Validators[0].(func(string) error)
 	// userDescNickname is the schema descriptor for nickname field.
-	userDescNickname := userFields[2].Descriptor()
+	userDescNickname := userFields[3].Descriptor()
 	// user.NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
 	user.NicknameValidator = userDescNickname.Validators[0].(func(string) error)
 	// userDescAvatar is the schema descriptor for avatar field.
-	userDescAvatar := userFields[3].Descriptor()
+	userDescAvatar := userFields[4].Descriptor()
 	// user.AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	user.AvatarValidator = userDescAvatar.Validators[0].(func(string) error)
 	// userDescPhone is the schema descriptor for phone field.
-	userDescPhone := userFields[4].Descriptor()
+	userDescPhone := userFields[5].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[5].Descriptor()
+	userDescCreatedAt := userFields[6].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userFields[6].Descriptor()
+	userDescUpdatedAt := userFields[7].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -50,23 +50,23 @@ func init() {
 	uservehicleFields := schema.UserVehicle{}.Fields()
 	_ = uservehicleFields
 	// uservehicleDescPlateNumber is the schema descriptor for plate_number field.
-	uservehicleDescPlateNumber := uservehicleFields[2].Descriptor()
+	uservehicleDescPlateNumber := uservehicleFields[3].Descriptor()
 	// uservehicle.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
 	uservehicle.PlateNumberValidator = uservehicleDescPlateNumber.Validators[0].(func(string) error)
 	// uservehicleDescOwnerName is the schema descriptor for owner_name field.
-	uservehicleDescOwnerName := uservehicleFields[3].Descriptor()
+	uservehicleDescOwnerName := uservehicleFields[4].Descriptor()
 	// uservehicle.OwnerNameValidator is a validator for the "owner_name" field. It is called by the builders before save.
 	uservehicle.OwnerNameValidator = uservehicleDescOwnerName.Validators[0].(func(string) error)
 	// uservehicleDescOwnerPhone is the schema descriptor for owner_phone field.
-	uservehicleDescOwnerPhone := uservehicleFields[4].Descriptor()
+	uservehicleDescOwnerPhone := uservehicleFields[5].Descriptor()
 	// uservehicle.OwnerPhoneValidator is a validator for the "owner_phone" field. It is called by the builders before save.
 	uservehicle.OwnerPhoneValidator = uservehicleDescOwnerPhone.Validators[0].(func(string) error)
 	// uservehicleDescCreatedAt is the schema descriptor for created_at field.
-	uservehicleDescCreatedAt := uservehicleFields[5].Descriptor()
+	uservehicleDescCreatedAt := uservehicleFields[6].Descriptor()
 	// uservehicle.DefaultCreatedAt holds the default value on creation for the created_at field.
 	uservehicle.DefaultCreatedAt = uservehicleDescCreatedAt.Default.(func() time.Time)
 	// uservehicleDescUpdatedAt is the schema descriptor for updated_at field.
-	uservehicleDescUpdatedAt := uservehicleFields[6].Descriptor()
+	uservehicleDescUpdatedAt := uservehicleFields[7].Descriptor()
 	// uservehicle.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	uservehicle.DefaultUpdatedAt = uservehicleDescUpdatedAt.Default.(func() time.Time)
 	// uservehicle.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

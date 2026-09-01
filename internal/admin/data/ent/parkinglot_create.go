@@ -21,6 +21,12 @@ type ParkingLotCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *ParkingLotCreate) SetTenantID(v uuid.UUID) *ParkingLotCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *ParkingLotCreate) SetName(v string) *ParkingLotCreate {
 	_c.mutation.SetName(v)
@@ -170,6 +176,9 @@ func (_c *ParkingLotCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ParkingLotCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ParkingLot.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ParkingLot.name"`)}
 	}
@@ -234,6 +243,10 @@ func (_c *ParkingLotCreate) createSpec() (*ParkingLot, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(parkinglot.FieldTenantID, field.TypeUUID, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(parkinglot.FieldName, field.TypeString, value)

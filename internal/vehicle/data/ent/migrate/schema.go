@@ -362,7 +362,7 @@ var (
 		{Name: "device_id", Type: field.TypeString, Size: 64},
 		{Name: "gate_id", Type: field.TypeString, Size: 64},
 		{Name: "open_time", Type: field.TypeTime},
-		{Name: "sync_amount", Type: field.TypeFloat64, Nullable: true},
+		{Name: "sync_amount", Type: field.TypeInt64, Nullable: true, Default: 0},
 		{Name: "sync_status", Type: field.TypeEnum, Enums: []string{"pending_sync", "synced", "sync_failed"}, Default: "pending_sync"},
 		{Name: "sync_error", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "retry_count", Type: field.TypeInt, Default: 0},

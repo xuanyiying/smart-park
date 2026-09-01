@@ -3,16 +3,36 @@ package data
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
 )
 
-// SeedData creates initial seed data for development.
-func (r *vehicleRepo) SeedData(ctx context.Context) error {
-	// Check if devices already exist
+// ErrSeedLotNotConfigured is returned when seeding is requested without a target parking
+// lot. Seeding against a hard-coded lot id used to attach demo lanes and devices to a
+// parking lot that does not exist in any real deployment.
+var ErrSeedLotNotConfigured = errors.New("seed: no target parking lot configured")
+
+// SeedData creates the lanes and devices for the given parking lot.
+//
+// It is idempotent: seeding an already seeded lot is a no-op, so restarting a service in
+// production does not accumulate duplicate rows.
+//
+// lotID must be supplied by the operator. Passing uuid.Nil skips seeding, which is the
+// correct production default — a real car park's devices are registered through the
+// device management API, not conjured at boot.
+func (r *vehicleRepo) SeedData(ctx context.Context, lotID uuid.UUID) error {
+	if lotID == uuid.Nil {
+		return ErrSeedLotNotConfigured
+	}
+
 	count, err := r.data.db.Device.Query().Count(ctx)
 	if err != nil {
 		return err
@@ -22,71 +42,77 @@ func (r *vehicleRepo) SeedData(ctx context.Context) error {
 		return nil
 	}
 
-	// Create sample lanes and devices for parking lot 11111111-1111-1111-1111-111111111111
-	lotID := uuid.MustParse("11111111-1111-1111-1111-111111111111")
 	now := time.Now()
 
-	// Create lanes
 	lanes := []struct {
 		id        uuid.UUID
 		laneNo    int
-		lotID     uuid.UUID
 		direction lane.Direction
-		name      string
 	}{
-		{uuid.New(), 1, lotID, lane.DirectionEntry, "入口车道1"},
-		{uuid.New(), 2, lotID, lane.DirectionEntry, "入口车道2"},
-		{uuid.New(), 3, lotID, lane.DirectionExit, "出口车道1"},
-		{uuid.New(), 4, lotID, lane.DirectionExit, "出口车道2"},
+		{uuid.New(), 1, lane.DirectionEntry},
+		{uuid.New(), 2, lane.DirectionEntry},
+		{uuid.New(), 3, lane.DirectionExit},
+		{uuid.New(), 4, lane.DirectionExit},
 	}
 
 	for _, l := range lanes {
-		_, err := r.data.db.Lane.Create().
+		if _, err := r.data.db.Lane.Create().
 			SetID(l.id).
 			SetLaneNo(l.laneNo).
-			SetLotID(l.lotID).
+			SetLotID(lotID).
 			SetDirection(l.direction).
-			Save(ctx)
-		if err != nil {
+			Save(ctx); err != nil {
 			return err
 		}
 	}
 
-	// Create devices
 	devices := []struct {
 		deviceID   string
 		deviceType device.DeviceType
-		status     device.Status
 		laneID     uuid.UUID
-		lotID      uuid.UUID
-		name       string
 	}{
-		{"CAM001", device.DeviceTypeCamera, device.StatusActive, lanes[0].id, lotID, "入口摄像头1"},
-		{"GATE001", device.DeviceTypeGate, device.StatusActive, lanes[0].id, lotID, "入口道闸1"},
-		{"CAM002", device.DeviceTypeCamera, device.StatusActive, lanes[1].id, lotID, "入口摄像头2"},
-		{"GATE002", device.DeviceTypeGate, device.StatusActive, lanes[1].id, lotID, "入口道闸2"},
-		{"CAM003", device.DeviceTypeCamera, device.StatusActive, lanes[2].id, lotID, "出口摄像头1"},
-		{"GATE003", device.DeviceTypeGate, device.StatusActive, lanes[2].id, lotID, "出口道闸1"},
-		{"CAM004", device.DeviceTypeCamera, device.StatusActive, lanes[3].id, lotID, "出口摄像头2"},
-		{"GATE004", device.DeviceTypeGate, device.StatusActive, lanes[3].id, lotID, "出口道闸2"},
-		{"DISP001", device.DeviceTypeDisplay, device.StatusActive, lanes[0].id, lotID, "入口显示屏1"},
-		{"DISP002", device.DeviceTypeDisplay, device.StatusActive, lanes[2].id, lotID, "出口显示屏1"},
+		{"CAM001", device.DeviceTypeCamera, lanes[0].id},
+		{"GATE001", device.DeviceTypeGate, lanes[0].id},
+		{"CAM002", device.DeviceTypeCamera, lanes[1].id},
+		{"GATE002", device.DeviceTypeGate, lanes[1].id},
+		{"CAM003", device.DeviceTypeCamera, lanes[2].id},
+		{"GATE003", device.DeviceTypeGate, lanes[2].id},
+		{"CAM004", device.DeviceTypeCamera, lanes[3].id},
+		{"GATE004", device.DeviceTypeGate, lanes[3].id},
+		{"DISP001", device.DeviceTypeDisplay, lanes[0].id},
+		{"DISP002", device.DeviceTypeDisplay, lanes[2].id},
 	}
 
 	for _, d := range devices {
-		_, err := r.data.db.Device.Create().
-			SetDeviceID(d.deviceID).
-			SetDeviceSecret("secret_" + d.deviceID).
-			SetDeviceType(d.deviceType).
-			SetStatus(d.status).
-			SetLaneID(d.laneID).
-			SetLotID(d.lotID).
-			SetLastHeartbeat(now).
-			Save(ctx)
+		// The secret authenticates the device when it connects, so it must be
+		// unpredictable. "secret_"+deviceID was guessable for every device, which made
+		// device authentication worthless.
+		secret, err := generateDeviceSecret()
 		if err != nil {
+			return err
+		}
+
+		if _, err := r.data.db.Device.Create().
+			SetDeviceID(d.deviceID).
+			SetDeviceSecret(secret).
+			SetDeviceType(d.deviceType).
+			SetStatus(device.StatusActive).
+			SetLaneID(d.laneID).
+			SetLotID(lotID).
+			SetLastHeartbeat(now).
+			Save(ctx); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+// generateDeviceSecret returns a random per-device credential.
+func generateDeviceSecret() (string, error) {
+	buf := make([]byte, 32)
+	if _, err := rand.Read(buf); err != nil {
+		return "", fmt.Errorf("seed: failed to generate device secret: %w", err)
+	}
+	return "dev_" + hex.EncodeToString(buf), nil
 }

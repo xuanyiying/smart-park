@@ -52,27 +52,28 @@ type Order struct {
 	RecordID       uuid.UUID
 	LotID          uuid.UUID
 	PlateNumber    string
-	Amount         float64
-	DiscountAmount float64
-	FinalAmount    float64
+	// Amounts in cents (分).
+	Amount         int64
+	DiscountAmount int64
+	FinalAmount    int64
 	Status         string
 	PayTime        *time.Time
 	PayMethod      string
 }
 
-// DailyReport represents a daily report.
+// DailyReport represents a daily report. Amounts are in cents (分).
 type DailyReport struct {
 	LotID         string
 	Date          string
 	TotalEntries  int
 	TotalExits    int
 	TotalVehicles int
-	TotalAmount   float64
-	TotalDiscount float64
-	NetAmount     float64
+	TotalAmount   int64
+	TotalDiscount int64
+	NetAmount     int64
 }
 
-// MonthlyReport represents a monthly report.
+// MonthlyReport represents a monthly report. Amounts are in cents (分).
 type MonthlyReport struct {
 	LotID         string
 	Year          int
@@ -80,9 +81,9 @@ type MonthlyReport struct {
 	TotalEntries  int
 	TotalExits    int
 	TotalVehicles int
-	TotalAmount   float64
-	TotalDiscount float64
-	NetAmount     float64
+	TotalAmount   int64
+	TotalDiscount int64
+	NetAmount     int64
 	DailyReports  []*DailyReport
 }
 

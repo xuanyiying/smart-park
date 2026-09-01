@@ -17,7 +17,7 @@ func init() {
 	billingruleFields := schema.BillingRule{}.Fields()
 	_ = billingruleFields
 	// billingruleDescRuleName is the schema descriptor for rule_name field.
-	billingruleDescRuleName := billingruleFields[2].Descriptor()
+	billingruleDescRuleName := billingruleFields[3].Descriptor()
 	// billingrule.RuleNameValidator is a validator for the "rule_name" field. It is called by the builders before save.
 	billingrule.RuleNameValidator = func() func(string) error {
 		validators := billingruleDescRuleName.Validators
@@ -35,21 +35,21 @@ func init() {
 		}
 	}()
 	// billingruleDescPriority is the schema descriptor for priority field.
-	billingruleDescPriority := billingruleFields[7].Descriptor()
+	billingruleDescPriority := billingruleFields[8].Descriptor()
 	// billingrule.DefaultPriority holds the default value on creation for the priority field.
 	billingrule.DefaultPriority = billingruleDescPriority.Default.(int)
 	// billingrule.PriorityValidator is a validator for the "priority" field. It is called by the builders before save.
 	billingrule.PriorityValidator = billingruleDescPriority.Validators[0].(func(int) error)
 	// billingruleDescIsActive is the schema descriptor for is_active field.
-	billingruleDescIsActive := billingruleFields[8].Descriptor()
+	billingruleDescIsActive := billingruleFields[9].Descriptor()
 	// billingrule.DefaultIsActive holds the default value on creation for the is_active field.
 	billingrule.DefaultIsActive = billingruleDescIsActive.Default.(bool)
 	// billingruleDescCreatedAt is the schema descriptor for created_at field.
-	billingruleDescCreatedAt := billingruleFields[9].Descriptor()
+	billingruleDescCreatedAt := billingruleFields[10].Descriptor()
 	// billingrule.DefaultCreatedAt holds the default value on creation for the created_at field.
 	billingrule.DefaultCreatedAt = billingruleDescCreatedAt.Default.(func() time.Time)
 	// billingruleDescUpdatedAt is the schema descriptor for updated_at field.
-	billingruleDescUpdatedAt := billingruleFields[10].Descriptor()
+	billingruleDescUpdatedAt := billingruleFields[11].Descriptor()
 	// billingrule.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	billingrule.DefaultUpdatedAt = billingruleDescUpdatedAt.Default.(func() time.Time)
 	// billingrule.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

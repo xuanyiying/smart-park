@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"math"
 	"os"
 	"testing"
 	"time"
@@ -26,7 +27,7 @@ func NewMockBillingClient() *MockBillingClient {
 
 func (m *MockBillingClient) CalculateFee(ctx context.Context, recordID string, lotID string, entryTime, exitTime int64, vehicleType string) (*billing.FeeResult, error) {
 	duration := float64(exitTime-entryTime) / 3600.0
-	baseAmount := duration * m.HourlyRate
+	baseAmount := int64(math.Round(duration*m.HourlyRate*100)) // cents
 
 	return &billing.FeeResult{
 		BaseAmount:     baseAmount,
@@ -60,7 +61,7 @@ func TestEntryExitUseCase_Entry(t *testing.T) {
 		Status:    "active",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, nil, logger)
 
 	req := &v1.EntryRequest{
 		DeviceId:      deviceID,
@@ -124,7 +125,7 @@ func TestEntryExitUseCase_Exit(t *testing.T) {
 		RecordStatus: "entry",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, nil, logger)
 
 	req := &v1.ExitRequest{
 		DeviceId:      deviceID,
@@ -186,7 +187,7 @@ func TestEntryExitUseCase_Entry_DuplicateEntry(t *testing.T) {
 		RecordStatus: "entry",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, nil, logger)
 
 	req := &v1.EntryRequest{
 		DeviceId:      deviceID,
@@ -241,7 +242,7 @@ func TestEntryExitUseCase_Exit_NoEntryRecord(t *testing.T) {
 		Status:    "active",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, nil, logger)
 
 	req := &v1.ExitRequest{
 		DeviceId:      deviceID,
@@ -316,7 +317,7 @@ func TestEntryExitUseCase_Exit_MonthlyVehicle(t *testing.T) {
 		MonthlyValidUntil: &validUntil,
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, nil, logger)
 
 	req := &v1.ExitRequest{
 		DeviceId:      deviceID,
@@ -335,7 +336,7 @@ func TestEntryExitUseCase_Exit_MonthlyVehicle(t *testing.T) {
 	}
 
 	if data.FinalAmount != 0 {
-		t.Errorf("Expected final amount to be 0 for monthly vehicle, got %f", data.FinalAmount)
+		t.Errorf("Expected final amount to be 0 for monthly vehicle, got %d", data.FinalAmount)
 	}
 
 	if !data.Allowed {
@@ -378,7 +379,7 @@ func TestEntryExitUseCase_Entry_VIPVehicle(t *testing.T) {
 		VehicleType: "vip",
 	}
 
-	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, logger)
+	uc := NewEntryExitUseCase(mockRepo, mockBillingClient, nil, NewMockLockRepo(), nil, nil, logger)
 
 	req := &v1.EntryRequest{
 		DeviceId:      deviceID,

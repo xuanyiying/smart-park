@@ -1,9 +1,17 @@
 package biz
 
 import (
+	"bytes"
 	"context"
+	"crypto/tls"
+	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/smtp"
+	"net/url"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -671,9 +679,9 @@ func TestInAppNotifier_Send(t *testing.T) {
 	}
 }
 
-func TestEmailNotifier_Send(t *testing.T) {
+func TestEmailNotifier_SendWithoutConfig(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
-	notifier := NewEmailNotifier(logger)
+	notifier := NewEmailNotifier(nil, nil, logger)
 
 	ctx := context.Background()
 	notification := &Notification{
@@ -684,14 +692,16 @@ func TestEmailNotifier_Send(t *testing.T) {
 		Recipient: "user-001",
 	}
 
-	if err := notifier.Send(ctx, notification); err != nil {
-		t.Errorf("Send() error: %v", err)
+	// An unconfigured channel must fail loudly; the old stub logged "queued" and
+	// returned success while nothing was ever delivered.
+	if err := notifier.Send(ctx, notification); !errors.Is(err, ErrChannelNotConfigured) {
+		t.Errorf("Send() error = %v, want ErrChannelNotConfigured", err)
 	}
 }
 
-func TestSMSNotifier_Send(t *testing.T) {
+func TestSMSNotifier_SendWithoutConfig(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
-	notifier := NewSMSNotifier(logger)
+	notifier := NewSMSNotifier(nil, nil, logger)
 
 	ctx := context.Background()
 	notification := &Notification{
@@ -702,14 +712,14 @@ func TestSMSNotifier_Send(t *testing.T) {
 		Recipient: "admin",
 	}
 
-	if err := notifier.Send(ctx, notification); err != nil {
-		t.Errorf("Send() error: %v", err)
+	if err := notifier.Send(ctx, notification); !errors.Is(err, ErrChannelNotConfigured) {
+		t.Errorf("Send() error = %v, want ErrChannelNotConfigured", err)
 	}
 }
 
-func TestWechatNotifier_Send(t *testing.T) {
+func TestWechatNotifier_SendWithoutConfig(t *testing.T) {
 	logger := log.NewStdLogger(os.Stdout)
-	notifier := NewWechatNotifier(logger)
+	notifier := NewWechatNotifier(nil, nil, logger)
 
 	ctx := context.Background()
 	notification := &Notification{
@@ -720,7 +730,177 @@ func TestWechatNotifier_Send(t *testing.T) {
 		Recipient: "user-001",
 	}
 
-	if err := notifier.Send(ctx, notification); err != nil {
-		t.Errorf("Send() error: %v", err)
+	if err := notifier.Send(ctx, notification); !errors.Is(err, ErrChannelNotConfigured) {
+		t.Errorf("Send() error = %v, want ErrChannelNotConfigured", err)
 	}
+}
+
+func TestEmailNotifier_SMTPDelivery(t *testing.T) {
+	// A recording SMTP session verifies the notifier walks the protocol in the
+	// right order (hello, auth, mail, rcpt, data) without a real server.
+	var steps []string
+	session := &recordingSMTPSession{onStep: func(step string) { steps = append(steps, step) }}
+
+	original := dialSMTPFn
+	dialSMTPFn = func(cfg *EmailConfig) (smtpSession, error) { return session, nil }
+	defer func() { dialSMTPFn = original }()
+
+	cfg := &EmailConfig{
+		Host:     "smtp.example.com",
+		Port:     587,
+		Username: "alerts@example.com",
+		Password: "secret",
+		From:     "alerts@example.com",
+	}
+	notifier := NewEmailNotifier(cfg, nil, log.NewStdLogger(os.Stdout))
+
+	ctx := context.Background()
+	notification := &Notification{
+		ID:        uuid.New(),
+		Type:      NotificationTypePaymentSuccess,
+		Title:     "Payment",
+		Content:   "Paid 10.00",
+		Recipient: "owner@example.com",
+	}
+
+	if err := notifier.Send(ctx, notification); err != nil {
+		t.Fatalf("Send() error: %v", err)
+	}
+
+	want := []string{"hello", "auth", "mail", "rcpt", "data", "quit"}
+	if len(steps) != len(want) {
+		t.Fatalf("smtp steps = %v, want %v", steps, want)
+	}
+	for i := range want {
+		if steps[i] != want[i] {
+			t.Fatalf("smtp step %d = %s, want %s", i, steps[i], want[i])
+		}
+	}
+	if !session.bodyContains("owner@example.com") || !session.bodyContains("Payment") {
+		t.Fatalf("message body does not carry recipient and subject: %q", session.body())
+	}
+}
+
+func TestSMSNotifier_GatewayDelivery(t *testing.T) {
+	var captured url.Values
+	original := smsPostFn
+	smsPostFn = func(ctx context.Context, endpoint, form string) (*http.Response, error) {
+		captured = url.Values{}
+		for k, v := range parseForm(t, form) {
+			captured[k] = v
+		}
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"Code":"OK","Message":"OK"}`)),
+		}, nil
+	}
+	defer func() { smsPostFn = original }()
+
+	cfg := &SMSConfig{
+		AccessKeyID:  "key-id",
+		AccessKey:    "key-secret",
+		SignName:     "SmartPark",
+		TemplateCode: "SMS_123",
+	}
+	notifier := NewSMSNotifier(cfg, nil, log.NewStdLogger(os.Stdout))
+
+	ctx := context.Background()
+	notification := &Notification{
+		ID:        uuid.New(),
+		Type:      NotificationTypeSystemAlert,
+		Title:     "Alert",
+		Content:   "System down",
+		Recipient: "13800000000",
+	}
+
+	if err := notifier.Send(ctx, notification); err != nil {
+		t.Fatalf("Send() error: %v", err)
+	}
+
+	if got := captured.Get("Signature"); got == "" {
+		t.Fatal("expected the request to carry a POP signature")
+	}
+	if got := captured.Get("PhoneNumbers"); got != "13800000000" {
+		t.Fatalf("PhoneNumbers = %q, want the resolved recipient", got)
+	}
+	if got := captured.Get("TemplateCode"); got != "SMS_123" {
+		t.Fatalf("TemplateCode = %q, want SMS_123", got)
+	}
+}
+
+func TestSMSNotifier_GatewayRejection(t *testing.T) {
+	original := smsPostFn
+	smsPostFn = func(ctx context.Context, endpoint, form string) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"Code":"isv.BUSINESS_LIMIT_CONTROL","Message":"触发分钟级流控"}`)),
+		}, nil
+	}
+	defer func() { smsPostFn = original }()
+
+	cfg := &SMSConfig{
+		AccessKeyID:  "key-id",
+		AccessKey:    "key-secret",
+		SignName:     "SmartPark",
+		TemplateCode: "SMS_123",
+	}
+	notifier := NewSMSNotifier(cfg, nil, log.NewStdLogger(os.Stdout))
+
+	ctx := context.Background()
+	notification := &Notification{
+		ID:        uuid.New(),
+		Type:      NotificationTypeSystemAlert,
+		Title:     "Alert",
+		Content:   "System down",
+		Recipient: "13800000000",
+	}
+
+	// A provider rejection (rate limit, blocked number, empty balance) must
+	// surface as an error so the composite notifier can record the failure.
+	err := notifier.Send(ctx, notification)
+	if err == nil || !strings.Contains(err.Error(), "isv.BUSINESS_LIMIT_CONTROL") {
+		t.Fatalf("Send() error = %v, want gateway rejection", err)
+	}
+}
+
+// recordingSMTPSession records the protocol steps and captures the message body.
+type recordingSMTPSession struct {
+	onStep  func(string)
+	bodyBuf bytes.Buffer
+}
+
+func (s *recordingSMTPSession) Hello(string) error { s.onStep("hello"); return nil }
+func (s *recordingSMTPSession) StartTLS(*tls.Config) error {
+	s.onStep("starttls")
+	return nil
+}
+func (s *recordingSMTPSession) Auth(smtp.Auth) error { s.onStep("auth"); return nil }
+func (s *recordingSMTPSession) Mail(string) error    { s.onStep("mail"); return nil }
+func (s *recordingSMTPSession) Rcpt(string) error    { s.onStep("rcpt"); return nil }
+func (s *recordingSMTPSession) Data() (io.WriteCloser, error) {
+	s.onStep("data")
+	return &nopWriteCloser{w: &s.bodyBuf}, nil
+}
+func (s *recordingSMTPSession) Quit() error { s.onStep("quit"); return nil }
+
+func (s *recordingSMTPSession) bodyContains(substr string) bool {
+	return strings.Contains(s.bodyBuf.String(), substr)
+}
+
+func (s *recordingSMTPSession) body() string {
+	return s.bodyBuf.String()
+}
+
+type nopWriteCloser struct{ w io.Writer }
+
+func (n *nopWriteCloser) Write(p []byte) (int, error) { return n.w.Write(p) }
+func (n *nopWriteCloser) Close() error                { return nil }
+
+func parseForm(t *testing.T, form string) url.Values {
+	t.Helper()
+	values, err := url.ParseQuery(form)
+	if err != nil {
+		t.Fatalf("parse form: %v", err)
+	}
+	return values
 }

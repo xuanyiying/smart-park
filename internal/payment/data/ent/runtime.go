@@ -38,26 +38,32 @@ func init() {
 	}()
 	// orderDescAmount is the schema descriptor for amount field.
 	orderDescAmount := orderFields[5].Descriptor()
+	// order.DefaultAmount holds the default value on creation for the amount field.
+	order.DefaultAmount = orderDescAmount.Default.(int64)
 	// order.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	order.AmountValidator = orderDescAmount.Validators[0].(func(float64) error)
+	order.AmountValidator = orderDescAmount.Validators[0].(func(int64) error)
 	// orderDescDiscountAmount is the schema descriptor for discount_amount field.
 	orderDescDiscountAmount := orderFields[6].Descriptor()
 	// order.DefaultDiscountAmount holds the default value on creation for the discount_amount field.
-	order.DefaultDiscountAmount = orderDescDiscountAmount.Default.(float64)
+	order.DefaultDiscountAmount = orderDescDiscountAmount.Default.(int64)
 	// order.DiscountAmountValidator is a validator for the "discount_amount" field. It is called by the builders before save.
-	order.DiscountAmountValidator = orderDescDiscountAmount.Validators[0].(func(float64) error)
+	order.DiscountAmountValidator = orderDescDiscountAmount.Validators[0].(func(int64) error)
 	// orderDescFinalAmount is the schema descriptor for final_amount field.
 	orderDescFinalAmount := orderFields[7].Descriptor()
+	// order.DefaultFinalAmount holds the default value on creation for the final_amount field.
+	order.DefaultFinalAmount = orderDescFinalAmount.Default.(int64)
 	// order.FinalAmountValidator is a validator for the "final_amount" field. It is called by the builders before save.
-	order.FinalAmountValidator = orderDescFinalAmount.Validators[0].(func(float64) error)
+	order.FinalAmountValidator = orderDescFinalAmount.Validators[0].(func(int64) error)
 	// orderDescTransactionID is the schema descriptor for transaction_id field.
 	orderDescTransactionID := orderFields[11].Descriptor()
 	// order.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	order.TransactionIDValidator = orderDescTransactionID.Validators[0].(func(string) error)
 	// orderDescPaidAmount is the schema descriptor for paid_amount field.
 	orderDescPaidAmount := orderFields[12].Descriptor()
+	// order.DefaultPaidAmount holds the default value on creation for the paid_amount field.
+	order.DefaultPaidAmount = orderDescPaidAmount.Default.(int64)
 	// order.PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
-	order.PaidAmountValidator = orderDescPaidAmount.Validators[0].(func(float64) error)
+	order.PaidAmountValidator = orderDescPaidAmount.Validators[0].(func(int64) error)
 	// orderDescRefundTransactionID is the schema descriptor for refund_transaction_id field.
 	orderDescRefundTransactionID := orderFields[14].Descriptor()
 	// order.RefundTransactionIDValidator is a validator for the "refund_transaction_id" field. It is called by the builders before save.
@@ -84,12 +90,16 @@ func init() {
 	reconciliation.PaymentMethodValidator = reconciliationDescPaymentMethod.Validators[0].(func(string) error)
 	// reconciliationDescOrderAmount is the schema descriptor for order_amount field.
 	reconciliationDescOrderAmount := reconciliationFields[3].Descriptor()
+	// reconciliation.DefaultOrderAmount holds the default value on creation for the order_amount field.
+	reconciliation.DefaultOrderAmount = reconciliationDescOrderAmount.Default.(int64)
 	// reconciliation.OrderAmountValidator is a validator for the "order_amount" field. It is called by the builders before save.
-	reconciliation.OrderAmountValidator = reconciliationDescOrderAmount.Validators[0].(func(float64) error)
+	reconciliation.OrderAmountValidator = reconciliationDescOrderAmount.Validators[0].(func(int64) error)
 	// reconciliationDescPaidAmount is the schema descriptor for paid_amount field.
 	reconciliationDescPaidAmount := reconciliationFields[4].Descriptor()
+	// reconciliation.DefaultPaidAmount holds the default value on creation for the paid_amount field.
+	reconciliation.DefaultPaidAmount = reconciliationDescPaidAmount.Default.(int64)
 	// reconciliation.PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
-	reconciliation.PaidAmountValidator = reconciliationDescPaidAmount.Validators[0].(func(float64) error)
+	reconciliation.PaidAmountValidator = reconciliationDescPaidAmount.Validators[0].(func(int64) error)
 	// reconciliationDescTransactionID is the schema descriptor for transaction_id field.
 	reconciliationDescTransactionID := reconciliationFields[5].Descriptor()
 	// reconciliation.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
@@ -142,8 +152,10 @@ func init() {
 	refundapproval.ApproverValidator = refundapprovalDescApprover.Validators[0].(func(string) error)
 	// refundapprovalDescAmount is the schema descriptor for amount field.
 	refundapprovalDescAmount := refundapprovalFields[4].Descriptor()
+	// refundapproval.DefaultAmount holds the default value on creation for the amount field.
+	refundapproval.DefaultAmount = refundapprovalDescAmount.Default.(int64)
 	// refundapproval.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	refundapproval.AmountValidator = refundapprovalDescAmount.Validators[0].(func(float64) error)
+	refundapproval.AmountValidator = refundapprovalDescAmount.Validators[0].(func(int64) error)
 	// refundapprovalDescReason is the schema descriptor for reason field.
 	refundapprovalDescReason := refundapprovalFields[5].Descriptor()
 	// refundapproval.ReasonValidator is a validator for the "reason" field. It is called by the builders before save.

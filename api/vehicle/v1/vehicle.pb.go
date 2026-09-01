@@ -384,14 +384,15 @@ type ExitData struct {
 	RecordId        string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
 	PlateNumber     string                 `protobuf:"bytes,2,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
 	ParkingDuration int32                  `protobuf:"varint,3,opt,name=parkingDuration,proto3" json:"parkingDuration,omitempty"`
-	Amount          float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	DiscountAmount  float64                `protobuf:"fixed64,5,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
-	FinalAmount     float64                `protobuf:"fixed64,6,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
-	Allowed         bool                   `protobuf:"varint,7,opt,name=allowed,proto3" json:"allowed,omitempty"`
-	GateOpen        bool                   `protobuf:"varint,8,opt,name=gateOpen,proto3" json:"gateOpen,omitempty"`
-	DisplayMessage  string                 `protobuf:"bytes,9,opt,name=displayMessage,proto3" json:"displayMessage,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Amounts in cents (分).
+	Amount         int64  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	DiscountAmount int64  `protobuf:"varint,5,opt,name=discountAmount,proto3" json:"discountAmount,omitempty"`
+	FinalAmount    int64  `protobuf:"varint,6,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
+	Allowed        bool   `protobuf:"varint,7,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	GateOpen       bool   `protobuf:"varint,8,opt,name=gateOpen,proto3" json:"gateOpen,omitempty"`
+	DisplayMessage string `protobuf:"bytes,9,opt,name=displayMessage,proto3" json:"displayMessage,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ExitData) Reset() {
@@ -445,21 +446,21 @@ func (x *ExitData) GetParkingDuration() int32 {
 	return 0
 }
 
-func (x *ExitData) GetAmount() float64 {
+func (x *ExitData) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
 	return 0
 }
 
-func (x *ExitData) GetDiscountAmount() float64 {
+func (x *ExitData) GetDiscountAmount() int64 {
 	if x != nil {
 		return x.DiscountAmount
 	}
 	return 0
 }
 
-func (x *ExitData) GetFinalAmount() float64 {
+func (x *ExitData) GetFinalAmount() int64 {
 	if x != nil {
 		return x.FinalAmount
 	}
@@ -5807,9 +5808,9 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\brecordId\x18\x01 \x01(\tR\brecordId\x12 \n" +
 	"\vplateNumber\x18\x02 \x01(\tR\vplateNumber\x12(\n" +
 	"\x0fparkingDuration\x18\x03 \x01(\x05R\x0fparkingDuration\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x01R\x06amount\x12&\n" +
-	"\x0ediscountAmount\x18\x05 \x01(\x01R\x0ediscountAmount\x12 \n" +
-	"\vfinalAmount\x18\x06 \x01(\x01R\vfinalAmount\x12\x18\n" +
+	"\x06amount\x18\x04 \x01(\x03R\x06amount\x12&\n" +
+	"\x0ediscountAmount\x18\x05 \x01(\x03R\x0ediscountAmount\x12 \n" +
+	"\vfinalAmount\x18\x06 \x01(\x03R\vfinalAmount\x12\x18\n" +
 	"\aallowed\x18\a \x01(\bR\aallowed\x12\x1a\n" +
 	"\bgateOpen\x18\b \x01(\bR\bgateOpen\x12&\n" +
 	"\x0edisplayMessage\x18\t \x01(\tR\x0edisplayMessage\"\xf7\x02\n" +

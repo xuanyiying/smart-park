@@ -30,8 +30,8 @@ type HourlyStats struct {
 	OccupiedSpaces int `json:"occupied_spaces,omitempty"`
 	// 占用率
 	OccupancyRate float64 `json:"occupancy_rate,omitempty"`
-	// 收入
-	Revenue float64 `json:"revenue,omitempty"`
+	// 收入(分)
+	Revenue int64 `json:"revenue,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
@@ -42,9 +42,9 @@ func (*HourlyStats) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case hourlystats.FieldOccupancyRate, hourlystats.FieldRevenue:
+		case hourlystats.FieldOccupancyRate:
 			values[i] = new(sql.NullFloat64)
-		case hourlystats.FieldEntries, hourlystats.FieldExits, hourlystats.FieldOccupiedSpaces:
+		case hourlystats.FieldEntries, hourlystats.FieldExits, hourlystats.FieldOccupiedSpaces, hourlystats.FieldRevenue:
 			values[i] = new(sql.NullInt64)
 		case hourlystats.FieldStatHour, hourlystats.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -108,10 +108,10 @@ func (_m *HourlyStats) assignValues(columns []string, values []any) error {
 				_m.OccupancyRate = value.Float64
 			}
 		case hourlystats.FieldRevenue:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field revenue", values[i])
 			} else if value.Valid {
-				_m.Revenue = value.Float64
+				_m.Revenue = value.Int64
 			}
 		case hourlystats.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

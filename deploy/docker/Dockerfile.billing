@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/billing-svc ./cmd/billing-svc
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/billing-svc ./cmd/billing
 
 # Final stage
 FROM alpine:latest
@@ -24,4 +24,4 @@ COPY configs/billing.yaml /app/configs/billing.yaml
 
 EXPOSE 8002
 
-CMD ["./billing-svc"]
+CMD ["./billing-svc", "-conf", "/app/configs/billing.yaml"]

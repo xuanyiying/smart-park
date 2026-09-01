@@ -16,6 +16,7 @@ import (
 	"github.com/xuanyiying/smart-park/internal/charging/data/ent"
 	"github.com/xuanyiying/smart-park/internal/charging/service"
 	"github.com/xuanyiying/smart-park/pkg/config"
+	"github.com/xuanyiying/smart-park/pkg/tenant"
 )
 
 var (
@@ -54,6 +55,10 @@ func main() {
 		os.Exit(1)
 	}
 	defer dbClient.Close()
+
+	// Scope every query and mutation to the tenant carried by the request
+	// context, so one operator cannot read or rewrite another's charging estate.
+	tenant.ApplyTenantScoping(dbClient, data.TenantScopes(), data.TenantTypes())
 
 	// Run migrations
 	if err := dbClient.Schema.Create(context.Background()); err != nil {

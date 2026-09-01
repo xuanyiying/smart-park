@@ -67,10 +67,14 @@ func ValidColumn(column string) bool {
 var (
 	// PaymentMethodValidator is a validator for the "payment_method" field. It is called by the builders before save.
 	PaymentMethodValidator func(string) error
+	// DefaultOrderAmount holds the default value on creation for the "order_amount" field.
+	DefaultOrderAmount int64
 	// OrderAmountValidator is a validator for the "order_amount" field. It is called by the builders before save.
-	OrderAmountValidator func(float64) error
+	OrderAmountValidator func(int64) error
+	// DefaultPaidAmount holds the default value on creation for the "paid_amount" field.
+	DefaultPaidAmount int64
 	// PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
-	PaidAmountValidator func(float64) error
+	PaidAmountValidator func(int64) error
 	// TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	TransactionIDValidator func(string) error
 	// DefaultReconciliationTime holds the default value on creation for the "reconciliation_time" field.

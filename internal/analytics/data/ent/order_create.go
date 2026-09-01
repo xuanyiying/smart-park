@@ -54,19 +54,27 @@ func (_c *OrderCreate) SetPlateNumber(v string) *OrderCreate {
 }
 
 // SetAmount sets the "amount" field.
-func (_c *OrderCreate) SetAmount(v float64) *OrderCreate {
+func (_c *OrderCreate) SetAmount(v int64) *OrderCreate {
 	_c.mutation.SetAmount(v)
 	return _c
 }
 
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableAmount(v *int64) *OrderCreate {
+	if v != nil {
+		_c.SetAmount(*v)
+	}
+	return _c
+}
+
 // SetDiscountAmount sets the "discount_amount" field.
-func (_c *OrderCreate) SetDiscountAmount(v float64) *OrderCreate {
+func (_c *OrderCreate) SetDiscountAmount(v int64) *OrderCreate {
 	_c.mutation.SetDiscountAmount(v)
 	return _c
 }
 
 // SetNillableDiscountAmount sets the "discount_amount" field if the given value is not nil.
-func (_c *OrderCreate) SetNillableDiscountAmount(v *float64) *OrderCreate {
+func (_c *OrderCreate) SetNillableDiscountAmount(v *int64) *OrderCreate {
 	if v != nil {
 		_c.SetDiscountAmount(*v)
 	}
@@ -74,8 +82,16 @@ func (_c *OrderCreate) SetNillableDiscountAmount(v *float64) *OrderCreate {
 }
 
 // SetFinalAmount sets the "final_amount" field.
-func (_c *OrderCreate) SetFinalAmount(v float64) *OrderCreate {
+func (_c *OrderCreate) SetFinalAmount(v int64) *OrderCreate {
 	_c.mutation.SetFinalAmount(v)
+	return _c
+}
+
+// SetNillableFinalAmount sets the "final_amount" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableFinalAmount(v *int64) *OrderCreate {
+	if v != nil {
+		_c.SetFinalAmount(*v)
+	}
 	return _c
 }
 
@@ -136,13 +152,13 @@ func (_c *OrderCreate) SetNillableTransactionID(v *string) *OrderCreate {
 }
 
 // SetPaidAmount sets the "paid_amount" field.
-func (_c *OrderCreate) SetPaidAmount(v float64) *OrderCreate {
+func (_c *OrderCreate) SetPaidAmount(v int64) *OrderCreate {
 	_c.mutation.SetPaidAmount(v)
 	return _c
 }
 
 // SetNillablePaidAmount sets the "paid_amount" field if the given value is not nil.
-func (_c *OrderCreate) SetNillablePaidAmount(v *float64) *OrderCreate {
+func (_c *OrderCreate) SetNillablePaidAmount(v *int64) *OrderCreate {
 	if v != nil {
 		_c.SetPaidAmount(*v)
 	}
@@ -254,13 +270,25 @@ func (_c *OrderCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *OrderCreate) defaults() {
+	if _, ok := _c.mutation.Amount(); !ok {
+		v := order.DefaultAmount
+		_c.mutation.SetAmount(v)
+	}
 	if _, ok := _c.mutation.DiscountAmount(); !ok {
 		v := order.DefaultDiscountAmount
 		_c.mutation.SetDiscountAmount(v)
 	}
+	if _, ok := _c.mutation.FinalAmount(); !ok {
+		v := order.DefaultFinalAmount
+		_c.mutation.SetFinalAmount(v)
+	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := order.DefaultStatus
 		_c.mutation.SetStatus(v)
+	}
+	if _, ok := _c.mutation.PaidAmount(); !ok {
+		v := order.DefaultPaidAmount
+		_c.mutation.SetPaidAmount(v)
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := order.DefaultCreatedAt()
@@ -402,15 +430,15 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_node.PlateNumber = value
 	}
 	if value, ok := _c.mutation.Amount(); ok {
-		_spec.SetField(order.FieldAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldAmount, field.TypeInt64, value)
 		_node.Amount = value
 	}
 	if value, ok := _c.mutation.DiscountAmount(); ok {
-		_spec.SetField(order.FieldDiscountAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldDiscountAmount, field.TypeInt64, value)
 		_node.DiscountAmount = value
 	}
 	if value, ok := _c.mutation.FinalAmount(); ok {
-		_spec.SetField(order.FieldFinalAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldFinalAmount, field.TypeInt64, value)
 		_node.FinalAmount = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
@@ -430,7 +458,7 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_node.TransactionID = value
 	}
 	if value, ok := _c.mutation.PaidAmount(); ok {
-		_spec.SetField(order.FieldPaidAmount, field.TypeFloat64, value)
+		_spec.SetField(order.FieldPaidAmount, field.TypeInt64, value)
 		_node.PaidAmount = value
 	}
 	if value, ok := _c.mutation.RefundedAt(); ok {

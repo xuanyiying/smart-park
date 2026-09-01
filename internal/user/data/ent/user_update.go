@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/user/data/ent/predicate"
 	"github.com/xuanyiying/smart-park/internal/user/data/ent/user"
 )
@@ -25,6 +26,20 @@ type UserUpdate struct {
 // Where appends a list predicates to the UserUpdate builder.
 func (_u *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	_u.mutation.Where(ps...)
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *UserUpdate) SetTenantID(v uuid.UUID) *UserUpdate {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableTenantID(v *uuid.UUID) *UserUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
 	return _u
 }
 
@@ -186,6 +201,9 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(user.FieldTenantID, field.TypeUUID, value)
+	}
 	if value, ok := _u.mutation.OpenID(); ok {
 		_spec.SetField(user.FieldOpenID, field.TypeString, value)
 	}
@@ -228,6 +246,20 @@ type UserUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *UserMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *UserUpdateOne) SetTenantID(v uuid.UUID) *UserUpdateOne {
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableTenantID(v *uuid.UUID) *UserUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
 }
 
 // SetOpenID sets the "open_id" field.
@@ -417,6 +449,9 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(user.FieldTenantID, field.TypeUUID, value)
 	}
 	if value, ok := _u.mutation.OpenID(); ok {
 		_spec.SetField(user.FieldOpenID, field.TypeString, value)

@@ -19,7 +19,9 @@ type Session struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// 充电桩ID
+	// 租户ID
+	TenantID uuid.UUID `json:"tenant_id,omitempty"`
+	// 充电站ID
 	StationID uuid.UUID `json:"station_id,omitempty"`
 	// 连接器ID
 	ConnectorID uuid.UUID `json:"connector_id,omitempty"`
@@ -37,12 +39,12 @@ type Session struct {
 	EndEnergy float64 `json:"end_energy,omitempty"`
 	// 充电电量(kWh)
 	ChargedEnergy float64 `json:"charged_energy,omitempty"`
-	// 电费
-	Cost float64 `json:"cost,omitempty"`
-	// 服务费
-	ServiceFee float64 `json:"service_fee,omitempty"`
-	// 总金额
-	TotalAmount float64 `json:"total_amount,omitempty"`
+	// 电费(分)
+	Cost int64 `json:"cost,omitempty"`
+	// 服务费(分)
+	ServiceFee int64 `json:"service_fee,omitempty"`
+	// 总金额(分)
+	TotalAmount int64 `json:"total_amount,omitempty"`
 	// 状态
 	Status session.Status `json:"status,omitempty"`
 	// 支付状态
@@ -88,13 +90,15 @@ func (*Session) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case session.FieldStartEnergy, session.FieldEndEnergy, session.FieldChargedEnergy, session.FieldCost, session.FieldServiceFee, session.FieldTotalAmount:
+		case session.FieldStartEnergy, session.FieldEndEnergy, session.FieldChargedEnergy:
 			values[i] = new(sql.NullFloat64)
+		case session.FieldCost, session.FieldServiceFee, session.FieldTotalAmount:
+			values[i] = new(sql.NullInt64)
 		case session.FieldVehiclePlate, session.FieldStatus, session.FieldPaymentStatus, session.FieldPaymentMethod, session.FieldTransactionID:
 			values[i] = new(sql.NullString)
 		case session.FieldStartTime, session.FieldEndTime, session.FieldPayTime, session.FieldCreatedAt, session.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case session.FieldID, session.FieldStationID, session.FieldConnectorID, session.FieldUserID:
+		case session.FieldID, session.FieldTenantID, session.FieldStationID, session.FieldConnectorID, session.FieldUserID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -116,6 +120,12 @@ func (_m *Session) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
+			}
+		case session.FieldTenantID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value != nil {
+				_m.TenantID = *value
 			}
 		case session.FieldStationID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -173,22 +183,22 @@ func (_m *Session) assignValues(columns []string, values []any) error {
 				_m.ChargedEnergy = value.Float64
 			}
 		case session.FieldCost:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field cost", values[i])
 			} else if value.Valid {
-				_m.Cost = value.Float64
+				_m.Cost = value.Int64
 			}
 		case session.FieldServiceFee:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field service_fee", values[i])
 			} else if value.Valid {
-				_m.ServiceFee = value.Float64
+				_m.ServiceFee = value.Int64
 			}
 		case session.FieldTotalAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_amount", values[i])
 			} else if value.Valid {
-				_m.TotalAmount = value.Float64
+				_m.TotalAmount = value.Int64
 			}
 		case session.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -274,6 +284,9 @@ func (_m *Session) String() string {
 	var builder strings.Builder
 	builder.WriteString("Session(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("station_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.StationID))
 	builder.WriteString(", ")

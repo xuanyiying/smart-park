@@ -3,6 +3,7 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -113,6 +114,99 @@ func (r *orderRepo) UpdateOrder(ctx context.Context, o *biz.Order) error {
 
 	_, err := update.Save(ctx)
 	return err
+}
+
+// MarkOrderPaid performs a conditional update so that concurrent duplicate callbacks
+// cannot both observe "pending" and then both write "paid".
+//
+// Ent's Update().Where(...) emits `UPDATE orders SET ... WHERE id = ? AND status = ?`,
+// and Exec returns zero affected rows when the status predicate no longer matches.
+func (r *orderRepo) MarkOrderPaid(ctx context.Context, orderID uuid.UUID, method, transactionID string, paidAmount int64, paidAt time.Time) (bool, error) {
+	n, err := r.data.db.Order.Update().
+		Where(
+			order.ID(orderID),
+			order.StatusEQ(order.StatusPending),
+		).
+		SetStatus(order.StatusPaid).
+		SetPayMethod(order.PayMethod(method)).
+		SetTransactionID(transactionID).
+		SetPaidAmount(paidAmount).
+		SetPayTime(paidAt).
+		Save(ctx)
+	if err != nil {
+		// A unique constraint on transaction_id means the same gateway transaction was
+		// already recorded for another order; treat it as "not newly paid".
+		if ent.IsConstraintError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return n > 0, nil
+}
+
+// MarkOrderClosed performs a conditional update from pending to failed.
+//
+// Like MarkOrderPaid this must be a predicate update: a gateway callback for an order the
+// sweeper just closed must lose the race cleanly instead of overwriting a closed order
+// back to paid. (Callbacks settle through MarkOrderPaid, which matches on pending only.)
+func (r *orderRepo) MarkOrderClosed(ctx context.Context, orderID uuid.UUID, closedAt time.Time) (bool, error) {
+	n, err := r.data.db.Order.Update().
+		Where(
+			order.ID(orderID),
+			order.StatusEQ(order.StatusPending),
+		).
+		SetStatus(order.StatusFailed).
+		SetUpdatedAt(closedAt).
+		Save(ctx)
+	if err != nil {
+		return false, err
+	}
+	return n > 0, nil
+}
+
+func (r *orderRepo) ListOrdersByStatus(ctx context.Context, status string, cutoff time.Time, limit int) ([]*biz.Order, error) {
+	statusValue, err := parseOrderStatus(status)
+	if err != nil {
+		return nil, err
+	}
+
+	query := r.data.db.Order.Query().
+		Where(
+			order.StatusEQ(statusValue),
+			order.CreatedAtLTE(cutoff),
+		).
+		Order(ent.Asc(order.FieldCreatedAt))
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+
+	orders, err := query.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*biz.Order, 0, len(orders))
+	for _, o := range orders {
+		result = append(result, toBizOrder(o))
+	}
+	return result, nil
+}
+
+func parseOrderStatus(status string) (order.Status, error) {
+	switch status {
+	case "pending":
+		return order.StatusPending, nil
+	case "paid":
+		return order.StatusPaid, nil
+	case "refunding":
+		return order.StatusRefunding, nil
+	case "refunded":
+		return order.StatusRefunded, nil
+	case "failed":
+		return order.StatusFailed, nil
+	default:
+		return "", fmt.Errorf("unknown order status: %s", status)
+	}
 }
 
 func (r *orderRepo) ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*biz.Order, int64, error) {

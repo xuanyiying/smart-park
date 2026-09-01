@@ -94,7 +94,7 @@ type Connector struct {
 	UpdatedAt time.Time
 }
 
-// Session represents a charging session.
+// Session represents a charging session. Cost/ServiceFee/TotalAmount are in cents (分).
 type Session struct {
 	ID            uuid.UUID
 	StationID     uuid.UUID
@@ -106,9 +106,9 @@ type Session struct {
 	StartEnergy   float64
 	EndEnergy     float64
 	ChargedEnergy float64
-	Cost          float64
-	ServiceFee    float64
-	TotalAmount   float64
+	Cost          int64
+	ServiceFee    int64
+	TotalAmount   int64
 	Status        SessionStatus
 	PaymentStatus PaymentStatus
 	PayTime       *time.Time
@@ -145,7 +145,7 @@ type Price struct {
 	UpdatedAt   time.Time
 }
 
-// ChargingSummary represents a summary of a charging session.
+// ChargingSummary represents a summary of a charging session. Cost/ServiceFee/TotalAmount are in cents (分).
 type ChargingSummary struct {
 	SessionID     uuid.UUID
 	StationName   string
@@ -155,8 +155,8 @@ type ChargingSummary struct {
 	EndTime       time.Time
 	Duration      float64
 	ChargedEnergy float64
-	Cost          float64
-	ServiceFee    float64
-	TotalAmount   float64
+	Cost          int64
+	ServiceFee    int64
+	TotalAmount   int64
 	PaymentStatus string
 }

@@ -67,7 +67,7 @@ var (
 	// DefaultOccupancyRate holds the default value on creation for the "occupancy_rate" field.
 	DefaultOccupancyRate float64
 	// DefaultRevenue holds the default value on creation for the "revenue" field.
-	DefaultRevenue float64
+	DefaultRevenue int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.

@@ -32,6 +32,9 @@ type MessagesConfig struct {
 	ValidationError string
 	SystemError    string
 	FallbackMode   string
+	// BillingUnavailable is shown when the exit fee cannot be computed. The gate stays
+	// closed and the driver is routed to staff instead of being released for free.
+	BillingUnavailable string
 }
 
 // DefaultConfig returns the default configuration.
@@ -41,17 +44,18 @@ func DefaultConfig() *Config {
 		DeviceOnlineThreshold: 5 * time.Minute,
 		MinConfidence:         0.7,
 		Messages: MessagesConfig{
-			Welcome:         "欢迎光临",
-			MonthlyWelcome:  "月卡车，欢迎光临",
-			VIPWelcome:      "VIP 车辆，欢迎光临",
-			DuplicateEntry:  "车辆已在场内，请勿重复入场",
-			DuplicateExit:   "车辆正在出场中，请勿重复操作",
-			NoEntryRecord:   "未找到入场记录",
-			PleasePay:       "请缴费",
-			FreePass:        "免费放行",
-			ValidationError: "信息验证失败，请重试",
-			SystemError:     "系统错误，请联系管理员",
-			FallbackMode:    "系统维护中，人工处理",
+			Welcome:            "欢迎光临",
+			MonthlyWelcome:     "月卡车，欢迎光临",
+			VIPWelcome:         "VIP 车辆，欢迎光临",
+			DuplicateEntry:     "车辆已在场内，请勿重复入场",
+			DuplicateExit:      "车辆正在出场中，请勿重复操作",
+			NoEntryRecord:      "未找到入场记录",
+			PleasePay:          "请缴费",
+			FreePass:           "免费放行",
+			ValidationError:    "信息验证失败，请重试",
+			SystemError:        "系统错误，请联系管理员",
+			FallbackMode:       "系统维护中，人工处理",
+			BillingUnavailable: "计费服务暂不可用，请联系工作人员",
 		},
 	}
 }

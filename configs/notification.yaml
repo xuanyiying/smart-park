@@ -5,3 +5,27 @@ server:
 log:
   level: info
   format: json
+
+# Outbound delivery channels. Credentials live here or in the SP_NOTIFICATION_*
+# environment overrides; a channel without credentials stays disabled and sends
+# through it fail with "notification channel is not configured" instead of
+# reporting a delivery that never happened.
+notification:
+  email:
+    # host: smtp.example.com
+    # port: 465          # 465 implicit TLS, 587 STARTTLS
+    # username: alerts@example.com
+    # password: ""
+    # from: alerts@example.com
+    # use_tls: true
+  sms:
+    # endpoint: https://dysmsapi.aliyuncs.com   # any POP-compatible gateway
+    # access_key_id: ""
+    # access_key: ""
+    # sign_name: ""
+    # template_code: ""
+  wechat:
+    # base_url: https://api.weixin.qq.com
+    # app_id: ""
+    # secret: ""
+    # template_id: ""
