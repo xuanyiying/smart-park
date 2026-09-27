@@ -196,18 +196,37 @@
 git clone https://github.com/xuanyiying/smart-park.git
 cd smart-park
 
-# 2. 启动所有服务
-docker-compose up -d
+# 2. 在 deploy/ 下创建 .env（必填：GRAFANA_PASSWORD、SP_MQTT_BROKER、
+#    SP_WECHAT_API_KEY、SP_JWT_SECRET），可参考 .env 中注释说明
 
-# 3. 查看服务状态
+# 3. 启动所有服务（自包含模式：基础设施随项目一起启动）
+cd deploy && docker-compose up -d
+
+# 4. 查看服务状态
 docker-compose ps
 
-# 4. 访问系统
+# 5. 访问系统
 # API 网关:  http://localhost:8000
 # Grafana 监控: http://localhost:3000 （口令通过 GRAFANA_PASSWORD 注入）
 # 营销官网: site/ 目录（Next.js），注意它是产品介绍页，不是管理后台；
 #           管理后台前端尚未实现，运营操作目前通过 API 完成。
 ```
+
+#### 本地开发：复用全局基础设施（可选）
+
+如果本机有多个项目需要共享 postgres/redis/etcd/监控栈，可改用全局基础设施模式，
+避免每个项目重复创建镜像和容器：
+
+```bash
+# 1. 启动全局基础设施（一次性配置 ~/dev-app/infra/.env）
+cd ~/dev-app/infra && docker compose up -d
+
+# 2. 仅启动本项目应用服务（加入 dev-infra 网络，连接串无需修改）
+cd smart-park/deploy && docker compose -f docker-compose.app.yml up -d
+```
+
+两种模式通过 `-f` 参数二选一：`docker-compose.yml` 为自包含模式（开源默认），
+`docker-compose.app.yml` 为全局复用模式（本地开发）。
 
 ### 💻 本地开发
 

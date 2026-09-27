@@ -91,11 +91,15 @@ type RuleType string
 
 // RuleType values.
 const (
-	RuleTypeTime    RuleType = "time"
-	RuleTypePeriod  RuleType = "period"
-	RuleTypeMonthly RuleType = "monthly"
-	RuleTypeCoupon  RuleType = "coupon"
-	RuleTypeVip     RuleType = "vip"
+	RuleTypeTime      RuleType = "time"
+	RuleTypePeriod    RuleType = "period"
+	RuleTypeMonthly   RuleType = "monthly"
+	RuleTypeCoupon    RuleType = "coupon"
+	RuleTypeVip       RuleType = "vip"
+	RuleTypeBase      RuleType = "base"
+	RuleTypeDiscount  RuleType = "discount"
+	RuleTypeExemption RuleType = "exemption"
+	RuleTypeOverride  RuleType = "override"
 )
 
 func (rt RuleType) String() string {
@@ -105,7 +109,7 @@ func (rt RuleType) String() string {
 // RuleTypeValidator is a validator for the "rule_type" field enum values. It is called by the builders before save.
 func RuleTypeValidator(rt RuleType) error {
 	switch rt {
-	case RuleTypeTime, RuleTypePeriod, RuleTypeMonthly, RuleTypeCoupon, RuleTypeVip:
+	case RuleTypeTime, RuleTypePeriod, RuleTypeMonthly, RuleTypeCoupon, RuleTypeVip, RuleTypeBase, RuleTypeDiscount, RuleTypeExemption, RuleTypeOverride:
 		return nil
 	default:
 		return fmt.Errorf("billingrule: invalid enum value for rule_type field: %q", rt)

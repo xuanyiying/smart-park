@@ -27,7 +27,7 @@ func (BillingRule) Fields() []ent.Field {
 			NotEmpty().
 			Comment("规则名称"),
 		field.Enum("rule_type").
-			Values("time", "period", "monthly", "coupon", "vip").
+			Values("time", "period", "monthly", "coupon", "vip", "base", "discount", "exemption", "override").
 			Comment("规则类型"),
 		field.Text("conditions_json").
 			Optional().

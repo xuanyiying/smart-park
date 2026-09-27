@@ -51,6 +51,14 @@ func (r *billingRuleRepo) GetBillingRule(ctx context.Context, ruleID uuid.UUID) 
 func (r *billingRuleRepo) CreateBillingRule(ctx context.Context, rule *biz.BillingRule) error {
 	ruleType := billingrule.RuleTypeTime
 	switch rule.RuleType {
+	case "base":
+		ruleType = billingrule.RuleTypeBase
+	case "discount":
+		ruleType = billingrule.RuleTypeDiscount
+	case "exemption":
+		ruleType = billingrule.RuleTypeExemption
+	case "override":
+		ruleType = billingrule.RuleTypeOverride
 	case "period":
 		ruleType = billingrule.RuleTypePeriod
 	case "monthly":
@@ -78,6 +86,14 @@ func (r *billingRuleRepo) CreateBillingRule(ctx context.Context, rule *biz.Billi
 func (r *billingRuleRepo) UpdateBillingRule(ctx context.Context, rule *biz.BillingRule) error {
 	ruleType := billingrule.RuleTypeTime
 	switch rule.RuleType {
+	case "base":
+		ruleType = billingrule.RuleTypeBase
+	case "discount":
+		ruleType = billingrule.RuleTypeDiscount
+	case "exemption":
+		ruleType = billingrule.RuleTypeExemption
+	case "override":
+		ruleType = billingrule.RuleTypeOverride
 	case "period":
 		ruleType = billingrule.RuleTypePeriod
 	case "monthly":

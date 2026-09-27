@@ -433,6 +433,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 	var discountAmount float64
 	var appliedRules []*v1.AppliedRule
 	var appliedRuleSet = make(map[string]bool)
+	monthlyExempt := false
 
 	for _, rule := range rules {
 		if !rule.IsActive {
@@ -474,7 +475,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 			discountAmount += ruleAmount
 		case "monthly":
 			if req.VehicleType == "monthly" {
-				discountAmount = baseAmount
+				monthlyExempt = true
 			}
 		case "override":
 			// 覆盖规则，直接使用该规则的金额
@@ -486,6 +487,13 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 	if baseAmount == 0 {
 		hours := duration.Hours()
 		baseAmount = calculateDefaultFee(hours)
+	}
+
+	// 月卡全免必须等基础金额（含默认费率兜底）确定后再结算：
+	// 若月卡车没有命中任何基础规则，baseAmount 在规则循环中仍为 0，
+	// 提前置 discountAmount 会让默认费率漏出，月卡车被误收费。
+	if monthlyExempt {
+		discountAmount = baseAmount
 	}
 
 	finalAmount := baseAmount - discountAmount

@@ -4,6 +4,8 @@ version: '3.8'
 # - 各服务通过 SP_* 环境变量覆盖 YAML 中的默认连接串（默认值指向 localhost，仅在容器外
 #   裸跑时有效）；容器内必须连 compose 网络中的 postgres/redis/etcd。
 # - 敏感信息（数据库口令、支付密钥）应通过 .env 或部署系统的 secret 机制注入，不要写死。
+# - 本文件为自包含模式：基础设施随本 compose 一起启动，适合开源用户开箱即用。
+#   本地多项目开发可改用 docker-compose.app.yml（基础设施复用 ~/dev-app/infra 全局实例）。
 
 services:
   postgres:
@@ -125,7 +127,7 @@ services:
 
   gateway:
     build:
-      context: ../../
+      context: ..
       dockerfile: deploy/docker/Dockerfile.gateway
     container_name: smart-park-gateway
     ports:
@@ -141,7 +143,7 @@ services:
 
   vehicle:
     build:
-      context: ../../
+      context: ..
       dockerfile: deploy/docker/Dockerfile.vehicle
     container_name: smart-park-vehicle
     ports:
@@ -159,7 +161,7 @@ services:
 
   billing:
     build:
-      context: ../../
+      context: ..
       dockerfile: deploy/docker/Dockerfile.billing
     container_name: smart-park-billing
     ports:
@@ -173,7 +175,7 @@ services:
 
   payment:
     build:
-      context: ../../
+      context: ..
       dockerfile: deploy/docker/Dockerfile.payment
     container_name: smart-park-payment
     ports:
@@ -190,7 +192,7 @@ services:
 
   admin:
     build:
-      context: ../../
+      context: ..
       dockerfile: deploy/docker/Dockerfile.admin
     container_name: smart-park-admin
     ports:
@@ -204,7 +206,7 @@ services:
 
   charging:
     build:
-      context: ../../
+      context: ..
       dockerfile: deploy/docker/Dockerfile.charging
     container_name: smart-park-charging
     ports:

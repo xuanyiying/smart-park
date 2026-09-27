@@ -1,6 +1,6 @@
 module github.com/xuanyiying/smart-park
 
-go 1.26
+go 1.25.0
 
 require (
 	entgo.io/ent v0.14.6

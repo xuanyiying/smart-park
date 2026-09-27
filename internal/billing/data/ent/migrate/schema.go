@@ -14,7 +14,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeUUID},
 		{Name: "lot_id", Type: field.TypeUUID},
 		{Name: "rule_name", Type: field.TypeString, Size: 100},
-		{Name: "rule_type", Type: field.TypeEnum, Enums: []string{"time", "period", "monthly", "coupon", "vip"}},
+		{Name: "rule_type", Type: field.TypeEnum, Enums: []string{"time", "period", "monthly", "coupon", "vip", "base", "discount", "exemption", "override"}},
 		{Name: "conditions_json", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "actions_json", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "rule_config", Type: field.TypeJSON, Nullable: true},
