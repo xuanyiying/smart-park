@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/blacklistentry"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
@@ -36,6 +37,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// BillingRule is the client for interacting with the BillingRule builders.
 	BillingRule *BillingRuleClient
+	// BlacklistEntry is the client for interacting with the BlacklistEntry builders.
+	BlacklistEntry *BlacklistEntryClient
 	// Device is the client for interacting with the Device builders.
 	Device *DeviceClient
 	// DeviceFault is the client for interacting with the DeviceFault builders.
@@ -70,6 +73,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.BillingRule = NewBillingRuleClient(c.config)
+	c.BlacklistEntry = NewBlacklistEntryClient(c.config)
 	c.Device = NewDeviceClient(c.config)
 	c.DeviceFault = NewDeviceFaultClient(c.config)
 	c.DeviceLog = NewDeviceLogClient(c.config)
@@ -174,6 +178,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:               ctx,
 		config:            cfg,
 		BillingRule:       NewBillingRuleClient(cfg),
+		BlacklistEntry:    NewBlacklistEntryClient(cfg),
 		Device:            NewDeviceClient(cfg),
 		DeviceFault:       NewDeviceFaultClient(cfg),
 		DeviceLog:         NewDeviceLogClient(cfg),
@@ -205,6 +210,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:               ctx,
 		config:            cfg,
 		BillingRule:       NewBillingRuleClient(cfg),
+		BlacklistEntry:    NewBlacklistEntryClient(cfg),
 		Device:            NewDeviceClient(cfg),
 		DeviceFault:       NewDeviceFaultClient(cfg),
 		DeviceLog:         NewDeviceLogClient(cfg),
@@ -245,9 +251,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.BillingRule, c.Device, c.DeviceFault, c.DeviceLog, c.DevicePerformance,
-		c.DeviceUpgrade, c.Firmware, c.Lane, c.Manufacturer, c.OfflineSyncRecord,
-		c.ParkingRecord, c.Vehicle,
+		c.BillingRule, c.BlacklistEntry, c.Device, c.DeviceFault, c.DeviceLog,
+		c.DevicePerformance, c.DeviceUpgrade, c.Firmware, c.Lane, c.Manufacturer,
+		c.OfflineSyncRecord, c.ParkingRecord, c.Vehicle,
 	} {
 		n.Use(hooks...)
 	}
@@ -257,9 +263,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.BillingRule, c.Device, c.DeviceFault, c.DeviceLog, c.DevicePerformance,
-		c.DeviceUpgrade, c.Firmware, c.Lane, c.Manufacturer, c.OfflineSyncRecord,
-		c.ParkingRecord, c.Vehicle,
+		c.BillingRule, c.BlacklistEntry, c.Device, c.DeviceFault, c.DeviceLog,
+		c.DevicePerformance, c.DeviceUpgrade, c.Firmware, c.Lane, c.Manufacturer,
+		c.OfflineSyncRecord, c.ParkingRecord, c.Vehicle,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -270,6 +276,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *BillingRuleMutation:
 		return c.BillingRule.mutate(ctx, m)
+	case *BlacklistEntryMutation:
+		return c.BlacklistEntry.mutate(ctx, m)
 	case *DeviceMutation:
 		return c.Device.mutate(ctx, m)
 	case *DeviceFaultMutation:
@@ -427,6 +435,139 @@ func (c *BillingRuleClient) mutate(ctx context.Context, m *BillingRuleMutation) 
 		return (&BillingRuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown BillingRule mutation op: %q", m.Op())
+	}
+}
+
+// BlacklistEntryClient is a client for the BlacklistEntry schema.
+type BlacklistEntryClient struct {
+	config
+}
+
+// NewBlacklistEntryClient returns a client for the BlacklistEntry from the given config.
+func NewBlacklistEntryClient(c config) *BlacklistEntryClient {
+	return &BlacklistEntryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `blacklistentry.Hooks(f(g(h())))`.
+func (c *BlacklistEntryClient) Use(hooks ...Hook) {
+	c.hooks.BlacklistEntry = append(c.hooks.BlacklistEntry, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `blacklistentry.Intercept(f(g(h())))`.
+func (c *BlacklistEntryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BlacklistEntry = append(c.inters.BlacklistEntry, interceptors...)
+}
+
+// Create returns a builder for creating a BlacklistEntry entity.
+func (c *BlacklistEntryClient) Create() *BlacklistEntryCreate {
+	mutation := newBlacklistEntryMutation(c.config, OpCreate)
+	return &BlacklistEntryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BlacklistEntry entities.
+func (c *BlacklistEntryClient) CreateBulk(builders ...*BlacklistEntryCreate) *BlacklistEntryCreateBulk {
+	return &BlacklistEntryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BlacklistEntryClient) MapCreateBulk(slice any, setFunc func(*BlacklistEntryCreate, int)) *BlacklistEntryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BlacklistEntryCreateBulk{err: fmt.Errorf("calling to BlacklistEntryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BlacklistEntryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BlacklistEntryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BlacklistEntry.
+func (c *BlacklistEntryClient) Update() *BlacklistEntryUpdate {
+	mutation := newBlacklistEntryMutation(c.config, OpUpdate)
+	return &BlacklistEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BlacklistEntryClient) UpdateOne(_m *BlacklistEntry) *BlacklistEntryUpdateOne {
+	mutation := newBlacklistEntryMutation(c.config, OpUpdateOne, withBlacklistEntry(_m))
+	return &BlacklistEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BlacklistEntryClient) UpdateOneID(id uuid.UUID) *BlacklistEntryUpdateOne {
+	mutation := newBlacklistEntryMutation(c.config, OpUpdateOne, withBlacklistEntryID(id))
+	return &BlacklistEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BlacklistEntry.
+func (c *BlacklistEntryClient) Delete() *BlacklistEntryDelete {
+	mutation := newBlacklistEntryMutation(c.config, OpDelete)
+	return &BlacklistEntryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BlacklistEntryClient) DeleteOne(_m *BlacklistEntry) *BlacklistEntryDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BlacklistEntryClient) DeleteOneID(id uuid.UUID) *BlacklistEntryDeleteOne {
+	builder := c.Delete().Where(blacklistentry.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BlacklistEntryDeleteOne{builder}
+}
+
+// Query returns a query builder for BlacklistEntry.
+func (c *BlacklistEntryClient) Query() *BlacklistEntryQuery {
+	return &BlacklistEntryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBlacklistEntry},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BlacklistEntry entity by its id.
+func (c *BlacklistEntryClient) Get(ctx context.Context, id uuid.UUID) (*BlacklistEntry, error) {
+	return c.Query().Where(blacklistentry.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BlacklistEntryClient) GetX(ctx context.Context, id uuid.UUID) *BlacklistEntry {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *BlacklistEntryClient) Hooks() []Hook {
+	return c.hooks.BlacklistEntry
+}
+
+// Interceptors returns the client interceptors.
+func (c *BlacklistEntryClient) Interceptors() []Interceptor {
+	return c.inters.BlacklistEntry
+}
+
+func (c *BlacklistEntryClient) mutate(ctx context.Context, m *BlacklistEntryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BlacklistEntryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BlacklistEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BlacklistEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BlacklistEntryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BlacklistEntry mutation op: %q", m.Op())
 	}
 }
 
@@ -1896,13 +2037,13 @@ func (c *VehicleClient) mutate(ctx context.Context, m *VehicleMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		BillingRule, Device, DeviceFault, DeviceLog, DevicePerformance, DeviceUpgrade,
-		Firmware, Lane, Manufacturer, OfflineSyncRecord, ParkingRecord,
+		BillingRule, BlacklistEntry, Device, DeviceFault, DeviceLog, DevicePerformance,
+		DeviceUpgrade, Firmware, Lane, Manufacturer, OfflineSyncRecord, ParkingRecord,
 		Vehicle []ent.Hook
 	}
 	inters struct {
-		BillingRule, Device, DeviceFault, DeviceLog, DevicePerformance, DeviceUpgrade,
-		Firmware, Lane, Manufacturer, OfflineSyncRecord, ParkingRecord,
+		BillingRule, BlacklistEntry, Device, DeviceFault, DeviceLog, DevicePerformance,
+		DeviceUpgrade, Firmware, Lane, Manufacturer, OfflineSyncRecord, ParkingRecord,
 		Vehicle []ent.Interceptor
 	}
 )

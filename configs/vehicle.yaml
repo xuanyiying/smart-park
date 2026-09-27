@@ -45,6 +45,9 @@ mqtt:
   client_id: "vehicle-service"
   username: ""
   password: ""
+  # TLS 传输（或 broker 使用 tls:// 前缀时自动启用）；skip_verify 仅限开发环境
+  tls: false
+  tls_skip_verify: false
   topics:
     command: "parking/device/{device_id}/command"
     status: "parking/device/{device_id}/status"
@@ -58,6 +61,11 @@ entry_exit:
   device_online_threshold: "5m"
   # 车牌识别置信度下限，低于该值拒绝入场/出场
   min_confidence: 0.7
+  # 道闸屏显文案覆盖（未配置的键使用内置默认值）
+  # messages:
+  #   welcome: "欢迎光临"
+  #   lot_full: "车位已满，禁止入场"
+  #   blacklisted: "车辆已被限制入场，请联系管理员"
 
 log:
   level: info

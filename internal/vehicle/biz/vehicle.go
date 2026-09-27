@@ -202,6 +202,17 @@ type DeviceUpgrade struct {
 	UpdatedAt    time.Time
 }
 
+// BlacklistEntry represents a blacklisted vehicle.
+type BlacklistEntry struct {
+	ID          uuid.UUID
+	PlateNumber string
+	Reason      string
+	CreatedBy   string
+	Active      bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 // VehicleRepo defines the repository interface for vehicle operations.
 type VehicleRepo interface {
 	GetVehicleByPlate(ctx context.Context, plateNumber string) (*Vehicle, error)
@@ -265,4 +276,12 @@ type VehicleRepo interface {
 	CreateDeviceUpgrade(ctx context.Context, deviceID string, fromVersion string, toVersion string, firmwareURL string) (uuid.UUID, error)
 	GetDeviceUpgrade(ctx context.Context, id uuid.UUID) (*DeviceUpgrade, error)
 	UpdateDeviceUpgradeStatus(ctx context.Context, id uuid.UUID, status string, errMsg string) error
+	// Blacklist management
+	CreateBlacklistEntry(ctx context.Context, entry *BlacklistEntry) error
+	GetBlacklistEntry(ctx context.Context, plateNumber string) (*BlacklistEntry, error)
+	SetBlacklistEntryActive(ctx context.Context, plateNumber string, active bool) error
+	ListBlacklistEntries(ctx context.Context, page, pageSize int) ([]*BlacklistEntry, int, error)
+	// Parking lot capacity (supports the full-lot entry check)
+	GetLotCapacity(ctx context.Context, lotID uuid.UUID) (int, error)
+	CountActiveRecordsByLot(ctx context.Context, lotID uuid.UUID) (int, error)
 }

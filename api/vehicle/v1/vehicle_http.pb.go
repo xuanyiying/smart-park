@@ -19,6 +19,8 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationVehicleServiceAddBlacklistEntry = "/api.vehicle.v1.VehicleService/AddBlacklistEntry"
+const OperationVehicleServiceCheckBlacklist = "/api.vehicle.v1.VehicleService/CheckBlacklist"
 const OperationVehicleServiceCreateDevice = "/api.vehicle.v1.VehicleService/CreateDevice"
 const OperationVehicleServiceCreateDeviceFault = "/api.vehicle.v1.VehicleService/CreateDeviceFault"
 const OperationVehicleServiceCreateDevicePerformance = "/api.vehicle.v1.VehicleService/CreateDevicePerformance"
@@ -47,11 +49,13 @@ const OperationVehicleServiceGetManufacturer = "/api.vehicle.v1.VehicleService/G
 const OperationVehicleServiceGetParkingRecord = "/api.vehicle.v1.VehicleService/GetParkingRecord"
 const OperationVehicleServiceGetVehicleInfo = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
 const OperationVehicleServiceHeartbeat = "/api.vehicle.v1.VehicleService/Heartbeat"
+const OperationVehicleServiceListBlacklistEntries = "/api.vehicle.v1.VehicleService/ListBlacklistEntries"
 const OperationVehicleServiceListDeviceFaults = "/api.vehicle.v1.VehicleService/ListDeviceFaults"
 const OperationVehicleServiceListDevices = "/api.vehicle.v1.VehicleService/ListDevices"
 const OperationVehicleServiceListFirmwares = "/api.vehicle.v1.VehicleService/ListFirmwares"
 const OperationVehicleServiceListManufacturers = "/api.vehicle.v1.VehicleService/ListManufacturers"
 const OperationVehicleServiceListParkingRecords = "/api.vehicle.v1.VehicleService/ListParkingRecords"
+const OperationVehicleServiceRemoveBlacklistEntry = "/api.vehicle.v1.VehicleService/RemoveBlacklistEntry"
 const OperationVehicleServiceResolveDeviceFault = "/api.vehicle.v1.VehicleService/ResolveDeviceFault"
 const OperationVehicleServiceSendCommand = "/api.vehicle.v1.VehicleService/SendCommand"
 const OperationVehicleServiceUpdateDevice = "/api.vehicle.v1.VehicleService/UpdateDevice"
@@ -61,6 +65,9 @@ const OperationVehicleServiceUpdateManufacturer = "/api.vehicle.v1.VehicleServic
 const OperationVehicleServiceUpgradeDevice = "/api.vehicle.v1.VehicleService/UpgradeDevice"
 
 type VehicleServiceHTTPServer interface {
+	// AddBlacklistEntry Blacklist management
+	AddBlacklistEntry(context.Context, *AddBlacklistEntryRequest) (*AddBlacklistEntryResponse, error)
+	CheckBlacklist(context.Context, *CheckBlacklistRequest) (*CheckBlacklistResponse, error)
 	CreateDevice(context.Context, *CreateDeviceRequest) (*CreateDeviceResponse, error)
 	// CreateDeviceFault Device fault diagnosis
 	CreateDeviceFault(context.Context, *CreateDeviceFaultRequest) (*CreateDeviceFaultResponse, error)
@@ -96,11 +103,13 @@ type VehicleServiceHTTPServer interface {
 	GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error)
 	GetVehicleInfo(context.Context, *GetVehicleInfoRequest) (*GetVehicleInfoResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	ListBlacklistEntries(context.Context, *ListBlacklistEntriesRequest) (*ListBlacklistEntriesResponse, error)
 	ListDeviceFaults(context.Context, *ListDeviceFaultsRequest) (*ListDeviceFaultsResponse, error)
 	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
 	ListFirmwares(context.Context, *ListFirmwaresRequest) (*ListFirmwaresResponse, error)
 	ListManufacturers(context.Context, *ListManufacturersRequest) (*ListManufacturersResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
+	RemoveBlacklistEntry(context.Context, *RemoveBlacklistEntryRequest) (*RemoveBlacklistEntryResponse, error)
 	ResolveDeviceFault(context.Context, *ResolveDeviceFaultRequest) (*ResolveDeviceFaultResponse, error)
 	SendCommand(context.Context, *SendCommandRequest) (*SendCommandResponse, error)
 	UpdateDevice(context.Context, *UpdateDeviceRequest) (*UpdateDeviceResponse, error)
@@ -154,6 +163,10 @@ func RegisterVehicleServiceHTTPServer(s *http.Server, srv VehicleServiceHTTPServ
 	r.GET("/api/v1/device/{deviceId}/logs", _VehicleService_GetDeviceLogs0_HTTP_Handler(srv))
 	r.GET("/api/v1/device/{deviceId}/stats", _VehicleService_GetDeviceStats0_HTTP_Handler(srv))
 	r.PUT("/api/v1/device/{deviceId}/config", _VehicleService_UpdateDeviceConfig0_HTTP_Handler(srv))
+	r.POST("/api/v1/blacklist", _VehicleService_AddBlacklistEntry0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/blacklist/{plateNumber}", _VehicleService_RemoveBlacklistEntry0_HTTP_Handler(srv))
+	r.GET("/api/v1/blacklist", _VehicleService_ListBlacklistEntries0_HTTP_Handler(srv))
+	r.GET("/api/v1/blacklist/{plateNumber}", _VehicleService_CheckBlacklist0_HTTP_Handler(srv))
 }
 
 func _VehicleService_Entry0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
@@ -1033,7 +1046,94 @@ func _VehicleService_UpdateDeviceConfig0_HTTP_Handler(srv VehicleServiceHTTPServ
 	}
 }
 
+func _VehicleService_AddBlacklistEntry0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AddBlacklistEntryRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceAddBlacklistEntry)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AddBlacklistEntry(ctx, req.(*AddBlacklistEntryRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AddBlacklistEntryResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_RemoveBlacklistEntry0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in RemoveBlacklistEntryRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceRemoveBlacklistEntry)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.RemoveBlacklistEntry(ctx, req.(*RemoveBlacklistEntryRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RemoveBlacklistEntryResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_ListBlacklistEntries0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListBlacklistEntriesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceListBlacklistEntries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListBlacklistEntries(ctx, req.(*ListBlacklistEntriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListBlacklistEntriesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_CheckBlacklist0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CheckBlacklistRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceCheckBlacklist)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CheckBlacklist(ctx, req.(*CheckBlacklistRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CheckBlacklistResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type VehicleServiceHTTPClient interface {
+	AddBlacklistEntry(ctx context.Context, req *AddBlacklistEntryRequest, opts ...http.CallOption) (rsp *AddBlacklistEntryResponse, err error)
+	CheckBlacklist(ctx context.Context, req *CheckBlacklistRequest, opts ...http.CallOption) (rsp *CheckBlacklistResponse, err error)
 	CreateDevice(ctx context.Context, req *CreateDeviceRequest, opts ...http.CallOption) (rsp *CreateDeviceResponse, err error)
 	CreateDeviceFault(ctx context.Context, req *CreateDeviceFaultRequest, opts ...http.CallOption) (rsp *CreateDeviceFaultResponse, err error)
 	CreateDevicePerformance(ctx context.Context, req *CreateDevicePerformanceRequest, opts ...http.CallOption) (rsp *CreateDevicePerformanceResponse, err error)
@@ -1062,11 +1162,13 @@ type VehicleServiceHTTPClient interface {
 	GetParkingRecord(ctx context.Context, req *GetParkingRecordRequest, opts ...http.CallOption) (rsp *GetParkingRecordResponse, err error)
 	GetVehicleInfo(ctx context.Context, req *GetVehicleInfoRequest, opts ...http.CallOption) (rsp *GetVehicleInfoResponse, err error)
 	Heartbeat(ctx context.Context, req *HeartbeatRequest, opts ...http.CallOption) (rsp *HeartbeatResponse, err error)
+	ListBlacklistEntries(ctx context.Context, req *ListBlacklistEntriesRequest, opts ...http.CallOption) (rsp *ListBlacklistEntriesResponse, err error)
 	ListDeviceFaults(ctx context.Context, req *ListDeviceFaultsRequest, opts ...http.CallOption) (rsp *ListDeviceFaultsResponse, err error)
 	ListDevices(ctx context.Context, req *ListDevicesRequest, opts ...http.CallOption) (rsp *ListDevicesResponse, err error)
 	ListFirmwares(ctx context.Context, req *ListFirmwaresRequest, opts ...http.CallOption) (rsp *ListFirmwaresResponse, err error)
 	ListManufacturers(ctx context.Context, req *ListManufacturersRequest, opts ...http.CallOption) (rsp *ListManufacturersResponse, err error)
 	ListParkingRecords(ctx context.Context, req *ListParkingRecordsRequest, opts ...http.CallOption) (rsp *ListParkingRecordsResponse, err error)
+	RemoveBlacklistEntry(ctx context.Context, req *RemoveBlacklistEntryRequest, opts ...http.CallOption) (rsp *RemoveBlacklistEntryResponse, err error)
 	ResolveDeviceFault(ctx context.Context, req *ResolveDeviceFaultRequest, opts ...http.CallOption) (rsp *ResolveDeviceFaultResponse, err error)
 	SendCommand(ctx context.Context, req *SendCommandRequest, opts ...http.CallOption) (rsp *SendCommandResponse, err error)
 	UpdateDevice(ctx context.Context, req *UpdateDeviceRequest, opts ...http.CallOption) (rsp *UpdateDeviceResponse, err error)
@@ -1082,6 +1184,32 @@ type VehicleServiceHTTPClientImpl struct {
 
 func NewVehicleServiceHTTPClient(client *http.Client) VehicleServiceHTTPClient {
 	return &VehicleServiceHTTPClientImpl{client}
+}
+
+func (c *VehicleServiceHTTPClientImpl) AddBlacklistEntry(ctx context.Context, in *AddBlacklistEntryRequest, opts ...http.CallOption) (*AddBlacklistEntryResponse, error) {
+	var out AddBlacklistEntryResponse
+	pattern := "/api/v1/blacklist"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceAddBlacklistEntry))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) CheckBlacklist(ctx context.Context, in *CheckBlacklistRequest, opts ...http.CallOption) (*CheckBlacklistResponse, error) {
+	var out CheckBlacklistResponse
+	pattern := "/api/v1/blacklist/{plateNumber}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceCheckBlacklist))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *VehicleServiceHTTPClientImpl) CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...http.CallOption) (*CreateDeviceResponse, error) {
@@ -1448,6 +1576,19 @@ func (c *VehicleServiceHTTPClientImpl) Heartbeat(ctx context.Context, in *Heartb
 	return &out, nil
 }
 
+func (c *VehicleServiceHTTPClientImpl) ListBlacklistEntries(ctx context.Context, in *ListBlacklistEntriesRequest, opts ...http.CallOption) (*ListBlacklistEntriesResponse, error) {
+	var out ListBlacklistEntriesResponse
+	pattern := "/api/v1/blacklist"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceListBlacklistEntries))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *VehicleServiceHTTPClientImpl) ListDeviceFaults(ctx context.Context, in *ListDeviceFaultsRequest, opts ...http.CallOption) (*ListDeviceFaultsResponse, error) {
 	var out ListDeviceFaultsResponse
 	pattern := "/api/v1/device/faults"
@@ -1507,6 +1648,19 @@ func (c *VehicleServiceHTTPClientImpl) ListParkingRecords(ctx context.Context, i
 	opts = append(opts, http.Operation(OperationVehicleServiceListParkingRecords))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) RemoveBlacklistEntry(ctx context.Context, in *RemoveBlacklistEntryRequest, opts ...http.CallOption) (*RemoveBlacklistEntryResponse, error) {
+	var out RemoveBlacklistEntryResponse
+	pattern := "/api/v1/blacklist/{plateNumber}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceRemoveBlacklistEntry))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

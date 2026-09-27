@@ -26,6 +26,7 @@ type VehicleService struct {
 	vehicleUseCase           *biz.VehicleQueryUseCase
 	commandUseCase           *biz.CommandUseCase
 	recordUseCase            *biz.RecordQueryUseCase
+	blacklistUseCase         *biz.BlacklistUseCase
 	log                      *log.Helper
 }
 
@@ -41,6 +42,7 @@ func NewVehicleService(
 	vehicleUseCase *biz.VehicleQueryUseCase,
 	commandUseCase *biz.CommandUseCase,
 	recordUseCase *biz.RecordQueryUseCase,
+	blacklistUseCase *biz.BlacklistUseCase,
 	logger log.Logger,
 ) *VehicleService {
 	return &VehicleService{
@@ -54,6 +56,7 @@ func NewVehicleService(
 		vehicleUseCase:           vehicleUseCase,
 		commandUseCase:           commandUseCase,
 		recordUseCase:            recordUseCase,
+		blacklistUseCase:         blacklistUseCase,
 		log:                      log.NewHelper(logger),
 	}
 }
@@ -654,4 +657,81 @@ func mapToStructPB(m map[string]interface{}) map[string]*structpb.Value {
 		result[k] = sv
 	}
 	return result
+}
+
+// ---- Blacklist management ----
+
+func toBlacklistEntryInfo(entry *biz.BlacklistEntry) *v1.BlacklistEntryInfo {
+	if entry == nil {
+		return nil
+	}
+	return &v1.BlacklistEntryInfo{
+		PlateNumber: entry.PlateNumber,
+		Reason:      entry.Reason,
+		CreatedBy:   entry.CreatedBy,
+		Active:      entry.Active,
+		CreatedAt:   entry.CreatedAt.Format(time.RFC3339),
+	}
+}
+
+// AddBlacklistEntry adds (or re-activates) a blacklist record.
+func (s *VehicleService) AddBlacklistEntry(ctx context.Context, req *v1.AddBlacklistEntryRequest) (*v1.AddBlacklistEntryResponse, error) {
+	entry, err := s.blacklistUseCase.AddBlacklistEntry(ctx, req.PlateNumber, req.Reason, req.CreatedBy)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("AddBlacklistEntry failed: %v", err)
+		return &v1.AddBlacklistEntryResponse{Code: 500, Message: "加入黑名单失败: " + err.Error()}, nil
+	}
+	return &v1.AddBlacklistEntryResponse{
+		Code:    0,
+		Message: "success",
+		Data:    toBlacklistEntryInfo(entry),
+	}, nil
+}
+
+// RemoveBlacklistEntry deactivates a blacklist record.
+func (s *VehicleService) RemoveBlacklistEntry(ctx context.Context, req *v1.RemoveBlacklistEntryRequest) (*v1.RemoveBlacklistEntryResponse, error) {
+	if err := s.blacklistUseCase.RemoveBlacklistEntry(ctx, req.PlateNumber); err != nil {
+		s.log.WithContext(ctx).Errorf("RemoveBlacklistEntry failed: %v", err)
+		return &v1.RemoveBlacklistEntryResponse{Code: 500, Message: "移出黑名单失败: " + err.Error()}, nil
+	}
+	return &v1.RemoveBlacklistEntryResponse{Code: 0, Message: "success"}, nil
+}
+
+// ListBlacklistEntries lists blacklist records with pagination.
+func (s *VehicleService) ListBlacklistEntries(ctx context.Context, req *v1.ListBlacklistEntriesRequest) (*v1.ListBlacklistEntriesResponse, error) {
+	entries, total, err := s.blacklistUseCase.ListBlacklistEntries(ctx, int(req.Page), int(req.PageSize))
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("ListBlacklistEntries failed: %v", err)
+		return &v1.ListBlacklistEntriesResponse{Code: 500, Message: "查询黑名单失败: " + err.Error()}, nil
+	}
+
+	items := make([]*v1.BlacklistEntryInfo, 0, len(entries))
+	for _, entry := range entries {
+		items = append(items, toBlacklistEntryInfo(entry))
+	}
+
+	return &v1.ListBlacklistEntriesResponse{
+		Code:    0,
+		Message: "success",
+		Entries: items,
+		Total:   int32(total),
+	}, nil
+}
+
+// CheckBlacklist reports whether a plate is currently blacklisted.
+func (s *VehicleService) CheckBlacklist(ctx context.Context, req *v1.CheckBlacklistRequest) (*v1.CheckBlacklistResponse, error) {
+	entry, err := s.blacklistUseCase.CheckBlacklist(ctx, req.PlateNumber)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("CheckBlacklist failed: %v", err)
+		return &v1.CheckBlacklistResponse{Code: 500, Message: "黑名单检查失败: " + err.Error()}, nil
+	}
+	if entry == nil {
+		return &v1.CheckBlacklistResponse{Code: 0, Message: "success", Blacklisted: false}, nil
+	}
+	return &v1.CheckBlacklistResponse{
+		Code:        0,
+		Message:     "success",
+		Blacklisted: true,
+		Entry:       toBlacklistEntryInfo(entry),
+	}, nil
 }

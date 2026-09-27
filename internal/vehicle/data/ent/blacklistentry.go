@@ -10,26 +10,24 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/xuanyiying/smart-park/internal/admin/data/ent/parkinglot"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/blacklistentry"
 )
 
-// ParkingLot is the model entity for the ParkingLot schema.
-type ParkingLot struct {
+// BlacklistEntry is the model entity for the BlacklistEntry schema.
+type BlacklistEntry struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// 租户ID
 	TenantID uuid.UUID `json:"tenant_id,omitempty"`
-	// 停车场名称
-	Name string `json:"name,omitempty"`
-	// 地址
-	Address string `json:"address,omitempty"`
-	// 车道数量
-	Lanes int `json:"lanes,omitempty"`
-	// 总车位数，0 表示未配置（不参与满位校验），与 analytics 侧字段同名
-	TotalCapacity int `json:"total_capacity,omitempty"`
-	// 状态
-	Status string `json:"status,omitempty"`
+	// 车牌号
+	PlateNumber string `json:"plate_number,omitempty"`
+	// 拉黑原因
+	Reason string `json:"reason,omitempty"`
+	// 操作人
+	CreatedBy string `json:"created_by,omitempty"`
+	// 是否生效，移除时置 false 以保留执行历史
+	Active bool `json:"active,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -38,17 +36,17 @@ type ParkingLot struct {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*ParkingLot) scanValues(columns []string) ([]any, error) {
+func (*BlacklistEntry) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case parkinglot.FieldLanes, parkinglot.FieldTotalCapacity:
-			values[i] = new(sql.NullInt64)
-		case parkinglot.FieldName, parkinglot.FieldAddress, parkinglot.FieldStatus:
+		case blacklistentry.FieldActive:
+			values[i] = new(sql.NullBool)
+		case blacklistentry.FieldPlateNumber, blacklistentry.FieldReason, blacklistentry.FieldCreatedBy:
 			values[i] = new(sql.NullString)
-		case parkinglot.FieldCreatedAt, parkinglot.FieldUpdatedAt:
+		case blacklistentry.FieldCreatedAt, blacklistentry.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case parkinglot.FieldID, parkinglot.FieldTenantID:
+		case blacklistentry.FieldID, blacklistentry.FieldTenantID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -58,62 +56,56 @@ func (*ParkingLot) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the ParkingLot fields.
-func (_m *ParkingLot) assignValues(columns []string, values []any) error {
+// to the BlacklistEntry fields.
+func (_m *BlacklistEntry) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case parkinglot.FieldID:
+		case blacklistentry.FieldID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
 			}
-		case parkinglot.FieldTenantID:
+		case blacklistentry.FieldTenantID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value != nil {
 				_m.TenantID = *value
 			}
-		case parkinglot.FieldName:
+		case blacklistentry.FieldPlateNumber:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
+				return fmt.Errorf("unexpected type %T for field plate_number", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.PlateNumber = value.String
 			}
-		case parkinglot.FieldAddress:
+		case blacklistentry.FieldReason:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field address", values[i])
+				return fmt.Errorf("unexpected type %T for field reason", values[i])
 			} else if value.Valid {
-				_m.Address = value.String
+				_m.Reason = value.String
 			}
-		case parkinglot.FieldLanes:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field lanes", values[i])
-			} else if value.Valid {
-				_m.Lanes = int(value.Int64)
-			}
-		case parkinglot.FieldTotalCapacity:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field total_capacity", values[i])
-			} else if value.Valid {
-				_m.TotalCapacity = int(value.Int64)
-			}
-		case parkinglot.FieldStatus:
+		case blacklistentry.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				_m.Status = value.String
+				_m.CreatedBy = value.String
 			}
-		case parkinglot.FieldCreatedAt:
+		case blacklistentry.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				_m.Active = value.Bool
+			}
+		case blacklistentry.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
 			}
-		case parkinglot.FieldUpdatedAt:
+		case blacklistentry.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
@@ -126,52 +118,49 @@ func (_m *ParkingLot) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the ParkingLot.
+// Value returns the ent.Value that was dynamically selected and assigned to the BlacklistEntry.
 // This includes values selected through modifiers, order, etc.
-func (_m *ParkingLot) Value(name string) (ent.Value, error) {
+func (_m *BlacklistEntry) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// Update returns a builder for updating this ParkingLot.
-// Note that you need to call ParkingLot.Unwrap() before calling this method if this ParkingLot
+// Update returns a builder for updating this BlacklistEntry.
+// Note that you need to call BlacklistEntry.Unwrap() before calling this method if this BlacklistEntry
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (_m *ParkingLot) Update() *ParkingLotUpdateOne {
-	return NewParkingLotClient(_m.config).UpdateOne(_m)
+func (_m *BlacklistEntry) Update() *BlacklistEntryUpdateOne {
+	return NewBlacklistEntryClient(_m.config).UpdateOne(_m)
 }
 
-// Unwrap unwraps the ParkingLot entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the BlacklistEntry entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (_m *ParkingLot) Unwrap() *ParkingLot {
+func (_m *BlacklistEntry) Unwrap() *BlacklistEntry {
 	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: ParkingLot is not a transactional entity")
+		panic("ent: BlacklistEntry is not a transactional entity")
 	}
 	_m.config.driver = _tx.drv
 	return _m
 }
 
 // String implements the fmt.Stringer.
-func (_m *ParkingLot) String() string {
+func (_m *BlacklistEntry) String() string {
 	var builder strings.Builder
-	builder.WriteString("ParkingLot(")
+	builder.WriteString("BlacklistEntry(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(_m.Name)
+	builder.WriteString("plate_number=")
+	builder.WriteString(_m.PlateNumber)
 	builder.WriteString(", ")
-	builder.WriteString("address=")
-	builder.WriteString(_m.Address)
+	builder.WriteString("reason=")
+	builder.WriteString(_m.Reason)
 	builder.WriteString(", ")
-	builder.WriteString("lanes=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Lanes))
+	builder.WriteString("created_by=")
+	builder.WriteString(_m.CreatedBy)
 	builder.WriteString(", ")
-	builder.WriteString("total_capacity=")
-	builder.WriteString(fmt.Sprintf("%v", _m.TotalCapacity))
-	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(_m.Status)
+	builder.WriteString("active=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Active))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
@@ -182,5 +171,5 @@ func (_m *ParkingLot) String() string {
 	return builder.String()
 }
 
-// ParkingLots is a parsable slice of ParkingLot.
-type ParkingLots []*ParkingLot
+// BlacklistEntries is a parsable slice of BlacklistEntry.
+type BlacklistEntries []*BlacklistEntry

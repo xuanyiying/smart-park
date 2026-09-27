@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/blacklistentry"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
@@ -69,6 +70,52 @@ func init() {
 	billingruleDescID := billingruleFields[0].Descriptor()
 	// billingrule.DefaultID holds the default value on creation for the id field.
 	billingrule.DefaultID = billingruleDescID.Default.(func() uuid.UUID)
+	blacklistentryFields := schema.BlacklistEntry{}.Fields()
+	_ = blacklistentryFields
+	// blacklistentryDescPlateNumber is the schema descriptor for plate_number field.
+	blacklistentryDescPlateNumber := blacklistentryFields[2].Descriptor()
+	// blacklistentry.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
+	blacklistentry.PlateNumberValidator = func() func(string) error {
+		validators := blacklistentryDescPlateNumber.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(plate_number string) error {
+			for _, fn := range fns {
+				if err := fn(plate_number); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// blacklistentryDescReason is the schema descriptor for reason field.
+	blacklistentryDescReason := blacklistentryFields[3].Descriptor()
+	// blacklistentry.ReasonValidator is a validator for the "reason" field. It is called by the builders before save.
+	blacklistentry.ReasonValidator = blacklistentryDescReason.Validators[0].(func(string) error)
+	// blacklistentryDescCreatedBy is the schema descriptor for created_by field.
+	blacklistentryDescCreatedBy := blacklistentryFields[4].Descriptor()
+	// blacklistentry.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	blacklistentry.CreatedByValidator = blacklistentryDescCreatedBy.Validators[0].(func(string) error)
+	// blacklistentryDescActive is the schema descriptor for active field.
+	blacklistentryDescActive := blacklistentryFields[5].Descriptor()
+	// blacklistentry.DefaultActive holds the default value on creation for the active field.
+	blacklistentry.DefaultActive = blacklistentryDescActive.Default.(bool)
+	// blacklistentryDescCreatedAt is the schema descriptor for created_at field.
+	blacklistentryDescCreatedAt := blacklistentryFields[6].Descriptor()
+	// blacklistentry.DefaultCreatedAt holds the default value on creation for the created_at field.
+	blacklistentry.DefaultCreatedAt = blacklistentryDescCreatedAt.Default.(func() time.Time)
+	// blacklistentryDescUpdatedAt is the schema descriptor for updated_at field.
+	blacklistentryDescUpdatedAt := blacklistentryFields[7].Descriptor()
+	// blacklistentry.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	blacklistentry.DefaultUpdatedAt = blacklistentryDescUpdatedAt.Default.(func() time.Time)
+	// blacklistentry.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	blacklistentry.UpdateDefaultUpdatedAt = blacklistentryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// blacklistentryDescID is the schema descriptor for id field.
+	blacklistentryDescID := blacklistentryFields[0].Descriptor()
+	// blacklistentry.DefaultID holds the default value on creation for the id field.
+	blacklistentry.DefaultID = blacklistentryDescID.Default.(func() uuid.UUID)
 	deviceFields := schema.Device{}.Fields()
 	_ = deviceFields
 	// deviceDescDeviceID is the schema descriptor for device_id field.

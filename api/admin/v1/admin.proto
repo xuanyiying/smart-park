@@ -121,6 +121,7 @@ message CreateParkingLotRequest {
   string name    = 1;
   string address = 2;
   int32  lanes   = 3;
+  int32  totalCapacity = 4;
 }
 
 message CreateParkingLotResponse {
@@ -145,6 +146,7 @@ message UpdateParkingLotRequest {
   string address = 3;
   int32  lanes   = 4;
   string status  = 5;
+  int32  totalCapacity = 6;
 }
 
 message UpdateParkingLotResponse {
@@ -178,6 +180,7 @@ message ParkingLot {
   string status    = 5;
   string createdAt = 6;
   string updatedAt = 7;
+  int32  totalCapacity = 8;
 }
 
 message ListParkingRecordsRequest {

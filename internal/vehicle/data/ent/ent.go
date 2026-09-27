@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/blacklistentry"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
@@ -85,6 +86,7 @@ func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			billingrule.Table:       billingrule.ValidColumn,
+			blacklistentry.Table:    blacklistentry.ValidColumn,
 			device.Table:            device.ValidColumn,
 			devicefault.Table:       devicefault.ValidColumn,
 			devicelog.Table:         devicelog.ValidColumn,

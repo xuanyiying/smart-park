@@ -342,7 +342,7 @@ func TestApplyActions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, tt.exitTime)
+			got := applyActions(tt.actions, tt.exitTime.Add(-tt.duration), tt.exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}
@@ -462,7 +462,7 @@ func TestApplyActions_FreeDuration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, exitTime)
+			got := applyActions(tt.actions, exitTime.Add(-tt.duration), exitTime)
 			if math.Abs(got-tt.expected) > 0.0001 {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}
@@ -501,7 +501,7 @@ func TestApplyActions_Cap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, exitTime)
+			got := applyActions(tt.actions, exitTime.Add(-tt.duration), exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}
@@ -546,7 +546,7 @@ func TestApplyActions_MaxDaily(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, exitTime)
+			got := applyActions(tt.actions, exitTime.Add(-tt.duration), exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}
@@ -579,7 +579,7 @@ func TestApplyActions_MinCharge(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, exitTime)
+			got := applyActions(tt.actions, exitTime.Add(-tt.duration), exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}
@@ -620,7 +620,7 @@ func TestApplyActions_NightDiscount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, tt.exitTime)
+			got := applyActions(tt.actions, tt.exitTime.Add(-tt.duration), tt.exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}
@@ -653,7 +653,7 @@ func TestApplyActions_Ceil(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyActions(tt.actions, tt.duration, exitTime)
+			got := applyActions(tt.actions, exitTime.Add(-tt.duration), exitTime)
 			if got != tt.expected {
 				t.Errorf("applyActions() = %v, want %v", got, tt.expected)
 			}

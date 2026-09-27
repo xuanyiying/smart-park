@@ -271,6 +271,32 @@ service VehicleService {
       body: "*",
     };
   }
+
+  // Blacklist management
+  rpc AddBlacklistEntry(AddBlacklistEntryRequest) returns (AddBlacklistEntryResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/blacklist",
+      body: "*",
+    };
+  }
+
+  rpc RemoveBlacklistEntry(RemoveBlacklistEntryRequest) returns (RemoveBlacklistEntryResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/blacklist/{plateNumber}",
+    };
+  }
+
+  rpc ListBlacklistEntries(ListBlacklistEntriesRequest) returns (ListBlacklistEntriesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/blacklist",
+    };
+  }
+
+  rpc CheckBlacklist(CheckBlacklistRequest) returns (CheckBlacklistResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/blacklist/{plateNumber}",
+    };
+  }
 }
 
 message EntryRequest {
@@ -871,4 +897,57 @@ message UpdateDeviceConfigResponse {
   int32      code    = 1;
   string     message = 2;
   DeviceInfo data    = 3;
+}
+
+// Blacklist messages
+message AddBlacklistEntryRequest {
+  string plateNumber = 1;
+  string reason      = 2;
+  string createdBy   = 3;
+}
+
+message AddBlacklistEntryResponse {
+  int32             code    = 1;
+  string            message = 2;
+  BlacklistEntryInfo data   = 3;
+}
+
+message RemoveBlacklistEntryRequest {
+  string plateNumber = 1;
+}
+
+message RemoveBlacklistEntryResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message ListBlacklistEntriesRequest {
+  int32 page     = 1;
+  int32 pageSize = 2;
+}
+
+message ListBlacklistEntriesResponse {
+  int32                      code    = 1;
+  string                     message = 2;
+  repeated BlacklistEntryInfo entries = 3;
+  int32                      total   = 4;
+}
+
+message CheckBlacklistRequest {
+  string plateNumber = 1;
+}
+
+message CheckBlacklistResponse {
+  int32              code        = 1;
+  string             message     = 2;
+  bool               blacklisted = 3;
+  BlacklistEntryInfo entry       = 4;
+}
+
+message BlacklistEntryInfo {
+  string plateNumber = 1;
+  string reason      = 2;
+  string createdBy   = 3;
+  bool   active      = 4;
+  string createdAt   = 5;
 }

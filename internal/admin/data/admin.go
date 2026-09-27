@@ -30,6 +30,7 @@ func (r *adminRepo) CreateParkingLot(ctx context.Context, lot *biz.ParkingLot) e
 		SetName(lot.Name).
 		SetAddress(lot.Address).
 		SetLanes(lot.Lanes).
+		SetTotalCapacity(lot.TotalCapacity).
 		SetStatus(lot.Status).
 		Save(ctx)
 
@@ -49,13 +50,14 @@ func (r *adminRepo) GetParkingLot(ctx context.Context, lotID uuid.UUID) (*biz.Pa
 	}
 
 	return &biz.ParkingLot{
-		ID:        lot.ID,
-		Name:      lot.Name,
-		Address:   lot.Address,
-		Lanes:     lot.Lanes,
-		Status:    lot.Status,
-		CreatedAt: lot.CreatedAt,
-		UpdatedAt: lot.UpdatedAt,
+		ID:            lot.ID,
+		Name:          lot.Name,
+		Address:       lot.Address,
+		Lanes:         lot.Lanes,
+		TotalCapacity: lot.TotalCapacity,
+		Status:        lot.Status,
+		CreatedAt:     lot.CreatedAt,
+		UpdatedAt:     lot.UpdatedAt,
 	}, nil
 }
 
@@ -64,6 +66,7 @@ func (r *adminRepo) UpdateParkingLot(ctx context.Context, lot *biz.ParkingLot) e
 		SetName(lot.Name).
 		SetAddress(lot.Address).
 		SetLanes(lot.Lanes).
+		SetTotalCapacity(lot.TotalCapacity).
 		SetStatus(lot.Status).
 		Save(ctx)
 
@@ -96,13 +99,14 @@ func (r *adminRepo) ListParkingLots(ctx context.Context, page, pageSize int) ([]
 	result := make([]*biz.ParkingLot, 0, len(lots))
 	for _, lot := range lots {
 		result = append(result, &biz.ParkingLot{
-			ID:        lot.ID,
-			Name:      lot.Name,
-			Address:   lot.Address,
-			Lanes:     lot.Lanes,
-			Status:    lot.Status,
-			CreatedAt: lot.CreatedAt,
-			UpdatedAt: lot.UpdatedAt,
+			ID:            lot.ID,
+			Name:          lot.Name,
+			Address:       lot.Address,
+			Lanes:         lot.Lanes,
+			TotalCapacity: lot.TotalCapacity,
+			Status:        lot.Status,
+			CreatedAt:     lot.CreatedAt,
+			UpdatedAt:     lot.UpdatedAt,
 		})
 	}
 

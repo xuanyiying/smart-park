@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// BillingRule is the client for interacting with the BillingRule builders.
 	BillingRule *BillingRuleClient
+	// BlacklistEntry is the client for interacting with the BlacklistEntry builders.
+	BlacklistEntry *BlacklistEntryClient
 	// Device is the client for interacting with the Device builders.
 	Device *DeviceClient
 	// DeviceFault is the client for interacting with the DeviceFault builders.
@@ -168,6 +170,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.BillingRule = NewBillingRuleClient(tx.config)
+	tx.BlacklistEntry = NewBlacklistEntryClient(tx.config)
 	tx.Device = NewDeviceClient(tx.config)
 	tx.DeviceFault = NewDeviceFaultClient(tx.config)
 	tx.DeviceLog = NewDeviceLogClient(tx.config)

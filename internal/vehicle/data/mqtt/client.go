@@ -2,6 +2,7 @@ package mqtt
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"sync"
@@ -10,6 +11,11 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/uuid"
 )
+
+// tokenWaitTimeout bounds how long any broker round-trip (connect, publish,
+// subscribe) may block. Without it a hung broker pins the calling request thread
+// forever.
+const tokenWaitTimeout = 10 * time.Second
 
 type CommandType string
 
@@ -53,6 +59,10 @@ type Config struct {
 	Username string
 	Password string
 	Topics   []string
+	// TLS enables TLS transport (or is implied by a "tls://" broker scheme).
+	TLS bool
+	// TLSSkipVerify disables certificate verification (development only).
+	TLSSkipVerify bool
 }
 
 type MQTTClient struct {
@@ -61,8 +71,11 @@ type MQTTClient struct {
 	connected bool
 	mu        sync.RWMutex
 
-	commandHandlers map[string]func(*Command)
-	results         chan *CommandResult
+	// subscriptions stores the wrapped handlers so they can be replayed after a
+	// reconnect: with a persistent session paho restores broker-side subscriptions,
+	// but resubscribing explicitly keeps delivery correct across all failure modes.
+	subscriptions map[string]func(*Command)
+	results       chan *CommandResult
 }
 
 func NewMQTTClient(cfg *Config) *MQTTClient {
@@ -71,7 +84,11 @@ func NewMQTTClient(cfg *Config) *MQTTClient {
 		clientID = fmt.Sprintf("smart-park-vehicle-%s", uuid.New().String()[:8])
 	}
 
-	broker := fmt.Sprintf("tcp://%s:%d", cfg.Broker, cfg.Port)
+	scheme := "tcp"
+	if cfg.TLS {
+		scheme = "ssl"
+	}
+	broker := fmt.Sprintf("%s://%s:%d", scheme, cfg.Broker, cfg.Port)
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(broker)
@@ -79,15 +96,53 @@ func NewMQTTClient(cfg *Config) *MQTTClient {
 	opts.SetUsername(cfg.Username)
 	opts.SetPassword(cfg.Password)
 	opts.SetAutoReconnect(true)
-	opts.SetCleanSession(true)
+	// 持久会话（CleanSession=false）：设备离线期间 QoS1 指令由 broker 暂存，
+	// 恢复连接后投递，而不是静默丢弃。生产部署应固定 ClientID 以复用会话。
+	opts.SetCleanSession(false)
+	opts.SetConnectTimeout(tokenWaitTimeout)
 
-	client := mqtt.NewClient(opts)
+	// 遗嘱消息：进程异常退出时 broker 会在状态主题上发布 offline，供监控告警。
+	willTopic := fmt.Sprintf("smart-park/service/%s/status", clientID)
+	opts.SetWill(willTopic, `{"status":"offline"}`, 1, true)
 
-	return &MQTTClient{
-		client:          client,
-		config:          cfg,
-		results:         make(chan *CommandResult, 100),
-		commandHandlers: make(map[string]func(*Command)),
+	if cfg.TLS {
+		opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: cfg.TLSSkipVerify}) //nolint:gosec // TLSSkipVerify is an explicit operator choice
+	}
+
+	c := &MQTTClient{
+		client:        mqtt.NewClient(opts),
+		config:        cfg,
+		results:       make(chan *CommandResult, 100),
+		subscriptions: make(map[string]func(*Command)),
+	}
+
+	// 重连后重建订阅关系，否则自动重连只是一条"假活"的连接。
+	opts.OnConnect = func(client mqtt.Client) {
+		c.mu.Lock()
+		subs := make(map[string]func(*Command), len(c.subscriptions))
+		for topic, handler := range c.subscriptions {
+			subs[topic] = handler
+		}
+		c.mu.Unlock()
+
+		for topic, handler := range subs {
+			if t := client.Subscribe(topic, 1, c.wrapHandler(handler)); t.WaitTimeout(tokenWaitTimeout) && t.Error() != nil {
+				continue
+			}
+		}
+	}
+
+	return c
+}
+
+// wrapHandler decodes the command payload once and funnels it to the business handler.
+func (c *MQTTClient) wrapHandler(handler func(*Command)) func(mqtt.Client, mqtt.Message) {
+	return func(client mqtt.Client, msg mqtt.Message) {
+		var cmd Command
+		if err := json.Unmarshal(msg.Payload(), &cmd); err != nil {
+			return
+		}
+		handler(&cmd)
 	}
 }
 
@@ -95,8 +150,11 @@ func (c *MQTTClient) Connect() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if token := c.client.Connect(); token.Wait() && token.Error() != nil {
-		return token.Error()
+	if token := c.client.Connect(); !token.WaitTimeout(tokenWaitTimeout) || token.Error() != nil {
+		if token.Error() != nil {
+			return token.Error()
+		}
+		return fmt.Errorf("connect timed out after %v", tokenWaitTimeout)
 	}
 
 	c.connected = true
@@ -110,7 +168,8 @@ func (c *MQTTClient) Disconnect() error {
 	if c.connected {
 		c.client.Disconnect(250)
 		c.connected = false
-		close(c.results)
+		// 不关闭 results channel：并发的 PublishCommand goroutine 向其写入时
+		// 会导致 panic。让 GC 回收即可。
 	}
 	return nil
 }
@@ -140,8 +199,16 @@ func (c *MQTTClient) PublishCommand(ctx context.Context, cmd *Command) error {
 
 	topic := fmt.Sprintf("smart-park/device/%s/command", cmd.DeviceID)
 
+	// 尊重调用方 context：请求已取消时不再等 broker。
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	token := c.client.Publish(topic, 1, false, payload)
-	if token.Wait() && token.Error() != nil {
+	if !token.WaitTimeout(tokenWaitTimeout) {
+		return fmt.Errorf("publish timed out after %v", tokenWaitTimeout)
+	}
+	if token.Error() != nil {
 		return fmt.Errorf("failed to publish command: %w", token.Error())
 	}
 
@@ -153,29 +220,32 @@ func (c *MQTTClient) Subscribe(topic string, handler func(*Command)) error {
 		return fmt.Errorf("client not connected")
 	}
 
-	token := c.client.Subscribe(topic, 1, func(client mqtt.Client, msg mqtt.Message) {
-		var cmd Command
-		if err := json.Unmarshal(msg.Payload(), &cmd); err != nil {
-			return
-		}
-		handler(&cmd)
-	})
-
-	if token.Wait() && token.Error() != nil {
+	token := c.client.Subscribe(topic, 1, c.wrapHandler(handler))
+	if !token.WaitTimeout(tokenWaitTimeout) {
+		return fmt.Errorf("subscribe timed out after %v", tokenWaitTimeout)
+	}
+	if token.Error() != nil {
 		return fmt.Errorf("failed to subscribe: %w", token.Error())
 	}
 
-	c.commandHandlers[topic] = handler
+	c.mu.Lock()
+	c.subscriptions[topic] = handler
+	c.mu.Unlock()
 	return nil
 }
 
 func (c *MQTTClient) Unsubscribe(topic string) error {
 	token := c.client.Unsubscribe(topic)
-	if token.Wait() && token.Error() != nil {
+	if !token.WaitTimeout(tokenWaitTimeout) {
+		return fmt.Errorf("unsubscribe timed out after %v", tokenWaitTimeout)
+	}
+	if token.Error() != nil {
 		return fmt.Errorf("failed to unsubscribe: %w", token.Error())
 	}
 
-	delete(c.commandHandlers, topic)
+	c.mu.Lock()
+	delete(c.subscriptions, topic)
+	c.mu.Unlock()
 	return nil
 }
 

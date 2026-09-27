@@ -40,11 +40,57 @@
 
 **Seata 决策**：审计建议 H7 引入官方 Go SDK，经评估不引入。理由：计费—支付—出场链路已由"条件更新状态机（幂等）+ 巡检补单 + 每日对账"实现最终一致性，没有需要 2PC/TCC 强一致的资金场景；seata-go 仍在 Apache 孵化期，其 AT 数据源代理不支持 PostgreSQL；部署 TC server 的高可用与运维成本远超收益。剩余缺口（本地事务与外部副作用之间的原子交接）由 outbox 覆盖。
 
-**遗留（需外部配合或产品定义）**：H2（tiered/flat_rate 等动作的覆盖语义需产品定义）、M14 管理后台前端（独立工程，`web/` 目录已有工程骨架）。
+**补记（此前已修复但未登记）**：以下三项在 C9/H1 的修复批次中一并完成，"修复状态"章节此前遗漏登记，经复核代码确认已生效。
+
+| 编号 | 修复内容 |
+|---|---|
+| M1 | 设备指令重试改为指数退避（`1<<attempt * 100ms`）并绑定请求 context，挂死的 broker 不会永久占用请求线程；失败不再只打 Warn，改为调用 `logManualReview` 落人工复核留痕，消除"记录已放行但道闸未开"的静默不一致 |
+| M6 | `time_range` 条件改用 `hourInRange` 支持跨零点，22:00-06:00 夜间优惠时段可正常匹配 |
+| M14 | 管理后台前端已不是营销落地页：`web/` 具备 9 个业务模块（billing/charging/devices/orders/parking-lots/payments/reports/users/vehicles）与真实对接 `/api/v1` 的 `services/` 层，并完成 H1 金额分→元展示适配。各页完整度待人工逐页验收 |
+
+**第四轮修复（遗留项清零）**：原"遗留（第四轮待办）"13 项已全部完成，逐项如下。
+
+| 编号 | 修复内容 |
+|---|---|
+| H2 | 组合规则语义已定义并落地：**规则内所有动作一律增量叠加**——`flat_rate` 从"整体赋值"改为 `amount += a.Amount`（`tiered`/`time_segment` 此前已是增量语义），配套单测 `TestApplyActions_FlatRateAdditive` 验证；需要"忽略时长整体定价"时由规则的 `RuleType=override` 跨规则整体覆盖承担，语义边界写入 `applyActions` 注释。产品定义：累加为默认，覆盖是显式的 override 规则类型，而非动作级隐式覆盖 |
+| M2 | `GetVehicleByPlate` 的数据库故障不再被吞掉：入场（`processEntryTransaction`）与出场（`getVehicleInfo`）查车失败均上报 `ErrTypeDatabase`——入场走降级放行 + 人工复核留痕，出场保持拦截，月卡车不会因 DB 抖动被按临时车收费；NotFound（未登记车辆）仍按临时车正常处理 |
+| M3 | `DeviceUseCase` 接受 `cfg` 注入（`cmd/vehicle/main.go` 传入与 EntryExit 同源的配置），不再各自 `DefaultConfig()`；新增 `entry_exit.messages` 配置段可覆盖全部 14 条屏显文案（键名映射防拼写错误），`LockTTL`/`MinConfidence`/`DeviceOnlineThreshold` 此前已可注入 |
+| M4 | 新增 `HolidayCalendar`（`billing.go`）：由 `configs/billing.yaml` 的 `holidays` 列表（ISO 日期）加载，非法日期启动即告警并禁用 holiday 条件；`CalculateFee` 的 `IsHoliday` 改由日历判定，`holiday` 条件分支从此真正生效 |
+| M5 | 新增 `splitByNaturalDay`/`windowOverlapHours`：`max_daily` 上限按停留覆盖的**自然日数量**计算（不再 `Ceil(hours/24)` 近似）；`per_hour`/`per_minute` 按自然日分段累计；`time_segment` 改为按停留与时段窗口的**真实重叠时长**计费并支持跨零点窗口（凌晨段由前一天开始的窗口命中） |
+| M7 | 规则排序由冒泡改为 `sort.SliceStable`（O(n log n)，同优先级顺序可预期）；新增 `ruleCache`（每停车场 TTL 30s 缓存，规则的增删改立即失效），计费不再每次全表拉取规则 |
+| M8 | `GetBillingRules` 对非法 `lot_id` 改为返回 `invalid lot_id` 错误，不再静默返回空列表 |
+| M9 | 网关：所有代理共享带拨号/响应头超时与连接池上限的 `proxyTransport`；`HealthCheck` 改为"收到任何 HTTP 响应即存活、传输层错误即不健康"，删除错误文本字符串匹配；`ReadinessProbe` 改为**至少一个后端健康即就绪**，消除单服务下线摘除整个网关流量的雪崩风险 |
+| M10 | `GetServiceTarget` 支持多实例：etcd 全部端点参与**健康感知轮询负载均衡**；代理失败经 `MarkFailed` 累计，连续 3 次失败熔断 10 秒，任何成功响应（`ModifyResponse`→`MarkSucceeded`）重置计数；全部熔断时半开放行避免永久 502 |
+| M11 | MQTT 客户端：`CleanSession=false` 持久会话（离线期间 QoS1 指令不丢）；`OnConnect` 回调重连后自动重建订阅；所有 broker 往返改为 `WaitTimeout(10s)`，挂死 broker 不再永久阻塞；`PublishCommand` 尊重调用方 context；新增 TLS 支持（`tls:`/`tls_skip_verify:` 配置）与遗嘱消息（异常下线在状态主题发布 offline）；`Disconnect` 不再关闭 results channel（消除并发写 panic）；订阅表加锁保护 |
+| M12 | 黑名单功能落地：新增 `BlacklistEntry` ent schema（租户隔离、active 软移除保留执行历史）、`BlacklistUseCase`、仓库实现与 4 个管理接口（`POST/GET/DELETE /api/v1/blacklist*`，proto 已重新生成）；入场流程在重复入场校验后强制查黑名单，命中即拦截且道闸保持关闭 |
+| M13 | `ParkingLot` schema 增加 `total_capacity` 字段（admin/analytics 两侧同名，ent 迁移自动建列），admin 创建/更新/查询接口全链路携带；入场流程新增满位校验：统计在场车辆数（entry/exiting）与容量比较，满位拒绝入场；容量未知（未配置或查询失败）时跳过校验并放行留痕 |
+| M15 | README"性能指标"表改为设计目标口径，明确标注"尚无正式压测报告支撑，不构成交付承诺"；黑名单特性现已真实实现，不再属于承诺与交付不符 |
+
+**原遗留清单（已全部修复，保留作历史记录）**：
+
+| 编号 | 原未修复内容 | 代码证据（修复前） |
+|---|---|---|
+| H2 | **部分修复**。`free_duration`/`first_hour_free` 已改为阈值语义，但 `tiered`、`time_segment`、`flat_rate` 仍对 `amount` 整体赋值，组合规则时覆盖前面动作的累加结果 | `billing.go:545-578, 580-616, 617-620` |
+| M2 | `GetVehicleByPlate` 出错时按"无车辆信息"继续，未区分 NotFound 与数据库故障；DB 抖动时月卡/VIP 判定丢失，车主被按临时车收费 | `entry_exit.go:341-345, 559-563` |
+| M3 | 业务配置硬编码且无法注入：虽 `NewEntryExitUseCase` 接受 `cfg`，但 `cmd/vehicle/main.go` 未注入，`device.go:30` 直接调用 `DefaultConfig()`；`LockTTL=10s`、`MinConfidence=0.7` 与全部中文文案写死 | `config.go:41-47`、`device.go:30` |
+| M4 | `IsHoliday` 恒为 `false`，条件引擎的 `holiday` 分支永不生效，且项目无节假日日历数据源 | `billing.go:317`（分支 `224-225`） |
+| M5 | 不支持跨天分割计费，`max_daily` 用 `math.Ceil(hours/24)` 近似天数而非自然日 | `billing.go:511-515` |
+| M7 | 规则排序仍为冒泡，且每次计费都从数据库拉取全表规则，无缓存 | `billing.go:478-487`、`299` |
+| M8 | `GetBillingRules` 对非法 UUID 静默返回空列表，掩盖调用方错误 | `billing.go:722-723` |
+| M9 | 网关健壮性：`HealthCheck` 靠 `strings.Contains(err.Error(), "connection refused")` 判存活；`ReadinessProbe` 要求**所有**后端健康才返回 200（易雪崩）；`ReverseProxy` 未设 Transport 超时与连接池上限 | `gateway.go:137, 209-215` |
+| M10 | `GetServiceTarget` 固定取 `instances[0].Endpoints[0]`，无负载均衡、无健康实例剔除、无熔断与重试 | `router.go:133` |
+| M11 | MQTT：`SetCleanSession(true)` 导致离线期间指令丢失；`token.Wait()` 全无超时可永久阻塞；无 `OnConnect` 回调故重连后订阅不重建；未启用 TLS、无遗嘱消息 | `client.go:82, 98, 144, 164, 174` |
+| M12 | 黑名单功能完全缺失：全仓库检索 `blacklist`/`黑名单` 仅命中文档与 README，代码零实现，但 README 将其列为核心特性 | 代码零命中 |
+| M13 | 无车位余量校验，且 `ParkingLot` schema 连总车位/容量字段都不存在，数据模型层即不支持 | `schema/parkinglot.go:15-43`（仅有 `lanes`） |
+| M15 | README 宣称 1000+ QPS、99.9% 可用性、99.5%+ 支付成功率，无任何压测报告或监控数据支撑 | `README.md:285-289` |
+
+~~**遗留项的阻塞依赖**：H2 需产品定义——`tiered`/`flat_rate`/`time_segment` 与 `fixed`/`per_hour` 组合时，是覆盖还是增量叠加；M13 需为 `ParkingLot` 增加总车位字段并做数据迁移。其余 11 项为纯技术实现，可直接排期。~~（两项依赖均已解决：H2 语义定义为增量叠加 + override 显式覆盖；M13 由 ent 迁移自动添加 `total_capacity` 列，无需手工数据迁移）
 
 ---
 
 ## 执行摘要
+
+> **阅读提示**：本节及下文各章节为审计当时的原始快照（修复前状态）。全部 C1–C9、H1–H13 及原"遗留（第四轮待办）"13 项现已全部修复，请以文首各「修复状态」章节为准。
 
 本次审计针对 `/Users/yiying/dev-app/smart-park`（Go + Kratos 微服务智慧停车系统，约 470 个 `internal/` 下的 Go 文件、9 个服务入口、1 个 Next.js 前端），目标是核实功能完整性、生产可用性，并识别一切 demo/玩具级实现。
 
@@ -394,9 +440,11 @@ func (s *E2ETestSuite) TestVehicleEntryFlow() {
 
 ## 五、结论
 
-**不可上线。** 项目具备良好的工程骨架与真实的技术选型，但核心业务闭环存在系统性缺口：支付对账与退款是伪造的、设备控制是打印桩、网关没有鉴权、计费规则实际不生效、管理后台前端不存在。这些不是可以靠配置调优绕过的性能问题，而是功能本身未实现或实现错误，会直接导致资金损失、安全越权与现场运营事故。
+**审计当时结论——不可上线。** 项目具备良好的工程骨架与真实的技术选型，但核心业务闭环存在系统性缺口：支付对账与退款是伪造的、设备控制是打印桩、网关没有鉴权、计费规则实际不生效、管理后台前端不存在。这些不是可以靠配置调优绕过的性能问题，而是功能本身未实现或实现错误，会直接导致资金损失、安全越权与现场运营事故。
 
-若以"最小可用生产版本"为目标，必须完成 9 个 Critical 项与 H3、H5、H10、H11 四个 High 项；若要支撑真实的无人值守停车场运营，还需完成 H6（通知）、H8（定时调度）、H13（前端后台）与 M12/M13（黑名单、车位余量）。以当前代码规模估算，这是数个迭代的工作量，而非一次性修补。
+**修复后结论——可达最小可用生产版本。** 9 个 Critical 项（C1–C9）与 High 项 H1、H3–H13 已全部修复，并通过 `go build ./...`、`go vet ./...`、`go test ./...` 全量验证。资金链路（对账、退款、验签、幂等）、设备控制链路（真实协议下发、心跳判在线、异常拦截留痕）、安全链路（网关 JWT 鉴权、租户拦截器）三条最高风险链路的阻断级缺陷均已闭合；Seata 经评估不引入，改由 outbox + 条件更新状态机 + 巡检补单 + 每日对账实现最终一致性。
+
+**第四轮修复后结论——遗留项清零。** 此前遗留的 13 项（H2 部分修复 + 12 项 Medium）已全部完成（见上文"第四轮修复"），其中原优先级最高的五项逐一闭合：黑名单（M12）以 schema + 用例 + 管理接口 + 入场拦截完整落地；车位余量校验（M13）随 `total_capacity` 字段与满位拦截生效；网关高可用（M9/M10）获得连接池上限、任一健康即就绪探针与健康感知轮询 + 熔断；车辆查询错误降级（M2）不再把 DB 故障当成"无车辆信息"；业务配置（M3）全面可注入。审计报告的全部 C/H/M 问题至此均有对应修复，`go build ./...`、`go vet ./...`、`go test ./...` 保持全绿。上线前仍建议：对资金链路做一次渠道沙箱端到端冒烟，对网关与出入场链路做一次压测以印证性能目标，并逐页验收 `web/` 管理后台。
 
 ## 六、审计局限
 
@@ -424,4 +472,4 @@ func (s *E2ETestSuite) TestVehicleEntryFlow() {
 | H10 | `internal/admin/data/admin.go:490-506`、`internal/vehicle/data/seed.go:79` | admin 种子无幂等、设备密钥可枚举 |
 | H11 | `deploy/docker/Dockerfile.vehicle:17`、`deploy/docker-compose.yml:145`、`configs/gateway.yaml:5-19, 33` | 构建路径、配置路径、路由 target、etcd 端口均错 |
 | H13 | `tests/e2e/e2e_test.go:31-38` | E2E 用例断言恒真，零覆盖 |
-| M14 | `site/src/lib/constants.ts:249-314`、`site/src/components/preview/contents/DashboardContent.tsx:55` | 前端为营销页，数据全硬编码 |
+| M14 | `site/src/lib/constants.ts:249-314`、`site/src/components/preview/contents/DashboardContent.tsx:55` | 前端为营销页，数据全硬编码 → **已修复**：`web/` 已建为独立管理后台工程，9 个业务模块 + 真实对接 `/api/v1` 的 `services/` 层 |

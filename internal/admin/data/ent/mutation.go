@@ -1507,21 +1507,23 @@ func (m *OrderMutation) ResetEdge(name string) error {
 // ParkingLotMutation represents an operation that mutates the ParkingLot nodes in the graph.
 type ParkingLotMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	tenant_id     *uuid.UUID
-	name          *string
-	address       *string
-	lanes         *int
-	addlanes      *int
-	status        *string
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*ParkingLot, error)
-	predicates    []predicate.ParkingLot
+	op                Op
+	typ               string
+	id                *uuid.UUID
+	tenant_id         *uuid.UUID
+	name              *string
+	address           *string
+	lanes             *int
+	addlanes          *int
+	total_capacity    *int
+	addtotal_capacity *int
+	status            *string
+	created_at        *time.Time
+	updated_at        *time.Time
+	clearedFields     map[string]struct{}
+	done              bool
+	oldValue          func(context.Context) (*ParkingLot, error)
+	predicates        []predicate.ParkingLot
 }
 
 var _ ent.Mutation = (*ParkingLotMutation)(nil)
@@ -1805,6 +1807,62 @@ func (m *ParkingLotMutation) ResetLanes() {
 	m.addlanes = nil
 }
 
+// SetTotalCapacity sets the "total_capacity" field.
+func (m *ParkingLotMutation) SetTotalCapacity(i int) {
+	m.total_capacity = &i
+	m.addtotal_capacity = nil
+}
+
+// TotalCapacity returns the value of the "total_capacity" field in the mutation.
+func (m *ParkingLotMutation) TotalCapacity() (r int, exists bool) {
+	v := m.total_capacity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalCapacity returns the old "total_capacity" field's value of the ParkingLot entity.
+// If the ParkingLot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ParkingLotMutation) OldTotalCapacity(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalCapacity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalCapacity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalCapacity: %w", err)
+	}
+	return oldValue.TotalCapacity, nil
+}
+
+// AddTotalCapacity adds i to the "total_capacity" field.
+func (m *ParkingLotMutation) AddTotalCapacity(i int) {
+	if m.addtotal_capacity != nil {
+		*m.addtotal_capacity += i
+	} else {
+		m.addtotal_capacity = &i
+	}
+}
+
+// AddedTotalCapacity returns the value that was added to the "total_capacity" field in this mutation.
+func (m *ParkingLotMutation) AddedTotalCapacity() (r int, exists bool) {
+	v := m.addtotal_capacity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalCapacity resets all changes to the "total_capacity" field.
+func (m *ParkingLotMutation) ResetTotalCapacity() {
+	m.total_capacity = nil
+	m.addtotal_capacity = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *ParkingLotMutation) SetStatus(s string) {
 	m.status = &s
@@ -1947,7 +2005,7 @@ func (m *ParkingLotMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ParkingLotMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.tenant_id != nil {
 		fields = append(fields, parkinglot.FieldTenantID)
 	}
@@ -1959,6 +2017,9 @@ func (m *ParkingLotMutation) Fields() []string {
 	}
 	if m.lanes != nil {
 		fields = append(fields, parkinglot.FieldLanes)
+	}
+	if m.total_capacity != nil {
+		fields = append(fields, parkinglot.FieldTotalCapacity)
 	}
 	if m.status != nil {
 		fields = append(fields, parkinglot.FieldStatus)
@@ -1985,6 +2046,8 @@ func (m *ParkingLotMutation) Field(name string) (ent.Value, bool) {
 		return m.Address()
 	case parkinglot.FieldLanes:
 		return m.Lanes()
+	case parkinglot.FieldTotalCapacity:
+		return m.TotalCapacity()
 	case parkinglot.FieldStatus:
 		return m.Status()
 	case parkinglot.FieldCreatedAt:
@@ -2008,6 +2071,8 @@ func (m *ParkingLotMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldAddress(ctx)
 	case parkinglot.FieldLanes:
 		return m.OldLanes(ctx)
+	case parkinglot.FieldTotalCapacity:
+		return m.OldTotalCapacity(ctx)
 	case parkinglot.FieldStatus:
 		return m.OldStatus(ctx)
 	case parkinglot.FieldCreatedAt:
@@ -2051,6 +2116,13 @@ func (m *ParkingLotMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLanes(v)
 		return nil
+	case parkinglot.FieldTotalCapacity:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalCapacity(v)
+		return nil
 	case parkinglot.FieldStatus:
 		v, ok := value.(string)
 		if !ok {
@@ -2083,6 +2155,9 @@ func (m *ParkingLotMutation) AddedFields() []string {
 	if m.addlanes != nil {
 		fields = append(fields, parkinglot.FieldLanes)
 	}
+	if m.addtotal_capacity != nil {
+		fields = append(fields, parkinglot.FieldTotalCapacity)
+	}
 	return fields
 }
 
@@ -2093,6 +2168,8 @@ func (m *ParkingLotMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case parkinglot.FieldLanes:
 		return m.AddedLanes()
+	case parkinglot.FieldTotalCapacity:
+		return m.AddedTotalCapacity()
 	}
 	return nil, false
 }
@@ -2108,6 +2185,13 @@ func (m *ParkingLotMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddLanes(v)
+		return nil
+	case parkinglot.FieldTotalCapacity:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalCapacity(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ParkingLot numeric field %s", name)
@@ -2156,6 +2240,9 @@ func (m *ParkingLotMutation) ResetField(name string) error {
 		return nil
 	case parkinglot.FieldLanes:
 		m.ResetLanes()
+		return nil
+	case parkinglot.FieldTotalCapacity:
+		m.ResetTotalCapacity()
 		return nil
 	case parkinglot.FieldStatus:
 		m.ResetStatus()

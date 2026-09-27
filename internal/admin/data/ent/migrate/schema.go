@@ -69,6 +69,7 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 100},
 		{Name: "address", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "lanes", Type: field.TypeInt, Default: 1},
+		{Name: "total_capacity", Type: field.TypeInt, Default: 0},
 		{Name: "status", Type: field.TypeString, Default: "active"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},

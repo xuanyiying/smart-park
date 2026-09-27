@@ -15,13 +15,14 @@ import (
 
 // ParkingLot represents a parking lot entity.
 type ParkingLot struct {
-	ID        uuid.UUID
-	Name      string
-	Address   string
-	Lanes     int
-	Status    string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID            uuid.UUID
+	Name          string
+	Address       string
+	Lanes         int
+	TotalCapacity int
+	Status        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 // Vehicle represents a vehicle entity.
@@ -139,11 +140,12 @@ func NewAdminUseCase(repo AdminRepo, logger log.Logger) *AdminUseCase {
 // CreateParkingLot creates a new parking lot.
 func (uc *AdminUseCase) CreateParkingLot(ctx context.Context, req *v1.CreateParkingLotRequest) (*v1.ParkingLot, error) {
 	lot := &ParkingLot{
-		ID:      uuid.New(),
-		Name:    req.Name,
-		Address: req.Address,
-		Lanes:   int(req.Lanes),
-		Status:  "active",
+		ID:            uuid.New(),
+		Name:          req.Name,
+		Address:       req.Address,
+		Lanes:         int(req.Lanes),
+		TotalCapacity: int(req.TotalCapacity),
+		Status:        "active",
 	}
 
 	if err := uc.repo.CreateParkingLot(ctx, lot); err != nil {
@@ -152,13 +154,14 @@ func (uc *AdminUseCase) CreateParkingLot(ctx context.Context, req *v1.CreatePark
 	}
 
 	return &v1.ParkingLot{
-		Id:        lot.ID.String(),
-		Name:      lot.Name,
-		Address:   lot.Address,
-		Lanes:     int32(lot.Lanes),
-		Status:    lot.Status,
-		CreatedAt: lot.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: lot.UpdatedAt.Format(time.RFC3339),
+		Id:            lot.ID.String(),
+		Name:          lot.Name,
+		Address:       lot.Address,
+		Lanes:         int32(lot.Lanes),
+		Status:        lot.Status,
+		CreatedAt:     lot.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:     lot.UpdatedAt.Format(time.RFC3339),
+		TotalCapacity: int32(lot.TotalCapacity),
 	}, nil
 }
 
@@ -175,13 +178,14 @@ func (uc *AdminUseCase) GetParkingLot(ctx context.Context, id string) (*v1.Parki
 	}
 
 	return &v1.ParkingLot{
-		Id:        lot.ID.String(),
-		Name:      lot.Name,
-		Address:   lot.Address,
-		Lanes:     int32(lot.Lanes),
-		Status:    lot.Status,
-		CreatedAt: lot.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: lot.UpdatedAt.Format(time.RFC3339),
+		Id:            lot.ID.String(),
+		Name:          lot.Name,
+		Address:       lot.Address,
+		Lanes:         int32(lot.Lanes),
+		Status:        lot.Status,
+		CreatedAt:     lot.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:     lot.UpdatedAt.Format(time.RFC3339),
+		TotalCapacity: int32(lot.TotalCapacity),
 	}, nil
 }
 
@@ -193,11 +197,12 @@ func (uc *AdminUseCase) UpdateParkingLot(ctx context.Context, req *v1.UpdatePark
 	}
 
 	lot := &ParkingLot{
-		ID:      lotID,
-		Name:    req.Name,
-		Address: req.Address,
-		Lanes:   int(req.Lanes),
-		Status:  req.Status,
+		ID:            lotID,
+		Name:          req.Name,
+		Address:       req.Address,
+		Lanes:         int(req.Lanes),
+		TotalCapacity: int(req.TotalCapacity),
+		Status:        req.Status,
 	}
 
 	return uc.repo.UpdateParkingLot(ctx, lot)
@@ -213,13 +218,14 @@ func (uc *AdminUseCase) ListParkingLots(ctx context.Context, req *v1.ListParking
 	var items []*v1.ParkingLot
 	for _, lot := range lots {
 		items = append(items, &v1.ParkingLot{
-			Id:        lot.ID.String(),
-			Name:      lot.Name,
-			Address:   lot.Address,
-			Lanes:     int32(lot.Lanes),
-			Status:    lot.Status,
-			CreatedAt: lot.CreatedAt.Format(time.RFC3339),
-			UpdatedAt: lot.UpdatedAt.Format(time.RFC3339),
+			Id:            lot.ID.String(),
+			Name:          lot.Name,
+			Address:       lot.Address,
+			Lanes:         int32(lot.Lanes),
+			Status:        lot.Status,
+			CreatedAt:     lot.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:     lot.UpdatedAt.Format(time.RFC3339),
+			TotalCapacity: int32(lot.TotalCapacity),
 		})
 	}
 

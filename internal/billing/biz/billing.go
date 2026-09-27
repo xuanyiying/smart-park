@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"sort"
+	"sync"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -277,16 +279,123 @@ type BillingRuleRepo interface {
 
 // BillingUseCase implements billing business logic.
 type BillingUseCase struct {
-	repo BillingRuleRepo
-	log  *log.Helper
+	repo     BillingRuleRepo
+	log      *log.Helper
+	holidays *HolidayCalendar
+	cache    *ruleCache
+}
+
+// HolidayCalendar holds the configured statutory holiday dates ("2006-01-02").
+//
+// The condition engine has always supported a "holiday" condition, but with no
+// holiday data source it could never fire. Operators now maintain the calendar
+// through billing configuration; an absent or empty calendar simply means no
+// day is a holiday.
+type HolidayCalendar struct {
+	dates map[string]struct{}
+}
+
+// NewHolidayCalendar builds a calendar from ISO dates ("2006-01-02").
+func NewHolidayCalendar(dates []string) (*HolidayCalendar, error) {
+	cal := &HolidayCalendar{dates: make(map[string]struct{}, len(dates))}
+	for _, d := range dates {
+		t, err := time.Parse("2006-01-02", d)
+		if err != nil {
+			return nil, fmt.Errorf("invalid holiday date %q: %w", d, err)
+		}
+		cal.dates[t.Format("2006-01-02")] = struct{}{}
+	}
+	return cal, nil
+}
+
+// IsHoliday reports whether t falls on a configured holiday. A nil calendar
+// never reports a holiday.
+func (c *HolidayCalendar) IsHoliday(t time.Time) bool {
+	if c == nil {
+		return false
+	}
+	_, ok := c.dates[t.Format("2006-01-02")]
+	return ok
+}
+
+// defaultRuleCacheTTL bounds how long a lot's rules may be served from cache.
+// Rule mutations invalidate the cache immediately, so the TTL only controls how
+// stale rules can get when someone edits the database out-of-band.
+const defaultRuleCacheTTL = 30 * time.Second
+
+// ruleCache caches a parking lot's rules for a short TTL so per-vehicle fee
+// calculations stop reading the whole rules table on every call.
+type ruleCache struct {
+	mu      sync.RWMutex
+	ttl     time.Duration
+	entries map[uuid.UUID]ruleCacheEntry
+}
+
+type ruleCacheEntry struct {
+	rules     []*BillingRule
+	fetchedAt time.Time
+}
+
+func (c *ruleCache) get(lotID uuid.UUID) ([]*BillingRule, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	e, ok := c.entries[lotID]
+	if !ok || time.Since(e.fetchedAt) >= c.ttl {
+		return nil, false
+	}
+	return e.rules, true
+}
+
+func (c *ruleCache) put(lotID uuid.UUID, rules []*BillingRule) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.entries[lotID] = ruleCacheEntry{rules: rules, fetchedAt: time.Now()}
+}
+
+func (c *ruleCache) invalidate(lotID uuid.UUID) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	delete(c.entries, lotID)
+}
+
+func (c *ruleCache) invalidateAll() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.entries = make(map[uuid.UUID]ruleCacheEntry)
 }
 
 // NewBillingUseCase creates a new BillingUseCase.
-func NewBillingUseCase(repo BillingRuleRepo, logger log.Logger) *BillingUseCase {
-	return &BillingUseCase{
-		repo: repo,
-		log:  log.NewHelper(logger),
+//
+// holidays carries the configured statutory holiday dates ("2006-01-02"); a nil
+// or empty slice means the "holiday" condition never matches.
+func NewBillingUseCase(repo BillingRuleRepo, logger log.Logger, holidays []string) *BillingUseCase {
+	cal, err := NewHolidayCalendar(holidays)
+	if err != nil {
+		log.NewHelper(logger).Warnf("invalid holiday calendar, holiday conditions disabled: %v", err)
+		cal = &HolidayCalendar{dates: map[string]struct{}{}}
 	}
+	return &BillingUseCase{
+		repo:     repo,
+		log:      log.NewHelper(logger),
+		holidays: cal,
+		cache:    &ruleCache{ttl: defaultRuleCacheTTL, entries: make(map[uuid.UUID]ruleCacheEntry)},
+	}
+}
+
+// getRules returns a parking lot's rules, serving them from the short-TTL cache
+// when possible so the rules table is not read on every fee calculation.
+func (uc *BillingUseCase) getRules(ctx context.Context, lotID uuid.UUID) ([]*BillingRule, error) {
+	if rules, ok := uc.cache.get(lotID); ok {
+		return rules, nil
+	}
+
+	rules, err := uc.repo.GetRulesByLotID(ctx, lotID)
+	if err != nil {
+		return nil, err
+	}
+
+	uc.cache.put(lotID, rules)
+	return rules, nil
 }
 
 // CalculateFee calculates the parking fee.
@@ -296,14 +405,17 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 		return nil, err
 	}
 
-	rules, err := uc.repo.GetRulesByLotID(ctx, lotID)
+	rules, err := uc.getRules(ctx, lotID)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("failed to get billing rules: %v", err)
 		return nil, err
 	}
 
-	// 按优先级排序规则
-	sortRulesByPriority(rules)
+	// 按优先级排序规则（缓存返回的是共享切片，先拷贝再排序）
+	sorted := make([]*BillingRule, len(rules))
+	copy(sorted, rules)
+	sortRulesByPriority(sorted)
+	rules = sorted
 
 	entryTime := time.Unix(req.EntryTime, 0)
 	exitTime := time.Unix(req.ExitTime, 0)
@@ -314,7 +426,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 		Duration:    duration,
 		EntryTime:   entryTime,
 		ExitTime:    exitTime,
-		IsHoliday:   false,
+		IsHoliday:   uc.holidays.IsHoliday(exitTime),
 	}
 
 	var baseAmount float64
@@ -343,7 +455,7 @@ func (uc *BillingUseCase) CalculateFee(ctx context.Context, req *v1.CalculateFee
 			continue
 		}
 
-		ruleAmount := applyActions(actions, duration, exitTime)
+		ruleAmount := applyActions(actions, entryTime, exitTime)
 		if ruleAmount != 0 && !appliedRuleSet[rule.ID.String()] {
 			appliedRules = append(appliedRules, &v1.AppliedRule{
 				RuleId:   rule.ID.String(),
@@ -424,7 +536,7 @@ func (uc *BillingUseCase) TestBillingRule(ctx context.Context, req *v1.TestBilli
 		}
 
 		// 应用动作
-		ruleAmount = applyActions(actions, duration, exitTime)
+		ruleAmount = applyActions(actions, entryTime, exitTime)
 
 		// 记录应用的动作
 		for _, action := range actions {
@@ -476,30 +588,114 @@ func hourInRange(hour, start, end float64) bool {
 
 // sortRulesByPriority sorts rules by priority in descending order.
 func sortRulesByPriority(rules []*BillingRule) {
-	// 冒泡排序，按优先级降序排列
-	for i := 0; i < len(rules)-1; i++ {
-		for j := 0; j < len(rules)-i-1; j++ {
-			if rules[j].Priority < rules[j+1].Priority {
-				rules[j], rules[j+1] = rules[j+1], rules[j]
+	// 规则数量有限但每次计费都会执行，冒泡排序的 O(n²) 在规则增长后会
+	// 成为热点；稳定排序同时保证同优先级规则的声明顺序可预期。
+	sort.SliceStable(rules, func(i, j int) bool {
+		return rules[i].Priority > rules[j].Priority
+	})
+}
+
+// daySegment is one calendar-day slice of a stay, used for cross-day billing.
+type daySegment struct {
+	start, end time.Time
+}
+
+// splitByNaturalDay slices [entry, exit] into per-calendar-day segments so that
+// day-scoped fees (max_daily caps, time-segment windows) are computed against
+// natural days instead of the Ceil(hours/24) approximation. A stay crossing
+// midnight therefore contributes to two separate days.
+func splitByNaturalDay(entry, exit time.Time) []daySegment {
+	if !exit.After(entry) {
+		return nil
+	}
+
+	entryDayStart := time.Date(entry.Year(), entry.Month(), entry.Day(), 0, 0, 0, 0, entry.Location())
+	nextDayStart := entryDayStart.AddDate(0, 0, 1)
+
+	if !exit.After(nextDayStart) {
+		return []daySegment{{start: entry, end: exit}}
+	}
+
+	segs := []daySegment{{start: entry, end: nextDayStart}}
+	for cur := nextDayStart; cur.Before(exit); {
+		next := cur.AddDate(0, 0, 1)
+		end := next
+		if exit.Before(end) {
+			end = exit
+		}
+		segs = append(segs, daySegment{start: cur, end: end})
+		cur = next
+	}
+	return segs
+}
+
+// windowOverlapHours sums how many hours of the stay fall inside the
+// [startHour, endHour] window on each calendar day the stay touches. Windows
+// that wrap midnight (start > end) span from the start hour on one day to the
+// end hour on the following day, so a 22:00-06:00 night window matches both the
+// late-night and early-morning parts of a stay.
+func windowOverlapHours(entry, exit time.Time, startHour, endHour float64) float64 {
+	secs := func(h float64) time.Duration { return time.Duration(h * float64(time.Hour)) }
+
+	var total float64
+	for _, seg := range splitByNaturalDay(entry, exit) {
+		day := time.Date(seg.start.Year(), seg.start.Month(), seg.start.Day(), 0, 0, 0, 0, seg.start.Location())
+
+		// 跨零点窗口的凌晨段从"前一天"的窗口开始时间延续而来，因此除当天
+		// 窗口外还需检查前一天开始的窗口；非跨零点窗口与前一天不会重叠，
+		// 多算一次检查不会产生重复计费。
+		for _, d := range []time.Time{day, day.AddDate(0, 0, -1)} {
+			var ws, we time.Time
+			if startHour <= endHour {
+				ws, we = d.Add(secs(startHour)), d.Add(secs(endHour))
+			} else {
+				ws, we = d.Add(secs(startHour)), d.AddDate(0, 0, 1).Add(secs(endHour))
+			}
+
+			os := ws
+			if seg.start.After(os) {
+				os = seg.start
+			}
+			oe := we
+			if seg.end.Before(oe) {
+				oe = seg.end
+			}
+			if oe.After(os) {
+				total += oe.Sub(os).Hours()
 			}
 		}
 	}
+	return total
 }
 
 // applyActions applies billing actions and returns the calculated amount.
-func applyActions(actions []*Action, duration time.Duration, exitTime time.Time) float64 {
+//
+// Combination semantics (defined product decision, see audit item H2): within a
+// single rule every action is incremental — base-fee actions (fixed, per_hour,
+// per_minute, tiered, time_segment, flat_rate) accumulate onto the running
+// amount and threshold/discount actions modify it. Rules that must replace the
+// whole accumulated fee declare RuleType "override" instead, which CalculateFee
+// applies across rules.
+func applyActions(actions []*Action, entryTime, exitTime time.Time) float64 {
 	var amount float64
+	duration := exitTime.Sub(entryTime)
 	hours := duration.Hours()
-	minutes := duration.Minutes()
+	segs := splitByNaturalDay(entryTime, exitTime)
 
 	for _, a := range actions {
 		switch a.Type {
 		case "fixed":
 			amount += a.Amount
 		case "per_hour":
-			amount += hours * a.Amount
+			// 按自然日分段累计：单日费率与总时长线性计算等价，但为跨天
+			// 分割计费保留了按日计费的语义入口。
+			for _, seg := range segs {
+				amount += seg.end.Sub(seg.start).Hours() * a.Amount
+			}
 		case "per_minute":
-			amount += minutes * a.Amount
+			for _, seg := range segs {
+				amount += seg.end.Sub(seg.start).Minutes() * a.Amount
+			}
 		case "percentage":
 			amount -= amount * (a.Percent / 100)
 		case "cap":
@@ -509,7 +705,9 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 		case "ceil":
 			amount = ceilToDecimal(amount, 2)
 		case "max_daily":
-			days := int(math.Ceil(hours / 24))
+			// 上限按自然日数量计：跨天停留每天最多 a.Amount，
+			// 而不是把不足 24h 的尾巴也折算成一整天。
+			days := len(segs)
 			if days < 1 {
 				days = 1
 			}
@@ -543,7 +741,7 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 				amount = 0
 			}
 		case "tiered":
-			// 阶梯计费
+			// 阶梯计费（增量叠加）
 			tiers, ok := a.Value.([]interface{})
 			if ok {
 				remainingHours := hours
@@ -578,10 +776,10 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 				}
 			}
 		case "time_segment":
-			// 时间段计费
+			// 时间段计费：按停留与窗口的真实重叠时长计费（支持跨零点窗口），
+			// 不再要求出场时刻恰落在窗口内、也不再对整段停留计时。
 			segments, ok := a.Value.([]interface{})
 			if ok {
-				hour := float64(exitTime.Hour()) + float64(exitTime.Minute())/60.0
 				for _, segment := range segments {
 					segmentMap, ok := segment.(map[string]interface{})
 					if !ok {
@@ -593,8 +791,9 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 					if !ok1 || !ok2 || !ok3 {
 						continue
 					}
-					if hour >= start && hour <= end {
-						amount += hours * rate
+					overlap := windowOverlapHours(entryTime, exitTime, start, end)
+					if overlap > 0 {
+						amount += overlap * rate
 						break
 					}
 				}
@@ -609,14 +808,15 @@ func applyActions(actions []*Action, duration time.Duration, exitTime time.Time)
 			// 季节性折扣
 			amount = amount * (1 - a.Percent/100)
 		case "long_term_discount":
-				// 长期停车折扣
-				longTermThreshold, _ := a.Value.(float64)
-				if hours >= longTermThreshold {
+			// 长期停车折扣
+			longTermThreshold, _ := a.Value.(float64)
+			if hours >= longTermThreshold {
 				amount = amount * (1 - a.Percent/100)
 			}
 		case "flat_rate":
-			// 固定费率（不管时长）
-			amount = a.Amount
+			// 固定费率（增量叠加语义）。如需"忽略时长整体定价"，请把规则
+			// 的 RuleType 设为 override，由 CalculateFee 跨规则整体覆盖。
+			amount += a.Amount
 		}
 	}
 
@@ -671,6 +871,7 @@ func (uc *BillingUseCase) CreateBillingRule(ctx context.Context, req *v1.CreateB
 		uc.log.WithContext(ctx).Errorf("failed to create billing rule: %v", err)
 		return nil, err
 	}
+	uc.cache.invalidate(rule.LotID)
 
 	return &v1.BillingRule{
 		Id:             rule.ID.String(),
@@ -702,7 +903,12 @@ func (uc *BillingUseCase) UpdateBillingRule(ctx context.Context, req *v1.UpdateB
 		IsActive:   req.IsActive,
 	}
 
-	return uc.repo.UpdateBillingRule(ctx, rule)
+	if err := uc.repo.UpdateBillingRule(ctx, rule); err != nil {
+		return err
+	}
+	// 更新请求不带 lot_id，整体失效缓存，代价可忽略。
+	uc.cache.invalidateAll()
+	return nil
 }
 
 // DeleteBillingRule deletes a billing rule.
@@ -712,15 +918,20 @@ func (uc *BillingUseCase) DeleteBillingRule(ctx context.Context, req *v1.DeleteB
 		return err
 	}
 
-	return uc.repo.DeleteBillingRule(ctx, ruleID)
+	if err := uc.repo.DeleteBillingRule(ctx, ruleID); err != nil {
+		return err
+	}
+	uc.cache.invalidateAll()
+	return nil
 }
 
 // GetBillingRules retrieves billing rules for a parking lot.
 func (uc *BillingUseCase) GetBillingRules(ctx context.Context, req *v1.GetBillingRulesRequest) ([]*v1.BillingRule, error) {
 	lotID, err := uuid.Parse(req.LotId)
 	if err != nil {
-		// 如果 lot_id 不是有效的 UUID，返回空列表而不是错误
-		return []*v1.BillingRule{}, nil
+		// 非法 UUID 说明调用方传参有误，静默返回空列表会掩盖真实错误，
+		// 改为显式报错（M8）。
+		return nil, fmt.Errorf("invalid lot_id %q: %w", req.LotId, err)
 	}
 
 	rules, err := uc.repo.GetRulesByLotID(ctx, lotID)

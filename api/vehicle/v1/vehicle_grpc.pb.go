@@ -59,6 +59,10 @@ const (
 	VehicleService_GetDeviceLogs_FullMethodName              = "/api.vehicle.v1.VehicleService/GetDeviceLogs"
 	VehicleService_GetDeviceStats_FullMethodName             = "/api.vehicle.v1.VehicleService/GetDeviceStats"
 	VehicleService_UpdateDeviceConfig_FullMethodName         = "/api.vehicle.v1.VehicleService/UpdateDeviceConfig"
+	VehicleService_AddBlacklistEntry_FullMethodName          = "/api.vehicle.v1.VehicleService/AddBlacklistEntry"
+	VehicleService_RemoveBlacklistEntry_FullMethodName       = "/api.vehicle.v1.VehicleService/RemoveBlacklistEntry"
+	VehicleService_ListBlacklistEntries_FullMethodName       = "/api.vehicle.v1.VehicleService/ListBlacklistEntries"
+	VehicleService_CheckBlacklist_FullMethodName             = "/api.vehicle.v1.VehicleService/CheckBlacklist"
 )
 
 // VehicleServiceClient is the client API for VehicleService service.
@@ -114,6 +118,11 @@ type VehicleServiceClient interface {
 	GetDeviceStats(ctx context.Context, in *GetDeviceStatsRequest, opts ...grpc.CallOption) (*DeviceStatsResponse, error)
 	// Device config
 	UpdateDeviceConfig(ctx context.Context, in *UpdateDeviceConfigRequest, opts ...grpc.CallOption) (*UpdateDeviceConfigResponse, error)
+	// Blacklist management
+	AddBlacklistEntry(ctx context.Context, in *AddBlacklistEntryRequest, opts ...grpc.CallOption) (*AddBlacklistEntryResponse, error)
+	RemoveBlacklistEntry(ctx context.Context, in *RemoveBlacklistEntryRequest, opts ...grpc.CallOption) (*RemoveBlacklistEntryResponse, error)
+	ListBlacklistEntries(ctx context.Context, in *ListBlacklistEntriesRequest, opts ...grpc.CallOption) (*ListBlacklistEntriesResponse, error)
+	CheckBlacklist(ctx context.Context, in *CheckBlacklistRequest, opts ...grpc.CallOption) (*CheckBlacklistResponse, error)
 }
 
 type vehicleServiceClient struct {
@@ -524,6 +533,46 @@ func (c *vehicleServiceClient) UpdateDeviceConfig(ctx context.Context, in *Updat
 	return out, nil
 }
 
+func (c *vehicleServiceClient) AddBlacklistEntry(ctx context.Context, in *AddBlacklistEntryRequest, opts ...grpc.CallOption) (*AddBlacklistEntryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddBlacklistEntryResponse)
+	err := c.cc.Invoke(ctx, VehicleService_AddBlacklistEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) RemoveBlacklistEntry(ctx context.Context, in *RemoveBlacklistEntryRequest, opts ...grpc.CallOption) (*RemoveBlacklistEntryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveBlacklistEntryResponse)
+	err := c.cc.Invoke(ctx, VehicleService_RemoveBlacklistEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) ListBlacklistEntries(ctx context.Context, in *ListBlacklistEntriesRequest, opts ...grpc.CallOption) (*ListBlacklistEntriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListBlacklistEntriesResponse)
+	err := c.cc.Invoke(ctx, VehicleService_ListBlacklistEntries_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) CheckBlacklist(ctx context.Context, in *CheckBlacklistRequest, opts ...grpc.CallOption) (*CheckBlacklistResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckBlacklistResponse)
+	err := c.cc.Invoke(ctx, VehicleService_CheckBlacklist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VehicleServiceServer is the server API for VehicleService service.
 // All implementations must embed UnimplementedVehicleServiceServer
 // for forward compatibility.
@@ -577,6 +626,11 @@ type VehicleServiceServer interface {
 	GetDeviceStats(context.Context, *GetDeviceStatsRequest) (*DeviceStatsResponse, error)
 	// Device config
 	UpdateDeviceConfig(context.Context, *UpdateDeviceConfigRequest) (*UpdateDeviceConfigResponse, error)
+	// Blacklist management
+	AddBlacklistEntry(context.Context, *AddBlacklistEntryRequest) (*AddBlacklistEntryResponse, error)
+	RemoveBlacklistEntry(context.Context, *RemoveBlacklistEntryRequest) (*RemoveBlacklistEntryResponse, error)
+	ListBlacklistEntries(context.Context, *ListBlacklistEntriesRequest) (*ListBlacklistEntriesResponse, error)
+	CheckBlacklist(context.Context, *CheckBlacklistRequest) (*CheckBlacklistResponse, error)
 	mustEmbedUnimplementedVehicleServiceServer()
 }
 
@@ -706,6 +760,18 @@ func (UnimplementedVehicleServiceServer) GetDeviceStats(context.Context, *GetDev
 }
 func (UnimplementedVehicleServiceServer) UpdateDeviceConfig(context.Context, *UpdateDeviceConfigRequest) (*UpdateDeviceConfigResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateDeviceConfig not implemented")
+}
+func (UnimplementedVehicleServiceServer) AddBlacklistEntry(context.Context, *AddBlacklistEntryRequest) (*AddBlacklistEntryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AddBlacklistEntry not implemented")
+}
+func (UnimplementedVehicleServiceServer) RemoveBlacklistEntry(context.Context, *RemoveBlacklistEntryRequest) (*RemoveBlacklistEntryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveBlacklistEntry not implemented")
+}
+func (UnimplementedVehicleServiceServer) ListBlacklistEntries(context.Context, *ListBlacklistEntriesRequest) (*ListBlacklistEntriesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBlacklistEntries not implemented")
+}
+func (UnimplementedVehicleServiceServer) CheckBlacklist(context.Context, *CheckBlacklistRequest) (*CheckBlacklistResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckBlacklist not implemented")
 }
 func (UnimplementedVehicleServiceServer) mustEmbedUnimplementedVehicleServiceServer() {}
 func (UnimplementedVehicleServiceServer) testEmbeddedByValue()                        {}
@@ -1448,6 +1514,78 @@ func _VehicleService_UpdateDeviceConfig_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VehicleService_AddBlacklistEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddBlacklistEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).AddBlacklistEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_AddBlacklistEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).AddBlacklistEntry(ctx, req.(*AddBlacklistEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_RemoveBlacklistEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveBlacklistEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).RemoveBlacklistEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_RemoveBlacklistEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).RemoveBlacklistEntry(ctx, req.(*RemoveBlacklistEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_ListBlacklistEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListBlacklistEntriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).ListBlacklistEntries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_ListBlacklistEntries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).ListBlacklistEntries(ctx, req.(*ListBlacklistEntriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_CheckBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckBlacklistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).CheckBlacklist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_CheckBlacklist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).CheckBlacklist(ctx, req.(*CheckBlacklistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VehicleService_ServiceDesc is the grpc.ServiceDesc for VehicleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1614,6 +1752,22 @@ var VehicleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateDeviceConfig",
 			Handler:    _VehicleService_UpdateDeviceConfig_Handler,
+		},
+		{
+			MethodName: "AddBlacklistEntry",
+			Handler:    _VehicleService_AddBlacklistEntry_Handler,
+		},
+		{
+			MethodName: "RemoveBlacklistEntry",
+			Handler:    _VehicleService_RemoveBlacklistEntry_Handler,
+		},
+		{
+			MethodName: "ListBlacklistEntries",
+			Handler:    _VehicleService_ListBlacklistEntries_Handler,
+		},
+		{
+			MethodName: "CheckBlacklist",
+			Handler:    _VehicleService_CheckBlacklist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

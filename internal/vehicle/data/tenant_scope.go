@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	vehicleent "github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/blacklistentry"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/billingrule"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/lane"
@@ -27,6 +28,8 @@ func TenantScopes() []tenant.ScopeFunc {
 			switch tq := q.(type) {
 			case *vehicleent.BillingRuleQuery:
 				tq.Where(billingrule.TenantID(tenantID))
+			case *vehicleent.BlacklistEntryQuery:
+				tq.Where(blacklistentry.TenantID(tenantID))
 			case *vehicleent.DeviceQuery:
 				tq.Where(device.TenantID(tenantID))
 			case *vehicleent.LaneQuery:
@@ -46,6 +49,7 @@ func TenantScopes() []tenant.ScopeFunc {
 func TenantTypes() []string {
 	return []string{
 		vehicleent.TypeBillingRule,
+		vehicleent.TypeBlacklistEntry,
 		vehicleent.TypeDevice,
 		vehicleent.TypeLane,
 		vehicleent.TypeOfflineSyncRecord,

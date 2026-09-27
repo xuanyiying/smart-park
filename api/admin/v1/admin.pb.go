@@ -27,6 +27,7 @@ type CreateParkingLotRequest struct {
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Address       string                 `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	Lanes         int32                  `protobuf:"varint,3,opt,name=lanes,proto3" json:"lanes,omitempty"`
+	TotalCapacity int32                  `protobuf:"varint,4,opt,name=totalCapacity,proto3" json:"totalCapacity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -78,6 +79,13 @@ func (x *CreateParkingLotRequest) GetAddress() string {
 func (x *CreateParkingLotRequest) GetLanes() int32 {
 	if x != nil {
 		return x.Lanes
+	}
+	return 0
+}
+
+func (x *CreateParkingLotRequest) GetTotalCapacity() int32 {
+	if x != nil {
+		return x.TotalCapacity
 	}
 	return 0
 }
@@ -253,6 +261,7 @@ type UpdateParkingLotRequest struct {
 	Address       string                 `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
 	Lanes         int32                  `protobuf:"varint,4,opt,name=lanes,proto3" json:"lanes,omitempty"`
 	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	TotalCapacity int32                  `protobuf:"varint,6,opt,name=totalCapacity,proto3" json:"totalCapacity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -320,6 +329,13 @@ func (x *UpdateParkingLotRequest) GetStatus() string {
 		return x.Status
 	}
 	return ""
+}
+
+func (x *UpdateParkingLotRequest) GetTotalCapacity() int32 {
+	if x != nil {
+		return x.TotalCapacity
+	}
+	return 0
 }
 
 type UpdateParkingLotResponse struct {
@@ -563,6 +579,7 @@ type ParkingLot struct {
 	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	TotalCapacity int32                  `protobuf:"varint,8,opt,name=totalCapacity,proto3" json:"totalCapacity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -644,6 +661,13 @@ func (x *ParkingLot) GetUpdatedAt() string {
 		return x.UpdatedAt
 	}
 	return ""
+}
+
+func (x *ParkingLot) GetTotalCapacity() int32 {
+	if x != nil {
+		return x.TotalCapacity
+	}
+	return 0
 }
 
 type ListParkingRecordsRequest struct {
@@ -3147,11 +3171,12 @@ var File_api_admin_v1_admin_proto protoreflect.FileDescriptor
 
 const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\n" +
-	"\x18api/admin/v1/admin.proto\x12\fapi.admin.v1\x1a\x1cgoogle/api/annotations.proto\"]\n" +
+	"\x18api/admin/v1/admin.proto\x12\fapi.admin.v1\x1a\x1cgoogle/api/annotations.proto\"\x83\x01\n" +
 	"\x17CreateParkingLotRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x14\n" +
-	"\x05lanes\x18\x03 \x01(\x05R\x05lanes\"v\n" +
+	"\x05lanes\x18\x03 \x01(\x05R\x05lanes\x12$\n" +
+	"\rtotalCapacity\x18\x04 \x01(\x05R\rtotalCapacity\"v\n" +
 	"\x18CreateParkingLotResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
@@ -3161,13 +3186,14 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x15GetParkingLotResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x04data\x18\x03 \x01(\v2\x18.api.admin.v1.ParkingLotR\x04data\"\x85\x01\n" +
+	"\x04data\x18\x03 \x01(\v2\x18.api.admin.v1.ParkingLotR\x04data\"\xab\x01\n" +
 	"\x17UpdateParkingLotRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x03 \x01(\tR\aaddress\x12\x14\n" +
 	"\x05lanes\x18\x04 \x01(\x05R\x05lanes\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\"H\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12$\n" +
+	"\rtotalCapacity\x18\x06 \x01(\x05R\rtotalCapacity\"H\n" +
 	"\x18UpdateParkingLotResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"H\n" +
@@ -3182,7 +3208,7 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x04list\x18\x01 \x03(\v2\x18.api.admin.v1.ParkingLotR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1a\n" +
-	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\xb4\x01\n" +
+	"\bpageSize\x18\x04 \x01(\x05R\bpageSize\"\xda\x01\n" +
 	"\n" +
 	"ParkingLot\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
@@ -3191,7 +3217,8 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x05lanes\x18\x04 \x01(\x05R\x05lanes\x12\x16\n" +
 	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1c\n" +
 	"\tcreatedAt\x18\x06 \x01(\tR\tcreatedAt\x12\x1c\n" +
-	"\tupdatedAt\x18\a \x01(\tR\tupdatedAt\"\xbb\x01\n" +
+	"\tupdatedAt\x18\a \x01(\tR\tupdatedAt\x12$\n" +
+	"\rtotalCapacity\x18\b \x01(\x05R\rtotalCapacity\"\xbb\x01\n" +
 	"\x19ListParkingRecordsRequest\x12\x14\n" +
 	"\x05lotId\x18\x01 \x01(\tR\x05lotId\x12\x1c\n" +
 	"\tstartTime\x18\x02 \x01(\tR\tstartTime\x12\x18\n" +

@@ -3,6 +3,8 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/xuanyiying/smart-park/internal/vehicle/biz"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent"
+	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/blacklistentry"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/device"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicefault"
 	"github.com/xuanyiying/smart-park/internal/vehicle/data/ent/devicelog"
@@ -22,16 +25,27 @@ import (
 	"github.com/xuanyiying/smart-park/pkg/multitenancy"
 )
 
-// NewData creates a new Data instance.
-func NewData(db *ent.Client, logger log.Logger) (*Data, func(), error) {
+// NewData creates a new Data instance. source is the same database DSN the ent client
+// uses; it is opened again as a raw *sql.DB handle for cross-domain reads (parking lot
+// capacity), which the vehicle ent schema does not model.
+func NewData(db *ent.Client, source string, logger log.Logger) (*Data, func(), error) {
+	raw, err := sql.Open("postgres", source)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	d := &Data{
 		db:  db,
+		raw: raw,
 		log: log.NewHelper(logger),
 	}
 
 	RegisterTenantHooks(db)
 
 	cleanup := func() {
+		if err := raw.Close(); err != nil {
+			d.log.Errorf("failed to close raw database handle: %v", err)
+		}
 		if err := d.db.Close(); err != nil {
 			d.log.Errorf("failed to close database: %v", err)
 		}
@@ -1544,4 +1558,133 @@ func (r *vehicleRepo) UpdateDeviceUpgradeStatus(ctx context.Context, id uuid.UUI
 
 	_, err := update.Save(ctx)
 	return err
+}
+
+// ---- Blacklist management ----
+
+// CreateBlacklistEntry persists a new blacklist record.
+func (r *vehicleRepo) CreateBlacklistEntry(ctx context.Context, entry *biz.BlacklistEntry) error {
+	create := r.clientFromCtx(ctx).BlacklistEntry.Create().
+		SetID(entry.ID).
+		SetPlateNumber(entry.PlateNumber).
+		SetReason(entry.Reason).
+		SetCreatedBy(entry.CreatedBy).
+		SetActive(entry.Active)
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		create.SetTenantID(*tenantID)
+	}
+
+	_, err := create.Save(ctx)
+	return err
+}
+
+// GetBlacklistEntry retrieves the blacklist record for a plate, or nil when absent.
+func (r *vehicleRepo) GetBlacklistEntry(ctx context.Context, plateNumber string) (*biz.BlacklistEntry, error) {
+	query := r.clientFromCtx(ctx).BlacklistEntry.Query().
+		Where(blacklistentry.PlateNumber(plateNumber))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(blacklistentry.TenantID(*tenantID))
+	}
+
+	e, err := query.First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return toBizBlacklistEntry(e), nil
+}
+
+// SetBlacklistEntryActive activates or deactivates the record for a plate.
+func (r *vehicleRepo) SetBlacklistEntryActive(ctx context.Context, plateNumber string, active bool) error {
+	update := r.clientFromCtx(ctx).BlacklistEntry.Update().
+		Where(blacklistentry.PlateNumber(plateNumber))
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		update = update.Where(blacklistentry.TenantID(*tenantID))
+	}
+
+	_, err := update.SetActive(active).Save(ctx)
+	return err
+}
+
+// ListBlacklistEntries lists blacklist records with pagination.
+func (r *vehicleRepo) ListBlacklistEntries(ctx context.Context, page, pageSize int) ([]*biz.BlacklistEntry, int, error) {
+	query := r.clientFromCtx(ctx).BlacklistEntry.Query()
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(blacklistentry.TenantID(*tenantID))
+	}
+
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * pageSize
+	entries, err := query.
+		Order(ent.Desc(blacklistentry.FieldCreatedAt)).
+		Offset(offset).
+		Limit(pageSize).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	result := make([]*biz.BlacklistEntry, len(entries))
+	for i, e := range entries {
+		result[i] = toBizBlacklistEntry(e)
+	}
+	return result, total, nil
+}
+
+func toBizBlacklistEntry(e *ent.BlacklistEntry) *biz.BlacklistEntry {
+	return &biz.BlacklistEntry{
+		ID:          e.ID,
+		PlateNumber: e.PlateNumber,
+		Reason:      e.Reason,
+		CreatedBy:   e.CreatedBy,
+		Active:      e.Active,
+		CreatedAt:   e.CreatedAt,
+		UpdatedAt:   e.UpdatedAt,
+	}
+}
+
+// ---- Parking lot capacity ----
+
+// GetLotCapacity reads the total_capacity of a parking lot. The parking_lots table is
+// owned by the admin/analytics services and is therefore not part of the vehicle ent
+// schema; it is read through the raw handle. An unregistered lot or a missing column
+// yields (0, nil)/(err), both of which the business layer treats as "capacity unknown,
+// skip the full-lot check".
+func (r *vehicleRepo) GetLotCapacity(ctx context.Context, lotID uuid.UUID) (int, error) {
+	var capacity int
+	err := r.data.raw.QueryRowContext(ctx,
+		`SELECT total_capacity FROM parking_lots WHERE id = $1`, lotID).Scan(&capacity)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return capacity, nil
+}
+
+// CountActiveRecordsByLot counts vehicles currently inside the lot (entered or exiting).
+func (r *vehicleRepo) CountActiveRecordsByLot(ctx context.Context, lotID uuid.UUID) (int, error) {
+	query := r.clientFromCtx(ctx).ParkingRecord.Query().
+		Where(
+			parkingrecord.LotID(lotID),
+			parkingrecord.RecordStatusIn(parkingrecord.RecordStatusEntry, parkingrecord.RecordStatusExiting),
+		)
+
+	if tenantID := r.getTenantID(ctx); tenantID != nil {
+		query = query.Where(parkingrecord.TenantID(*tenantID))
+	}
+
+	return query.Count(ctx)
 }

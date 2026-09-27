@@ -23,11 +23,18 @@ type DeviceUseCase struct {
 }
 
 // NewDeviceUseCase creates a new DeviceUseCase.
-func NewDeviceUseCase(vehicleRepo VehicleRepo, adapterFactory *device.AdapterFactory, mqttClient mqtt.Client, logger log.Logger) *DeviceUseCase {
+//
+// cfg carries the tunables (device online threshold, etc.); passing nil falls back
+// to the built-in defaults. Injecting it lets operations adjust behaviour without
+// a rebuild instead of relying on a hard-coded DefaultConfig().
+func NewDeviceUseCase(vehicleRepo VehicleRepo, adapterFactory *device.AdapterFactory, mqttClient mqtt.Client, cfg *Config, logger log.Logger) *DeviceUseCase {
+	if cfg == nil {
+		cfg = DefaultConfig()
+	}
 	return &DeviceUseCase{
 		vehicleRepo:    vehicleRepo,
 		adapterFactory: adapterFactory,
-		config:         DefaultConfig(),
+		config:         cfg,
 		log:            log.NewHelper(logger),
 		mqttClient:     mqttClient,
 	}

@@ -35,6 +35,10 @@ type MessagesConfig struct {
 	// BillingUnavailable is shown when the exit fee cannot be computed. The gate stays
 	// closed and the driver is routed to staff instead of being released for free.
 	BillingUnavailable string
+	// LotFull is shown when the parking lot has no remaining spaces.
+	LotFull string
+	// Blacklisted is shown when a plate matches an active blacklist entry.
+	Blacklisted string
 }
 
 // DefaultConfig returns the default configuration.
@@ -56,6 +60,8 @@ func DefaultConfig() *Config {
 			SystemError:        "系统错误，请联系管理员",
 			FallbackMode:       "系统维护中，人工处理",
 			BillingUnavailable: "计费服务暂不可用，请联系工作人员",
+			LotFull:            "车位已满，禁止入场",
+			Blacklisted:        "车辆已被限制入场，请联系管理员",
 		},
 	}
 }

@@ -26,6 +26,9 @@ log:
   level: info
   format: json
 
+# 节假日日历（ISO 日期），命中时计费引擎的 holiday 条件生效
+holidays: []
+
 telemetry:
   enabled: true
   endpoint: "localhost:4317"

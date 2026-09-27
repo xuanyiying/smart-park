@@ -29,6 +29,9 @@ type Config struct {
 	// EntryExit tunes the vehicle entry/exit pipeline (distributed lock TTL, plate
 	// recognition confidence threshold, device online threshold).
 	EntryExit EntryExitConfig `mapstructure:"entry_exit"`
+	// Holidays lists statutory holiday dates ("2006-01-02") that activate the
+	// billing engine's "holiday" condition. Empty means no day is a holiday.
+	Holidays []string `mapstructure:"holidays"`
 	Billing   *BillingConfig  `mapstructure:"billing"`
 	Vehicle   *VehicleConfig  `mapstructure:"vehicle"`
 	Payment   *PaymentConfig  `mapstructure:"payment"`
@@ -136,6 +139,10 @@ type MQTTConfig struct {
 	ClientID string `mapstructure:"client_id"`
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
+	// TLS enables TLS transport to the broker; TLSSkipVerify disables certificate
+	// verification (development only).
+	TLS           bool `mapstructure:"tls"`
+	TLSSkipVerify bool `mapstructure:"tls_skip_verify"`
 }
 
 // EntryExitConfig holds tunables for the vehicle entry/exit pipeline. Durations are
@@ -145,6 +152,9 @@ type EntryExitConfig struct {
 	LockTTL               string  `mapstructure:"lock_ttl"`
 	DeviceOnlineThreshold string  `mapstructure:"device_online_threshold"`
 	MinConfidence         float64 `mapstructure:"min_confidence"`
+	// Messages overrides driver-facing display messages by key (e.g. "welcome",
+	// "lot_full", "blacklisted"). Unset keys fall back to the built-in defaults.
+	Messages map[string]string `mapstructure:"messages"`
 	// SeedLotID opts into provisioning demo lanes/devices for a specific parking lot.
 	// Empty disables seeding entirely, which is the production default.
 	SeedLotID string `mapstructure:"seed_lot_id"`

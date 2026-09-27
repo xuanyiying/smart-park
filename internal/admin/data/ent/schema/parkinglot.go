@@ -31,6 +31,10 @@ func (ParkingLot) Fields() []ent.Field {
 			Default(1).
 			Min(1).
 			Comment("车道数量"),
+		field.Int("total_capacity").
+			Default(0).
+			Min(0).
+			Comment("总车位数，0 表示未配置（不参与满位校验），与 analytics 侧字段同名"),
 		field.String("status").
 			Default("active").
 			Comment("状态"),

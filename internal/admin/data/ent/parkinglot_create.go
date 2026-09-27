@@ -61,6 +61,20 @@ func (_c *ParkingLotCreate) SetNillableLanes(v *int) *ParkingLotCreate {
 	return _c
 }
 
+// SetTotalCapacity sets the "total_capacity" field.
+func (_c *ParkingLotCreate) SetTotalCapacity(v int) *ParkingLotCreate {
+	_c.mutation.SetTotalCapacity(v)
+	return _c
+}
+
+// SetNillableTotalCapacity sets the "total_capacity" field if the given value is not nil.
+func (_c *ParkingLotCreate) SetNillableTotalCapacity(v *int) *ParkingLotCreate {
+	if v != nil {
+		_c.SetTotalCapacity(*v)
+	}
+	return _c
+}
+
 // SetStatus sets the "status" field.
 func (_c *ParkingLotCreate) SetStatus(v string) *ParkingLotCreate {
 	_c.mutation.SetStatus(v)
@@ -156,6 +170,10 @@ func (_c *ParkingLotCreate) defaults() {
 		v := parkinglot.DefaultLanes
 		_c.mutation.SetLanes(v)
 	}
+	if _, ok := _c.mutation.TotalCapacity(); !ok {
+		v := parkinglot.DefaultTotalCapacity
+		_c.mutation.SetTotalCapacity(v)
+	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := parkinglot.DefaultStatus
 		_c.mutation.SetStatus(v)
@@ -198,6 +216,14 @@ func (_c *ParkingLotCreate) check() error {
 	if v, ok := _c.mutation.Lanes(); ok {
 		if err := parkinglot.LanesValidator(v); err != nil {
 			return &ValidationError{Name: "lanes", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.lanes": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TotalCapacity(); !ok {
+		return &ValidationError{Name: "total_capacity", err: errors.New(`ent: missing required field "ParkingLot.total_capacity"`)}
+	}
+	if v, ok := _c.mutation.TotalCapacity(); ok {
+		if err := parkinglot.TotalCapacityValidator(v); err != nil {
+			return &ValidationError{Name: "total_capacity", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.total_capacity": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Status(); !ok {
@@ -259,6 +285,10 @@ func (_c *ParkingLotCreate) createSpec() (*ParkingLot, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Lanes(); ok {
 		_spec.SetField(parkinglot.FieldLanes, field.TypeInt, value)
 		_node.Lanes = value
+	}
+	if value, ok := _c.mutation.TotalCapacity(); ok {
+		_spec.SetField(parkinglot.FieldTotalCapacity, field.TypeInt, value)
+		_node.TotalCapacity = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(parkinglot.FieldStatus, field.TypeString, value)

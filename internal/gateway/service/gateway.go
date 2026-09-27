@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -70,6 +71,19 @@ func (s *GatewayService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.log.Infof("request completed: %s %s, duration: %v", r.Method, r.URL.Path, duration)
 }
 
+// proxyTransport 是所有反向代理共享的传输层：带拨号/响应头超时与受限的连接池，
+// 防止后端挂起或慢响应无限占用网关资源（默认 Transport 没有任何超时）。
+var proxyTransport = &http.Transport{
+	Proxy:                 http.ProxyFromEnvironment,
+	DialContext:           (&net.Dialer{Timeout: 5 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+	MaxIdleConns:          200,
+	MaxIdleConnsPerHost:   50,
+	IdleConnTimeout:       90 * time.Second,
+	TLSHandshakeTimeout:   5 * time.Second,
+	ExpectContinueTimeout: 1 * time.Second,
+	ResponseHeaderTimeout: 30 * time.Second,
+}
+
 // createProxy 创建反向代理
 func (s *GatewayService) createProxy(target string) (*httputil.ReverseProxy, error) {
 	// 解析目标地址
@@ -79,11 +93,19 @@ func (s *GatewayService) createProxy(target string) (*httputil.ReverseProxy, err
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+	proxy.Transport = proxyTransport
 
-	// 自定义错误处理
+	// 自定义错误处理：转发失败即向熔断统计上报，触发实例剔除
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		s.log.Errorf("proxy error: %v, path: %s", err, r.URL.Path)
+		s.router.MarkFailed(target)
 		http.Error(w, "Bad Gateway", http.StatusBadGateway)
+	}
+
+	// 收到任何响应（即使是 4xx/5xx）都证明后端存活，重置熔断计数
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		s.router.MarkSucceeded(target)
+		return nil
 	}
 
 	// 修改请求
@@ -129,21 +151,16 @@ func (s *GatewayService) HealthCheck(ctx context.Context) (map[string]bool, erro
 			continue
 		}
 
-		// 简单的 HTTP ping，假设如果服务存活其端口是可达的
+		// 判活标准：拿到任何 HTTP 响应（含 404/401 等）都证明服务进程存活；
+		// 传输层错误（连接被拒、DNS 失败、超时）一律判不健康。此前靠错误文本里
+		// 是否包含 "connection refused" 来区分，极度脆弱。
 		resp, err := client.Get(fmt.Sprintf("http://%s/", target))
 		if err != nil {
-			// 在开发环境中，如果只是代理被拒绝，我们也认为可能存在但不可达状态
-			// 为了防止因为没根路径而报警，我们直接简单检查错误信息中是否包含 connection refused 等
-			if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "no such host") {
-				health[route.Path] = false
-			} else {
-				// 只要能建立连接返回404或401等，都说明服务存在
-				health[route.Path] = true
-			}
-		} else {
-			health[route.Path] = true
-			resp.Body.Close()
+			health[route.Path] = false
+			continue
 		}
+		health[route.Path] = true
+		resp.Body.Close()
 	}
 
 	return health, nil
@@ -207,19 +224,26 @@ func (s *GatewayService) Hub() *ws.Hub {
 
 // ReadinessProbe 就绪探针
 func (s *GatewayService) ReadinessProbe(w http.ResponseWriter, r *http.Request) {
-	// 检查所有后端服务是否可用
 	health, err := s.HealthCheck(r.Context())
 	if err != nil {
 		http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
 		return
 	}
 
+	healthy := 0
 	for path, ok := range health {
-		if !ok {
+		if ok {
+			healthy++
+		} else {
 			s.log.Errorf("service unhealthy: %s", path)
-			http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
-			return
 		}
+	}
+
+	// 至少有一个后端可达即视为就绪。此前要求全部后端健康，任一服务下线就会把
+	// 网关整体摘出负载均衡，把单个服务的故障放大成全站不可用（雪崩）。
+	if healthy == 0 {
+		http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

@@ -69,6 +69,36 @@ func (r vehicleRepoStateReader) DeviceState(ctx context.Context, deviceID string
 	return device.Status, device.LastHeartbeat, nil
 }
 
+// messageOverrideKeys maps config message keys to the built-in message fields they
+// override. Keys not listed here are ignored so a typo cannot silently break the
+// default copy.
+var messageOverrideKeys = map[string]func(cfg *biz.Config, text string){
+	"welcome":             func(cfg *biz.Config, text string) { cfg.Messages.Welcome = text },
+	"monthly_welcome":     func(cfg *biz.Config, text string) { cfg.Messages.MonthlyWelcome = text },
+	"vip_welcome":         func(cfg *biz.Config, text string) { cfg.Messages.VIPWelcome = text },
+	"duplicate_entry":     func(cfg *biz.Config, text string) { cfg.Messages.DuplicateEntry = text },
+	"duplicate_exit":      func(cfg *biz.Config, text string) { cfg.Messages.DuplicateExit = text },
+	"no_entry_record":     func(cfg *biz.Config, text string) { cfg.Messages.NoEntryRecord = text },
+	"please_pay":          func(cfg *biz.Config, text string) { cfg.Messages.PleasePay = text },
+	"free_pass":           func(cfg *biz.Config, text string) { cfg.Messages.FreePass = text },
+	"validation_error":    func(cfg *biz.Config, text string) { cfg.Messages.ValidationError = text },
+	"system_error":        func(cfg *biz.Config, text string) { cfg.Messages.SystemError = text },
+	"fallback_mode":       func(cfg *biz.Config, text string) { cfg.Messages.FallbackMode = text },
+	"billing_unavailable": func(cfg *biz.Config, text string) { cfg.Messages.BillingUnavailable = text },
+	"lot_full":            func(cfg *biz.Config, text string) { cfg.Messages.LotFull = text },
+	"blacklisted":         func(cfg *biz.Config, text string) { cfg.Messages.Blacklisted = text },
+}
+
+// applyMessageOverrides overlays operator-configured display messages onto the
+// defaults, so on-site copy can be tuned without a rebuild.
+func applyMessageOverrides(cfg *biz.Config, overrides map[string]string) {
+	for key, apply := range messageOverrideKeys {
+		if text, ok := overrides[key]; ok && text != "" {
+			apply(cfg, text)
+		}
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -138,7 +168,7 @@ func main() {
 	}
 
 	// Initialize data layer
-	dataLayer, cleanup, err := data.NewData(dbClient, logger)
+	dataLayer, cleanup, err := data.NewData(dbClient, cfg.Database.Source, logger)
 	if err != nil {
 		logHelper.Errorf("failed to initialize data layer: %v", err)
 		os.Exit(1)
@@ -184,11 +214,13 @@ func main() {
 	}
 
 	mqttCfg := &mqtt.Config{
-		Broker:   cfg.MQTT.Broker,
-		Port:     cfg.MQTT.Port,
-		ClientID: cfg.MQTT.ClientID,
-		Username: cfg.MQTT.Username,
-		Password: cfg.MQTT.Password,
+		Broker:        cfg.MQTT.Broker,
+		Port:          cfg.MQTT.Port,
+		ClientID:      cfg.MQTT.ClientID,
+		Username:      cfg.MQTT.Username,
+		Password:      cfg.MQTT.Password,
+		TLS:           cfg.MQTT.TLS,
+		TLSSkipVerify: cfg.MQTT.TLSSkipVerify,
 	}
 
 	var mqttClient mqtt.Client = mqtt.NewMQTTClient(mqttCfg)
@@ -229,6 +261,7 @@ func main() {
 	if cfg.EntryExit.MinConfidence > 0 {
 		entryExitConfig.MinConfidence = cfg.EntryExit.MinConfidence
 	}
+	applyMessageOverrides(entryExitConfig, cfg.EntryExit.Messages)
 
 	// Initialize device adapter factory.
 	//
@@ -260,7 +293,7 @@ func main() {
 
 	// Initialize business logic layer
 	entryExitUseCase := biz.NewEntryExitUseCase(vehicleRepo, billingClient, mqttClient, lockRepo, adapterFactory, entryExitConfig, logger)
-	deviceUseCase := biz.NewDeviceUseCase(vehicleRepo, adapterFactory, mqttClient, logger)
+	deviceUseCase := biz.NewDeviceUseCase(vehicleRepo, adapterFactory, mqttClient, entryExitConfig, logger)
 	manufacturerUseCase := biz.NewManufacturerUseCase(vehicleRepo, logger)
 	firmwareUseCase := biz.NewFirmwareUseCase(vehicleRepo, logger)
 	devicePerformanceUseCase := biz.NewDevicePerformanceUseCase(vehicleRepo, logger)
@@ -269,9 +302,10 @@ func main() {
 	vehicleQueryUseCase := biz.NewVehicleQueryUseCase(vehicleRepo, logger)
 	commandUseCase := biz.NewCommandUseCase(vehicleRepo, mqttClient, logger)
 	recordQueryUseCase := biz.NewRecordQueryUseCase(vehicleRepo)
+	blacklistUseCase := biz.NewBlacklistUseCase(vehicleRepo, logger)
 
 	// Initialize gRPC service
-	vehicleSvc := service.NewVehicleService(entryExitUseCase, deviceUseCase, manufacturerUseCase, firmwareUseCase, devicePerformanceUseCase, deviceFaultUseCase, deviceStatsUseCase, vehicleQueryUseCase, commandUseCase, recordQueryUseCase, logger)
+	vehicleSvc := service.NewVehicleService(entryExitUseCase, deviceUseCase, manufacturerUseCase, firmwareUseCase, devicePerformanceUseCase, deviceFaultUseCase, deviceStatsUseCase, vehicleQueryUseCase, commandUseCase, recordQueryUseCase, blacklistUseCase, logger)
 
 	multentClient, err := multent.Open("postgres", cfg.Database.Source)
 	if err != nil {

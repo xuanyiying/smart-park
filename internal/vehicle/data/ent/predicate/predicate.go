@@ -9,6 +9,9 @@ import (
 // BillingRule is the predicate function for billingrule builders.
 type BillingRule func(*sql.Selector)
 
+// BlacklistEntry is the predicate function for blacklistentry builders.
+type BlacklistEntry func(*sql.Selector)
+
 // Device is the predicate function for device builders.
 type Device func(*sql.Selector)
 

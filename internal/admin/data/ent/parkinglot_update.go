@@ -98,6 +98,27 @@ func (_u *ParkingLotUpdate) AddLanes(v int) *ParkingLotUpdate {
 	return _u
 }
 
+// SetTotalCapacity sets the "total_capacity" field.
+func (_u *ParkingLotUpdate) SetTotalCapacity(v int) *ParkingLotUpdate {
+	_u.mutation.ResetTotalCapacity()
+	_u.mutation.SetTotalCapacity(v)
+	return _u
+}
+
+// SetNillableTotalCapacity sets the "total_capacity" field if the given value is not nil.
+func (_u *ParkingLotUpdate) SetNillableTotalCapacity(v *int) *ParkingLotUpdate {
+	if v != nil {
+		_u.SetTotalCapacity(*v)
+	}
+	return _u
+}
+
+// AddTotalCapacity adds value to the "total_capacity" field.
+func (_u *ParkingLotUpdate) AddTotalCapacity(v int) *ParkingLotUpdate {
+	_u.mutation.AddTotalCapacity(v)
+	return _u
+}
+
 // SetStatus sets the "status" field.
 func (_u *ParkingLotUpdate) SetStatus(v string) *ParkingLotUpdate {
 	_u.mutation.SetStatus(v)
@@ -176,6 +197,11 @@ func (_u *ParkingLotUpdate) check() error {
 			return &ValidationError{Name: "lanes", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.lanes": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.TotalCapacity(); ok {
+		if err := parkinglot.TotalCapacityValidator(v); err != nil {
+			return &ValidationError{Name: "total_capacity", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.total_capacity": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -208,6 +234,12 @@ func (_u *ParkingLotUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if value, ok := _u.mutation.AddedLanes(); ok {
 		_spec.AddField(parkinglot.FieldLanes, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.TotalCapacity(); ok {
+		_spec.SetField(parkinglot.FieldTotalCapacity, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTotalCapacity(); ok {
+		_spec.AddField(parkinglot.FieldTotalCapacity, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(parkinglot.FieldStatus, field.TypeString, value)
@@ -304,6 +336,27 @@ func (_u *ParkingLotUpdateOne) AddLanes(v int) *ParkingLotUpdateOne {
 	return _u
 }
 
+// SetTotalCapacity sets the "total_capacity" field.
+func (_u *ParkingLotUpdateOne) SetTotalCapacity(v int) *ParkingLotUpdateOne {
+	_u.mutation.ResetTotalCapacity()
+	_u.mutation.SetTotalCapacity(v)
+	return _u
+}
+
+// SetNillableTotalCapacity sets the "total_capacity" field if the given value is not nil.
+func (_u *ParkingLotUpdateOne) SetNillableTotalCapacity(v *int) *ParkingLotUpdateOne {
+	if v != nil {
+		_u.SetTotalCapacity(*v)
+	}
+	return _u
+}
+
+// AddTotalCapacity adds value to the "total_capacity" field.
+func (_u *ParkingLotUpdateOne) AddTotalCapacity(v int) *ParkingLotUpdateOne {
+	_u.mutation.AddTotalCapacity(v)
+	return _u
+}
+
 // SetStatus sets the "status" field.
 func (_u *ParkingLotUpdateOne) SetStatus(v string) *ParkingLotUpdateOne {
 	_u.mutation.SetStatus(v)
@@ -395,6 +448,11 @@ func (_u *ParkingLotUpdateOne) check() error {
 			return &ValidationError{Name: "lanes", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.lanes": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.TotalCapacity(); ok {
+		if err := parkinglot.TotalCapacityValidator(v); err != nil {
+			return &ValidationError{Name: "total_capacity", err: fmt.Errorf(`ent: validator failed for field "ParkingLot.total_capacity": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -444,6 +502,12 @@ func (_u *ParkingLotUpdateOne) sqlSave(ctx context.Context) (_node *ParkingLot, 
 	}
 	if value, ok := _u.mutation.AddedLanes(); ok {
 		_spec.AddField(parkinglot.FieldLanes, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.TotalCapacity(); ok {
+		_spec.SetField(parkinglot.FieldTotalCapacity, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTotalCapacity(); ok {
+		_spec.AddField(parkinglot.FieldTotalCapacity, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(parkinglot.FieldStatus, field.TypeString, value)

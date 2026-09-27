@@ -143,7 +143,7 @@ func main() {
 	}
 
 	// Initialize business logic
-	billingUseCase := biz.NewBillingUseCase(billingRepo, logger)
+	billingUseCase := biz.NewBillingUseCase(billingRepo, logger, cfg.Holidays)
 
 	// Initialize gRPC service
 	billingSvc := service.NewBillingService(billingUseCase, logger)

@@ -46,6 +46,35 @@ var (
 			},
 		},
 	}
+	// BlacklistEntriesColumns holds the columns for the "blacklist_entries" table.
+	BlacklistEntriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "tenant_id", Type: field.TypeUUID},
+		{Name: "plate_number", Type: field.TypeString, Size: 20},
+		{Name: "reason", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "created_by", Type: field.TypeString, Nullable: true, Size: 100},
+		{Name: "active", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// BlacklistEntriesTable holds the schema information for the "blacklist_entries" table.
+	BlacklistEntriesTable = &schema.Table{
+		Name:       "blacklist_entries",
+		Columns:    BlacklistEntriesColumns,
+		PrimaryKey: []*schema.Column{BlacklistEntriesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "blacklistentry_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{BlacklistEntriesColumns[1]},
+			},
+			{
+				Name:    "blacklistentry_plate_number",
+				Unique:  false,
+				Columns: []*schema.Column{BlacklistEntriesColumns[2]},
+			},
+		},
+	}
 	// DevicesColumns holds the columns for the "devices" table.
 	DevicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -491,6 +520,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BillingRulesTable,
+		BlacklistEntriesTable,
 		DevicesTable,
 		DeviceFaultsTable,
 		DeviceLogsTable,

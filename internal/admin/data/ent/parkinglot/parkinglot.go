@@ -22,6 +22,8 @@ const (
 	FieldAddress = "address"
 	// FieldLanes holds the string denoting the lanes field in the database.
 	FieldLanes = "lanes"
+	// FieldTotalCapacity holds the string denoting the total_capacity field in the database.
+	FieldTotalCapacity = "total_capacity"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -39,6 +41,7 @@ var Columns = []string{
 	FieldName,
 	FieldAddress,
 	FieldLanes,
+	FieldTotalCapacity,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -63,6 +66,10 @@ var (
 	DefaultLanes int
 	// LanesValidator is a validator for the "lanes" field. It is called by the builders before save.
 	LanesValidator func(int) error
+	// DefaultTotalCapacity holds the default value on creation for the "total_capacity" field.
+	DefaultTotalCapacity int
+	// TotalCapacityValidator is a validator for the "total_capacity" field. It is called by the builders before save.
+	TotalCapacityValidator func(int) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -101,6 +108,11 @@ func ByAddress(opts ...sql.OrderTermOption) OrderOption {
 // ByLanes orders the results by the lanes field.
 func ByLanes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLanes, opts...).ToFunc()
+}
+
+// ByTotalCapacity orders the results by the total_capacity field.
+func ByTotalCapacity(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotalCapacity, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

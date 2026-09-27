@@ -75,6 +75,11 @@ func Lanes(v int) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldEQ(FieldLanes, v))
 }
 
+// TotalCapacity applies equality check predicate on the "total_capacity" field. It's identical to TotalCapacityEQ.
+func TotalCapacity(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldEQ(FieldTotalCapacity, v))
+}
+
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v string) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldEQ(FieldStatus, v))
@@ -308,6 +313,46 @@ func LanesLT(v int) predicate.ParkingLot {
 // LanesLTE applies the LTE predicate on the "lanes" field.
 func LanesLTE(v int) predicate.ParkingLot {
 	return predicate.ParkingLot(sql.FieldLTE(FieldLanes, v))
+}
+
+// TotalCapacityEQ applies the EQ predicate on the "total_capacity" field.
+func TotalCapacityEQ(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldEQ(FieldTotalCapacity, v))
+}
+
+// TotalCapacityNEQ applies the NEQ predicate on the "total_capacity" field.
+func TotalCapacityNEQ(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldNEQ(FieldTotalCapacity, v))
+}
+
+// TotalCapacityIn applies the In predicate on the "total_capacity" field.
+func TotalCapacityIn(vs ...int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldIn(FieldTotalCapacity, vs...))
+}
+
+// TotalCapacityNotIn applies the NotIn predicate on the "total_capacity" field.
+func TotalCapacityNotIn(vs ...int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldNotIn(FieldTotalCapacity, vs...))
+}
+
+// TotalCapacityGT applies the GT predicate on the "total_capacity" field.
+func TotalCapacityGT(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldGT(FieldTotalCapacity, v))
+}
+
+// TotalCapacityGTE applies the GTE predicate on the "total_capacity" field.
+func TotalCapacityGTE(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldGTE(FieldTotalCapacity, v))
+}
+
+// TotalCapacityLT applies the LT predicate on the "total_capacity" field.
+func TotalCapacityLT(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldLT(FieldTotalCapacity, v))
+}
+
+// TotalCapacityLTE applies the LTE predicate on the "total_capacity" field.
+func TotalCapacityLTE(v int) predicate.ParkingLot {
+	return predicate.ParkingLot(sql.FieldLTE(FieldTotalCapacity, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

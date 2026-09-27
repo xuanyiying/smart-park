@@ -21,6 +21,18 @@ func (f BillingRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BillingRuleMutation", m)
 }
 
+// The BlacklistEntryFunc type is an adapter to allow the use of ordinary
+// function as BlacklistEntry mutator.
+type BlacklistEntryFunc func(context.Context, *ent.BlacklistEntryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BlacklistEntryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BlacklistEntryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BlacklistEntryMutation", m)
+}
+
 // The DeviceFunc type is an adapter to allow the use of ordinary
 // function as Device mutator.
 type DeviceFunc func(context.Context, *ent.DeviceMutation) (ent.Value, error)

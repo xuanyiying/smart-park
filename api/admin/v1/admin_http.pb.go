@@ -70,7 +70,7 @@ func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) 
 	r.GET("/api/v1/admin/lots/{id}", _AdminService_GetParkingLot0_HTTP_Handler(srv))
 	r.PUT("/api/v1/admin/lots/{id}", _AdminService_UpdateParkingLot0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/lots", _AdminService_ListParkingLots0_HTTP_Handler(srv))
-	r.GET("/api/v1/admin/records", _AdminService_ListParkingRecords0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/records", _AdminService_ListParkingRecords1_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/orders", _AdminService_ListOrders0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/orders/{id}", _AdminService_GetOrder0_HTTP_Handler(srv))
 	r.POST("/api/v1/admin/vehicles", _AdminService_CreateVehicle0_HTTP_Handler(srv))
@@ -296,7 +296,7 @@ func _AdminService_ListParkingLots0_HTTP_Handler(srv AdminServiceHTTPServer) fun
 	}
 }
 
-func _AdminService_ListParkingRecords0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+func _AdminService_ListParkingRecords1_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListParkingRecordsRequest
 		if err := ctx.BindQuery(&in); err != nil {

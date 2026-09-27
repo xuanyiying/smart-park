@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -89,6 +90,20 @@ func (d *StaticDiscovery) Close() error {
 	return nil
 }
 
+// targetState tracks per-target circuit-breaker state and the round-robin counter
+// for the service it belongs to.
+type targetState struct {
+	failures  int
+	openUntil time.Time
+}
+
+// circuitBreakerThreshold/thresholdReset define when a target is pulled from the
+// rotation after consecutive failures, and for how long.
+const (
+	circuitBreakerThreshold = 3
+	circuitBreakerCooldown  = 10 * time.Second
+)
+
 // RouterUseCase 路由用例
 type RouterUseCase struct {
 	discovery ServiceDiscovery
@@ -96,16 +111,50 @@ type RouterUseCase struct {
 	routes    []*RouteConfig
 	log       *log.Helper
 	useEtcd   bool
+
+	mu           sync.Mutex
+	states       map[string]*targetState
+	rrCounters   map[string]uint64
 }
 
 // NewRouterUseCase 创建路由用例
 func NewRouterUseCase(discovery ServiceDiscovery, etcdReg *EtcdRegistry, routes []*RouteConfig, useEtcd bool, logger log.Logger) *RouterUseCase {
 	return &RouterUseCase{
-		discovery: discovery,
-		etcdReg:   etcdReg,
-		routes:    routes,
-		useEtcd:   useEtcd,
-		log:       log.NewHelper(logger),
+		discovery:  discovery,
+		etcdReg:    etcdReg,
+		routes:     routes,
+		useEtcd:    useEtcd,
+		log:        log.NewHelper(logger),
+		states:     make(map[string]*targetState),
+		rrCounters: make(map[string]uint64),
+	}
+}
+
+// MarkFailed records a delivery failure against a target. Consecutive failures
+// open the circuit so the target is skipped while it is known to be down.
+func (uc *RouterUseCase) MarkFailed(target string) {
+	uc.mu.Lock()
+	defer uc.mu.Unlock()
+
+	st, ok := uc.states[target]
+	if !ok {
+		st = &targetState{}
+		uc.states[target] = st
+	}
+	st.failures++
+	if st.failures >= circuitBreakerThreshold {
+		st.openUntil = time.Now().Add(circuitBreakerCooldown)
+	}
+}
+
+// MarkSucceeded resets the failure streak of a target after any successful response.
+func (uc *RouterUseCase) MarkSucceeded(target string) {
+	uc.mu.Lock()
+	defer uc.mu.Unlock()
+
+	if st, ok := uc.states[target]; ok {
+		st.failures = 0
+		st.openUntil = time.Time{}
 	}
 }
 
@@ -120,21 +169,65 @@ func (uc *RouterUseCase) MatchRoute(path string) *RouteConfig {
 }
 
 // GetServiceTarget 获取服务目标地址
+//
+// 从 etcd 取回全部实例后做健康感知的轮询负载均衡：连续失败的目标会被熔断
+// 冷却一段时间，期间流量自动切到其余实例；静态配置退化为单实例轮询。
 func (uc *RouterUseCase) GetServiceTarget(ctx context.Context, path string) (string, error) {
 	route := uc.MatchRoute(path)
 	if route == nil {
 		return "", ErrRouteNotFound
 	}
 
+	var candidates []string
 	if uc.useEtcd && uc.etcdReg != nil {
 		serviceName := strings.Split(route.Target, ":")[0]
-		instances, err := uc.etcdReg.GetService(ctx, serviceName)
-		if err == nil && len(instances) > 0 {
-			return instances[0].Endpoints[0], nil
+		if instances, err := uc.etcdReg.GetService(ctx, serviceName); err == nil && len(instances) > 0 {
+			for _, inst := range instances {
+				candidates = append(candidates, inst.Endpoints...)
+			}
 		}
 	}
+	if len(candidates) == 0 {
+		candidates = []string{route.Target}
+	}
 
-	return route.Target, nil
+	eligible := uc.eligibleTargets(candidates)
+	if len(eligible) == 0 {
+		// 所有目标都在熔断冷却期：半开放行一次尝试，否则后端恢复后网关
+		// 会永久 502。选轮询序列中的下一个即可。
+		eligible = candidates
+	}
+
+	uc.mu.Lock()
+	defer uc.mu.Unlock()
+
+	if uc.rrCounters == nil {
+		uc.rrCounters = make(map[string]uint64)
+	}
+	if uc.states == nil {
+		uc.states = make(map[string]*targetState)
+	}
+
+	key := route.Target
+	n := uint64(len(eligible))
+	idx := uc.rrCounters[key] % n
+	uc.rrCounters[key]++
+
+	return eligible[idx], nil
+}
+
+// eligibleTargets filters out targets whose circuit is currently open.
+func (uc *RouterUseCase) eligibleTargets(candidates []string) []string {
+	now := time.Now()
+	var out []string
+	for _, c := range candidates {
+		st, ok := uc.states[c]
+		if ok && st.openUntil.After(now) {
+			continue
+		}
+		out = append(out, c)
+	}
+	return out
 }
 
 // GetAllRoutes 获取所有路由

@@ -45,6 +45,8 @@ type MockVehicleRepo struct {
 	ParkingRecords map[string]*ParkingRecord
 	Devices        map[string]*Device
 	Lanes          map[string]*Lane
+	Blacklist      map[string]*BlacklistEntry
+	LotCapacity    *int
 }
 
 func NewMockVehicleRepo() *MockVehicleRepo {
@@ -53,6 +55,7 @@ func NewMockVehicleRepo() *MockVehicleRepo {
 		ParkingRecords: make(map[string]*ParkingRecord),
 		Devices:        make(map[string]*Device),
 		Lanes:          make(map[string]*Lane),
+		Blacklist:      make(map[string]*BlacklistEntry),
 	}
 }
 
@@ -204,3 +207,51 @@ func (m *MockVehicleRepo) CreateDeviceUpgrade(ctx context.Context, deviceID, fro
 }
 func (m *MockVehicleRepo) GetDeviceUpgrade(ctx context.Context, id uuid.UUID) (*DeviceUpgrade, error)    { return nil, nil }
 func (m *MockVehicleRepo) UpdateDeviceUpgradeStatus(ctx context.Context, id uuid.UUID, status, errMsg string) error { return nil }
+
+// ---- Blacklist ----
+
+func (m *MockVehicleRepo) CreateBlacklistEntry(ctx context.Context, entry *BlacklistEntry) error {
+	m.Blacklist[entry.PlateNumber] = entry
+	return nil
+}
+
+func (m *MockVehicleRepo) GetBlacklistEntry(ctx context.Context, plateNumber string) (*BlacklistEntry, error) {
+	if entry, ok := m.Blacklist[plateNumber]; ok {
+		return entry, nil
+	}
+	return nil, nil
+}
+
+func (m *MockVehicleRepo) SetBlacklistEntryActive(ctx context.Context, plateNumber string, active bool) error {
+	if entry, ok := m.Blacklist[plateNumber]; ok {
+		entry.Active = active
+	}
+	return nil
+}
+
+func (m *MockVehicleRepo) ListBlacklistEntries(ctx context.Context, page, pageSize int) ([]*BlacklistEntry, int, error) {
+	var result []*BlacklistEntry
+	for _, entry := range m.Blacklist {
+		result = append(result, entry)
+	}
+	return result, len(result), nil
+}
+
+// ---- Parking lot capacity ----
+
+func (m *MockVehicleRepo) GetLotCapacity(ctx context.Context, lotID uuid.UUID) (int, error) {
+	if m.LotCapacity != nil {
+		return *m.LotCapacity, nil
+	}
+	return 0, nil
+}
+
+func (m *MockVehicleRepo) CountActiveRecordsByLot(ctx context.Context, lotID uuid.UUID) (int, error) {
+	count := 0
+	for _, record := range m.ParkingRecords {
+		if record.LotID == lotID {
+			count++
+		}
+	}
+	return count, nil
+}

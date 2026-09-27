@@ -340,8 +340,10 @@ func (uc *EntryExitUseCase) processEntryTransaction(ctx context.Context, req *v1
 
 	vehicle, err := uc.vehicleRepo.GetVehicleByPlate(ctx, req.PlateNumber)
 	if err != nil {
-		uc.log.WithContext(ctx).Warnf("[ENTRY] Failed to get vehicle info: %v, proceeding with unknown vehicle", err)
-		// Continue processing without vehicle info
+		// A database failure is not the same as "no registered vehicle": swallowing it
+		// silently downgrades monthly/VIP vehicles to temporary rates. Surface it so the
+		// entry handler admits the car in degraded mode while the incident is recorded.
+		return nil, &EntryExitError{Type: ErrTypeDatabase, Message: "failed to get vehicle info", Err: err}
 	}
 
 	existingRecord, err := uc.vehicleRepo.GetEntryRecord(ctx, req.PlateNumber)
@@ -355,6 +357,36 @@ func (uc *EntryExitUseCase) processEntryTransaction(ctx context.Context, req *v1
 			Allowed:        false,
 			GateOpen:       false,
 			DisplayMessage: uc.config.Messages.DuplicateEntry,
+		}, nil
+	}
+
+	// 黑名单校验：命中即拦截，道闸保持关闭。查询故障按数据库错误上报，走降级留痕路径。
+	blacklisted, err := uc.vehicleRepo.GetBlacklistEntry(ctx, req.PlateNumber)
+	if err != nil {
+		return nil, &EntryExitError{Type: ErrTypeDatabase, Message: "failed to check blacklist", Err: err}
+	}
+	if blacklisted != nil && blacklisted.Active {
+		uc.log.WithContext(ctx).Warnf("[ENTRY] Blacklisted vehicle denied - PlateNumber: [REDACTED]")
+		return &v1.EntryData{
+			PlateNumber:    req.PlateNumber,
+			Allowed:        false,
+			GateOpen:       false,
+			DisplayMessage: uc.config.Messages.Blacklisted,
+		}, nil
+	}
+
+	// 车位余量校验：满位时拒绝入场，而不是放行一辆无处可停的车。
+	full, err := uc.isLotFull(ctx, lane.LotID)
+	if err != nil {
+		return nil, err
+	}
+	if full {
+		uc.log.WithContext(ctx).Warnf("[ENTRY] Lot full, entry denied - PlateNumber: [REDACTED]")
+		return &v1.EntryData{
+			PlateNumber:    req.PlateNumber,
+			Allowed:        false,
+			GateOpen:       false,
+			DisplayMessage: uc.config.Messages.LotFull,
 		}, nil
 	}
 
@@ -410,7 +442,12 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 	duration := int(exitTime.Sub(record.EntryTime).Seconds())
 
 	// Calculate fee first, before updating the record
-	vehicle, vehicleType := uc.getVehicleInfo(ctx, req.PlateNumber)
+	vehicle, vehicleType, err := uc.getVehicleInfo(ctx, req.PlateNumber)
+	if err != nil {
+		// M2: 数据库故障不等于"无车辆信息"，把月卡车按临时车收费是直接的资损与客诉。
+		// 这里上报数据库错误，由 handleExitError 保持拦截并留痕。
+		return nil, &EntryExitError{Type: ErrTypeDatabase, Message: "failed to get vehicle info", Err: err}
+	}
 	amount, discountAmount, finalAmount, err := uc.calculateExitFee(ctx, record, lane, exitTime, vehicle, vehicleType)
 	if err != nil {
 		return nil, &EntryExitError{Type: ErrTypeBilling, Message: "failed to calculate fee", Err: err}
@@ -554,17 +591,38 @@ func (uc *EntryExitUseCase) updateParkingRecordForExit(ctx context.Context, reco
 	return nil
 }
 
-func (uc *EntryExitUseCase) getVehicleInfo(ctx context.Context, plateNumber string) (*Vehicle, string) {
+func (uc *EntryExitUseCase) getVehicleInfo(ctx context.Context, plateNumber string) (*Vehicle, string, error) {
 	vehicleType := VehicleTypeTemporary
 	vehicle, err := uc.vehicleRepo.GetVehicleByPlate(ctx, plateNumber)
 	if err != nil {
-		uc.log.WithContext(ctx).Warnf("[EXIT] Failed to get vehicle info: %v, using default type", err)
-		return nil, vehicleType
+		return nil, vehicleType, err
 	}
 	if vehicle != nil {
 		vehicleType = vehicle.VehicleType
 	}
-	return vehicle, vehicleType
+	return vehicle, vehicleType, nil
+}
+
+// isLotFull reports whether the parking lot has reached its capacity. A lot with no
+// configured or discoverable capacity (<= 0) is treated as unlimited: the check is
+// skipped rather than blocking every entry behind a data gap.
+func (uc *EntryExitUseCase) isLotFull(ctx context.Context, lotID uuid.UUID) (bool, error) {
+	capacity, err := uc.vehicleRepo.GetLotCapacity(ctx, lotID)
+	if err != nil {
+		// 容量查询失败按"未知容量"处理并放行，避免数据库抖动阻断所有入场；
+		// 真实满位风险由每日运营复核兜底。
+		uc.log.WithContext(ctx).Warnf("[ENTRY] failed to get lot capacity for %s: %v, capacity check skipped", lotID, err)
+		return false, nil
+	}
+	if capacity <= 0 {
+		return false, nil
+	}
+
+	occupied, err := uc.vehicleRepo.CountActiveRecordsByLot(ctx, lotID)
+	if err != nil {
+		return false, &EntryExitError{Type: ErrTypeDatabase, Message: "failed to count occupied spaces", Err: err}
+	}
+	return occupied >= capacity, nil
 }
 
 func (uc *EntryExitUseCase) calculateExitFee(ctx context.Context, record *ParkingRecord, lane *Lane, exitTime time.Time, vehicle *Vehicle, vehicleType string) (int64, int64, int64, error) {

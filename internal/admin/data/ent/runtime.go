@@ -114,16 +114,22 @@ func init() {
 	parkinglot.DefaultLanes = parkinglotDescLanes.Default.(int)
 	// parkinglot.LanesValidator is a validator for the "lanes" field. It is called by the builders before save.
 	parkinglot.LanesValidator = parkinglotDescLanes.Validators[0].(func(int) error)
+	// parkinglotDescTotalCapacity is the schema descriptor for total_capacity field.
+	parkinglotDescTotalCapacity := parkinglotFields[5].Descriptor()
+	// parkinglot.DefaultTotalCapacity holds the default value on creation for the total_capacity field.
+	parkinglot.DefaultTotalCapacity = parkinglotDescTotalCapacity.Default.(int)
+	// parkinglot.TotalCapacityValidator is a validator for the "total_capacity" field. It is called by the builders before save.
+	parkinglot.TotalCapacityValidator = parkinglotDescTotalCapacity.Validators[0].(func(int) error)
 	// parkinglotDescStatus is the schema descriptor for status field.
-	parkinglotDescStatus := parkinglotFields[5].Descriptor()
+	parkinglotDescStatus := parkinglotFields[6].Descriptor()
 	// parkinglot.DefaultStatus holds the default value on creation for the status field.
 	parkinglot.DefaultStatus = parkinglotDescStatus.Default.(string)
 	// parkinglotDescCreatedAt is the schema descriptor for created_at field.
-	parkinglotDescCreatedAt := parkinglotFields[6].Descriptor()
+	parkinglotDescCreatedAt := parkinglotFields[7].Descriptor()
 	// parkinglot.DefaultCreatedAt holds the default value on creation for the created_at field.
 	parkinglot.DefaultCreatedAt = parkinglotDescCreatedAt.Default.(func() time.Time)
 	// parkinglotDescUpdatedAt is the schema descriptor for updated_at field.
-	parkinglotDescUpdatedAt := parkinglotFields[7].Descriptor()
+	parkinglotDescUpdatedAt := parkinglotFields[8].Descriptor()
 	// parkinglot.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	parkinglot.DefaultUpdatedAt = parkinglotDescUpdatedAt.Default.(func() time.Time)
 	// parkinglot.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
