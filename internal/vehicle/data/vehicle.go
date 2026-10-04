@@ -234,6 +234,21 @@ func (r *vehicleRepo) UpdateParkingRecord(ctx context.Context, rec *biz.ParkingR
 			update.SetRecordStatus(parkingrecord.RecordStatusPaid)
 		}
 	}
+	if rec.ExitStatus != "" {
+		switch rec.ExitStatus {
+		case "unpaid":
+			update.SetExitStatus(parkingrecord.ExitStatusUnpaid)
+		case "paid":
+			update.SetExitStatus(parkingrecord.ExitStatusPaid)
+		case "refunded":
+			update.SetExitStatus(parkingrecord.ExitStatusRefunded)
+		case "waived":
+			update.SetExitStatus(parkingrecord.ExitStatusWaived)
+		}
+	}
+	if rec.Metadata != nil {
+		update.SetRecordMetadata(rec.Metadata)
+	}
 
 	_, err := update.Save(ctx)
 	return err

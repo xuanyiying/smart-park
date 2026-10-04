@@ -45,6 +45,12 @@ func (uc *PaymentUseCase) SetOutbox(store outbox.Store) {
 	uc.outbox = store
 }
 
+// SetChargingClient attaches the charging service used to confirm sessions
+// after charging orders settle.
+func (uc *PaymentUseCase) SetChargingClient(client ChargingPaymentClient) {
+	uc.chargingClient = client
+}
+
 // entTxSource is the subset of an Ent transaction the outbox needs. Declared as
 // an interface so the biz layer keeps its distance from generated Ent types:
 // database.TxFromCtx hands back an *ent.Tx, whose raw handle comes through
@@ -115,7 +121,7 @@ func (uc *PaymentUseCase) HandleOutboxMessage(ctx context.Context, msg *outbox.M
 			uc.log.WithContext(ctx).Warnf("order %s not found for settled event, dropping", event.OrderID)
 			return nil
 		}
-		return uc.triggerAutoGateOpen(ctx, order)
+		return uc.applyOrderSettledSideEffects(ctx, order)
 	default:
 		uc.log.WithContext(ctx).Warnf("outbox message of unknown type %q dropped", msg.Type)
 		return nil

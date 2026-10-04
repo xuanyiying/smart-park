@@ -119,7 +119,7 @@ var (
 				Columns: []*schema.Column{DevicesColumns[1]},
 			},
 			{
-				Name:    "idx_device_id",
+				Name:    "idx_devices_device_id",
 				Unique:  true,
 				Columns: []*schema.Column{DevicesColumns[2]},
 			},
@@ -162,17 +162,17 @@ var (
 		PrimaryKey: []*schema.Column{DeviceFaultsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "idx_device_id",
+				Name:    "idx_device_faults_device_id",
 				Unique:  false,
 				Columns: []*schema.Column{DeviceFaultsColumns[1]},
 			},
 			{
-				Name:    "idx_status",
+				Name:    "idx_device_faults_status",
 				Unique:  false,
 				Columns: []*schema.Column{DeviceFaultsColumns[6]},
 			},
 			{
-				Name:    "idx_severity",
+				Name:    "idx_device_faults_severity",
 				Unique:  false,
 				Columns: []*schema.Column{DeviceFaultsColumns[5]},
 			},
@@ -242,17 +242,17 @@ var (
 		PrimaryKey: []*schema.Column{DevicePerformancesColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "idx_device_id",
+				Name:    "idx_device_performances_device_id",
 				Unique:  false,
 				Columns: []*schema.Column{DevicePerformancesColumns[1]},
 			},
 			{
-				Name:    "idx_timestamp",
+				Name:    "idx_device_performances_timestamp",
 				Unique:  false,
 				Columns: []*schema.Column{DevicePerformancesColumns[8]},
 			},
 			{
-				Name:    "idx_device_timestamp",
+				Name:    "idx_device_performances_device_timestamp",
 				Unique:  false,
 				Columns: []*schema.Column{DevicePerformancesColumns[1], DevicePerformancesColumns[8]},
 			},

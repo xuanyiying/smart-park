@@ -61,6 +61,13 @@ service VehicleService {
     };
   }
 
+  rpc UpdateRecordStatus(UpdateRecordStatusRequest) returns (UpdateRecordStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/vehicle/records/{recordId}/status",
+      body: "*",
+    };
+  }
+
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse) {
     option (google.api.http) = {
       get: "/api/v1/devices",
@@ -444,6 +451,17 @@ message GetParkingRecordResponse {
   ParkingRecordInfo data    = 3;
 }
 
+message UpdateRecordStatusRequest {
+  string recordId = 1;
+  // 出场支付状态: unpaid/paid/refunded/waived
+  string status   = 2;
+}
+
+message UpdateRecordStatusResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
 message ParkingRecordInfo {
   string recordId        = 1;
   string lotId           = 2;
@@ -460,6 +478,8 @@ message ParkingRecordInfo {
   int32  parkingDuration = 13;
   string exitStatus      = 14;
   int32  paymentLock     = 15;
+  // 服务端计费的应收金额(分)，由出场流程写入记录元数据；0 表示未计费
+  int64  finalAmount     = 16;
 }
 
 message ListDevicesRequest {

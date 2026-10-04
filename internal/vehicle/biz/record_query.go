@@ -70,6 +70,61 @@ func (uc *RecordQueryUseCase) GetParkingRecord(ctx context.Context, recordID str
 	return uc.toParkingRecordInfo(record), nil
 }
 
+// validExitStatuses lists the exit_status enum values accepted from callers.
+var validExitStatuses = map[string]struct{}{
+	ExitStatusUnpaid: {},
+	ExitStatusPaid:   {},
+	"refunded":       {},
+	"waived":         {},
+}
+
+// finalAmountFromMetadata extracts the server-side fee (in cents) that the exit
+// flow stored in the record metadata. JSON round-trips may deliver it as
+// float64; Go callers may have written int64.
+func finalAmountFromMetadata(metadata map[string]interface{}) int64 {
+	if metadata == nil {
+		return 0
+	}
+	switch v := metadata["finalAmount"].(type) {
+	case int64:
+		return v
+	case float64:
+		return int64(v)
+	default:
+		return 0
+	}
+}
+
+// UpdateRecordStatus updates a parking record's exit payment status.
+//
+// The payment service calls this after an order settles so the exit barrier can
+// release an already-paid driver without recalculating the fee.
+func (uc *RecordQueryUseCase) UpdateRecordStatus(ctx context.Context, recordID, status string) error {
+	id, err := parseUUID(recordID)
+	if err != nil {
+		return fmt.Errorf("invalid record ID: %w", err)
+	}
+	if _, ok := validExitStatuses[status]; !ok {
+		return fmt.Errorf("invalid exit status: %q", status)
+	}
+
+	record, err := uc.vehicleRepo.GetParkingRecord(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get parking record: %w", err)
+	}
+	if record == nil {
+		return fmt.Errorf("parking record not found: %s", recordID)
+	}
+
+	// 已是目标状态时直接返回，保证支付渠道重复通知下的幂等。
+	if record.ExitStatus == status {
+		return nil
+	}
+
+	record.ExitStatus = status
+	return uc.vehicleRepo.UpdateParkingRecord(ctx, record)
+}
+
 // toParkingRecordInfo converts biz ParkingRecord to proto ParkingRecordInfo.
 func (uc *RecordQueryUseCase) toParkingRecordInfo(record *ParkingRecord) *v1.ParkingRecordInfo {
 	info := &v1.ParkingRecordInfo{
@@ -102,6 +157,7 @@ func (uc *RecordQueryUseCase) toParkingRecordInfo(record *ParkingRecord) *v1.Par
 	if record.ExitDeviceID != "" {
 		info.ExitDeviceId = record.ExitDeviceID
 	}
+	info.FinalAmount = finalAmountFromMetadata(record.Metadata)
 
 	return info
 }

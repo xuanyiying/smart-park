@@ -67,6 +67,9 @@ type ParkingRecordInfo struct {
 	ExitDeviceID string
 	LotID        string
 	PlateNumber  string
+	// FinalAmount is the server-side fee (in cents) calculated at exit time.
+	// Zero means the record carries no authoritative amount yet.
+	FinalAmount int64
 }
 
 // settlementOutcome summarises how a verified callback was applied.
@@ -275,8 +278,8 @@ func (uc *PaymentUseCase) settleOrder(ctx context.Context, orderID uuid.UUID, me
 		order.PayMethod = string(method)
 		order.TransactionID = transactionID
 		order.PaidAmount = order.FinalAmount
-		if err := uc.triggerAutoGateOpen(ctx, order); err != nil {
-			uc.log.WithContext(ctx).Warnf("auto gate open failed for order %s: %v, owner can scan again at the lane", order.ID, err)
+		if err := uc.applyOrderSettledSideEffects(ctx, order); err != nil {
+			uc.log.WithContext(ctx).Warnf("settlement side effects failed for order %s: %v", order.ID, err)
 		}
 		return nil
 	})
@@ -320,6 +323,36 @@ func (uc *PaymentUseCase) logSecurityEvent(ctx context.Context, eventType, order
 		eventType, orderID, expected, received, transactionID, details)
 }
 
+// applyOrderSettledSideEffects runs the post-settlement side effect for an
+// order: charging orders confirm their charging session, parking orders open
+// the exit gate (after the record's exit_status is flipped to paid).
+func (uc *PaymentUseCase) applyOrderSettledSideEffects(ctx context.Context, order *Order) error {
+	if order.OrderType == OrderTypeCharging {
+		return uc.confirmChargingSession(ctx, order)
+	}
+	return uc.triggerAutoGateOpen(ctx, order)
+}
+
+// confirmChargingSession marks the charging session paid through the charging
+// service. For charging orders the RecordID carries the charging session ID
+// (see CreatePayment).
+func (uc *PaymentUseCase) confirmChargingSession(ctx context.Context, order *Order) error {
+	if uc.chargingClient == nil {
+		uc.log.WithContext(ctx).Warnf("charging service not configured, skipping payment confirmation for order %s", order.ID)
+		return nil
+	}
+
+	if err := uc.chargingClient.ConfirmChargingPayment(ctx, order.RecordID.String(),
+		order.TransactionID, order.PayMethod, order.PaidAmount); err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to confirm charging session %s for order %s: %v",
+			order.RecordID, order.ID, err)
+		return fmt.Errorf("failed to confirm charging session: %w", err)
+	}
+
+	uc.log.WithContext(ctx).Infof("charging session %s confirmed for order %s", order.RecordID, order.ID)
+	return nil
+}
+
 // triggerAutoGateOpen opens the exit gate once a payment is confirmed. A failure here is
 // deliberately non-fatal: the order stays paid and the driver can still be released by
 // re-scanning, whereas propagating the error would make the gateway retry a settlement
@@ -346,12 +379,14 @@ func (uc *PaymentUseCase) triggerAutoGateOpen(ctx context.Context, order *Order)
 		return nil
 	}
 
-	if err := uc.gateClient.OpenGate(ctx, record.ExitDeviceID, record.ID); err != nil {
-		return fmt.Errorf("failed to open gate: %w", err)
-	}
-
+	// 先回写支付状态再开闸：若开闸失败，司机在场内重新扫码时 Exit() 的
+	// "已支付直接抬杆"快速路径也能命中，不会被要求二次支付。
 	if err := uc.recordRepo.UpdateRecordStatus(ctx, record.ID, "paid"); err != nil {
 		uc.log.WithContext(ctx).Warnf("failed to update record status: %v", err)
+	}
+
+	if err := uc.gateClient.OpenGate(ctx, record.ExitDeviceID, record.ID); err != nil {
+		return fmt.Errorf("failed to open gate: %w", err)
 	}
 
 	uc.log.WithContext(ctx).Infof("auto gate opened successfully for record %s", record.ID)

@@ -14,6 +14,7 @@ import (
 
 	v1 "github.com/xuanyiying/smart-park/api/payment/v1"
 	vehiclev1 "github.com/xuanyiying/smart-park/api/vehicle/v1"
+	chargingv1 "github.com/xuanyiying/smart-park/api/charging/v1"
 	"github.com/xuanyiying/smart-park/internal/payment/alipay"
 	"github.com/xuanyiying/smart-park/internal/payment/biz"
 	"github.com/xuanyiying/smart-park/internal/payment/data"
@@ -200,8 +201,19 @@ func main() {
 		logHelper.Warn("vehicle service unavailable; paid orders will not open the exit gate automatically")
 	}
 
+	// charging-svc confirms charging sessions after their orders settle.
+	chargingConn, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint("charging-svc:9005"))
+	if err != nil {
+		logHelper.Warnf("failed to connect charging service: %v, charging confirmations disabled", err)
+	}
+
 	// Initialize business logic
 	paymentUseCase := biz.NewPaymentUseCase(orderRepo, recordRepo, gateClient, paymentConfig, wechatClient, alipayClient, logger)
+	if chargingConn != nil {
+		paymentUseCase.SetChargingClient(biz.NewChargingPaymentAdapter(chargingv1.NewChargingServiceClient(chargingConn)))
+	} else {
+		logHelper.Warn("charging service unavailable; charging orders will not be confirmed automatically")
+	}
 	// The reconciliation use case refunds through the real gateway client, never a stub.
 	reconciliationUseCase := biz.NewReconciliationUseCase(orderRepo, reconciliationRepo, wechatClient, alipayClient, paymentUseCase, logger)
 

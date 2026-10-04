@@ -21,59 +21,45 @@ func init() {
 	// orderDescPlateNumber is the schema descriptor for plate_number field.
 	orderDescPlateNumber := orderFields[4].Descriptor()
 	// order.PlateNumberValidator is a validator for the "plate_number" field. It is called by the builders before save.
-	order.PlateNumberValidator = func() func(string) error {
-		validators := orderDescPlateNumber.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(plate_number string) error {
-			for _, fn := range fns {
-				if err := fn(plate_number); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	order.PlateNumberValidator = orderDescPlateNumber.Validators[0].(func(string) error)
 	// orderDescAmount is the schema descriptor for amount field.
-	orderDescAmount := orderFields[5].Descriptor()
+	orderDescAmount := orderFields[6].Descriptor()
 	// order.DefaultAmount holds the default value on creation for the amount field.
 	order.DefaultAmount = orderDescAmount.Default.(int64)
 	// order.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
 	order.AmountValidator = orderDescAmount.Validators[0].(func(int64) error)
 	// orderDescDiscountAmount is the schema descriptor for discount_amount field.
-	orderDescDiscountAmount := orderFields[6].Descriptor()
+	orderDescDiscountAmount := orderFields[7].Descriptor()
 	// order.DefaultDiscountAmount holds the default value on creation for the discount_amount field.
 	order.DefaultDiscountAmount = orderDescDiscountAmount.Default.(int64)
 	// order.DiscountAmountValidator is a validator for the "discount_amount" field. It is called by the builders before save.
 	order.DiscountAmountValidator = orderDescDiscountAmount.Validators[0].(func(int64) error)
 	// orderDescFinalAmount is the schema descriptor for final_amount field.
-	orderDescFinalAmount := orderFields[7].Descriptor()
+	orderDescFinalAmount := orderFields[8].Descriptor()
 	// order.DefaultFinalAmount holds the default value on creation for the final_amount field.
 	order.DefaultFinalAmount = orderDescFinalAmount.Default.(int64)
 	// order.FinalAmountValidator is a validator for the "final_amount" field. It is called by the builders before save.
 	order.FinalAmountValidator = orderDescFinalAmount.Validators[0].(func(int64) error)
 	// orderDescTransactionID is the schema descriptor for transaction_id field.
-	orderDescTransactionID := orderFields[11].Descriptor()
+	orderDescTransactionID := orderFields[12].Descriptor()
 	// order.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	order.TransactionIDValidator = orderDescTransactionID.Validators[0].(func(string) error)
 	// orderDescPaidAmount is the schema descriptor for paid_amount field.
-	orderDescPaidAmount := orderFields[12].Descriptor()
+	orderDescPaidAmount := orderFields[13].Descriptor()
 	// order.DefaultPaidAmount holds the default value on creation for the paid_amount field.
 	order.DefaultPaidAmount = orderDescPaidAmount.Default.(int64)
 	// order.PaidAmountValidator is a validator for the "paid_amount" field. It is called by the builders before save.
 	order.PaidAmountValidator = orderDescPaidAmount.Validators[0].(func(int64) error)
 	// orderDescRefundTransactionID is the schema descriptor for refund_transaction_id field.
-	orderDescRefundTransactionID := orderFields[14].Descriptor()
+	orderDescRefundTransactionID := orderFields[15].Descriptor()
 	// order.RefundTransactionIDValidator is a validator for the "refund_transaction_id" field. It is called by the builders before save.
 	order.RefundTransactionIDValidator = orderDescRefundTransactionID.Validators[0].(func(string) error)
 	// orderDescCreatedAt is the schema descriptor for created_at field.
-	orderDescCreatedAt := orderFields[15].Descriptor()
+	orderDescCreatedAt := orderFields[16].Descriptor()
 	// order.DefaultCreatedAt holds the default value on creation for the created_at field.
 	order.DefaultCreatedAt = orderDescCreatedAt.Default.(func() time.Time)
 	// orderDescUpdatedAt is the schema descriptor for updated_at field.
-	orderDescUpdatedAt := orderFields[16].Descriptor()
+	orderDescUpdatedAt := orderFields[17].Descriptor()
 	// order.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	order.DefaultUpdatedAt = orderDescUpdatedAt.Default.(func() time.Time)
 	// order.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

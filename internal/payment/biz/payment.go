@@ -30,6 +30,11 @@ type PaymentUseCase struct {
 	// (gate opening) with retries. Nil keeps the legacy inline behaviour.
 	outbox outbox.Store
 
+	// chargingClient confirms charging sessions after their orders settle.
+	// Nil means charging confirmations are skipped (logged), as in tests and
+	// deployments without the charging service.
+	chargingClient ChargingPaymentClient
+
 	// queryGateway asks the channel whether an order was paid. Nil means the default
 	// implementation is used; tests replace it with a stub so sweep behaviour can be
 	// scripted without real merchant credentials.
@@ -78,7 +83,22 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 		}
 	}
 
-	order, err := uc.createOrder(ctx, recordID, req.Amount)
+	amount := req.Amount
+	if req.OrderType != "charging" {
+		// 客户端自报金额不可信：以出场时计费并落库的服务端金额为权威，
+		// 防止篡改金额创建低价订单。取不到服务端金额（历史记录/异常路径）
+		// 时保持原行为，由对账兜底。
+		if serverAmount, ok := uc.serverAmountForRecord(ctx, recordID); ok && serverAmount > 0 {
+			if serverAmount != req.Amount {
+				uc.logSecurityEvent(ctx, SecurityEventAmountMismatch, recordID.String(),
+					float64(serverAmount)/100, float64(req.Amount)/100, "",
+					"client-provided amount differs from the server-side exit fee; using the server amount")
+			}
+			amount = serverAmount
+		}
+	}
+
+	order, err := uc.createOrder(ctx, recordID, req.OrderType, amount)
 	// req.Amount is already in cents (分) from the API boundary; the SDKs below
 	// accept cents directly, so no 元→分 conversion can introduce rounding.
 	if err != nil {
@@ -121,8 +141,35 @@ func (uc *PaymentUseCase) buildExistingPaymentResponse(order *Order) *v1.Payment
 	}
 }
 
+// serverAmountForRecord looks up the server-side exit fee for a parking record.
+// ok is false when the record does not exist or carries no authoritative amount.
+func (uc *PaymentUseCase) serverAmountForRecord(ctx context.Context, recordID uuid.UUID) (int64, bool) {
+	if uc.recordRepo == nil {
+		return 0, false
+	}
+	record, err := uc.recordRepo.GetRecord(ctx, recordID.String())
+	if err != nil {
+		uc.log.WithContext(ctx).Warnf("failed to load parking record %s for amount check: %v", recordID, err)
+		return 0, false
+	}
+	if record == nil || record.FinalAmount <= 0 {
+		return 0, false
+	}
+	return record.FinalAmount, true
+}
+
+// Order types. The settlement side effects branch on this: parking orders open
+// the exit gate, charging orders confirm the charging session.
+const (
+	OrderTypeParking  = "parking"
+	OrderTypeCharging = "charging"
+)
+
 // createOrder creates a new order in the repository. amount is in cents (分).
-func (uc *PaymentUseCase) createOrder(ctx context.Context, recordID uuid.UUID, amount int64) (*Order, error) {
+func (uc *PaymentUseCase) createOrder(ctx context.Context, recordID uuid.UUID, orderType string, amount int64) (*Order, error) {
+	if orderType == "" {
+		orderType = OrderTypeParking
+	}
 	order := &Order{
 		ID:             uuid.New(),
 		RecordID:       recordID,
@@ -130,6 +177,7 @@ func (uc *PaymentUseCase) createOrder(ctx context.Context, recordID uuid.UUID, a
 		DiscountAmount: 0,
 		FinalAmount:    amount,
 		Status:         string(StatusPending),
+		OrderType:      orderType,
 	}
 
 	if err := uc.orderRepo.CreateOrder(ctx, order); err != nil {

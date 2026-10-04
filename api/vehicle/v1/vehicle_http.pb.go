@@ -62,6 +62,7 @@ const OperationVehicleServiceUpdateDevice = "/api.vehicle.v1.VehicleService/Upda
 const OperationVehicleServiceUpdateDeviceConfig = "/api.vehicle.v1.VehicleService/UpdateDeviceConfig"
 const OperationVehicleServiceUpdateFirmware = "/api.vehicle.v1.VehicleService/UpdateFirmware"
 const OperationVehicleServiceUpdateManufacturer = "/api.vehicle.v1.VehicleService/UpdateManufacturer"
+const OperationVehicleServiceUpdateRecordStatus = "/api.vehicle.v1.VehicleService/UpdateRecordStatus"
 const OperationVehicleServiceUpgradeDevice = "/api.vehicle.v1.VehicleService/UpgradeDevice"
 
 type VehicleServiceHTTPServer interface {
@@ -117,6 +118,7 @@ type VehicleServiceHTTPServer interface {
 	UpdateDeviceConfig(context.Context, *UpdateDeviceConfigRequest) (*UpdateDeviceConfigResponse, error)
 	UpdateFirmware(context.Context, *UpdateFirmwareRequest) (*UpdateFirmwareResponse, error)
 	UpdateManufacturer(context.Context, *UpdateManufacturerRequest) (*UpdateManufacturerResponse, error)
+	UpdateRecordStatus(context.Context, *UpdateRecordStatusRequest) (*UpdateRecordStatusResponse, error)
 	// UpgradeDevice Device upgrade
 	UpgradeDevice(context.Context, *UpgradeDeviceRequest) (*UpgradeDeviceResponse, error)
 }
@@ -131,6 +133,7 @@ func RegisterVehicleServiceHTTPServer(s *http.Server, srv VehicleServiceHTTPServ
 	r.GET("/api/v1/vehicle/{plateNumber}", _VehicleService_GetVehicleInfo0_HTTP_Handler(srv))
 	r.GET("/api/v1/vehicle/records", _VehicleService_ListParkingRecords0_HTTP_Handler(srv))
 	r.GET("/api/v1/vehicle/records/{recordId}", _VehicleService_GetParkingRecord0_HTTP_Handler(srv))
+	r.POST("/api/v1/vehicle/records/{recordId}/status", _VehicleService_UpdateRecordStatus0_HTTP_Handler(srv))
 	r.GET("/api/v1/devices", _VehicleService_ListDevices0_HTTP_Handler(srv))
 	r.POST("/api/v1/devices", _VehicleService_CreateDevice0_HTTP_Handler(srv))
 	r.GET("/api/v1/devices/{deviceId}", _VehicleService_GetDevice0_HTTP_Handler(srv))
@@ -341,6 +344,31 @@ func _VehicleService_GetParkingRecord0_HTTP_Handler(srv VehicleServiceHTTPServer
 			return err
 		}
 		reply := out.(*GetParkingRecordResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_UpdateRecordStatus0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateRecordStatusRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceUpdateRecordStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateRecordStatus(ctx, req.(*UpdateRecordStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateRecordStatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -1175,6 +1203,7 @@ type VehicleServiceHTTPClient interface {
 	UpdateDeviceConfig(ctx context.Context, req *UpdateDeviceConfigRequest, opts ...http.CallOption) (rsp *UpdateDeviceConfigResponse, err error)
 	UpdateFirmware(ctx context.Context, req *UpdateFirmwareRequest, opts ...http.CallOption) (rsp *UpdateFirmwareResponse, err error)
 	UpdateManufacturer(ctx context.Context, req *UpdateManufacturerRequest, opts ...http.CallOption) (rsp *UpdateManufacturerResponse, err error)
+	UpdateRecordStatus(ctx context.Context, req *UpdateRecordStatusRequest, opts ...http.CallOption) (rsp *UpdateRecordStatusResponse, err error)
 	UpgradeDevice(ctx context.Context, req *UpgradeDeviceRequest, opts ...http.CallOption) (rsp *UpgradeDeviceResponse, err error)
 }
 
@@ -1739,6 +1768,19 @@ func (c *VehicleServiceHTTPClientImpl) UpdateManufacturer(ctx context.Context, i
 	opts = append(opts, http.Operation(OperationVehicleServiceUpdateManufacturer))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) UpdateRecordStatus(ctx context.Context, in *UpdateRecordStatusRequest, opts ...http.CallOption) (*UpdateRecordStatusResponse, error) {
+	var out UpdateRecordStatusResponse
+	pattern := "/api/v1/vehicle/records/{recordId}/status"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationVehicleServiceUpdateRecordStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

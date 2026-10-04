@@ -3,93 +3,15 @@
 
 openapi: 3.0.3
 info:
-    title: ChargingService API
+    title: VehicleService API
     version: 0.0.1
 paths:
-    /api/v1/charging/connectors:
-        post:
-            tags:
-                - ChargingService
-            description: Connector management
-            operationId: ChargingService_CreateConnector
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateConnectorRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CreateConnectorResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/connectors/{connectorId}:
+    /api/v1/blacklist:
         get:
             tags:
-                - ChargingService
-            operationId: ChargingService_GetConnector
+                - VehicleService
+            operationId: VehicleService_ListBlacklistEntries
             parameters:
-                - name: connectorId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetConnectorResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/prices:
-        post:
-            tags:
-                - ChargingService
-            description: Price management
-            operationId: ChargingService_CreatePrice
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreatePriceRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CreatePriceResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/sessions:
-        get:
-            tags:
-                - ChargingService
-            operationId: ChargingService_ListUserSessions
-            parameters:
-                - name: userId
-                  in: query
-                  schema:
-                    type: string
                 - name: page
                   in: query
                   schema:
@@ -106,174 +28,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListUserSessionsResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/sessions/start:
-        post:
-            tags:
-                - ChargingService
-            description: Charging session
-            operationId: ChargingService_StartCharging
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/StartChargingRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/StartChargingResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/sessions/{sessionId}:
-        get:
-            tags:
-                - ChargingService
-            operationId: ChargingService_GetSession
-            parameters:
-                - name: sessionId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetSessionResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/sessions/{sessionId}/payment/confirm:
-        post:
-            tags:
-                - ChargingService
-            description: Payment
-            operationId: ChargingService_ConfirmPayment
-            parameters:
-                - name: sessionId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/ConfirmPaymentRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ConfirmPaymentResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/sessions/{sessionId}/stop:
-        post:
-            tags:
-                - ChargingService
-            operationId: ChargingService_StopCharging
-            parameters:
-                - name: sessionId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/StopChargingRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/StopChargingResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/sessions/{sessionId}/summary:
-        get:
-            tags:
-                - ChargingService
-            operationId: ChargingService_GetChargingSummary
-            parameters:
-                - name: sessionId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetChargingSummaryResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/stations:
-        get:
-            tags:
-                - ChargingService
-            operationId: ChargingService_ListStations
-            parameters:
-                - name: lotId
-                  in: query
-                  schema:
-                    type: string
-                - name: page
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageSize
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListStationsResponse'
+                                $ref: '#/components/schemas/ListBlacklistEntriesResponse'
                 default:
                     description: Default error response
                     content:
@@ -282,14 +37,14 @@ paths:
                                 $ref: '#/components/schemas/Status'
         post:
             tags:
-                - ChargingService
-            description: Station management
-            operationId: ChargingService_CreateStation
+                - VehicleService
+            description: Blacklist management
+            operationId: VehicleService_AddBlacklistEntry
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateStationRequest'
+                            $ref: '#/components/schemas/AddBlacklistEntryRequest'
                 required: true
             responses:
                 "200":
@@ -297,43 +52,20 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateStationResponse'
+                                $ref: '#/components/schemas/AddBlacklistEntryResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/charging/stations/available:
+    /api/v1/blacklist/{plateNumber}:
         get:
             tags:
-                - ChargingService
-            operationId: ChargingService_GetAvailableStations
+                - VehicleService
+            operationId: VehicleService_CheckBlacklist
             parameters:
-                - name: lotId
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetAvailableStationsResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/charging/stations/{stationId}:
-        get:
-            tags:
-                - ChargingService
-            operationId: ChargingService_GetStation
-            parameters:
-                - name: stationId
+                - name: plateNumber
                   in: path
                   required: true
                   schema:
@@ -344,36 +76,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetStationResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        put:
-            tags:
-                - ChargingService
-            operationId: ChargingService_UpdateStation
-            parameters:
-                - name: stationId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateStationRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/UpdateStationResponse'
+                                $ref: '#/components/schemas/CheckBlacklistResponse'
                 default:
                     description: Default error response
                     content:
@@ -382,10 +85,10 @@ paths:
                                 $ref: '#/components/schemas/Status'
         delete:
             tags:
-                - ChargingService
-            operationId: ChargingService_DeleteStation
+                - VehicleService
+            operationId: VehicleService_RemoveBlacklistEntry
             parameters:
-                - name: stationId
+                - name: plateNumber
                   in: path
                   required: true
                   schema:
@@ -396,68 +99,93 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/DeleteStationResponse'
+                                $ref: '#/components/schemas/RemoveBlacklistEntryResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/charging/stations/{stationId}/connectors:
-        get:
+    /api/v1/device/entry:
+        post:
             tags:
-                - ChargingService
-            operationId: ChargingService_ListConnectors
-            parameters:
-                - name: stationId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - VehicleService
+            operationId: VehicleService_Entry
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/EntryRequest'
+                required: true
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListConnectorsResponse'
+                                $ref: '#/components/schemas/EntryResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/charging/stations/{stationId}/price:
-        get:
+    /api/v1/device/exit:
+        post:
             tags:
-                - ChargingService
-            operationId: ChargingService_GetCurrentPrice
-            parameters:
-                - name: stationId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - VehicleService
+            operationId: VehicleService_Exit
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ExitRequest'
+                required: true
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetCurrentPriceResponse'
+                                $ref: '#/components/schemas/ExitResponse'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/charging/stations/{stationId}/prices:
+    /api/v1/device/fault:
+        post:
+            tags:
+                - VehicleService
+            description: Device fault diagnosis
+            operationId: VehicleService_CreateDeviceFault
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateDeviceFaultRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateDeviceFaultResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/fault/{id}:
         get:
             tags:
-                - ChargingService
-            operationId: ChargingService_ListPrices
+                - VehicleService
+            operationId: VehicleService_GetDeviceFault
             parameters:
-                - name: stationId
+                - name: id
                   in: path
                   required: true
                   schema:
@@ -468,7 +196,1014 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListPricesResponse'
+                                $ref: '#/components/schemas/GetDeviceFaultResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/fault/{id}/resolve:
+        put:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ResolveDeviceFault
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ResolveDeviceFaultResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/faults:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListDeviceFaults
+            parameters:
+                - name: deviceId
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListDeviceFaultsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/heartbeat:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_Heartbeat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/HeartbeatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HeartbeatResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/performance:
+        post:
+            tags:
+                - VehicleService
+            description: Device performance monitoring
+            operationId: VehicleService_CreateDevicePerformance
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateDevicePerformanceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateDevicePerformanceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/upgrade:
+        post:
+            tags:
+                - VehicleService
+            description: Device upgrade
+            operationId: VehicleService_UpgradeDevice
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpgradeDeviceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpgradeDeviceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/upgrade/{upgradeId}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDeviceUpgradeStatus
+            parameters:
+                - name: upgradeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpgradeStatusResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/command:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_SendCommand
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SendCommandRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SendCommandResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/config:
+        put:
+            tags:
+                - VehicleService
+            description: Device config
+            operationId: VehicleService_UpdateDeviceConfig
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateDeviceConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateDeviceConfigResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/fault-stats:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDeviceFaultStats
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceFaultStatsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/logs:
+        get:
+            tags:
+                - VehicleService
+            description: Device logs
+            operationId: VehicleService_GetDeviceLogs
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceLogsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/performance:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDevicePerformance
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDevicePerformanceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/performance/latest:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDevicePerformanceLatest
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDevicePerformanceLatestResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/stats:
+        get:
+            tags:
+                - VehicleService
+            description: Device stats
+            operationId: VehicleService_GetDeviceStats
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeviceStatsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/stats-summary:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDeviceStatsSummary
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceStatsSummaryResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/status:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDeviceStatus
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceStatusResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/usage-stats:
+        get:
+            tags:
+                - VehicleService
+            description: Device statistics
+            operationId: VehicleService_GetDeviceUsageStats
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceUsageStatsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/devices:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListDevices
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListDevicesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_CreateDevice
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateDeviceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateDeviceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/devices/{deviceId}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDevice
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - VehicleService
+            operationId: VehicleService_UpdateDevice
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateDeviceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateDeviceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - VehicleService
+            operationId: VehicleService_DeleteDevice
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteDeviceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/firmwares:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListFirmwares
+            parameters:
+                - name: manufacturer
+                  in: query
+                  schema:
+                    type: string
+                - name: model
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListFirmwaresResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - VehicleService
+            description: Firmware management
+            operationId: VehicleService_CreateFirmware
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateFirmwareRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateFirmwareResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/firmwares/by-id/{firmwareId}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetFirmwareByID
+            parameters:
+                - name: firmwareId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetFirmwareByIDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/firmwares/latest:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetLatestFirmware
+            parameters:
+                - name: manufacturer
+                  in: query
+                  schema:
+                    type: string
+                - name: model
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetLatestFirmwareResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/firmwares/{id}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetFirmware
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetFirmwareResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - VehicleService
+            operationId: VehicleService_UpdateFirmware
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateFirmwareRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateFirmwareResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - VehicleService
+            operationId: VehicleService_DeleteFirmware
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteFirmwareResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/manufacturers:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListManufacturers
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListManufacturersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - VehicleService
+            description: Manufacturer management
+            operationId: VehicleService_CreateManufacturer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateManufacturerRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateManufacturerResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/manufacturers/{id}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetManufacturer
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetManufacturerResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - VehicleService
+            operationId: VehicleService_UpdateManufacturer
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateManufacturerRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateManufacturerResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - VehicleService
+            operationId: VehicleService_DeleteManufacturer
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteManufacturerResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/records:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_ListParkingRecords
+            parameters:
+                - name: plateNumbers
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListParkingRecordsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/records/{recordId}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetParkingRecord
+            parameters:
+                - name: recordId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetParkingRecordResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/records/{recordId}/status:
+        post:
+            tags:
+                - VehicleService
+            operationId: VehicleService_UpdateRecordStatus
+            parameters:
+                - name: recordId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateRecordStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateRecordStatusResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/vehicle/{plateNumber}:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetVehicleInfo
+            parameters:
+                - name: plateNumber
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetVehicleInfoResponse'
                 default:
                     description: Default error response
                     content:
@@ -477,51 +1212,17 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        ChargingSummary:
+        AddBlacklistEntryRequest:
             type: object
             properties:
-                sessionId:
+                plateNumber:
                     type: string
-                stationName:
+                reason:
                     type: string
-                connectorNum:
-                    type: integer
-                    format: int32
-                vehiclePlate:
+                createdBy:
                     type: string
-                startTime:
-                    type: string
-                endTime:
-                    type: string
-                duration:
-                    type: number
-                    format: double
-                chargedEnergy:
-                    type: number
-                    format: double
-                cost:
-                    type: string
-                    description: Amounts in cents (分).
-                serviceFee:
-                    type: string
-                totalAmount:
-                    type: string
-                paymentStatus:
-                    type: string
-        ConfirmPaymentRequest:
-            type: object
-            properties:
-                sessionId:
-                    type: string
-                transactionId:
-                    type: string
-                paymentMethod:
-                    type: string
-                paidAmount:
-                    type: string
-                    description: Amount in cents (分).
-            description: Payment messages
-        ConfirmPaymentResponse:
+            description: Blacklist messages
+        AddBlacklistEntryResponse:
             type: object
             properties:
                 code:
@@ -530,131 +1231,342 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Session'
-        Connector:
+                    $ref: '#/components/schemas/BlacklistEntryInfo'
+        BlacklistEntryInfo:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                reason:
+                    type: string
+                createdBy:
+                    type: string
+                active:
+                    type: boolean
+                createdAt:
+                    type: string
+        CheckBlacklistResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                blacklisted:
+                    type: boolean
+                entry:
+                    $ref: '#/components/schemas/BlacklistEntryInfo'
+        CommandData:
+            type: object
+            properties:
+                commandId:
+                    type: string
+                status:
+                    type: string
+        CreateDeviceFaultRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                faultType:
+                    type: string
+                faultCode:
+                    type: string
+                description:
+                    type: string
+                severity:
+                    type: string
+                status:
+                    type: string
+                suggestion:
+                    type: string
+                detectedAt:
+                    type: string
+            description: Device fault messages
+        CreateDeviceFaultResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DeviceFault'
+        CreateDevicePerformanceRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                cpuUsage:
+                    type: number
+                    format: double
+                memoryUsage:
+                    type: number
+                    format: double
+                storageUsage:
+                    type: number
+                    format: double
+                networkIn:
+                    type: string
+                networkOut:
+                    type: string
+                temperature:
+                    type: number
+                    format: double
+                timestamp:
+                    type: string
+            description: Device performance messages
+        CreateDevicePerformanceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        CreateDeviceRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                deviceType:
+                    type: string
+                lotId:
+                    type: string
+                laneId:
+                    type: string
+                status:
+                    type: string
+                manufacturer:
+                    type: string
+                model:
+                    type: string
+                firmwareVersion:
+                    type: string
+                vendorSpecificConfig:
+                    type: object
+                    additionalProperties:
+                        type: string
+        CreateDeviceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DeviceInfo'
+        CreateFirmwareRequest:
+            type: object
+            properties:
+                firmwareId:
+                    type: string
+                manufacturer:
+                    type: string
+                model:
+                    type: string
+                version:
+                    type: string
+                url:
+                    type: string
+                size:
+                    type: string
+                md5:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: string
+            description: Firmware messages
+        CreateFirmwareResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Firmware'
+        CreateManufacturerRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                website:
+                    type: string
+                contactInfo:
+                    type: string
+                description:
+                    type: string
+        CreateManufacturerResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Manufacturer'
+        DeleteDeviceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        DeleteFirmwareResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        DeleteManufacturerResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        DeviceFault:
             type: object
             properties:
                 id:
                     type: string
-                stationId:
+                deviceId:
                     type: string
-                number:
-                    type: integer
-                    format: int32
-                type:
+                faultType:
+                    type: string
+                faultCode:
+                    type: string
+                description:
+                    type: string
+                severity:
                     type: string
                 status:
                     type: string
-                maxPower:
-                    type: number
-                    format: double
-                voltage:
-                    type: number
-                    format: double
-                current:
-                    type: number
-                    format: double
-                faultCode:
+                suggestion:
+                    type: string
+                detectedAt:
+                    type: string
+                resolvedAt:
                     type: string
                 createdAt:
                     type: string
                 updatedAt:
                     type: string
-        CreateConnectorRequest:
+        DeviceInfo:
             type: object
             properties:
-                stationId:
+                deviceId:
                     type: string
-                number:
-                    type: integer
-                    format: int32
-                type:
+                status:
                     type: string
-                maxPower:
-                    type: number
-                    format: double
-                voltage:
-                    type: number
-                    format: double
-            description: Connector messages
-        CreateConnectorResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
+                lastHeartbeat:
                     type: string
-                data:
-                    $ref: '#/components/schemas/Connector'
-        CreatePriceRequest:
-            type: object
-            properties:
-                stationId:
+                lastOnline:
                     type: string
-                name:
-                    type: string
-                startHour:
-                    type: integer
-                    format: int32
-                endHour:
-                    type: integer
-                    format: int32
-                pricePerKwh:
-                    type: number
-                    format: double
-                serviceFee:
-                    type: number
-                    format: double
-                peakLoad:
-                    type: number
-                    format: double
-                offPeakLoad:
-                    type: number
-                    format: double
-                isPeakHours:
+                online:
                     type: boolean
-                effectiveAt:
+                laneId:
                     type: string
-                expiresAt:
-                    type: string
-            description: Price messages
-        CreatePriceResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/Price'
-        CreateStationRequest:
-            type: object
-            properties:
                 lotId:
                     type: string
-                name:
+                deviceType:
                     type: string
-                stationType:
+                deviceSecret:
                     type: string
-                connectorType:
+                createdAt:
                     type: string
-                maxPower:
-                    type: number
-                    format: double
-                voltage:
-                    type: number
-                    format: double
-                totalConnectors:
+                updatedAt:
+                    type: string
+                manufacturer:
+                    type: string
+                model:
+                    type: string
+                firmwareVersion:
+                    type: string
+                faultInfo:
+                    type: string
+                heartbeatCount:
                     type: integer
                     format: int32
-                location:
+                offlineCount:
+                    type: integer
+                    format: int32
+                vendorSpecificConfig:
+                    type: object
+                    additionalProperties:
+                        type: string
+        DeviceLog:
+            type: object
+            properties:
+                id:
                     type: string
-                floor:
+                deviceId:
                     type: string
-            description: Station messages
-        CreateStationResponse:
+                level:
+                    type: string
+                logType:
+                    type: string
+                message:
+                    type: string
+                detail:
+                    type: string
+                createdAt:
+                    type: string
+            description: Device log messages
+        DevicePerformance:
+            type: object
+            properties:
+                id:
+                    type: string
+                deviceId:
+                    type: string
+                cpuUsage:
+                    type: number
+                    format: double
+                memoryUsage:
+                    type: number
+                    format: double
+                storageUsage:
+                    type: number
+                    format: double
+                networkIn:
+                    type: string
+                networkOut:
+                    type: string
+                temperature:
+                    type: number
+                    format: double
+                timestamp:
+                    type: string
+                createdAt:
+                    type: string
+        DeviceStatsData:
+            type: object
+            properties:
+                totalDevices:
+                    type: integer
+                    format: int32
+                onlineDevices:
+                    type: integer
+                    format: int32
+                faultDevices:
+                    type: integer
+                    format: int32
+                onlineRate:
+                    type: number
+                    format: double
+        DeviceStatsResponse:
             type: object
             properties:
                 code:
@@ -663,8 +1575,48 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Station'
-        DeleteStationResponse:
+                    $ref: '#/components/schemas/DeviceStatsData'
+        DeviceStatus:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                online:
+                    type: boolean
+                status:
+                    type: string
+                lastHeartbeat:
+                    type: string
+        EntryData:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                plateNumber:
+                    type: string
+                allowed:
+                    type: boolean
+                gateOpen:
+                    type: boolean
+                displayMessage:
+                    type: string
+        EntryRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                plateNumber:
+                    type: string
+                plateImageUrl:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                vehicleType:
+                    type: string
+                timestamp:
+                    type: string
+        EntryResponse:
             type: object
             properties:
                 code:
@@ -672,7 +1624,107 @@ components:
                     format: int32
                 message:
                     type: string
-        GetAvailableStationsResponse:
+                data:
+                    $ref: '#/components/schemas/EntryData'
+        ExitData:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                plateNumber:
+                    type: string
+                parkingDuration:
+                    type: integer
+                    format: int32
+                amount:
+                    type: string
+                    description: Amounts in cents (分).
+                discountAmount:
+                    type: string
+                finalAmount:
+                    type: string
+                allowed:
+                    type: boolean
+                gateOpen:
+                    type: boolean
+                displayMessage:
+                    type: string
+        ExitRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                plateNumber:
+                    type: string
+                plateImageUrl:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                timestamp:
+                    type: string
+        ExitResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ExitData'
+        Firmware:
+            type: object
+            properties:
+                id:
+                    type: string
+                firmwareId:
+                    type: string
+                manufacturer:
+                    type: string
+                model:
+                    type: string
+                version:
+                    type: string
+                url:
+                    type: string
+                size:
+                    type: string
+                md5:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: string
+                releaseDate:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        GetDeviceFaultResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DeviceFault'
+        GetDeviceFaultStatsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+        GetDeviceLogsResponse:
             type: object
             properties:
                 code:
@@ -683,8 +1735,11 @@ components:
                 data:
                     type: array
                     items:
-                        $ref: '#/components/schemas/Station'
-        GetChargingSummaryResponse:
+                        $ref: '#/components/schemas/DeviceLog'
+                total:
+                    type: integer
+                    format: int32
+        GetDevicePerformanceLatestResponse:
             type: object
             properties:
                 code:
@@ -693,8 +1748,8 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ChargingSummary'
-        GetConnectorResponse:
+                    $ref: '#/components/schemas/DevicePerformance'
+        GetDevicePerformanceResponse:
             type: object
             properties:
                 code:
@@ -703,8 +1758,10 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Connector'
-        GetCurrentPriceResponse:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DevicePerformance'
+        GetDeviceResponse:
             type: object
             properties:
                 code:
@@ -713,8 +1770,8 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Price'
-        GetSessionResponse:
+                    $ref: '#/components/schemas/DeviceInfo'
+        GetDeviceStatsSummaryResponse:
             type: object
             properties:
                 code:
@@ -723,8 +1780,10 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Session'
-        GetStationResponse:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+        GetDeviceStatusResponse:
             type: object
             properties:
                 code:
@@ -733,7 +1792,79 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Station'
+                    $ref: '#/components/schemas/DeviceStatus'
+        GetDeviceUsageStatsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/GoogleProtobufValue'
+        GetFirmwareByIDResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Firmware'
+        GetFirmwareResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Firmware'
+        GetLatestFirmwareResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Firmware'
+        GetManufacturerResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Manufacturer'
+        GetParkingRecordResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ParkingRecordInfo'
+        GetVehicleInfoResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/VehicleInfo'
         GoogleProtobufAny:
             type: object
             properties:
@@ -742,155 +1873,53 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListConnectorsResponse:
+        GoogleProtobufValue:
+            description: Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
+        HeartbeatRequest:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Connector'
-        ListPricesResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Price'
-        ListStationsResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Station'
-                total:
-                    type: string
-        ListUserSessionsResponse:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Session'
-                total:
-                    type: string
-        Price:
-            type: object
-            properties:
-                id:
-                    type: string
-                stationId:
-                    type: string
-                name:
-                    type: string
-                startHour:
-                    type: integer
-                    format: int32
-                endHour:
-                    type: integer
-                    format: int32
-                pricePerKwh:
-                    type: number
-                    format: double
-                serviceFee:
-                    type: number
-                    format: double
-                peakLoad:
-                    type: number
-                    format: double
-                offPeakLoad:
-                    type: number
-                    format: double
-                isPeakHours:
-                    type: boolean
-                effectiveAt:
-                    type: string
-                expiresAt:
-                    type: string
-                createdAt:
-                    type: string
-                updatedAt:
-                    type: string
-        Session:
-            type: object
-            properties:
-                id:
-                    type: string
-                stationId:
-                    type: string
-                connectorId:
-                    type: string
-                userId:
-                    type: string
-                vehiclePlate:
-                    type: string
-                startTime:
-                    type: string
-                endTime:
-                    type: string
-                startEnergy:
-                    type: number
-                    format: double
-                endEnergy:
-                    type: number
-                    format: double
-                chargedEnergy:
-                    type: number
-                    format: double
-                cost:
-                    type: string
-                    description: Amounts in cents (分).
-                serviceFee:
-                    type: string
-                totalAmount:
+                deviceId:
                     type: string
                 status:
                     type: string
-                paymentStatus:
+                timestamp:
                     type: string
-                payTime:
+                faultCode:
                     type: string
-                paymentMethod:
+                faultMessage:
                     type: string
-                transactionId:
+                stats:
+                    type: object
+                    additionalProperties:
+                        type: string
+                firmwareVersion:
                     type: string
-                createdAt:
+                hardwareVersion:
                     type: string
-                updatedAt:
-                    type: string
-        StartChargingRequest:
+        HeartbeatResponse:
             type: object
             properties:
-                stationId:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
-                connectorId:
+        ListBlacklistEntriesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
-                userId:
-                    type: string
-                vehiclePlate:
-                    type: string
-            description: Session messages
-        StartChargingResponse:
+                entries:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/BlacklistEntryInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListDeviceFaultsResponse:
             type: object
             properties:
                 code:
@@ -899,42 +1928,169 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Session'
-        Station:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DeviceFault'
+                total:
+                    type: integer
+                    format: int32
+        ListDevicesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DeviceInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListFirmwaresResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Firmware'
+                total:
+                    type: integer
+                    format: int32
+        ListManufacturersResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Manufacturer'
+                total:
+                    type: integer
+                    format: int32
+        ListParkingRecordsData:
+            type: object
+            properties:
+                records:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ParkingRecordInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListParkingRecordsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ListParkingRecordsData'
+        Manufacturer:
             type: object
             properties:
                 id:
+                    type: string
+                name:
+                    type: string
+                website:
+                    type: string
+                contactInfo:
+                    type: string
+                description:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        ParkingRecordInfo:
+            type: object
+            properties:
+                recordId:
                     type: string
                 lotId:
                     type: string
-                name:
+                vehicleId:
                     type: string
-                stationType:
+                plateNumber:
                     type: string
-                status:
+                entryLaneId:
                     type: string
-                connectorType:
+                entryTime:
                     type: string
-                maxPower:
-                    type: number
-                    format: double
-                voltage:
-                    type: number
-                    format: double
-                totalConnectors:
+                entryImageUrl:
+                    type: string
+                recordStatus:
+                    type: string
+                exitTime:
+                    type: string
+                exitImageUrl:
+                    type: string
+                exitLaneId:
+                    type: string
+                exitDeviceId:
+                    type: string
+                parkingDuration:
                     type: integer
                     format: int32
-                availableConnectors:
+                exitStatus:
+                    type: string
+                paymentLock:
                     type: integer
                     format: int32
-                location:
+                finalAmount:
                     type: string
-                floor:
+                    description: 服务端计费的应收金额(分)，由出场流程写入记录元数据；0 表示未计费
+        RemoveBlacklistEntryResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
-                createdAt:
+        ResolveDeviceFaultResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
                     type: string
-                updatedAt:
+        SendCommandRequest:
+            type: object
+            properties:
+                deviceId:
                     type: string
+                command:
+                    type: string
+                params:
+                    type: object
+                    additionalProperties:
+                        type: string
+        SendCommandResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/CommandData'
         Status:
             type: object
             properties:
@@ -951,14 +2107,17 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        StopChargingRequest:
+        UpdateDeviceConfigRequest:
             type: object
             properties:
-                sessionId:
+                deviceId:
                     type: string
-                userId:
-                    type: string
-        StopChargingResponse:
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: Device config messages
+        UpdateDeviceConfigResponse:
             type: object
             properties:
                 code:
@@ -967,27 +2126,31 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Session'
-        UpdateStationRequest:
+                    $ref: '#/components/schemas/DeviceInfo'
+        UpdateDeviceRequest:
             type: object
             properties:
-                stationId:
+                deviceId:
                     type: string
-                name:
+                deviceType:
+                    type: string
+                lotId:
+                    type: string
+                laneId:
                     type: string
                 status:
                     type: string
-                maxPower:
-                    type: number
-                    format: double
-                totalConnectors:
-                    type: integer
-                    format: int32
-                location:
+                manufacturer:
                     type: string
-                floor:
+                model:
                     type: string
-        UpdateStationResponse:
+                firmwareVersion:
+                    type: string
+                vendorSpecificConfig:
+                    type: object
+                    additionalProperties:
+                        type: string
+        UpdateDeviceResponse:
             type: object
             properties:
                 code:
@@ -996,6 +2159,139 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/Station'
+                    $ref: '#/components/schemas/DeviceInfo'
+        UpdateFirmwareRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                firmwareId:
+                    type: string
+                manufacturer:
+                    type: string
+                model:
+                    type: string
+                version:
+                    type: string
+                url:
+                    type: string
+                size:
+                    type: string
+                md5:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: string
+        UpdateFirmwareResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Firmware'
+        UpdateManufacturerRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                website:
+                    type: string
+                contactInfo:
+                    type: string
+                description:
+                    type: string
+        UpdateManufacturerResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Manufacturer'
+        UpdateRecordStatusRequest:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                status:
+                    type: string
+                    description: '出场支付状态: unpaid/paid/refunded/waived'
+        UpdateRecordStatusResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        UpgradeDeviceRequest:
+            type: object
+            properties:
+                deviceId:
+                    type: string
+                firmwareVersion:
+                    type: string
+                firmwareUrl:
+                    type: string
+            description: Device upgrade messages
+        UpgradeDeviceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/UpgradeStatusData'
+        UpgradeStatusData:
+            type: object
+            properties:
+                upgradeId:
+                    type: string
+                status:
+                    type: string
+                message:
+                    type: string
+        UpgradeStatusResponse:
+            type: object
+            properties:
+                upgradeId:
+                    type: string
+                deviceId:
+                    type: string
+                fromVersion:
+                    type: string
+                toVersion:
+                    type: string
+                status:
+                    type: string
+                errorMessage:
+                    type: string
+                startTime:
+                    type: string
+                endTime:
+                    type: string
+        VehicleInfo:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                vehicleType:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+                monthlyValidUntil:
+                    type: string
 tags:
-    - name: ChargingService
+    - name: VehicleService

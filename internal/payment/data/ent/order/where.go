@@ -205,6 +205,16 @@ func LotIDLTE(v uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldLTE(FieldLotID, v))
 }
 
+// LotIDIsNil applies the IsNil predicate on the "lot_id" field.
+func LotIDIsNil() predicate.Order {
+	return predicate.Order(sql.FieldIsNull(FieldLotID))
+}
+
+// LotIDNotNil applies the NotNil predicate on the "lot_id" field.
+func LotIDNotNil() predicate.Order {
+	return predicate.Order(sql.FieldNotNull(FieldLotID))
+}
+
 // VehicleIDEQ applies the EQ predicate on the "vehicle_id" field.
 func VehicleIDEQ(v uuid.UUID) predicate.Order {
 	return predicate.Order(sql.FieldEQ(FieldVehicleID, v))
@@ -310,6 +320,16 @@ func PlateNumberHasSuffix(v string) predicate.Order {
 	return predicate.Order(sql.FieldHasSuffix(FieldPlateNumber, v))
 }
 
+// PlateNumberIsNil applies the IsNil predicate on the "plate_number" field.
+func PlateNumberIsNil() predicate.Order {
+	return predicate.Order(sql.FieldIsNull(FieldPlateNumber))
+}
+
+// PlateNumberNotNil applies the NotNil predicate on the "plate_number" field.
+func PlateNumberNotNil() predicate.Order {
+	return predicate.Order(sql.FieldNotNull(FieldPlateNumber))
+}
+
 // PlateNumberEqualFold applies the EqualFold predicate on the "plate_number" field.
 func PlateNumberEqualFold(v string) predicate.Order {
 	return predicate.Order(sql.FieldEqualFold(FieldPlateNumber, v))
@@ -318,6 +338,26 @@ func PlateNumberEqualFold(v string) predicate.Order {
 // PlateNumberContainsFold applies the ContainsFold predicate on the "plate_number" field.
 func PlateNumberContainsFold(v string) predicate.Order {
 	return predicate.Order(sql.FieldContainsFold(FieldPlateNumber, v))
+}
+
+// OrderTypeEQ applies the EQ predicate on the "order_type" field.
+func OrderTypeEQ(v OrderType) predicate.Order {
+	return predicate.Order(sql.FieldEQ(FieldOrderType, v))
+}
+
+// OrderTypeNEQ applies the NEQ predicate on the "order_type" field.
+func OrderTypeNEQ(v OrderType) predicate.Order {
+	return predicate.Order(sql.FieldNEQ(FieldOrderType, v))
+}
+
+// OrderTypeIn applies the In predicate on the "order_type" field.
+func OrderTypeIn(vs ...OrderType) predicate.Order {
+	return predicate.Order(sql.FieldIn(FieldOrderType, vs...))
+}
+
+// OrderTypeNotIn applies the NotIn predicate on the "order_type" field.
+func OrderTypeNotIn(vs ...OrderType) predicate.Order {
+	return predicate.Order(sql.FieldNotIn(FieldOrderType, vs...))
 }
 
 // AmountEQ applies the EQ predicate on the "amount" field.

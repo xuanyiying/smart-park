@@ -27,6 +27,7 @@ const (
 	VehicleService_GetVehicleInfo_FullMethodName             = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
 	VehicleService_ListParkingRecords_FullMethodName         = "/api.vehicle.v1.VehicleService/ListParkingRecords"
 	VehicleService_GetParkingRecord_FullMethodName           = "/api.vehicle.v1.VehicleService/GetParkingRecord"
+	VehicleService_UpdateRecordStatus_FullMethodName         = "/api.vehicle.v1.VehicleService/UpdateRecordStatus"
 	VehicleService_ListDevices_FullMethodName                = "/api.vehicle.v1.VehicleService/ListDevices"
 	VehicleService_CreateDevice_FullMethodName               = "/api.vehicle.v1.VehicleService/CreateDevice"
 	VehicleService_GetDevice_FullMethodName                  = "/api.vehicle.v1.VehicleService/GetDevice"
@@ -77,6 +78,7 @@ type VehicleServiceClient interface {
 	GetVehicleInfo(ctx context.Context, in *GetVehicleInfoRequest, opts ...grpc.CallOption) (*GetVehicleInfoResponse, error)
 	ListParkingRecords(ctx context.Context, in *ListParkingRecordsRequest, opts ...grpc.CallOption) (*ListParkingRecordsResponse, error)
 	GetParkingRecord(ctx context.Context, in *GetParkingRecordRequest, opts ...grpc.CallOption) (*GetParkingRecordResponse, error)
+	UpdateRecordStatus(ctx context.Context, in *UpdateRecordStatusRequest, opts ...grpc.CallOption) (*UpdateRecordStatusResponse, error)
 	ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...grpc.CallOption) (*ListDevicesResponse, error)
 	CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*CreateDeviceResponse, error)
 	GetDevice(ctx context.Context, in *GetDeviceRequest, opts ...grpc.CallOption) (*GetDeviceResponse, error)
@@ -207,6 +209,16 @@ func (c *vehicleServiceClient) GetParkingRecord(ctx context.Context, in *GetPark
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetParkingRecordResponse)
 	err := c.cc.Invoke(ctx, VehicleService_GetParkingRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) UpdateRecordStatus(ctx context.Context, in *UpdateRecordStatusRequest, opts ...grpc.CallOption) (*UpdateRecordStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateRecordStatusResponse)
+	err := c.cc.Invoke(ctx, VehicleService_UpdateRecordStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -585,6 +597,7 @@ type VehicleServiceServer interface {
 	GetVehicleInfo(context.Context, *GetVehicleInfoRequest) (*GetVehicleInfoResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
 	GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error)
+	UpdateRecordStatus(context.Context, *UpdateRecordStatusRequest) (*UpdateRecordStatusResponse, error)
 	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
 	CreateDevice(context.Context, *CreateDeviceRequest) (*CreateDeviceResponse, error)
 	GetDevice(context.Context, *GetDeviceRequest) (*GetDeviceResponse, error)
@@ -664,6 +677,9 @@ func (UnimplementedVehicleServiceServer) ListParkingRecords(context.Context, *Li
 }
 func (UnimplementedVehicleServiceServer) GetParkingRecord(context.Context, *GetParkingRecordRequest) (*GetParkingRecordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetParkingRecord not implemented")
+}
+func (UnimplementedVehicleServiceServer) UpdateRecordStatus(context.Context, *UpdateRecordStatusRequest) (*UpdateRecordStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateRecordStatus not implemented")
 }
 func (UnimplementedVehicleServiceServer) ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListDevices not implemented")
@@ -934,6 +950,24 @@ func _VehicleService_GetParkingRecord_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VehicleServiceServer).GetParkingRecord(ctx, req.(*GetParkingRecordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_UpdateRecordStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRecordStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).UpdateRecordStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_UpdateRecordStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).UpdateRecordStatus(ctx, req.(*UpdateRecordStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1624,6 +1658,10 @@ var VehicleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetParkingRecord",
 			Handler:    _VehicleService_GetParkingRecord_Handler,
+		},
+		{
+			MethodName: "UpdateRecordStatus",
+			Handler:    _VehicleService_UpdateRecordStatus_Handler,
 		},
 		{
 			MethodName: "ListDevices",

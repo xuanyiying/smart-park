@@ -57,6 +57,12 @@ func (_u *OrderUpdate) SetNillableLotID(v *uuid.UUID) *OrderUpdate {
 	return _u
 }
 
+// ClearLotID clears the value of the "lot_id" field.
+func (_u *OrderUpdate) ClearLotID() *OrderUpdate {
+	_u.mutation.ClearLotID()
+	return _u
+}
+
 // SetVehicleID sets the "vehicle_id" field.
 func (_u *OrderUpdate) SetVehicleID(v uuid.UUID) *OrderUpdate {
 	_u.mutation.SetVehicleID(v)
@@ -87,6 +93,26 @@ func (_u *OrderUpdate) SetPlateNumber(v string) *OrderUpdate {
 func (_u *OrderUpdate) SetNillablePlateNumber(v *string) *OrderUpdate {
 	if v != nil {
 		_u.SetPlateNumber(*v)
+	}
+	return _u
+}
+
+// ClearPlateNumber clears the value of the "plate_number" field.
+func (_u *OrderUpdate) ClearPlateNumber() *OrderUpdate {
+	_u.mutation.ClearPlateNumber()
+	return _u
+}
+
+// SetOrderType sets the "order_type" field.
+func (_u *OrderUpdate) SetOrderType(v order.OrderType) *OrderUpdate {
+	_u.mutation.SetOrderType(v)
+	return _u
+}
+
+// SetNillableOrderType sets the "order_type" field if the given value is not nil.
+func (_u *OrderUpdate) SetNillableOrderType(v *order.OrderType) *OrderUpdate {
+	if v != nil {
+		_u.SetOrderType(*v)
 	}
 	return _u
 }
@@ -349,6 +375,11 @@ func (_u *OrderUpdate) check() error {
 			return &ValidationError{Name: "plate_number", err: fmt.Errorf(`ent: validator failed for field "Order.plate_number": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.OrderType(); ok {
+		if err := order.OrderTypeValidator(v); err != nil {
+			return &ValidationError{Name: "order_type", err: fmt.Errorf(`ent: validator failed for field "Order.order_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Amount(); ok {
 		if err := order.AmountValidator(v); err != nil {
 			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Order.amount": %w`, err)}
@@ -410,6 +441,9 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(order.FieldLotID, field.TypeUUID, value)
 	}
+	if _u.mutation.LotIDCleared() {
+		_spec.ClearField(order.FieldLotID, field.TypeUUID)
+	}
 	if value, ok := _u.mutation.VehicleID(); ok {
 		_spec.SetField(order.FieldVehicleID, field.TypeUUID, value)
 	}
@@ -418,6 +452,12 @@ func (_u *OrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.PlateNumber(); ok {
 		_spec.SetField(order.FieldPlateNumber, field.TypeString, value)
+	}
+	if _u.mutation.PlateNumberCleared() {
+		_spec.ClearField(order.FieldPlateNumber, field.TypeString)
+	}
+	if value, ok := _u.mutation.OrderType(); ok {
+		_spec.SetField(order.FieldOrderType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
 		_spec.SetField(order.FieldAmount, field.TypeInt64, value)
@@ -530,6 +570,12 @@ func (_u *OrderUpdateOne) SetNillableLotID(v *uuid.UUID) *OrderUpdateOne {
 	return _u
 }
 
+// ClearLotID clears the value of the "lot_id" field.
+func (_u *OrderUpdateOne) ClearLotID() *OrderUpdateOne {
+	_u.mutation.ClearLotID()
+	return _u
+}
+
 // SetVehicleID sets the "vehicle_id" field.
 func (_u *OrderUpdateOne) SetVehicleID(v uuid.UUID) *OrderUpdateOne {
 	_u.mutation.SetVehicleID(v)
@@ -560,6 +606,26 @@ func (_u *OrderUpdateOne) SetPlateNumber(v string) *OrderUpdateOne {
 func (_u *OrderUpdateOne) SetNillablePlateNumber(v *string) *OrderUpdateOne {
 	if v != nil {
 		_u.SetPlateNumber(*v)
+	}
+	return _u
+}
+
+// ClearPlateNumber clears the value of the "plate_number" field.
+func (_u *OrderUpdateOne) ClearPlateNumber() *OrderUpdateOne {
+	_u.mutation.ClearPlateNumber()
+	return _u
+}
+
+// SetOrderType sets the "order_type" field.
+func (_u *OrderUpdateOne) SetOrderType(v order.OrderType) *OrderUpdateOne {
+	_u.mutation.SetOrderType(v)
+	return _u
+}
+
+// SetNillableOrderType sets the "order_type" field if the given value is not nil.
+func (_u *OrderUpdateOne) SetNillableOrderType(v *order.OrderType) *OrderUpdateOne {
+	if v != nil {
+		_u.SetOrderType(*v)
 	}
 	return _u
 }
@@ -835,6 +901,11 @@ func (_u *OrderUpdateOne) check() error {
 			return &ValidationError{Name: "plate_number", err: fmt.Errorf(`ent: validator failed for field "Order.plate_number": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.OrderType(); ok {
+		if err := order.OrderTypeValidator(v); err != nil {
+			return &ValidationError{Name: "order_type", err: fmt.Errorf(`ent: validator failed for field "Order.order_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Amount(); ok {
 		if err := order.AmountValidator(v); err != nil {
 			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Order.amount": %w`, err)}
@@ -913,6 +984,9 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 	if value, ok := _u.mutation.LotID(); ok {
 		_spec.SetField(order.FieldLotID, field.TypeUUID, value)
 	}
+	if _u.mutation.LotIDCleared() {
+		_spec.ClearField(order.FieldLotID, field.TypeUUID)
+	}
 	if value, ok := _u.mutation.VehicleID(); ok {
 		_spec.SetField(order.FieldVehicleID, field.TypeUUID, value)
 	}
@@ -921,6 +995,12 @@ func (_u *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error)
 	}
 	if value, ok := _u.mutation.PlateNumber(); ok {
 		_spec.SetField(order.FieldPlateNumber, field.TypeString, value)
+	}
+	if _u.mutation.PlateNumberCleared() {
+		_spec.ClearField(order.FieldPlateNumber, field.TypeString)
+	}
+	if value, ok := _u.mutation.OrderType(); ok {
+		_spec.SetField(order.FieldOrderType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Amount(); ok {
 		_spec.SetField(order.FieldAmount, field.TypeInt64, value)

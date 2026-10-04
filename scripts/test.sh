@@ -48,8 +48,8 @@ if [ "$RUN_INTEGRATION" = true ]; then
 fi
 
 echo "==> [4/4] 覆盖率门禁（阈值 ${MIN_COVERAGE}%，已排除 ent/pb 等生成代码）"
-grep -Ev "/data/ent/|\.pb\.go|\.pb\.gw\.go" "$COVERAGE_FILE" > "${COVERAGE_FILE}.filtered"
-TOTAL=$(go tool cover -func="${COVERAGE_FILE}.filtered" | tail -1 | awk '{print substr($3, 1, length($3)-1)}')
+grep -Ev "/data/ent/|\.pb\.go|\.pb\.gw\.go" "$COVERAGE_FILE" > coverage.filtered.out
+TOTAL=$(go tool cover -func=coverage.filtered.out | tail -1 | awk '{print substr($3, 1, length($3)-1)}')
 echo "总覆盖率: ${TOTAL}%"
 awk -v t="$TOTAL" -v m="$MIN_COVERAGE" 'BEGIN { exit (t+0 >= m+0) ? 0 : 1 }' \
   || { echo "❌ 覆盖率 ${TOTAL}% 低于门禁 ${MIN_COVERAGE}%"; exit 1; }

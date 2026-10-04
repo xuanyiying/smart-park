@@ -454,7 +454,7 @@ func (uc *EntryExitUseCase) processExitTransaction(ctx context.Context, req *v1.
 	}
 
 	// Only update the record after fee calculation succeeds
-	if err := uc.updateParkingRecordForExit(ctx, record, req, device, lane, exitTime, duration); err != nil {
+	if err := uc.updateParkingRecordForExit(ctx, record, req, device, lane, exitTime, duration, finalAmount); err != nil {
 		return nil, &EntryExitError{Type: ErrTypeDatabase, Message: "failed to update parking record", Err: err}
 	}
 
@@ -576,13 +576,20 @@ func (uc *EntryExitUseCase) buildEntryResponse(record *ParkingRecord, plateNumbe
 	}
 }
 
-func (uc *EntryExitUseCase) updateParkingRecordForExit(ctx context.Context, record *ParkingRecord, req *v1.ExitRequest, device *Device, lane *Lane, exitTime time.Time, duration int) error {
+func (uc *EntryExitUseCase) updateParkingRecordForExit(ctx context.Context, record *ParkingRecord, req *v1.ExitRequest, device *Device, lane *Lane, exitTime time.Time, duration int, finalAmount int64) error {
 	record.ExitTime = &exitTime
 	record.ExitImageURL = req.PlateImageUrl
 	record.ExitLaneID = &lane.ID
 	record.ExitDeviceID = device.DeviceID
 	record.RecordStatus = RecordStatusExiting
 	record.ParkingDuration = duration
+
+	// 服务端计费金额随记录落库，payment 建单时以此为权威金额，
+	// 防止客户端自报金额篡改订单（断点 B 的金额可信缺口）。
+	if record.Metadata == nil {
+		record.Metadata = make(map[string]interface{})
+	}
+	record.Metadata["finalAmount"] = finalAmount
 
 	if err := uc.vehicleRepo.UpdateParkingRecord(ctx, record); err != nil {
 		uc.log.WithContext(ctx).Errorf("[EXIT] Failed to update parking record %s: %v", record.ID, err)

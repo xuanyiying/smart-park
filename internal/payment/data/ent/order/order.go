@@ -23,6 +23,8 @@ const (
 	FieldVehicleID = "vehicle_id"
 	// FieldPlateNumber holds the string denoting the plate_number field in the database.
 	FieldPlateNumber = "plate_number"
+	// FieldOrderType holds the string denoting the order_type field in the database.
+	FieldOrderType = "order_type"
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
 	// FieldDiscountAmount holds the string denoting the discount_amount field in the database.
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldLotID,
 	FieldVehicleID,
 	FieldPlateNumber,
+	FieldOrderType,
 	FieldAmount,
 	FieldDiscountAmount,
 	FieldFinalAmount,
@@ -114,6 +117,32 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// OrderType defines the type for the "order_type" enum field.
+type OrderType string
+
+// OrderTypeParking is the default value of the OrderType enum.
+const DefaultOrderType = OrderTypeParking
+
+// OrderType values.
+const (
+	OrderTypeParking  OrderType = "parking"
+	OrderTypeCharging OrderType = "charging"
+)
+
+func (ot OrderType) String() string {
+	return string(ot)
+}
+
+// OrderTypeValidator is a validator for the "order_type" field enum values. It is called by the builders before save.
+func OrderTypeValidator(ot OrderType) error {
+	switch ot {
+	case OrderTypeParking, OrderTypeCharging:
+		return nil
+	default:
+		return fmt.Errorf("order: invalid enum value for order_type field: %q", ot)
+	}
+}
 
 // Status defines the type for the "status" enum field.
 type Status string
@@ -194,6 +223,11 @@ func ByVehicleID(opts ...sql.OrderTermOption) OrderOption {
 // ByPlateNumber orders the results by the plate_number field.
 func ByPlateNumber(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPlateNumber, opts...).ToFunc()
+}
+
+// ByOrderType orders the results by the order_type field.
+func ByOrderType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrderType, opts...).ToFunc()
 }
 
 // ByAmount orders the results by the amount field.

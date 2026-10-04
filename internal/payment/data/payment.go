@@ -64,16 +64,26 @@ func (r *orderRepo) GetOrderByTransactionID(ctx context.Context, transactionID s
 }
 
 func (r *orderRepo) CreateOrder(ctx context.Context, o *biz.Order) error {
-	_, err := r.data.db.Order.Create().
+	orderType := o.OrderType
+	if orderType == "" {
+		orderType = biz.OrderTypeParking
+	}
+	create := r.data.db.Order.Create().
 		SetID(o.ID).
 		SetRecordID(o.RecordID).
 		SetLotID(o.LotID).
-		SetPlateNumber(o.PlateNumber).
+		SetOrderType(order.OrderType(orderType)).
 		SetAmount(o.Amount).
 		SetDiscountAmount(o.DiscountAmount).
 		SetFinalAmount(o.FinalAmount).
-		SetStatus(order.StatusPending).
-		Save(ctx)
+		SetStatus(order.StatusPending)
+
+	// 充电订单没有车牌
+	if o.PlateNumber != "" {
+		create.SetPlateNumber(o.PlateNumber)
+	}
+
+	_, err := create.Save(ctx)
 	return err
 }
 
@@ -285,6 +295,7 @@ func toBizOrder(o *ent.Order) *biz.Order {
 		DiscountAmount:      o.DiscountAmount,
 		FinalAmount:         o.FinalAmount,
 		Status:              string(o.Status),
+		OrderType:           string(o.OrderType),
 		PayTime:             o.PayTime,
 		PayMethod:           string(o.PayMethod),
 		TransactionID:       o.TransactionID,

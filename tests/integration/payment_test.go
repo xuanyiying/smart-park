@@ -102,3 +102,25 @@ func TestPaymentOrderConcurrentCallbacks(t *testing.T) {
 	require.Equal(t, "paid", got.Status)
 	require.Equal(t, order.FinalAmount, got.PaidAmount)
 }
+
+// TestPaymentChargingOrderCreation 回归：充电订单无车牌、无停车场，
+// 此前 plate_number NotEmpty 约束导致建单必然失败。
+func TestPaymentChargingOrderCreation(t *testing.T) {
+	repo, ctx := newPaymentStack(t)
+
+	order := &paymentbiz.Order{
+		ID:         uuid.New(),
+		RecordID:   uuid.New(), // 充电订单存会话ID
+		OrderType:  "charging",
+		Amount:     1450,
+		FinalAmount: 1450,
+	}
+	require.NoError(t, repo.CreateOrder(ctx, order))
+
+	got, err := repo.GetOrder(ctx, order.ID)
+	require.NoError(t, err)
+	require.NotNil(t, got)
+	require.Equal(t, "charging", got.OrderType)
+	require.Equal(t, int64(1450), got.FinalAmount)
+	require.Equal(t, "pending", got.Status)
+}

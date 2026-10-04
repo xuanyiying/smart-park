@@ -42,6 +42,7 @@ type OrderMutation struct {
 	lot_id                *uuid.UUID
 	vehicle_id            *uuid.UUID
 	plate_number          *string
+	order_type            *order.OrderType
 	amount                *int64
 	addamount             *int64
 	discount_amount       *int64
@@ -235,9 +236,22 @@ func (m *OrderMutation) OldLotID(ctx context.Context) (v uuid.UUID, err error) {
 	return oldValue.LotID, nil
 }
 
+// ClearLotID clears the value of the "lot_id" field.
+func (m *OrderMutation) ClearLotID() {
+	m.lot_id = nil
+	m.clearedFields[order.FieldLotID] = struct{}{}
+}
+
+// LotIDCleared returns if the "lot_id" field was cleared in this mutation.
+func (m *OrderMutation) LotIDCleared() bool {
+	_, ok := m.clearedFields[order.FieldLotID]
+	return ok
+}
+
 // ResetLotID resets all changes to the "lot_id" field.
 func (m *OrderMutation) ResetLotID() {
 	m.lot_id = nil
+	delete(m.clearedFields, order.FieldLotID)
 }
 
 // SetVehicleID sets the "vehicle_id" field.
@@ -320,9 +334,58 @@ func (m *OrderMutation) OldPlateNumber(ctx context.Context) (v string, err error
 	return oldValue.PlateNumber, nil
 }
 
+// ClearPlateNumber clears the value of the "plate_number" field.
+func (m *OrderMutation) ClearPlateNumber() {
+	m.plate_number = nil
+	m.clearedFields[order.FieldPlateNumber] = struct{}{}
+}
+
+// PlateNumberCleared returns if the "plate_number" field was cleared in this mutation.
+func (m *OrderMutation) PlateNumberCleared() bool {
+	_, ok := m.clearedFields[order.FieldPlateNumber]
+	return ok
+}
+
 // ResetPlateNumber resets all changes to the "plate_number" field.
 func (m *OrderMutation) ResetPlateNumber() {
 	m.plate_number = nil
+	delete(m.clearedFields, order.FieldPlateNumber)
+}
+
+// SetOrderType sets the "order_type" field.
+func (m *OrderMutation) SetOrderType(ot order.OrderType) {
+	m.order_type = &ot
+}
+
+// OrderType returns the value of the "order_type" field in the mutation.
+func (m *OrderMutation) OrderType() (r order.OrderType, exists bool) {
+	v := m.order_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOrderType returns the old "order_type" field's value of the Order entity.
+// If the Order object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrderMutation) OldOrderType(ctx context.Context) (v order.OrderType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOrderType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOrderType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOrderType: %w", err)
+	}
+	return oldValue.OrderType, nil
+}
+
+// ResetOrderType resets all changes to the "order_type" field.
+func (m *OrderMutation) ResetOrderType() {
+	m.order_type = nil
 }
 
 // SetAmount sets the "amount" field.
@@ -950,7 +1013,7 @@ func (m *OrderMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrderMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.record_id != nil {
 		fields = append(fields, order.FieldRecordID)
 	}
@@ -962,6 +1025,9 @@ func (m *OrderMutation) Fields() []string {
 	}
 	if m.plate_number != nil {
 		fields = append(fields, order.FieldPlateNumber)
+	}
+	if m.order_type != nil {
+		fields = append(fields, order.FieldOrderType)
 	}
 	if m.amount != nil {
 		fields = append(fields, order.FieldAmount)
@@ -1015,6 +1081,8 @@ func (m *OrderMutation) Field(name string) (ent.Value, bool) {
 		return m.VehicleID()
 	case order.FieldPlateNumber:
 		return m.PlateNumber()
+	case order.FieldOrderType:
+		return m.OrderType()
 	case order.FieldAmount:
 		return m.Amount()
 	case order.FieldDiscountAmount:
@@ -1056,6 +1124,8 @@ func (m *OrderMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldVehicleID(ctx)
 	case order.FieldPlateNumber:
 		return m.OldPlateNumber(ctx)
+	case order.FieldOrderType:
+		return m.OldOrderType(ctx)
 	case order.FieldAmount:
 		return m.OldAmount(ctx)
 	case order.FieldDiscountAmount:
@@ -1116,6 +1186,13 @@ func (m *OrderMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPlateNumber(v)
+		return nil
+	case order.FieldOrderType:
+		v, ok := value.(order.OrderType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOrderType(v)
 		return nil
 	case order.FieldAmount:
 		v, ok := value.(int64)
@@ -1282,8 +1359,14 @@ func (m *OrderMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *OrderMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(order.FieldLotID) {
+		fields = append(fields, order.FieldLotID)
+	}
 	if m.FieldCleared(order.FieldVehicleID) {
 		fields = append(fields, order.FieldVehicleID)
+	}
+	if m.FieldCleared(order.FieldPlateNumber) {
+		fields = append(fields, order.FieldPlateNumber)
 	}
 	if m.FieldCleared(order.FieldPayTime) {
 		fields = append(fields, order.FieldPayTime)
@@ -1317,8 +1400,14 @@ func (m *OrderMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *OrderMutation) ClearField(name string) error {
 	switch name {
+	case order.FieldLotID:
+		m.ClearLotID()
+		return nil
 	case order.FieldVehicleID:
 		m.ClearVehicleID()
+		return nil
+	case order.FieldPlateNumber:
+		m.ClearPlateNumber()
 		return nil
 	case order.FieldPayTime:
 		m.ClearPayTime()
@@ -1357,6 +1446,9 @@ func (m *OrderMutation) ResetField(name string) error {
 		return nil
 	case order.FieldPlateNumber:
 		m.ResetPlateNumber()
+		return nil
+	case order.FieldOrderType:
+		m.ResetOrderType()
 		return nil
 	case order.FieldAmount:
 		m.ResetAmount()

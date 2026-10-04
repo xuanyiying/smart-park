@@ -20,7 +20,9 @@ func (Order) Fields() []ent.Field {
 			StorageKey("id"),
 		field.UUID("record_id", uuid.UUID{}).
 			Comment("停车记录ID"),
+		// 充电订单以充电会话ID占用该字段，且无停车场归属
 		field.UUID("lot_id", uuid.UUID{}).
+			Optional().
 			Comment("停车场ID"),
 		field.UUID("vehicle_id", uuid.UUID{}).
 			Optional().
@@ -28,8 +30,12 @@ func (Order) Fields() []ent.Field {
 			Comment("车辆ID"),
 		field.String("plate_number").
 			MaxLen(20).
-			NotEmpty().
-			Comment("车牌号"),
+			Optional().
+			Comment("车牌号(充电订单无车牌)"),
+		field.Enum("order_type").
+			Values("parking", "charging").
+			Default("parking").
+			Comment("订单类型: 停车费/充电费"),
 		field.Int64("amount").
 			Default(0).
 			Min(0).

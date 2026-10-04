@@ -33,6 +33,14 @@ func (_c *OrderCreate) SetLotID(v uuid.UUID) *OrderCreate {
 	return _c
 }
 
+// SetNillableLotID sets the "lot_id" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableLotID(v *uuid.UUID) *OrderCreate {
+	if v != nil {
+		_c.SetLotID(*v)
+	}
+	return _c
+}
+
 // SetVehicleID sets the "vehicle_id" field.
 func (_c *OrderCreate) SetVehicleID(v uuid.UUID) *OrderCreate {
 	_c.mutation.SetVehicleID(v)
@@ -50,6 +58,28 @@ func (_c *OrderCreate) SetNillableVehicleID(v *uuid.UUID) *OrderCreate {
 // SetPlateNumber sets the "plate_number" field.
 func (_c *OrderCreate) SetPlateNumber(v string) *OrderCreate {
 	_c.mutation.SetPlateNumber(v)
+	return _c
+}
+
+// SetNillablePlateNumber sets the "plate_number" field if the given value is not nil.
+func (_c *OrderCreate) SetNillablePlateNumber(v *string) *OrderCreate {
+	if v != nil {
+		_c.SetPlateNumber(*v)
+	}
+	return _c
+}
+
+// SetOrderType sets the "order_type" field.
+func (_c *OrderCreate) SetOrderType(v order.OrderType) *OrderCreate {
+	_c.mutation.SetOrderType(v)
+	return _c
+}
+
+// SetNillableOrderType sets the "order_type" field if the given value is not nil.
+func (_c *OrderCreate) SetNillableOrderType(v *order.OrderType) *OrderCreate {
+	if v != nil {
+		_c.SetOrderType(*v)
+	}
 	return _c
 }
 
@@ -270,6 +300,10 @@ func (_c *OrderCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *OrderCreate) defaults() {
+	if _, ok := _c.mutation.OrderType(); !ok {
+		v := order.DefaultOrderType
+		_c.mutation.SetOrderType(v)
+	}
 	if _, ok := _c.mutation.Amount(); !ok {
 		v := order.DefaultAmount
 		_c.mutation.SetAmount(v)
@@ -309,15 +343,17 @@ func (_c *OrderCreate) check() error {
 	if _, ok := _c.mutation.RecordID(); !ok {
 		return &ValidationError{Name: "record_id", err: errors.New(`ent: missing required field "Order.record_id"`)}
 	}
-	if _, ok := _c.mutation.LotID(); !ok {
-		return &ValidationError{Name: "lot_id", err: errors.New(`ent: missing required field "Order.lot_id"`)}
-	}
-	if _, ok := _c.mutation.PlateNumber(); !ok {
-		return &ValidationError{Name: "plate_number", err: errors.New(`ent: missing required field "Order.plate_number"`)}
-	}
 	if v, ok := _c.mutation.PlateNumber(); ok {
 		if err := order.PlateNumberValidator(v); err != nil {
 			return &ValidationError{Name: "plate_number", err: fmt.Errorf(`ent: validator failed for field "Order.plate_number": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.OrderType(); !ok {
+		return &ValidationError{Name: "order_type", err: errors.New(`ent: missing required field "Order.order_type"`)}
+	}
+	if v, ok := _c.mutation.OrderType(); ok {
+		if err := order.OrderTypeValidator(v); err != nil {
+			return &ValidationError{Name: "order_type", err: fmt.Errorf(`ent: validator failed for field "Order.order_type": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Amount(); !ok {
@@ -428,6 +464,10 @@ func (_c *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.PlateNumber(); ok {
 		_spec.SetField(order.FieldPlateNumber, field.TypeString, value)
 		_node.PlateNumber = value
+	}
+	if value, ok := _c.mutation.OrderType(); ok {
+		_spec.SetField(order.FieldOrderType, field.TypeEnum, value)
+		_node.OrderType = value
 	}
 	if value, ok := _c.mutation.Amount(); ok {
 		_spec.SetField(order.FieldAmount, field.TypeInt64, value)

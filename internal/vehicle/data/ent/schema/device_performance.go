@@ -48,8 +48,8 @@ func (DevicePerformance) Fields() []ent.Field {
 // Indexes of the DevicePerformance.
 func (DevicePerformance) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("device_id").StorageKey("idx_device_id"),
-		index.Fields("timestamp").StorageKey("idx_timestamp"),
-		index.Fields("device_id", "timestamp").StorageKey("idx_device_timestamp"),
+		index.Fields("device_id").StorageKey("idx_device_performances_device_id"),
+		index.Fields("timestamp").StorageKey("idx_device_performances_timestamp"),
+		index.Fields("device_id", "timestamp").StorageKey("idx_device_performances_device_timestamp"),
 	}
 }

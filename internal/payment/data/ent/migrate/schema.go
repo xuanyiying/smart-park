@@ -12,9 +12,10 @@ var (
 	OrdersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "record_id", Type: field.TypeUUID},
-		{Name: "lot_id", Type: field.TypeUUID},
+		{Name: "lot_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "vehicle_id", Type: field.TypeUUID, Nullable: true},
-		{Name: "plate_number", Type: field.TypeString, Size: 20},
+		{Name: "plate_number", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "order_type", Type: field.TypeEnum, Enums: []string{"parking", "charging"}, Default: "parking"},
 		{Name: "amount", Type: field.TypeInt64, Default: 0},
 		{Name: "discount_amount", Type: field.TypeInt64, Default: 0},
 		{Name: "final_amount", Type: field.TypeInt64, Default: 0},
@@ -37,22 +38,22 @@ var (
 			{
 				Name:    "idx_orders_status",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[8]},
+				Columns: []*schema.Column{OrdersColumns[9]},
 			},
 			{
 				Name:    "idx_orders_pay_time",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[9]},
+				Columns: []*schema.Column{OrdersColumns[10]},
 			},
 			{
 				Name:    "idx_orders_transaction",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[11]},
+				Columns: []*schema.Column{OrdersColumns[12]},
 			},
 			{
 				Name:    "order_lot_id_status",
 				Unique:  false,
-				Columns: []*schema.Column{OrdersColumns[2], OrdersColumns[8]},
+				Columns: []*schema.Column{OrdersColumns[2], OrdersColumns[9]},
 			},
 		},
 	}

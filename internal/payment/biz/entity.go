@@ -20,6 +20,9 @@ type Order struct {
 	DiscountAmount      int64
 	FinalAmount         int64
 	Status              string
+	// OrderType distinguishes parking-fee orders from charging-session orders;
+	// the settlement side effects differ (gate open vs charging confirm).
+	OrderType           string
 	PayTime             *time.Time
 	PayMethod           string
 	TransactionID       string

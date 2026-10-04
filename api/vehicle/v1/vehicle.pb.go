@@ -1440,6 +1440,111 @@ func (x *GetParkingRecordResponse) GetData() *ParkingRecordInfo {
 	return nil
 }
 
+type UpdateRecordStatusRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	RecordId string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
+	// 出场支付状态: unpaid/paid/refunded/waived
+	Status        string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRecordStatusRequest) Reset() {
+	*x = UpdateRecordStatusRequest{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRecordStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRecordStatusRequest) ProtoMessage() {}
+
+func (x *UpdateRecordStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRecordStatusRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRecordStatusRequest) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *UpdateRecordStatusRequest) GetRecordId() string {
+	if x != nil {
+		return x.RecordId
+	}
+	return ""
+}
+
+func (x *UpdateRecordStatusRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type UpdateRecordStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRecordStatusResponse) Reset() {
+	*x = UpdateRecordStatusResponse{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRecordStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRecordStatusResponse) ProtoMessage() {}
+
+func (x *UpdateRecordStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRecordStatusResponse.ProtoReflect.Descriptor instead.
+func (*UpdateRecordStatusResponse) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *UpdateRecordStatusResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateRecordStatusResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type ParkingRecordInfo struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	RecordId        string                 `protobuf:"bytes,1,opt,name=recordId,proto3" json:"recordId,omitempty"`
@@ -1457,13 +1562,15 @@ type ParkingRecordInfo struct {
 	ParkingDuration int32                  `protobuf:"varint,13,opt,name=parkingDuration,proto3" json:"parkingDuration,omitempty"`
 	ExitStatus      string                 `protobuf:"bytes,14,opt,name=exitStatus,proto3" json:"exitStatus,omitempty"`
 	PaymentLock     int32                  `protobuf:"varint,15,opt,name=paymentLock,proto3" json:"paymentLock,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// 服务端计费的应收金额(分)，由出场流程写入记录元数据；0 表示未计费
+	FinalAmount   int64 `protobuf:"varint,16,opt,name=finalAmount,proto3" json:"finalAmount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ParkingRecordInfo) Reset() {
 	*x = ParkingRecordInfo{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[22]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1475,7 +1582,7 @@ func (x *ParkingRecordInfo) String() string {
 func (*ParkingRecordInfo) ProtoMessage() {}
 
 func (x *ParkingRecordInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[22]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1488,7 +1595,7 @@ func (x *ParkingRecordInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParkingRecordInfo.ProtoReflect.Descriptor instead.
 func (*ParkingRecordInfo) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{22}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ParkingRecordInfo) GetRecordId() string {
@@ -1596,6 +1703,13 @@ func (x *ParkingRecordInfo) GetPaymentLock() int32 {
 	return 0
 }
 
+func (x *ParkingRecordInfo) GetFinalAmount() int64 {
+	if x != nil {
+		return x.FinalAmount
+	}
+	return 0
+}
+
 type ListDevicesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
@@ -1606,7 +1720,7 @@ type ListDevicesRequest struct {
 
 func (x *ListDevicesRequest) Reset() {
 	*x = ListDevicesRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[23]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1618,7 +1732,7 @@ func (x *ListDevicesRequest) String() string {
 func (*ListDevicesRequest) ProtoMessage() {}
 
 func (x *ListDevicesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[23]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1631,7 +1745,7 @@ func (x *ListDevicesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDevicesRequest.ProtoReflect.Descriptor instead.
 func (*ListDevicesRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{23}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ListDevicesRequest) GetPage() int32 {
@@ -1660,7 +1774,7 @@ type ListDevicesResponse struct {
 
 func (x *ListDevicesResponse) Reset() {
 	*x = ListDevicesResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[24]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1672,7 +1786,7 @@ func (x *ListDevicesResponse) String() string {
 func (*ListDevicesResponse) ProtoMessage() {}
 
 func (x *ListDevicesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[24]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1685,7 +1799,7 @@ func (x *ListDevicesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDevicesResponse.ProtoReflect.Descriptor instead.
 func (*ListDevicesResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{24}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ListDevicesResponse) GetCode() int32 {
@@ -1742,7 +1856,7 @@ type DeviceInfo struct {
 
 func (x *DeviceInfo) Reset() {
 	*x = DeviceInfo{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[25]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1754,7 +1868,7 @@ func (x *DeviceInfo) String() string {
 func (*DeviceInfo) ProtoMessage() {}
 
 func (x *DeviceInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[25]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1767,7 +1881,7 @@ func (x *DeviceInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceInfo.ProtoReflect.Descriptor instead.
 func (*DeviceInfo) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{25}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeviceInfo) GetDeviceId() string {
@@ -1913,7 +2027,7 @@ type CreateDeviceRequest struct {
 
 func (x *CreateDeviceRequest) Reset() {
 	*x = CreateDeviceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[26]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1925,7 +2039,7 @@ func (x *CreateDeviceRequest) String() string {
 func (*CreateDeviceRequest) ProtoMessage() {}
 
 func (x *CreateDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[26]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1938,7 +2052,7 @@ func (x *CreateDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDeviceRequest.ProtoReflect.Descriptor instead.
 func (*CreateDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{26}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *CreateDeviceRequest) GetDeviceId() string {
@@ -2015,7 +2129,7 @@ type CreateDeviceResponse struct {
 
 func (x *CreateDeviceResponse) Reset() {
 	*x = CreateDeviceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[27]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2027,7 +2141,7 @@ func (x *CreateDeviceResponse) String() string {
 func (*CreateDeviceResponse) ProtoMessage() {}
 
 func (x *CreateDeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[27]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2040,7 +2154,7 @@ func (x *CreateDeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDeviceResponse.ProtoReflect.Descriptor instead.
 func (*CreateDeviceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{27}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CreateDeviceResponse) GetCode() int32 {
@@ -2073,7 +2187,7 @@ type GetDeviceRequest struct {
 
 func (x *GetDeviceRequest) Reset() {
 	*x = GetDeviceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[28]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2085,7 +2199,7 @@ func (x *GetDeviceRequest) String() string {
 func (*GetDeviceRequest) ProtoMessage() {}
 
 func (x *GetDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[28]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2098,7 +2212,7 @@ func (x *GetDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{28}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetDeviceRequest) GetDeviceId() string {
@@ -2119,7 +2233,7 @@ type GetDeviceResponse struct {
 
 func (x *GetDeviceResponse) Reset() {
 	*x = GetDeviceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[29]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2131,7 +2245,7 @@ func (x *GetDeviceResponse) String() string {
 func (*GetDeviceResponse) ProtoMessage() {}
 
 func (x *GetDeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[29]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2144,7 +2258,7 @@ func (x *GetDeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceResponse.ProtoReflect.Descriptor instead.
 func (*GetDeviceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{29}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetDeviceResponse) GetCode() int32 {
@@ -2185,7 +2299,7 @@ type UpdateDeviceRequest struct {
 
 func (x *UpdateDeviceRequest) Reset() {
 	*x = UpdateDeviceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[30]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2197,7 +2311,7 @@ func (x *UpdateDeviceRequest) String() string {
 func (*UpdateDeviceRequest) ProtoMessage() {}
 
 func (x *UpdateDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[30]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2210,7 +2324,7 @@ func (x *UpdateDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDeviceRequest.ProtoReflect.Descriptor instead.
 func (*UpdateDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{30}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *UpdateDeviceRequest) GetDeviceId() string {
@@ -2287,7 +2401,7 @@ type UpdateDeviceResponse struct {
 
 func (x *UpdateDeviceResponse) Reset() {
 	*x = UpdateDeviceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[31]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2299,7 +2413,7 @@ func (x *UpdateDeviceResponse) String() string {
 func (*UpdateDeviceResponse) ProtoMessage() {}
 
 func (x *UpdateDeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[31]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2312,7 +2426,7 @@ func (x *UpdateDeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDeviceResponse.ProtoReflect.Descriptor instead.
 func (*UpdateDeviceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{31}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *UpdateDeviceResponse) GetCode() int32 {
@@ -2345,7 +2459,7 @@ type DeleteDeviceRequest struct {
 
 func (x *DeleteDeviceRequest) Reset() {
 	*x = DeleteDeviceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[32]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2357,7 +2471,7 @@ func (x *DeleteDeviceRequest) String() string {
 func (*DeleteDeviceRequest) ProtoMessage() {}
 
 func (x *DeleteDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[32]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2370,7 +2484,7 @@ func (x *DeleteDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDeviceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{32}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *DeleteDeviceRequest) GetDeviceId() string {
@@ -2390,7 +2504,7 @@ type DeleteDeviceResponse struct {
 
 func (x *DeleteDeviceResponse) Reset() {
 	*x = DeleteDeviceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[33]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2402,7 +2516,7 @@ func (x *DeleteDeviceResponse) String() string {
 func (*DeleteDeviceResponse) ProtoMessage() {}
 
 func (x *DeleteDeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[33]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2415,7 +2529,7 @@ func (x *DeleteDeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDeviceResponse.ProtoReflect.Descriptor instead.
 func (*DeleteDeviceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{33}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *DeleteDeviceResponse) GetCode() int32 {
@@ -2450,7 +2564,7 @@ type CreateFirmwareRequest struct {
 
 func (x *CreateFirmwareRequest) Reset() {
 	*x = CreateFirmwareRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[34]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2462,7 +2576,7 @@ func (x *CreateFirmwareRequest) String() string {
 func (*CreateFirmwareRequest) ProtoMessage() {}
 
 func (x *CreateFirmwareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[34]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2475,7 +2589,7 @@ func (x *CreateFirmwareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFirmwareRequest.ProtoReflect.Descriptor instead.
 func (*CreateFirmwareRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{34}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *CreateFirmwareRequest) GetFirmwareId() string {
@@ -2552,7 +2666,7 @@ type CreateFirmwareResponse struct {
 
 func (x *CreateFirmwareResponse) Reset() {
 	*x = CreateFirmwareResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[35]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2564,7 +2678,7 @@ func (x *CreateFirmwareResponse) String() string {
 func (*CreateFirmwareResponse) ProtoMessage() {}
 
 func (x *CreateFirmwareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[35]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2577,7 +2691,7 @@ func (x *CreateFirmwareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFirmwareResponse.ProtoReflect.Descriptor instead.
 func (*CreateFirmwareResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{35}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *CreateFirmwareResponse) GetCode() int32 {
@@ -2610,7 +2724,7 @@ type GetFirmwareRequest struct {
 
 func (x *GetFirmwareRequest) Reset() {
 	*x = GetFirmwareRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[36]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2622,7 +2736,7 @@ func (x *GetFirmwareRequest) String() string {
 func (*GetFirmwareRequest) ProtoMessage() {}
 
 func (x *GetFirmwareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[36]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2635,7 +2749,7 @@ func (x *GetFirmwareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFirmwareRequest.ProtoReflect.Descriptor instead.
 func (*GetFirmwareRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{36}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *GetFirmwareRequest) GetId() string {
@@ -2656,7 +2770,7 @@ type GetFirmwareResponse struct {
 
 func (x *GetFirmwareResponse) Reset() {
 	*x = GetFirmwareResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[37]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2668,7 +2782,7 @@ func (x *GetFirmwareResponse) String() string {
 func (*GetFirmwareResponse) ProtoMessage() {}
 
 func (x *GetFirmwareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[37]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2681,7 +2795,7 @@ func (x *GetFirmwareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFirmwareResponse.ProtoReflect.Descriptor instead.
 func (*GetFirmwareResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{37}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetFirmwareResponse) GetCode() int32 {
@@ -2714,7 +2828,7 @@ type GetFirmwareByIDRequest struct {
 
 func (x *GetFirmwareByIDRequest) Reset() {
 	*x = GetFirmwareByIDRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[38]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2726,7 +2840,7 @@ func (x *GetFirmwareByIDRequest) String() string {
 func (*GetFirmwareByIDRequest) ProtoMessage() {}
 
 func (x *GetFirmwareByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[38]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2739,7 +2853,7 @@ func (x *GetFirmwareByIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFirmwareByIDRequest.ProtoReflect.Descriptor instead.
 func (*GetFirmwareByIDRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{38}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *GetFirmwareByIDRequest) GetFirmwareId() string {
@@ -2760,7 +2874,7 @@ type GetFirmwareByIDResponse struct {
 
 func (x *GetFirmwareByIDResponse) Reset() {
 	*x = GetFirmwareByIDResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[39]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2772,7 +2886,7 @@ func (x *GetFirmwareByIDResponse) String() string {
 func (*GetFirmwareByIDResponse) ProtoMessage() {}
 
 func (x *GetFirmwareByIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[39]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2785,7 +2899,7 @@ func (x *GetFirmwareByIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFirmwareByIDResponse.ProtoReflect.Descriptor instead.
 func (*GetFirmwareByIDResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{39}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *GetFirmwareByIDResponse) GetCode() int32 {
@@ -2821,7 +2935,7 @@ type ListFirmwaresRequest struct {
 
 func (x *ListFirmwaresRequest) Reset() {
 	*x = ListFirmwaresRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[40]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2833,7 +2947,7 @@ func (x *ListFirmwaresRequest) String() string {
 func (*ListFirmwaresRequest) ProtoMessage() {}
 
 func (x *ListFirmwaresRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[40]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2846,7 +2960,7 @@ func (x *ListFirmwaresRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFirmwaresRequest.ProtoReflect.Descriptor instead.
 func (*ListFirmwaresRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{40}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ListFirmwaresRequest) GetManufacturer() string {
@@ -2889,7 +3003,7 @@ type ListFirmwaresResponse struct {
 
 func (x *ListFirmwaresResponse) Reset() {
 	*x = ListFirmwaresResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[41]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2901,7 +3015,7 @@ func (x *ListFirmwaresResponse) String() string {
 func (*ListFirmwaresResponse) ProtoMessage() {}
 
 func (x *ListFirmwaresResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[41]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2914,7 +3028,7 @@ func (x *ListFirmwaresResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFirmwaresResponse.ProtoReflect.Descriptor instead.
 func (*ListFirmwaresResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{41}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListFirmwaresResponse) GetCode() int32 {
@@ -2963,7 +3077,7 @@ type UpdateFirmwareRequest struct {
 
 func (x *UpdateFirmwareRequest) Reset() {
 	*x = UpdateFirmwareRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[42]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2975,7 +3089,7 @@ func (x *UpdateFirmwareRequest) String() string {
 func (*UpdateFirmwareRequest) ProtoMessage() {}
 
 func (x *UpdateFirmwareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[42]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2988,7 +3102,7 @@ func (x *UpdateFirmwareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFirmwareRequest.ProtoReflect.Descriptor instead.
 func (*UpdateFirmwareRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{42}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *UpdateFirmwareRequest) GetId() string {
@@ -3072,7 +3186,7 @@ type UpdateFirmwareResponse struct {
 
 func (x *UpdateFirmwareResponse) Reset() {
 	*x = UpdateFirmwareResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[43]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3084,7 +3198,7 @@ func (x *UpdateFirmwareResponse) String() string {
 func (*UpdateFirmwareResponse) ProtoMessage() {}
 
 func (x *UpdateFirmwareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[43]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3097,7 +3211,7 @@ func (x *UpdateFirmwareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFirmwareResponse.ProtoReflect.Descriptor instead.
 func (*UpdateFirmwareResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{43}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *UpdateFirmwareResponse) GetCode() int32 {
@@ -3130,7 +3244,7 @@ type DeleteFirmwareRequest struct {
 
 func (x *DeleteFirmwareRequest) Reset() {
 	*x = DeleteFirmwareRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[44]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3142,7 +3256,7 @@ func (x *DeleteFirmwareRequest) String() string {
 func (*DeleteFirmwareRequest) ProtoMessage() {}
 
 func (x *DeleteFirmwareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[44]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3155,7 +3269,7 @@ func (x *DeleteFirmwareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFirmwareRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFirmwareRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{44}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *DeleteFirmwareRequest) GetId() string {
@@ -3175,7 +3289,7 @@ type DeleteFirmwareResponse struct {
 
 func (x *DeleteFirmwareResponse) Reset() {
 	*x = DeleteFirmwareResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[45]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3187,7 +3301,7 @@ func (x *DeleteFirmwareResponse) String() string {
 func (*DeleteFirmwareResponse) ProtoMessage() {}
 
 func (x *DeleteFirmwareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[45]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3200,7 +3314,7 @@ func (x *DeleteFirmwareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFirmwareResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFirmwareResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{45}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *DeleteFirmwareResponse) GetCode() int32 {
@@ -3227,7 +3341,7 @@ type GetLatestFirmwareRequest struct {
 
 func (x *GetLatestFirmwareRequest) Reset() {
 	*x = GetLatestFirmwareRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[46]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3239,7 +3353,7 @@ func (x *GetLatestFirmwareRequest) String() string {
 func (*GetLatestFirmwareRequest) ProtoMessage() {}
 
 func (x *GetLatestFirmwareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[46]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3252,7 +3366,7 @@ func (x *GetLatestFirmwareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestFirmwareRequest.ProtoReflect.Descriptor instead.
 func (*GetLatestFirmwareRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{46}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GetLatestFirmwareRequest) GetManufacturer() string {
@@ -3280,7 +3394,7 @@ type GetLatestFirmwareResponse struct {
 
 func (x *GetLatestFirmwareResponse) Reset() {
 	*x = GetLatestFirmwareResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[47]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3292,7 +3406,7 @@ func (x *GetLatestFirmwareResponse) String() string {
 func (*GetLatestFirmwareResponse) ProtoMessage() {}
 
 func (x *GetLatestFirmwareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[47]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3305,7 +3419,7 @@ func (x *GetLatestFirmwareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestFirmwareResponse.ProtoReflect.Descriptor instead.
 func (*GetLatestFirmwareResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{47}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *GetLatestFirmwareResponse) GetCode() int32 {
@@ -3350,7 +3464,7 @@ type Firmware struct {
 
 func (x *Firmware) Reset() {
 	*x = Firmware{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[48]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3362,7 +3476,7 @@ func (x *Firmware) String() string {
 func (*Firmware) ProtoMessage() {}
 
 func (x *Firmware) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[48]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3375,7 +3489,7 @@ func (x *Firmware) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Firmware.ProtoReflect.Descriptor instead.
 func (*Firmware) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{48}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *Firmware) GetId() string {
@@ -3486,7 +3600,7 @@ type CreateDevicePerformanceRequest struct {
 
 func (x *CreateDevicePerformanceRequest) Reset() {
 	*x = CreateDevicePerformanceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[49]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3498,7 +3612,7 @@ func (x *CreateDevicePerformanceRequest) String() string {
 func (*CreateDevicePerformanceRequest) ProtoMessage() {}
 
 func (x *CreateDevicePerformanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[49]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3511,7 +3625,7 @@ func (x *CreateDevicePerformanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDevicePerformanceRequest.ProtoReflect.Descriptor instead.
 func (*CreateDevicePerformanceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{49}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *CreateDevicePerformanceRequest) GetDeviceId() string {
@@ -3580,7 +3694,7 @@ type CreateDevicePerformanceResponse struct {
 
 func (x *CreateDevicePerformanceResponse) Reset() {
 	*x = CreateDevicePerformanceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[50]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3592,7 +3706,7 @@ func (x *CreateDevicePerformanceResponse) String() string {
 func (*CreateDevicePerformanceResponse) ProtoMessage() {}
 
 func (x *CreateDevicePerformanceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[50]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3605,7 +3719,7 @@ func (x *CreateDevicePerformanceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDevicePerformanceResponse.ProtoReflect.Descriptor instead.
 func (*CreateDevicePerformanceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{50}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *CreateDevicePerformanceResponse) GetCode() int32 {
@@ -3633,7 +3747,7 @@ type GetDevicePerformanceRequest struct {
 
 func (x *GetDevicePerformanceRequest) Reset() {
 	*x = GetDevicePerformanceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[51]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3645,7 +3759,7 @@ func (x *GetDevicePerformanceRequest) String() string {
 func (*GetDevicePerformanceRequest) ProtoMessage() {}
 
 func (x *GetDevicePerformanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[51]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3658,7 +3772,7 @@ func (x *GetDevicePerformanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDevicePerformanceRequest.ProtoReflect.Descriptor instead.
 func (*GetDevicePerformanceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{51}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *GetDevicePerformanceRequest) GetDeviceId() string {
@@ -3693,7 +3807,7 @@ type GetDevicePerformanceResponse struct {
 
 func (x *GetDevicePerformanceResponse) Reset() {
 	*x = GetDevicePerformanceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[52]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3705,7 +3819,7 @@ func (x *GetDevicePerformanceResponse) String() string {
 func (*GetDevicePerformanceResponse) ProtoMessage() {}
 
 func (x *GetDevicePerformanceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[52]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3718,7 +3832,7 @@ func (x *GetDevicePerformanceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDevicePerformanceResponse.ProtoReflect.Descriptor instead.
 func (*GetDevicePerformanceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{52}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *GetDevicePerformanceResponse) GetCode() int32 {
@@ -3751,7 +3865,7 @@ type GetDevicePerformanceLatestRequest struct {
 
 func (x *GetDevicePerformanceLatestRequest) Reset() {
 	*x = GetDevicePerformanceLatestRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[53]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3763,7 +3877,7 @@ func (x *GetDevicePerformanceLatestRequest) String() string {
 func (*GetDevicePerformanceLatestRequest) ProtoMessage() {}
 
 func (x *GetDevicePerformanceLatestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[53]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3776,7 +3890,7 @@ func (x *GetDevicePerformanceLatestRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetDevicePerformanceLatestRequest.ProtoReflect.Descriptor instead.
 func (*GetDevicePerformanceLatestRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{53}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *GetDevicePerformanceLatestRequest) GetDeviceId() string {
@@ -3797,7 +3911,7 @@ type GetDevicePerformanceLatestResponse struct {
 
 func (x *GetDevicePerformanceLatestResponse) Reset() {
 	*x = GetDevicePerformanceLatestResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[54]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3809,7 +3923,7 @@ func (x *GetDevicePerformanceLatestResponse) String() string {
 func (*GetDevicePerformanceLatestResponse) ProtoMessage() {}
 
 func (x *GetDevicePerformanceLatestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[54]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3822,7 +3936,7 @@ func (x *GetDevicePerformanceLatestResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use GetDevicePerformanceLatestResponse.ProtoReflect.Descriptor instead.
 func (*GetDevicePerformanceLatestResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{54}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *GetDevicePerformanceLatestResponse) GetCode() int32 {
@@ -3864,7 +3978,7 @@ type DevicePerformance struct {
 
 func (x *DevicePerformance) Reset() {
 	*x = DevicePerformance{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[55]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3876,7 +3990,7 @@ func (x *DevicePerformance) String() string {
 func (*DevicePerformance) ProtoMessage() {}
 
 func (x *DevicePerformance) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[55]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3889,7 +4003,7 @@ func (x *DevicePerformance) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DevicePerformance.ProtoReflect.Descriptor instead.
 func (*DevicePerformance) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{55}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *DevicePerformance) GetId() string {
@@ -3979,7 +4093,7 @@ type CreateDeviceFaultRequest struct {
 
 func (x *CreateDeviceFaultRequest) Reset() {
 	*x = CreateDeviceFaultRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[56]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3991,7 +4105,7 @@ func (x *CreateDeviceFaultRequest) String() string {
 func (*CreateDeviceFaultRequest) ProtoMessage() {}
 
 func (x *CreateDeviceFaultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[56]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4004,7 +4118,7 @@ func (x *CreateDeviceFaultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDeviceFaultRequest.ProtoReflect.Descriptor instead.
 func (*CreateDeviceFaultRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{56}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *CreateDeviceFaultRequest) GetDeviceId() string {
@@ -4074,7 +4188,7 @@ type CreateDeviceFaultResponse struct {
 
 func (x *CreateDeviceFaultResponse) Reset() {
 	*x = CreateDeviceFaultResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[57]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4086,7 +4200,7 @@ func (x *CreateDeviceFaultResponse) String() string {
 func (*CreateDeviceFaultResponse) ProtoMessage() {}
 
 func (x *CreateDeviceFaultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[57]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4099,7 +4213,7 @@ func (x *CreateDeviceFaultResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDeviceFaultResponse.ProtoReflect.Descriptor instead.
 func (*CreateDeviceFaultResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{57}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *CreateDeviceFaultResponse) GetCode() int32 {
@@ -4132,7 +4246,7 @@ type GetDeviceFaultRequest struct {
 
 func (x *GetDeviceFaultRequest) Reset() {
 	*x = GetDeviceFaultRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[58]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4144,7 +4258,7 @@ func (x *GetDeviceFaultRequest) String() string {
 func (*GetDeviceFaultRequest) ProtoMessage() {}
 
 func (x *GetDeviceFaultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[58]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4157,7 +4271,7 @@ func (x *GetDeviceFaultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceFaultRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceFaultRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{58}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *GetDeviceFaultRequest) GetId() string {
@@ -4178,7 +4292,7 @@ type GetDeviceFaultResponse struct {
 
 func (x *GetDeviceFaultResponse) Reset() {
 	*x = GetDeviceFaultResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[59]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4190,7 +4304,7 @@ func (x *GetDeviceFaultResponse) String() string {
 func (*GetDeviceFaultResponse) ProtoMessage() {}
 
 func (x *GetDeviceFaultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[59]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4203,7 +4317,7 @@ func (x *GetDeviceFaultResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceFaultResponse.ProtoReflect.Descriptor instead.
 func (*GetDeviceFaultResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{59}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *GetDeviceFaultResponse) GetCode() int32 {
@@ -4239,7 +4353,7 @@ type ListDeviceFaultsRequest struct {
 
 func (x *ListDeviceFaultsRequest) Reset() {
 	*x = ListDeviceFaultsRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[60]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4251,7 +4365,7 @@ func (x *ListDeviceFaultsRequest) String() string {
 func (*ListDeviceFaultsRequest) ProtoMessage() {}
 
 func (x *ListDeviceFaultsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[60]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4264,7 +4378,7 @@ func (x *ListDeviceFaultsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDeviceFaultsRequest.ProtoReflect.Descriptor instead.
 func (*ListDeviceFaultsRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{60}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *ListDeviceFaultsRequest) GetDeviceId() string {
@@ -4307,7 +4421,7 @@ type ListDeviceFaultsResponse struct {
 
 func (x *ListDeviceFaultsResponse) Reset() {
 	*x = ListDeviceFaultsResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[61]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4319,7 +4433,7 @@ func (x *ListDeviceFaultsResponse) String() string {
 func (*ListDeviceFaultsResponse) ProtoMessage() {}
 
 func (x *ListDeviceFaultsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[61]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4332,7 +4446,7 @@ func (x *ListDeviceFaultsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDeviceFaultsResponse.ProtoReflect.Descriptor instead.
 func (*ListDeviceFaultsResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{61}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *ListDeviceFaultsResponse) GetCode() int32 {
@@ -4372,7 +4486,7 @@ type ResolveDeviceFaultRequest struct {
 
 func (x *ResolveDeviceFaultRequest) Reset() {
 	*x = ResolveDeviceFaultRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[62]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4384,7 +4498,7 @@ func (x *ResolveDeviceFaultRequest) String() string {
 func (*ResolveDeviceFaultRequest) ProtoMessage() {}
 
 func (x *ResolveDeviceFaultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[62]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4397,7 +4511,7 @@ func (x *ResolveDeviceFaultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveDeviceFaultRequest.ProtoReflect.Descriptor instead.
 func (*ResolveDeviceFaultRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{62}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *ResolveDeviceFaultRequest) GetId() string {
@@ -4417,7 +4531,7 @@ type ResolveDeviceFaultResponse struct {
 
 func (x *ResolveDeviceFaultResponse) Reset() {
 	*x = ResolveDeviceFaultResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[63]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4429,7 +4543,7 @@ func (x *ResolveDeviceFaultResponse) String() string {
 func (*ResolveDeviceFaultResponse) ProtoMessage() {}
 
 func (x *ResolveDeviceFaultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[63]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4442,7 +4556,7 @@ func (x *ResolveDeviceFaultResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveDeviceFaultResponse.ProtoReflect.Descriptor instead.
 func (*ResolveDeviceFaultResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{63}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *ResolveDeviceFaultResponse) GetCode() int32 {
@@ -4479,7 +4593,7 @@ type DeviceFault struct {
 
 func (x *DeviceFault) Reset() {
 	*x = DeviceFault{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[64]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4491,7 +4605,7 @@ func (x *DeviceFault) String() string {
 func (*DeviceFault) ProtoMessage() {}
 
 func (x *DeviceFault) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[64]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4504,7 +4618,7 @@ func (x *DeviceFault) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceFault.ProtoReflect.Descriptor instead.
 func (*DeviceFault) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{64}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *DeviceFault) GetId() string {
@@ -4603,7 +4717,7 @@ type GetDeviceUsageStatsRequest struct {
 
 func (x *GetDeviceUsageStatsRequest) Reset() {
 	*x = GetDeviceUsageStatsRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[65]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4615,7 +4729,7 @@ func (x *GetDeviceUsageStatsRequest) String() string {
 func (*GetDeviceUsageStatsRequest) ProtoMessage() {}
 
 func (x *GetDeviceUsageStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[65]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4628,7 +4742,7 @@ func (x *GetDeviceUsageStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceUsageStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceUsageStatsRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{65}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *GetDeviceUsageStatsRequest) GetDeviceId() string {
@@ -4663,7 +4777,7 @@ type GetDeviceUsageStatsResponse struct {
 
 func (x *GetDeviceUsageStatsResponse) Reset() {
 	*x = GetDeviceUsageStatsResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[66]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4675,7 +4789,7 @@ func (x *GetDeviceUsageStatsResponse) String() string {
 func (*GetDeviceUsageStatsResponse) ProtoMessage() {}
 
 func (x *GetDeviceUsageStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[66]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4688,7 +4802,7 @@ func (x *GetDeviceUsageStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceUsageStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetDeviceUsageStatsResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{66}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *GetDeviceUsageStatsResponse) GetCode() int32 {
@@ -4723,7 +4837,7 @@ type GetDeviceFaultStatsRequest struct {
 
 func (x *GetDeviceFaultStatsRequest) Reset() {
 	*x = GetDeviceFaultStatsRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[67]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4735,7 +4849,7 @@ func (x *GetDeviceFaultStatsRequest) String() string {
 func (*GetDeviceFaultStatsRequest) ProtoMessage() {}
 
 func (x *GetDeviceFaultStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[67]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4748,7 +4862,7 @@ func (x *GetDeviceFaultStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceFaultStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceFaultStatsRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{67}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *GetDeviceFaultStatsRequest) GetDeviceId() string {
@@ -4783,7 +4897,7 @@ type GetDeviceFaultStatsResponse struct {
 
 func (x *GetDeviceFaultStatsResponse) Reset() {
 	*x = GetDeviceFaultStatsResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[68]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4795,7 +4909,7 @@ func (x *GetDeviceFaultStatsResponse) String() string {
 func (*GetDeviceFaultStatsResponse) ProtoMessage() {}
 
 func (x *GetDeviceFaultStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[68]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4808,7 +4922,7 @@ func (x *GetDeviceFaultStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceFaultStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetDeviceFaultStatsResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{68}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *GetDeviceFaultStatsResponse) GetCode() int32 {
@@ -4841,7 +4955,7 @@ type GetDeviceStatsSummaryRequest struct {
 
 func (x *GetDeviceStatsSummaryRequest) Reset() {
 	*x = GetDeviceStatsSummaryRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[69]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4853,7 +4967,7 @@ func (x *GetDeviceStatsSummaryRequest) String() string {
 func (*GetDeviceStatsSummaryRequest) ProtoMessage() {}
 
 func (x *GetDeviceStatsSummaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[69]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4866,7 +4980,7 @@ func (x *GetDeviceStatsSummaryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceStatsSummaryRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceStatsSummaryRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{69}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *GetDeviceStatsSummaryRequest) GetDeviceId() string {
@@ -4887,7 +5001,7 @@ type GetDeviceStatsSummaryResponse struct {
 
 func (x *GetDeviceStatsSummaryResponse) Reset() {
 	*x = GetDeviceStatsSummaryResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[70]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4899,7 +5013,7 @@ func (x *GetDeviceStatsSummaryResponse) String() string {
 func (*GetDeviceStatsSummaryResponse) ProtoMessage() {}
 
 func (x *GetDeviceStatsSummaryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[70]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4912,7 +5026,7 @@ func (x *GetDeviceStatsSummaryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceStatsSummaryResponse.ProtoReflect.Descriptor instead.
 func (*GetDeviceStatsSummaryResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{70}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *GetDeviceStatsSummaryResponse) GetCode() int32 {
@@ -4948,7 +5062,7 @@ type UpgradeDeviceRequest struct {
 
 func (x *UpgradeDeviceRequest) Reset() {
 	*x = UpgradeDeviceRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[71]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4960,7 +5074,7 @@ func (x *UpgradeDeviceRequest) String() string {
 func (*UpgradeDeviceRequest) ProtoMessage() {}
 
 func (x *UpgradeDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[71]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4973,7 +5087,7 @@ func (x *UpgradeDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpgradeDeviceRequest.ProtoReflect.Descriptor instead.
 func (*UpgradeDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{71}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *UpgradeDeviceRequest) GetDeviceId() string {
@@ -5008,7 +5122,7 @@ type UpgradeDeviceResponse struct {
 
 func (x *UpgradeDeviceResponse) Reset() {
 	*x = UpgradeDeviceResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[72]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5020,7 +5134,7 @@ func (x *UpgradeDeviceResponse) String() string {
 func (*UpgradeDeviceResponse) ProtoMessage() {}
 
 func (x *UpgradeDeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[72]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5033,7 +5147,7 @@ func (x *UpgradeDeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpgradeDeviceResponse.ProtoReflect.Descriptor instead.
 func (*UpgradeDeviceResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{72}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *UpgradeDeviceResponse) GetCode() int32 {
@@ -5068,7 +5182,7 @@ type UpgradeStatusData struct {
 
 func (x *UpgradeStatusData) Reset() {
 	*x = UpgradeStatusData{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[73]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5080,7 +5194,7 @@ func (x *UpgradeStatusData) String() string {
 func (*UpgradeStatusData) ProtoMessage() {}
 
 func (x *UpgradeStatusData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[73]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5093,7 +5207,7 @@ func (x *UpgradeStatusData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpgradeStatusData.ProtoReflect.Descriptor instead.
 func (*UpgradeStatusData) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{73}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *UpgradeStatusData) GetUpgradeId() string {
@@ -5126,7 +5240,7 @@ type GetDeviceUpgradeStatusRequest struct {
 
 func (x *GetDeviceUpgradeStatusRequest) Reset() {
 	*x = GetDeviceUpgradeStatusRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[74]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5138,7 +5252,7 @@ func (x *GetDeviceUpgradeStatusRequest) String() string {
 func (*GetDeviceUpgradeStatusRequest) ProtoMessage() {}
 
 func (x *GetDeviceUpgradeStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[74]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5151,7 +5265,7 @@ func (x *GetDeviceUpgradeStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceUpgradeStatusRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceUpgradeStatusRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{74}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *GetDeviceUpgradeStatusRequest) GetUpgradeId() string {
@@ -5177,7 +5291,7 @@ type UpgradeStatusResponse struct {
 
 func (x *UpgradeStatusResponse) Reset() {
 	*x = UpgradeStatusResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[75]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5189,7 +5303,7 @@ func (x *UpgradeStatusResponse) String() string {
 func (*UpgradeStatusResponse) ProtoMessage() {}
 
 func (x *UpgradeStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[75]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5202,7 +5316,7 @@ func (x *UpgradeStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpgradeStatusResponse.ProtoReflect.Descriptor instead.
 func (*UpgradeStatusResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{75}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *UpgradeStatusResponse) GetUpgradeId() string {
@@ -5277,7 +5391,7 @@ type DeviceLog struct {
 
 func (x *DeviceLog) Reset() {
 	*x = DeviceLog{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[76]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5289,7 +5403,7 @@ func (x *DeviceLog) String() string {
 func (*DeviceLog) ProtoMessage() {}
 
 func (x *DeviceLog) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[76]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5302,7 +5416,7 @@ func (x *DeviceLog) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceLog.ProtoReflect.Descriptor instead.
 func (*DeviceLog) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{76}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *DeviceLog) GetId() string {
@@ -5365,7 +5479,7 @@ type GetDeviceLogsRequest struct {
 
 func (x *GetDeviceLogsRequest) Reset() {
 	*x = GetDeviceLogsRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[77]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5377,7 +5491,7 @@ func (x *GetDeviceLogsRequest) String() string {
 func (*GetDeviceLogsRequest) ProtoMessage() {}
 
 func (x *GetDeviceLogsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[77]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5390,7 +5504,7 @@ func (x *GetDeviceLogsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceLogsRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceLogsRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{77}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *GetDeviceLogsRequest) GetDeviceId() string {
@@ -5426,7 +5540,7 @@ type GetDeviceLogsResponse struct {
 
 func (x *GetDeviceLogsResponse) Reset() {
 	*x = GetDeviceLogsResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[78]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5438,7 +5552,7 @@ func (x *GetDeviceLogsResponse) String() string {
 func (*GetDeviceLogsResponse) ProtoMessage() {}
 
 func (x *GetDeviceLogsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[78]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5451,7 +5565,7 @@ func (x *GetDeviceLogsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceLogsResponse.ProtoReflect.Descriptor instead.
 func (*GetDeviceLogsResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{78}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *GetDeviceLogsResponse) GetCode() int32 {
@@ -5492,7 +5606,7 @@ type GetDeviceStatsRequest struct {
 
 func (x *GetDeviceStatsRequest) Reset() {
 	*x = GetDeviceStatsRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[79]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5504,7 +5618,7 @@ func (x *GetDeviceStatsRequest) String() string {
 func (*GetDeviceStatsRequest) ProtoMessage() {}
 
 func (x *GetDeviceStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[79]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5517,7 +5631,7 @@ func (x *GetDeviceStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDeviceStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetDeviceStatsRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{79}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *GetDeviceStatsRequest) GetDeviceId() string {
@@ -5538,7 +5652,7 @@ type DeviceStatsResponse struct {
 
 func (x *DeviceStatsResponse) Reset() {
 	*x = DeviceStatsResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[80]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5550,7 +5664,7 @@ func (x *DeviceStatsResponse) String() string {
 func (*DeviceStatsResponse) ProtoMessage() {}
 
 func (x *DeviceStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[80]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5563,7 +5677,7 @@ func (x *DeviceStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceStatsResponse.ProtoReflect.Descriptor instead.
 func (*DeviceStatsResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{80}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{82}
 }
 
 func (x *DeviceStatsResponse) GetCode() int32 {
@@ -5599,7 +5713,7 @@ type DeviceStatsData struct {
 
 func (x *DeviceStatsData) Reset() {
 	*x = DeviceStatsData{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[81]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5611,7 +5725,7 @@ func (x *DeviceStatsData) String() string {
 func (*DeviceStatsData) ProtoMessage() {}
 
 func (x *DeviceStatsData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[81]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5624,7 +5738,7 @@ func (x *DeviceStatsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceStatsData.ProtoReflect.Descriptor instead.
 func (*DeviceStatsData) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{81}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *DeviceStatsData) GetTotalDevices() int32 {
@@ -5666,7 +5780,7 @@ type UpdateDeviceConfigRequest struct {
 
 func (x *UpdateDeviceConfigRequest) Reset() {
 	*x = UpdateDeviceConfigRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[82]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5678,7 +5792,7 @@ func (x *UpdateDeviceConfigRequest) String() string {
 func (*UpdateDeviceConfigRequest) ProtoMessage() {}
 
 func (x *UpdateDeviceConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[82]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5691,7 +5805,7 @@ func (x *UpdateDeviceConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDeviceConfigRequest.ProtoReflect.Descriptor instead.
 func (*UpdateDeviceConfigRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{82}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *UpdateDeviceConfigRequest) GetDeviceId() string {
@@ -5719,7 +5833,7 @@ type UpdateDeviceConfigResponse struct {
 
 func (x *UpdateDeviceConfigResponse) Reset() {
 	*x = UpdateDeviceConfigResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[83]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5731,7 +5845,7 @@ func (x *UpdateDeviceConfigResponse) String() string {
 func (*UpdateDeviceConfigResponse) ProtoMessage() {}
 
 func (x *UpdateDeviceConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[83]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5744,7 +5858,7 @@ func (x *UpdateDeviceConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDeviceConfigResponse.ProtoReflect.Descriptor instead.
 func (*UpdateDeviceConfigResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{83}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *UpdateDeviceConfigResponse) GetCode() int32 {
@@ -5780,7 +5894,7 @@ type AddBlacklistEntryRequest struct {
 
 func (x *AddBlacklistEntryRequest) Reset() {
 	*x = AddBlacklistEntryRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[84]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5792,7 +5906,7 @@ func (x *AddBlacklistEntryRequest) String() string {
 func (*AddBlacklistEntryRequest) ProtoMessage() {}
 
 func (x *AddBlacklistEntryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[84]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5805,7 +5919,7 @@ func (x *AddBlacklistEntryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddBlacklistEntryRequest.ProtoReflect.Descriptor instead.
 func (*AddBlacklistEntryRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{84}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *AddBlacklistEntryRequest) GetPlateNumber() string {
@@ -5840,7 +5954,7 @@ type AddBlacklistEntryResponse struct {
 
 func (x *AddBlacklistEntryResponse) Reset() {
 	*x = AddBlacklistEntryResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[85]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5852,7 +5966,7 @@ func (x *AddBlacklistEntryResponse) String() string {
 func (*AddBlacklistEntryResponse) ProtoMessage() {}
 
 func (x *AddBlacklistEntryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[85]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5865,7 +5979,7 @@ func (x *AddBlacklistEntryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddBlacklistEntryResponse.ProtoReflect.Descriptor instead.
 func (*AddBlacklistEntryResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{85}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{87}
 }
 
 func (x *AddBlacklistEntryResponse) GetCode() int32 {
@@ -5898,7 +6012,7 @@ type RemoveBlacklistEntryRequest struct {
 
 func (x *RemoveBlacklistEntryRequest) Reset() {
 	*x = RemoveBlacklistEntryRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[86]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5910,7 +6024,7 @@ func (x *RemoveBlacklistEntryRequest) String() string {
 func (*RemoveBlacklistEntryRequest) ProtoMessage() {}
 
 func (x *RemoveBlacklistEntryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[86]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5923,7 +6037,7 @@ func (x *RemoveBlacklistEntryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveBlacklistEntryRequest.ProtoReflect.Descriptor instead.
 func (*RemoveBlacklistEntryRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{86}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{88}
 }
 
 func (x *RemoveBlacklistEntryRequest) GetPlateNumber() string {
@@ -5943,7 +6057,7 @@ type RemoveBlacklistEntryResponse struct {
 
 func (x *RemoveBlacklistEntryResponse) Reset() {
 	*x = RemoveBlacklistEntryResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[87]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5955,7 +6069,7 @@ func (x *RemoveBlacklistEntryResponse) String() string {
 func (*RemoveBlacklistEntryResponse) ProtoMessage() {}
 
 func (x *RemoveBlacklistEntryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[87]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5968,7 +6082,7 @@ func (x *RemoveBlacklistEntryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveBlacklistEntryResponse.ProtoReflect.Descriptor instead.
 func (*RemoveBlacklistEntryResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{87}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{89}
 }
 
 func (x *RemoveBlacklistEntryResponse) GetCode() int32 {
@@ -5995,7 +6109,7 @@ type ListBlacklistEntriesRequest struct {
 
 func (x *ListBlacklistEntriesRequest) Reset() {
 	*x = ListBlacklistEntriesRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[88]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6007,7 +6121,7 @@ func (x *ListBlacklistEntriesRequest) String() string {
 func (*ListBlacklistEntriesRequest) ProtoMessage() {}
 
 func (x *ListBlacklistEntriesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[88]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6020,7 +6134,7 @@ func (x *ListBlacklistEntriesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBlacklistEntriesRequest.ProtoReflect.Descriptor instead.
 func (*ListBlacklistEntriesRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{88}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{90}
 }
 
 func (x *ListBlacklistEntriesRequest) GetPage() int32 {
@@ -6049,7 +6163,7 @@ type ListBlacklistEntriesResponse struct {
 
 func (x *ListBlacklistEntriesResponse) Reset() {
 	*x = ListBlacklistEntriesResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[89]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6061,7 +6175,7 @@ func (x *ListBlacklistEntriesResponse) String() string {
 func (*ListBlacklistEntriesResponse) ProtoMessage() {}
 
 func (x *ListBlacklistEntriesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[89]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6074,7 +6188,7 @@ func (x *ListBlacklistEntriesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBlacklistEntriesResponse.ProtoReflect.Descriptor instead.
 func (*ListBlacklistEntriesResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{89}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{91}
 }
 
 func (x *ListBlacklistEntriesResponse) GetCode() int32 {
@@ -6114,7 +6228,7 @@ type CheckBlacklistRequest struct {
 
 func (x *CheckBlacklistRequest) Reset() {
 	*x = CheckBlacklistRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[90]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6126,7 +6240,7 @@ func (x *CheckBlacklistRequest) String() string {
 func (*CheckBlacklistRequest) ProtoMessage() {}
 
 func (x *CheckBlacklistRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[90]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6139,7 +6253,7 @@ func (x *CheckBlacklistRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckBlacklistRequest.ProtoReflect.Descriptor instead.
 func (*CheckBlacklistRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{90}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *CheckBlacklistRequest) GetPlateNumber() string {
@@ -6161,7 +6275,7 @@ type CheckBlacklistResponse struct {
 
 func (x *CheckBlacklistResponse) Reset() {
 	*x = CheckBlacklistResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[91]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6173,7 +6287,7 @@ func (x *CheckBlacklistResponse) String() string {
 func (*CheckBlacklistResponse) ProtoMessage() {}
 
 func (x *CheckBlacklistResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[91]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6186,7 +6300,7 @@ func (x *CheckBlacklistResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckBlacklistResponse.ProtoReflect.Descriptor instead.
 func (*CheckBlacklistResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{91}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *CheckBlacklistResponse) GetCode() int32 {
@@ -6230,7 +6344,7 @@ type BlacklistEntryInfo struct {
 
 func (x *BlacklistEntryInfo) Reset() {
 	*x = BlacklistEntryInfo{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6242,7 +6356,7 @@ func (x *BlacklistEntryInfo) String() string {
 func (*BlacklistEntryInfo) ProtoMessage() {}
 
 func (x *BlacklistEntryInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6255,7 +6369,7 @@ func (x *BlacklistEntryInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlacklistEntryInfo.ProtoReflect.Descriptor instead.
 func (*BlacklistEntryInfo) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{92}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *BlacklistEntryInfo) GetPlateNumber() string {
@@ -6410,7 +6524,13 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\x18GetParkingRecordResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
-	"\x04data\x18\x03 \x01(\v2!.api.vehicle.v1.ParkingRecordInfoR\x04data\"\xff\x03\n" +
+	"\x04data\x18\x03 \x01(\v2!.api.vehicle.v1.ParkingRecordInfoR\x04data\"O\n" +
+	"\x19UpdateRecordStatusRequest\x12\x1a\n" +
+	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"J\n" +
+	"\x1aUpdateRecordStatusResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xa1\x04\n" +
 	"\x11ParkingRecordInfo\x12\x1a\n" +
 	"\brecordId\x18\x01 \x01(\tR\brecordId\x12\x14\n" +
 	"\x05lotId\x18\x02 \x01(\tR\x05lotId\x12\x1c\n" +
@@ -6431,7 +6551,8 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\n" +
 	"exitStatus\x18\x0e \x01(\tR\n" +
 	"exitStatus\x12 \n" +
-	"\vpaymentLock\x18\x0f \x01(\x05R\vpaymentLock\"D\n" +
+	"\vpaymentLock\x18\x0f \x01(\x05R\vpaymentLock\x12 \n" +
+	"\vfinalAmount\x18\x10 \x01(\x03R\vfinalAmount\"D\n" +
 	"\x12ListDevicesRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1a\n" +
 	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"\x89\x01\n" +
@@ -6831,7 +6952,7 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x1c\n" +
 	"\tcreatedBy\x18\x03 \x01(\tR\tcreatedBy\x12\x16\n" +
 	"\x06active\x18\x04 \x01(\bR\x06active\x12\x1c\n" +
-	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt2\xf7/\n" +
+	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt2\x9b1\n" +
 	"\x0eVehicleService\x12e\n" +
 	"\x05Entry\x12\x1c.api.vehicle.v1.EntryRequest\x1a\x1d.api.vehicle.v1.EntryResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/device/entry\x12a\n" +
 	"\x04Exit\x12\x1b.api.vehicle.v1.ExitRequest\x1a\x1c.api.vehicle.v1.ExitResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/device/exit\x12u\n" +
@@ -6840,7 +6961,8 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\vSendCommand\x12\".api.vehicle.v1.SendCommandRequest\x1a#.api.vehicle.v1.SendCommandResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/device/{deviceId}/command\x12\x86\x01\n" +
 	"\x0eGetVehicleInfo\x12%.api.vehicle.v1.GetVehicleInfoRequest\x1a&.api.vehicle.v1.GetVehicleInfoResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/vehicle/{plateNumber}\x12\x8c\x01\n" +
 	"\x12ListParkingRecords\x12).api.vehicle.v1.ListParkingRecordsRequest\x1a*.api.vehicle.v1.ListParkingRecordsResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/vehicle/records\x12\x91\x01\n" +
-	"\x10GetParkingRecord\x12'.api.vehicle.v1.GetParkingRecordRequest\x1a(.api.vehicle.v1.GetParkingRecordResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/vehicle/records/{recordId}\x12o\n" +
+	"\x10GetParkingRecord\x12'.api.vehicle.v1.GetParkingRecordRequest\x1a(.api.vehicle.v1.GetParkingRecordResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/vehicle/records/{recordId}\x12\xa1\x01\n" +
+	"\x12UpdateRecordStatus\x12).api.vehicle.v1.UpdateRecordStatusRequest\x1a*.api.vehicle.v1.UpdateRecordStatusResponse\"4\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/vehicle/records/{recordId}/status\x12o\n" +
 	"\vListDevices\x12\".api.vehicle.v1.ListDevicesRequest\x1a#.api.vehicle.v1.ListDevicesResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/devices\x12u\n" +
 	"\fCreateDevice\x12#.api.vehicle.v1.CreateDeviceRequest\x1a$.api.vehicle.v1.CreateDeviceResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/devices\x12t\n" +
 	"\tGetDevice\x12 .api.vehicle.v1.GetDeviceRequest\x1a!.api.vehicle.v1.GetDeviceResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/devices/{deviceId}\x12\x80\x01\n" +
@@ -6890,7 +7012,7 @@ func file_api_vehicle_v1_vehicle_proto_rawDescGZIP() []byte {
 	return file_api_vehicle_v1_vehicle_proto_rawDescData
 }
 
-var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 102)
+var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 104)
 var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
 	(*EntryRequest)(nil),                       // 0: api.vehicle.v1.EntryRequest
 	(*EntryResponse)(nil),                      // 1: api.vehicle.v1.EntryResponse
@@ -6914,141 +7036,143 @@ var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
 	(*ListParkingRecordsData)(nil),             // 19: api.vehicle.v1.ListParkingRecordsData
 	(*GetParkingRecordRequest)(nil),            // 20: api.vehicle.v1.GetParkingRecordRequest
 	(*GetParkingRecordResponse)(nil),           // 21: api.vehicle.v1.GetParkingRecordResponse
-	(*ParkingRecordInfo)(nil),                  // 22: api.vehicle.v1.ParkingRecordInfo
-	(*ListDevicesRequest)(nil),                 // 23: api.vehicle.v1.ListDevicesRequest
-	(*ListDevicesResponse)(nil),                // 24: api.vehicle.v1.ListDevicesResponse
-	(*DeviceInfo)(nil),                         // 25: api.vehicle.v1.DeviceInfo
-	(*CreateDeviceRequest)(nil),                // 26: api.vehicle.v1.CreateDeviceRequest
-	(*CreateDeviceResponse)(nil),               // 27: api.vehicle.v1.CreateDeviceResponse
-	(*GetDeviceRequest)(nil),                   // 28: api.vehicle.v1.GetDeviceRequest
-	(*GetDeviceResponse)(nil),                  // 29: api.vehicle.v1.GetDeviceResponse
-	(*UpdateDeviceRequest)(nil),                // 30: api.vehicle.v1.UpdateDeviceRequest
-	(*UpdateDeviceResponse)(nil),               // 31: api.vehicle.v1.UpdateDeviceResponse
-	(*DeleteDeviceRequest)(nil),                // 32: api.vehicle.v1.DeleteDeviceRequest
-	(*DeleteDeviceResponse)(nil),               // 33: api.vehicle.v1.DeleteDeviceResponse
-	(*CreateFirmwareRequest)(nil),              // 34: api.vehicle.v1.CreateFirmwareRequest
-	(*CreateFirmwareResponse)(nil),             // 35: api.vehicle.v1.CreateFirmwareResponse
-	(*GetFirmwareRequest)(nil),                 // 36: api.vehicle.v1.GetFirmwareRequest
-	(*GetFirmwareResponse)(nil),                // 37: api.vehicle.v1.GetFirmwareResponse
-	(*GetFirmwareByIDRequest)(nil),             // 38: api.vehicle.v1.GetFirmwareByIDRequest
-	(*GetFirmwareByIDResponse)(nil),            // 39: api.vehicle.v1.GetFirmwareByIDResponse
-	(*ListFirmwaresRequest)(nil),               // 40: api.vehicle.v1.ListFirmwaresRequest
-	(*ListFirmwaresResponse)(nil),              // 41: api.vehicle.v1.ListFirmwaresResponse
-	(*UpdateFirmwareRequest)(nil),              // 42: api.vehicle.v1.UpdateFirmwareRequest
-	(*UpdateFirmwareResponse)(nil),             // 43: api.vehicle.v1.UpdateFirmwareResponse
-	(*DeleteFirmwareRequest)(nil),              // 44: api.vehicle.v1.DeleteFirmwareRequest
-	(*DeleteFirmwareResponse)(nil),             // 45: api.vehicle.v1.DeleteFirmwareResponse
-	(*GetLatestFirmwareRequest)(nil),           // 46: api.vehicle.v1.GetLatestFirmwareRequest
-	(*GetLatestFirmwareResponse)(nil),          // 47: api.vehicle.v1.GetLatestFirmwareResponse
-	(*Firmware)(nil),                           // 48: api.vehicle.v1.Firmware
-	(*CreateDevicePerformanceRequest)(nil),     // 49: api.vehicle.v1.CreateDevicePerformanceRequest
-	(*CreateDevicePerformanceResponse)(nil),    // 50: api.vehicle.v1.CreateDevicePerformanceResponse
-	(*GetDevicePerformanceRequest)(nil),        // 51: api.vehicle.v1.GetDevicePerformanceRequest
-	(*GetDevicePerformanceResponse)(nil),       // 52: api.vehicle.v1.GetDevicePerformanceResponse
-	(*GetDevicePerformanceLatestRequest)(nil),  // 53: api.vehicle.v1.GetDevicePerformanceLatestRequest
-	(*GetDevicePerformanceLatestResponse)(nil), // 54: api.vehicle.v1.GetDevicePerformanceLatestResponse
-	(*DevicePerformance)(nil),                  // 55: api.vehicle.v1.DevicePerformance
-	(*CreateDeviceFaultRequest)(nil),           // 56: api.vehicle.v1.CreateDeviceFaultRequest
-	(*CreateDeviceFaultResponse)(nil),          // 57: api.vehicle.v1.CreateDeviceFaultResponse
-	(*GetDeviceFaultRequest)(nil),              // 58: api.vehicle.v1.GetDeviceFaultRequest
-	(*GetDeviceFaultResponse)(nil),             // 59: api.vehicle.v1.GetDeviceFaultResponse
-	(*ListDeviceFaultsRequest)(nil),            // 60: api.vehicle.v1.ListDeviceFaultsRequest
-	(*ListDeviceFaultsResponse)(nil),           // 61: api.vehicle.v1.ListDeviceFaultsResponse
-	(*ResolveDeviceFaultRequest)(nil),          // 62: api.vehicle.v1.ResolveDeviceFaultRequest
-	(*ResolveDeviceFaultResponse)(nil),         // 63: api.vehicle.v1.ResolveDeviceFaultResponse
-	(*DeviceFault)(nil),                        // 64: api.vehicle.v1.DeviceFault
-	(*GetDeviceUsageStatsRequest)(nil),         // 65: api.vehicle.v1.GetDeviceUsageStatsRequest
-	(*GetDeviceUsageStatsResponse)(nil),        // 66: api.vehicle.v1.GetDeviceUsageStatsResponse
-	(*GetDeviceFaultStatsRequest)(nil),         // 67: api.vehicle.v1.GetDeviceFaultStatsRequest
-	(*GetDeviceFaultStatsResponse)(nil),        // 68: api.vehicle.v1.GetDeviceFaultStatsResponse
-	(*GetDeviceStatsSummaryRequest)(nil),       // 69: api.vehicle.v1.GetDeviceStatsSummaryRequest
-	(*GetDeviceStatsSummaryResponse)(nil),      // 70: api.vehicle.v1.GetDeviceStatsSummaryResponse
-	(*UpgradeDeviceRequest)(nil),               // 71: api.vehicle.v1.UpgradeDeviceRequest
-	(*UpgradeDeviceResponse)(nil),              // 72: api.vehicle.v1.UpgradeDeviceResponse
-	(*UpgradeStatusData)(nil),                  // 73: api.vehicle.v1.UpgradeStatusData
-	(*GetDeviceUpgradeStatusRequest)(nil),      // 74: api.vehicle.v1.GetDeviceUpgradeStatusRequest
-	(*UpgradeStatusResponse)(nil),              // 75: api.vehicle.v1.UpgradeStatusResponse
-	(*DeviceLog)(nil),                          // 76: api.vehicle.v1.DeviceLog
-	(*GetDeviceLogsRequest)(nil),               // 77: api.vehicle.v1.GetDeviceLogsRequest
-	(*GetDeviceLogsResponse)(nil),              // 78: api.vehicle.v1.GetDeviceLogsResponse
-	(*GetDeviceStatsRequest)(nil),              // 79: api.vehicle.v1.GetDeviceStatsRequest
-	(*DeviceStatsResponse)(nil),                // 80: api.vehicle.v1.DeviceStatsResponse
-	(*DeviceStatsData)(nil),                    // 81: api.vehicle.v1.DeviceStatsData
-	(*UpdateDeviceConfigRequest)(nil),          // 82: api.vehicle.v1.UpdateDeviceConfigRequest
-	(*UpdateDeviceConfigResponse)(nil),         // 83: api.vehicle.v1.UpdateDeviceConfigResponse
-	(*AddBlacklistEntryRequest)(nil),           // 84: api.vehicle.v1.AddBlacklistEntryRequest
-	(*AddBlacklistEntryResponse)(nil),          // 85: api.vehicle.v1.AddBlacklistEntryResponse
-	(*RemoveBlacklistEntryRequest)(nil),        // 86: api.vehicle.v1.RemoveBlacklistEntryRequest
-	(*RemoveBlacklistEntryResponse)(nil),       // 87: api.vehicle.v1.RemoveBlacklistEntryResponse
-	(*ListBlacklistEntriesRequest)(nil),        // 88: api.vehicle.v1.ListBlacklistEntriesRequest
-	(*ListBlacklistEntriesResponse)(nil),       // 89: api.vehicle.v1.ListBlacklistEntriesResponse
-	(*CheckBlacklistRequest)(nil),              // 90: api.vehicle.v1.CheckBlacklistRequest
-	(*CheckBlacklistResponse)(nil),             // 91: api.vehicle.v1.CheckBlacklistResponse
-	(*BlacklistEntryInfo)(nil),                 // 92: api.vehicle.v1.BlacklistEntryInfo
-	nil,                                        // 93: api.vehicle.v1.HeartbeatRequest.StatsEntry
-	nil,                                        // 94: api.vehicle.v1.SendCommandRequest.ParamsEntry
-	nil,                                        // 95: api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
-	nil,                                        // 96: api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
-	nil,                                        // 97: api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
-	nil,                                        // 98: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
-	nil,                                        // 99: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
-	nil,                                        // 100: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
-	nil,                                        // 101: api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
-	(*structpb.Value)(nil),                     // 102: google.protobuf.Value
-	(*CreateManufacturerRequest)(nil),          // 103: api.vehicle.v1.CreateManufacturerRequest
-	(*GetManufacturerRequest)(nil),             // 104: api.vehicle.v1.GetManufacturerRequest
-	(*ListManufacturersRequest)(nil),           // 105: api.vehicle.v1.ListManufacturersRequest
-	(*UpdateManufacturerRequest)(nil),          // 106: api.vehicle.v1.UpdateManufacturerRequest
-	(*DeleteManufacturerRequest)(nil),          // 107: api.vehicle.v1.DeleteManufacturerRequest
-	(*CreateManufacturerResponse)(nil),         // 108: api.vehicle.v1.CreateManufacturerResponse
-	(*GetManufacturerResponse)(nil),            // 109: api.vehicle.v1.GetManufacturerResponse
-	(*ListManufacturersResponse)(nil),          // 110: api.vehicle.v1.ListManufacturersResponse
-	(*UpdateManufacturerResponse)(nil),         // 111: api.vehicle.v1.UpdateManufacturerResponse
-	(*DeleteManufacturerResponse)(nil),         // 112: api.vehicle.v1.DeleteManufacturerResponse
+	(*UpdateRecordStatusRequest)(nil),          // 22: api.vehicle.v1.UpdateRecordStatusRequest
+	(*UpdateRecordStatusResponse)(nil),         // 23: api.vehicle.v1.UpdateRecordStatusResponse
+	(*ParkingRecordInfo)(nil),                  // 24: api.vehicle.v1.ParkingRecordInfo
+	(*ListDevicesRequest)(nil),                 // 25: api.vehicle.v1.ListDevicesRequest
+	(*ListDevicesResponse)(nil),                // 26: api.vehicle.v1.ListDevicesResponse
+	(*DeviceInfo)(nil),                         // 27: api.vehicle.v1.DeviceInfo
+	(*CreateDeviceRequest)(nil),                // 28: api.vehicle.v1.CreateDeviceRequest
+	(*CreateDeviceResponse)(nil),               // 29: api.vehicle.v1.CreateDeviceResponse
+	(*GetDeviceRequest)(nil),                   // 30: api.vehicle.v1.GetDeviceRequest
+	(*GetDeviceResponse)(nil),                  // 31: api.vehicle.v1.GetDeviceResponse
+	(*UpdateDeviceRequest)(nil),                // 32: api.vehicle.v1.UpdateDeviceRequest
+	(*UpdateDeviceResponse)(nil),               // 33: api.vehicle.v1.UpdateDeviceResponse
+	(*DeleteDeviceRequest)(nil),                // 34: api.vehicle.v1.DeleteDeviceRequest
+	(*DeleteDeviceResponse)(nil),               // 35: api.vehicle.v1.DeleteDeviceResponse
+	(*CreateFirmwareRequest)(nil),              // 36: api.vehicle.v1.CreateFirmwareRequest
+	(*CreateFirmwareResponse)(nil),             // 37: api.vehicle.v1.CreateFirmwareResponse
+	(*GetFirmwareRequest)(nil),                 // 38: api.vehicle.v1.GetFirmwareRequest
+	(*GetFirmwareResponse)(nil),                // 39: api.vehicle.v1.GetFirmwareResponse
+	(*GetFirmwareByIDRequest)(nil),             // 40: api.vehicle.v1.GetFirmwareByIDRequest
+	(*GetFirmwareByIDResponse)(nil),            // 41: api.vehicle.v1.GetFirmwareByIDResponse
+	(*ListFirmwaresRequest)(nil),               // 42: api.vehicle.v1.ListFirmwaresRequest
+	(*ListFirmwaresResponse)(nil),              // 43: api.vehicle.v1.ListFirmwaresResponse
+	(*UpdateFirmwareRequest)(nil),              // 44: api.vehicle.v1.UpdateFirmwareRequest
+	(*UpdateFirmwareResponse)(nil),             // 45: api.vehicle.v1.UpdateFirmwareResponse
+	(*DeleteFirmwareRequest)(nil),              // 46: api.vehicle.v1.DeleteFirmwareRequest
+	(*DeleteFirmwareResponse)(nil),             // 47: api.vehicle.v1.DeleteFirmwareResponse
+	(*GetLatestFirmwareRequest)(nil),           // 48: api.vehicle.v1.GetLatestFirmwareRequest
+	(*GetLatestFirmwareResponse)(nil),          // 49: api.vehicle.v1.GetLatestFirmwareResponse
+	(*Firmware)(nil),                           // 50: api.vehicle.v1.Firmware
+	(*CreateDevicePerformanceRequest)(nil),     // 51: api.vehicle.v1.CreateDevicePerformanceRequest
+	(*CreateDevicePerformanceResponse)(nil),    // 52: api.vehicle.v1.CreateDevicePerformanceResponse
+	(*GetDevicePerformanceRequest)(nil),        // 53: api.vehicle.v1.GetDevicePerformanceRequest
+	(*GetDevicePerformanceResponse)(nil),       // 54: api.vehicle.v1.GetDevicePerformanceResponse
+	(*GetDevicePerformanceLatestRequest)(nil),  // 55: api.vehicle.v1.GetDevicePerformanceLatestRequest
+	(*GetDevicePerformanceLatestResponse)(nil), // 56: api.vehicle.v1.GetDevicePerformanceLatestResponse
+	(*DevicePerformance)(nil),                  // 57: api.vehicle.v1.DevicePerformance
+	(*CreateDeviceFaultRequest)(nil),           // 58: api.vehicle.v1.CreateDeviceFaultRequest
+	(*CreateDeviceFaultResponse)(nil),          // 59: api.vehicle.v1.CreateDeviceFaultResponse
+	(*GetDeviceFaultRequest)(nil),              // 60: api.vehicle.v1.GetDeviceFaultRequest
+	(*GetDeviceFaultResponse)(nil),             // 61: api.vehicle.v1.GetDeviceFaultResponse
+	(*ListDeviceFaultsRequest)(nil),            // 62: api.vehicle.v1.ListDeviceFaultsRequest
+	(*ListDeviceFaultsResponse)(nil),           // 63: api.vehicle.v1.ListDeviceFaultsResponse
+	(*ResolveDeviceFaultRequest)(nil),          // 64: api.vehicle.v1.ResolveDeviceFaultRequest
+	(*ResolveDeviceFaultResponse)(nil),         // 65: api.vehicle.v1.ResolveDeviceFaultResponse
+	(*DeviceFault)(nil),                        // 66: api.vehicle.v1.DeviceFault
+	(*GetDeviceUsageStatsRequest)(nil),         // 67: api.vehicle.v1.GetDeviceUsageStatsRequest
+	(*GetDeviceUsageStatsResponse)(nil),        // 68: api.vehicle.v1.GetDeviceUsageStatsResponse
+	(*GetDeviceFaultStatsRequest)(nil),         // 69: api.vehicle.v1.GetDeviceFaultStatsRequest
+	(*GetDeviceFaultStatsResponse)(nil),        // 70: api.vehicle.v1.GetDeviceFaultStatsResponse
+	(*GetDeviceStatsSummaryRequest)(nil),       // 71: api.vehicle.v1.GetDeviceStatsSummaryRequest
+	(*GetDeviceStatsSummaryResponse)(nil),      // 72: api.vehicle.v1.GetDeviceStatsSummaryResponse
+	(*UpgradeDeviceRequest)(nil),               // 73: api.vehicle.v1.UpgradeDeviceRequest
+	(*UpgradeDeviceResponse)(nil),              // 74: api.vehicle.v1.UpgradeDeviceResponse
+	(*UpgradeStatusData)(nil),                  // 75: api.vehicle.v1.UpgradeStatusData
+	(*GetDeviceUpgradeStatusRequest)(nil),      // 76: api.vehicle.v1.GetDeviceUpgradeStatusRequest
+	(*UpgradeStatusResponse)(nil),              // 77: api.vehicle.v1.UpgradeStatusResponse
+	(*DeviceLog)(nil),                          // 78: api.vehicle.v1.DeviceLog
+	(*GetDeviceLogsRequest)(nil),               // 79: api.vehicle.v1.GetDeviceLogsRequest
+	(*GetDeviceLogsResponse)(nil),              // 80: api.vehicle.v1.GetDeviceLogsResponse
+	(*GetDeviceStatsRequest)(nil),              // 81: api.vehicle.v1.GetDeviceStatsRequest
+	(*DeviceStatsResponse)(nil),                // 82: api.vehicle.v1.DeviceStatsResponse
+	(*DeviceStatsData)(nil),                    // 83: api.vehicle.v1.DeviceStatsData
+	(*UpdateDeviceConfigRequest)(nil),          // 84: api.vehicle.v1.UpdateDeviceConfigRequest
+	(*UpdateDeviceConfigResponse)(nil),         // 85: api.vehicle.v1.UpdateDeviceConfigResponse
+	(*AddBlacklistEntryRequest)(nil),           // 86: api.vehicle.v1.AddBlacklistEntryRequest
+	(*AddBlacklistEntryResponse)(nil),          // 87: api.vehicle.v1.AddBlacklistEntryResponse
+	(*RemoveBlacklistEntryRequest)(nil),        // 88: api.vehicle.v1.RemoveBlacklistEntryRequest
+	(*RemoveBlacklistEntryResponse)(nil),       // 89: api.vehicle.v1.RemoveBlacklistEntryResponse
+	(*ListBlacklistEntriesRequest)(nil),        // 90: api.vehicle.v1.ListBlacklistEntriesRequest
+	(*ListBlacklistEntriesResponse)(nil),       // 91: api.vehicle.v1.ListBlacklistEntriesResponse
+	(*CheckBlacklistRequest)(nil),              // 92: api.vehicle.v1.CheckBlacklistRequest
+	(*CheckBlacklistResponse)(nil),             // 93: api.vehicle.v1.CheckBlacklistResponse
+	(*BlacklistEntryInfo)(nil),                 // 94: api.vehicle.v1.BlacklistEntryInfo
+	nil,                                        // 95: api.vehicle.v1.HeartbeatRequest.StatsEntry
+	nil,                                        // 96: api.vehicle.v1.SendCommandRequest.ParamsEntry
+	nil,                                        // 97: api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
+	nil,                                        // 98: api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
+	nil,                                        // 99: api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
+	nil,                                        // 100: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
+	nil,                                        // 101: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
+	nil,                                        // 102: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
+	nil,                                        // 103: api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
+	(*structpb.Value)(nil),                     // 104: google.protobuf.Value
+	(*CreateManufacturerRequest)(nil),          // 105: api.vehicle.v1.CreateManufacturerRequest
+	(*GetManufacturerRequest)(nil),             // 106: api.vehicle.v1.GetManufacturerRequest
+	(*ListManufacturersRequest)(nil),           // 107: api.vehicle.v1.ListManufacturersRequest
+	(*UpdateManufacturerRequest)(nil),          // 108: api.vehicle.v1.UpdateManufacturerRequest
+	(*DeleteManufacturerRequest)(nil),          // 109: api.vehicle.v1.DeleteManufacturerRequest
+	(*CreateManufacturerResponse)(nil),         // 110: api.vehicle.v1.CreateManufacturerResponse
+	(*GetManufacturerResponse)(nil),            // 111: api.vehicle.v1.GetManufacturerResponse
+	(*ListManufacturersResponse)(nil),          // 112: api.vehicle.v1.ListManufacturersResponse
+	(*UpdateManufacturerResponse)(nil),         // 113: api.vehicle.v1.UpdateManufacturerResponse
+	(*DeleteManufacturerResponse)(nil),         // 114: api.vehicle.v1.DeleteManufacturerResponse
 }
 var file_api_vehicle_v1_vehicle_proto_depIdxs = []int32{
 	2,   // 0: api.vehicle.v1.EntryResponse.data:type_name -> api.vehicle.v1.EntryData
 	5,   // 1: api.vehicle.v1.ExitResponse.data:type_name -> api.vehicle.v1.ExitData
-	93,  // 2: api.vehicle.v1.HeartbeatRequest.stats:type_name -> api.vehicle.v1.HeartbeatRequest.StatsEntry
+	95,  // 2: api.vehicle.v1.HeartbeatRequest.stats:type_name -> api.vehicle.v1.HeartbeatRequest.StatsEntry
 	10,  // 3: api.vehicle.v1.GetDeviceStatusResponse.data:type_name -> api.vehicle.v1.DeviceStatus
-	94,  // 4: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
+	96,  // 4: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
 	13,  // 5: api.vehicle.v1.SendCommandResponse.data:type_name -> api.vehicle.v1.CommandData
 	16,  // 6: api.vehicle.v1.GetVehicleInfoResponse.data:type_name -> api.vehicle.v1.VehicleInfo
 	19,  // 7: api.vehicle.v1.ListParkingRecordsResponse.data:type_name -> api.vehicle.v1.ListParkingRecordsData
-	22,  // 8: api.vehicle.v1.ListParkingRecordsData.records:type_name -> api.vehicle.v1.ParkingRecordInfo
-	22,  // 9: api.vehicle.v1.GetParkingRecordResponse.data:type_name -> api.vehicle.v1.ParkingRecordInfo
-	25,  // 10: api.vehicle.v1.ListDevicesResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	95,  // 11: api.vehicle.v1.DeviceInfo.vendorSpecificConfig:type_name -> api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
-	96,  // 12: api.vehicle.v1.CreateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
-	25,  // 13: api.vehicle.v1.CreateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	25,  // 14: api.vehicle.v1.GetDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	97,  // 15: api.vehicle.v1.UpdateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
-	25,  // 16: api.vehicle.v1.UpdateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	48,  // 17: api.vehicle.v1.CreateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
-	48,  // 18: api.vehicle.v1.GetFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
-	48,  // 19: api.vehicle.v1.GetFirmwareByIDResponse.data:type_name -> api.vehicle.v1.Firmware
-	48,  // 20: api.vehicle.v1.ListFirmwaresResponse.data:type_name -> api.vehicle.v1.Firmware
-	48,  // 21: api.vehicle.v1.UpdateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
-	48,  // 22: api.vehicle.v1.GetLatestFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
-	55,  // 23: api.vehicle.v1.GetDevicePerformanceResponse.data:type_name -> api.vehicle.v1.DevicePerformance
-	55,  // 24: api.vehicle.v1.GetDevicePerformanceLatestResponse.data:type_name -> api.vehicle.v1.DevicePerformance
-	64,  // 25: api.vehicle.v1.CreateDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
-	64,  // 26: api.vehicle.v1.GetDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
-	64,  // 27: api.vehicle.v1.ListDeviceFaultsResponse.data:type_name -> api.vehicle.v1.DeviceFault
-	98,  // 28: api.vehicle.v1.GetDeviceUsageStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
-	99,  // 29: api.vehicle.v1.GetDeviceFaultStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
-	100, // 30: api.vehicle.v1.GetDeviceStatsSummaryResponse.data:type_name -> api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
-	73,  // 31: api.vehicle.v1.UpgradeDeviceResponse.data:type_name -> api.vehicle.v1.UpgradeStatusData
-	76,  // 32: api.vehicle.v1.GetDeviceLogsResponse.data:type_name -> api.vehicle.v1.DeviceLog
-	81,  // 33: api.vehicle.v1.DeviceStatsResponse.data:type_name -> api.vehicle.v1.DeviceStatsData
-	101, // 34: api.vehicle.v1.UpdateDeviceConfigRequest.config:type_name -> api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
-	25,  // 35: api.vehicle.v1.UpdateDeviceConfigResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	92,  // 36: api.vehicle.v1.AddBlacklistEntryResponse.data:type_name -> api.vehicle.v1.BlacklistEntryInfo
-	92,  // 37: api.vehicle.v1.ListBlacklistEntriesResponse.entries:type_name -> api.vehicle.v1.BlacklistEntryInfo
-	92,  // 38: api.vehicle.v1.CheckBlacklistResponse.entry:type_name -> api.vehicle.v1.BlacklistEntryInfo
-	102, // 39: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
-	102, // 40: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
-	102, // 41: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry.value:type_name -> google.protobuf.Value
+	24,  // 8: api.vehicle.v1.ListParkingRecordsData.records:type_name -> api.vehicle.v1.ParkingRecordInfo
+	24,  // 9: api.vehicle.v1.GetParkingRecordResponse.data:type_name -> api.vehicle.v1.ParkingRecordInfo
+	27,  // 10: api.vehicle.v1.ListDevicesResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	97,  // 11: api.vehicle.v1.DeviceInfo.vendorSpecificConfig:type_name -> api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
+	98,  // 12: api.vehicle.v1.CreateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
+	27,  // 13: api.vehicle.v1.CreateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	27,  // 14: api.vehicle.v1.GetDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	99,  // 15: api.vehicle.v1.UpdateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
+	27,  // 16: api.vehicle.v1.UpdateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	50,  // 17: api.vehicle.v1.CreateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	50,  // 18: api.vehicle.v1.GetFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	50,  // 19: api.vehicle.v1.GetFirmwareByIDResponse.data:type_name -> api.vehicle.v1.Firmware
+	50,  // 20: api.vehicle.v1.ListFirmwaresResponse.data:type_name -> api.vehicle.v1.Firmware
+	50,  // 21: api.vehicle.v1.UpdateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	50,  // 22: api.vehicle.v1.GetLatestFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
+	57,  // 23: api.vehicle.v1.GetDevicePerformanceResponse.data:type_name -> api.vehicle.v1.DevicePerformance
+	57,  // 24: api.vehicle.v1.GetDevicePerformanceLatestResponse.data:type_name -> api.vehicle.v1.DevicePerformance
+	66,  // 25: api.vehicle.v1.CreateDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
+	66,  // 26: api.vehicle.v1.GetDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
+	66,  // 27: api.vehicle.v1.ListDeviceFaultsResponse.data:type_name -> api.vehicle.v1.DeviceFault
+	100, // 28: api.vehicle.v1.GetDeviceUsageStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
+	101, // 29: api.vehicle.v1.GetDeviceFaultStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
+	102, // 30: api.vehicle.v1.GetDeviceStatsSummaryResponse.data:type_name -> api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
+	75,  // 31: api.vehicle.v1.UpgradeDeviceResponse.data:type_name -> api.vehicle.v1.UpgradeStatusData
+	78,  // 32: api.vehicle.v1.GetDeviceLogsResponse.data:type_name -> api.vehicle.v1.DeviceLog
+	83,  // 33: api.vehicle.v1.DeviceStatsResponse.data:type_name -> api.vehicle.v1.DeviceStatsData
+	103, // 34: api.vehicle.v1.UpdateDeviceConfigRequest.config:type_name -> api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
+	27,  // 35: api.vehicle.v1.UpdateDeviceConfigResponse.data:type_name -> api.vehicle.v1.DeviceInfo
+	94,  // 36: api.vehicle.v1.AddBlacklistEntryResponse.data:type_name -> api.vehicle.v1.BlacklistEntryInfo
+	94,  // 37: api.vehicle.v1.ListBlacklistEntriesResponse.entries:type_name -> api.vehicle.v1.BlacklistEntryInfo
+	94,  // 38: api.vehicle.v1.CheckBlacklistResponse.entry:type_name -> api.vehicle.v1.BlacklistEntryInfo
+	104, // 39: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
+	104, // 40: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
+	104, // 41: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry.value:type_name -> google.protobuf.Value
 	0,   // 42: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
 	3,   // 43: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
 	6,   // 44: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
@@ -7057,88 +7181,90 @@ var file_api_vehicle_v1_vehicle_proto_depIdxs = []int32{
 	14,  // 47: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
 	17,  // 48: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
 	20,  // 49: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
-	23,  // 50: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
-	26,  // 51: api.vehicle.v1.VehicleService.CreateDevice:input_type -> api.vehicle.v1.CreateDeviceRequest
-	28,  // 52: api.vehicle.v1.VehicleService.GetDevice:input_type -> api.vehicle.v1.GetDeviceRequest
-	30,  // 53: api.vehicle.v1.VehicleService.UpdateDevice:input_type -> api.vehicle.v1.UpdateDeviceRequest
-	32,  // 54: api.vehicle.v1.VehicleService.DeleteDevice:input_type -> api.vehicle.v1.DeleteDeviceRequest
-	103, // 55: api.vehicle.v1.VehicleService.CreateManufacturer:input_type -> api.vehicle.v1.CreateManufacturerRequest
-	104, // 56: api.vehicle.v1.VehicleService.GetManufacturer:input_type -> api.vehicle.v1.GetManufacturerRequest
-	105, // 57: api.vehicle.v1.VehicleService.ListManufacturers:input_type -> api.vehicle.v1.ListManufacturersRequest
-	106, // 58: api.vehicle.v1.VehicleService.UpdateManufacturer:input_type -> api.vehicle.v1.UpdateManufacturerRequest
-	107, // 59: api.vehicle.v1.VehicleService.DeleteManufacturer:input_type -> api.vehicle.v1.DeleteManufacturerRequest
-	34,  // 60: api.vehicle.v1.VehicleService.CreateFirmware:input_type -> api.vehicle.v1.CreateFirmwareRequest
-	36,  // 61: api.vehicle.v1.VehicleService.GetFirmware:input_type -> api.vehicle.v1.GetFirmwareRequest
-	38,  // 62: api.vehicle.v1.VehicleService.GetFirmwareByID:input_type -> api.vehicle.v1.GetFirmwareByIDRequest
-	40,  // 63: api.vehicle.v1.VehicleService.ListFirmwares:input_type -> api.vehicle.v1.ListFirmwaresRequest
-	42,  // 64: api.vehicle.v1.VehicleService.UpdateFirmware:input_type -> api.vehicle.v1.UpdateFirmwareRequest
-	44,  // 65: api.vehicle.v1.VehicleService.DeleteFirmware:input_type -> api.vehicle.v1.DeleteFirmwareRequest
-	46,  // 66: api.vehicle.v1.VehicleService.GetLatestFirmware:input_type -> api.vehicle.v1.GetLatestFirmwareRequest
-	49,  // 67: api.vehicle.v1.VehicleService.CreateDevicePerformance:input_type -> api.vehicle.v1.CreateDevicePerformanceRequest
-	51,  // 68: api.vehicle.v1.VehicleService.GetDevicePerformance:input_type -> api.vehicle.v1.GetDevicePerformanceRequest
-	53,  // 69: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:input_type -> api.vehicle.v1.GetDevicePerformanceLatestRequest
-	56,  // 70: api.vehicle.v1.VehicleService.CreateDeviceFault:input_type -> api.vehicle.v1.CreateDeviceFaultRequest
-	58,  // 71: api.vehicle.v1.VehicleService.GetDeviceFault:input_type -> api.vehicle.v1.GetDeviceFaultRequest
-	60,  // 72: api.vehicle.v1.VehicleService.ListDeviceFaults:input_type -> api.vehicle.v1.ListDeviceFaultsRequest
-	62,  // 73: api.vehicle.v1.VehicleService.ResolveDeviceFault:input_type -> api.vehicle.v1.ResolveDeviceFaultRequest
-	65,  // 74: api.vehicle.v1.VehicleService.GetDeviceUsageStats:input_type -> api.vehicle.v1.GetDeviceUsageStatsRequest
-	67,  // 75: api.vehicle.v1.VehicleService.GetDeviceFaultStats:input_type -> api.vehicle.v1.GetDeviceFaultStatsRequest
-	69,  // 76: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:input_type -> api.vehicle.v1.GetDeviceStatsSummaryRequest
-	71,  // 77: api.vehicle.v1.VehicleService.UpgradeDevice:input_type -> api.vehicle.v1.UpgradeDeviceRequest
-	74,  // 78: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:input_type -> api.vehicle.v1.GetDeviceUpgradeStatusRequest
-	77,  // 79: api.vehicle.v1.VehicleService.GetDeviceLogs:input_type -> api.vehicle.v1.GetDeviceLogsRequest
-	79,  // 80: api.vehicle.v1.VehicleService.GetDeviceStats:input_type -> api.vehicle.v1.GetDeviceStatsRequest
-	82,  // 81: api.vehicle.v1.VehicleService.UpdateDeviceConfig:input_type -> api.vehicle.v1.UpdateDeviceConfigRequest
-	84,  // 82: api.vehicle.v1.VehicleService.AddBlacklistEntry:input_type -> api.vehicle.v1.AddBlacklistEntryRequest
-	86,  // 83: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:input_type -> api.vehicle.v1.RemoveBlacklistEntryRequest
-	88,  // 84: api.vehicle.v1.VehicleService.ListBlacklistEntries:input_type -> api.vehicle.v1.ListBlacklistEntriesRequest
-	90,  // 85: api.vehicle.v1.VehicleService.CheckBlacklist:input_type -> api.vehicle.v1.CheckBlacklistRequest
-	1,   // 86: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
-	4,   // 87: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
-	7,   // 88: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
-	9,   // 89: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
-	12,  // 90: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
-	15,  // 91: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
-	18,  // 92: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
-	21,  // 93: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
-	24,  // 94: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
-	27,  // 95: api.vehicle.v1.VehicleService.CreateDevice:output_type -> api.vehicle.v1.CreateDeviceResponse
-	29,  // 96: api.vehicle.v1.VehicleService.GetDevice:output_type -> api.vehicle.v1.GetDeviceResponse
-	31,  // 97: api.vehicle.v1.VehicleService.UpdateDevice:output_type -> api.vehicle.v1.UpdateDeviceResponse
-	33,  // 98: api.vehicle.v1.VehicleService.DeleteDevice:output_type -> api.vehicle.v1.DeleteDeviceResponse
-	108, // 99: api.vehicle.v1.VehicleService.CreateManufacturer:output_type -> api.vehicle.v1.CreateManufacturerResponse
-	109, // 100: api.vehicle.v1.VehicleService.GetManufacturer:output_type -> api.vehicle.v1.GetManufacturerResponse
-	110, // 101: api.vehicle.v1.VehicleService.ListManufacturers:output_type -> api.vehicle.v1.ListManufacturersResponse
-	111, // 102: api.vehicle.v1.VehicleService.UpdateManufacturer:output_type -> api.vehicle.v1.UpdateManufacturerResponse
-	112, // 103: api.vehicle.v1.VehicleService.DeleteManufacturer:output_type -> api.vehicle.v1.DeleteManufacturerResponse
-	35,  // 104: api.vehicle.v1.VehicleService.CreateFirmware:output_type -> api.vehicle.v1.CreateFirmwareResponse
-	37,  // 105: api.vehicle.v1.VehicleService.GetFirmware:output_type -> api.vehicle.v1.GetFirmwareResponse
-	39,  // 106: api.vehicle.v1.VehicleService.GetFirmwareByID:output_type -> api.vehicle.v1.GetFirmwareByIDResponse
-	41,  // 107: api.vehicle.v1.VehicleService.ListFirmwares:output_type -> api.vehicle.v1.ListFirmwaresResponse
-	43,  // 108: api.vehicle.v1.VehicleService.UpdateFirmware:output_type -> api.vehicle.v1.UpdateFirmwareResponse
-	45,  // 109: api.vehicle.v1.VehicleService.DeleteFirmware:output_type -> api.vehicle.v1.DeleteFirmwareResponse
-	47,  // 110: api.vehicle.v1.VehicleService.GetLatestFirmware:output_type -> api.vehicle.v1.GetLatestFirmwareResponse
-	50,  // 111: api.vehicle.v1.VehicleService.CreateDevicePerformance:output_type -> api.vehicle.v1.CreateDevicePerformanceResponse
-	52,  // 112: api.vehicle.v1.VehicleService.GetDevicePerformance:output_type -> api.vehicle.v1.GetDevicePerformanceResponse
-	54,  // 113: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:output_type -> api.vehicle.v1.GetDevicePerformanceLatestResponse
-	57,  // 114: api.vehicle.v1.VehicleService.CreateDeviceFault:output_type -> api.vehicle.v1.CreateDeviceFaultResponse
-	59,  // 115: api.vehicle.v1.VehicleService.GetDeviceFault:output_type -> api.vehicle.v1.GetDeviceFaultResponse
-	61,  // 116: api.vehicle.v1.VehicleService.ListDeviceFaults:output_type -> api.vehicle.v1.ListDeviceFaultsResponse
-	63,  // 117: api.vehicle.v1.VehicleService.ResolveDeviceFault:output_type -> api.vehicle.v1.ResolveDeviceFaultResponse
-	66,  // 118: api.vehicle.v1.VehicleService.GetDeviceUsageStats:output_type -> api.vehicle.v1.GetDeviceUsageStatsResponse
-	68,  // 119: api.vehicle.v1.VehicleService.GetDeviceFaultStats:output_type -> api.vehicle.v1.GetDeviceFaultStatsResponse
-	70,  // 120: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:output_type -> api.vehicle.v1.GetDeviceStatsSummaryResponse
-	72,  // 121: api.vehicle.v1.VehicleService.UpgradeDevice:output_type -> api.vehicle.v1.UpgradeDeviceResponse
-	75,  // 122: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:output_type -> api.vehicle.v1.UpgradeStatusResponse
-	78,  // 123: api.vehicle.v1.VehicleService.GetDeviceLogs:output_type -> api.vehicle.v1.GetDeviceLogsResponse
-	80,  // 124: api.vehicle.v1.VehicleService.GetDeviceStats:output_type -> api.vehicle.v1.DeviceStatsResponse
-	83,  // 125: api.vehicle.v1.VehicleService.UpdateDeviceConfig:output_type -> api.vehicle.v1.UpdateDeviceConfigResponse
-	85,  // 126: api.vehicle.v1.VehicleService.AddBlacklistEntry:output_type -> api.vehicle.v1.AddBlacklistEntryResponse
-	87,  // 127: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:output_type -> api.vehicle.v1.RemoveBlacklistEntryResponse
-	89,  // 128: api.vehicle.v1.VehicleService.ListBlacklistEntries:output_type -> api.vehicle.v1.ListBlacklistEntriesResponse
-	91,  // 129: api.vehicle.v1.VehicleService.CheckBlacklist:output_type -> api.vehicle.v1.CheckBlacklistResponse
-	86,  // [86:130] is the sub-list for method output_type
-	42,  // [42:86] is the sub-list for method input_type
+	22,  // 50: api.vehicle.v1.VehicleService.UpdateRecordStatus:input_type -> api.vehicle.v1.UpdateRecordStatusRequest
+	25,  // 51: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
+	28,  // 52: api.vehicle.v1.VehicleService.CreateDevice:input_type -> api.vehicle.v1.CreateDeviceRequest
+	30,  // 53: api.vehicle.v1.VehicleService.GetDevice:input_type -> api.vehicle.v1.GetDeviceRequest
+	32,  // 54: api.vehicle.v1.VehicleService.UpdateDevice:input_type -> api.vehicle.v1.UpdateDeviceRequest
+	34,  // 55: api.vehicle.v1.VehicleService.DeleteDevice:input_type -> api.vehicle.v1.DeleteDeviceRequest
+	105, // 56: api.vehicle.v1.VehicleService.CreateManufacturer:input_type -> api.vehicle.v1.CreateManufacturerRequest
+	106, // 57: api.vehicle.v1.VehicleService.GetManufacturer:input_type -> api.vehicle.v1.GetManufacturerRequest
+	107, // 58: api.vehicle.v1.VehicleService.ListManufacturers:input_type -> api.vehicle.v1.ListManufacturersRequest
+	108, // 59: api.vehicle.v1.VehicleService.UpdateManufacturer:input_type -> api.vehicle.v1.UpdateManufacturerRequest
+	109, // 60: api.vehicle.v1.VehicleService.DeleteManufacturer:input_type -> api.vehicle.v1.DeleteManufacturerRequest
+	36,  // 61: api.vehicle.v1.VehicleService.CreateFirmware:input_type -> api.vehicle.v1.CreateFirmwareRequest
+	38,  // 62: api.vehicle.v1.VehicleService.GetFirmware:input_type -> api.vehicle.v1.GetFirmwareRequest
+	40,  // 63: api.vehicle.v1.VehicleService.GetFirmwareByID:input_type -> api.vehicle.v1.GetFirmwareByIDRequest
+	42,  // 64: api.vehicle.v1.VehicleService.ListFirmwares:input_type -> api.vehicle.v1.ListFirmwaresRequest
+	44,  // 65: api.vehicle.v1.VehicleService.UpdateFirmware:input_type -> api.vehicle.v1.UpdateFirmwareRequest
+	46,  // 66: api.vehicle.v1.VehicleService.DeleteFirmware:input_type -> api.vehicle.v1.DeleteFirmwareRequest
+	48,  // 67: api.vehicle.v1.VehicleService.GetLatestFirmware:input_type -> api.vehicle.v1.GetLatestFirmwareRequest
+	51,  // 68: api.vehicle.v1.VehicleService.CreateDevicePerformance:input_type -> api.vehicle.v1.CreateDevicePerformanceRequest
+	53,  // 69: api.vehicle.v1.VehicleService.GetDevicePerformance:input_type -> api.vehicle.v1.GetDevicePerformanceRequest
+	55,  // 70: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:input_type -> api.vehicle.v1.GetDevicePerformanceLatestRequest
+	58,  // 71: api.vehicle.v1.VehicleService.CreateDeviceFault:input_type -> api.vehicle.v1.CreateDeviceFaultRequest
+	60,  // 72: api.vehicle.v1.VehicleService.GetDeviceFault:input_type -> api.vehicle.v1.GetDeviceFaultRequest
+	62,  // 73: api.vehicle.v1.VehicleService.ListDeviceFaults:input_type -> api.vehicle.v1.ListDeviceFaultsRequest
+	64,  // 74: api.vehicle.v1.VehicleService.ResolveDeviceFault:input_type -> api.vehicle.v1.ResolveDeviceFaultRequest
+	67,  // 75: api.vehicle.v1.VehicleService.GetDeviceUsageStats:input_type -> api.vehicle.v1.GetDeviceUsageStatsRequest
+	69,  // 76: api.vehicle.v1.VehicleService.GetDeviceFaultStats:input_type -> api.vehicle.v1.GetDeviceFaultStatsRequest
+	71,  // 77: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:input_type -> api.vehicle.v1.GetDeviceStatsSummaryRequest
+	73,  // 78: api.vehicle.v1.VehicleService.UpgradeDevice:input_type -> api.vehicle.v1.UpgradeDeviceRequest
+	76,  // 79: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:input_type -> api.vehicle.v1.GetDeviceUpgradeStatusRequest
+	79,  // 80: api.vehicle.v1.VehicleService.GetDeviceLogs:input_type -> api.vehicle.v1.GetDeviceLogsRequest
+	81,  // 81: api.vehicle.v1.VehicleService.GetDeviceStats:input_type -> api.vehicle.v1.GetDeviceStatsRequest
+	84,  // 82: api.vehicle.v1.VehicleService.UpdateDeviceConfig:input_type -> api.vehicle.v1.UpdateDeviceConfigRequest
+	86,  // 83: api.vehicle.v1.VehicleService.AddBlacklistEntry:input_type -> api.vehicle.v1.AddBlacklistEntryRequest
+	88,  // 84: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:input_type -> api.vehicle.v1.RemoveBlacklistEntryRequest
+	90,  // 85: api.vehicle.v1.VehicleService.ListBlacklistEntries:input_type -> api.vehicle.v1.ListBlacklistEntriesRequest
+	92,  // 86: api.vehicle.v1.VehicleService.CheckBlacklist:input_type -> api.vehicle.v1.CheckBlacklistRequest
+	1,   // 87: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
+	4,   // 88: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
+	7,   // 89: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
+	9,   // 90: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
+	12,  // 91: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
+	15,  // 92: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
+	18,  // 93: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
+	21,  // 94: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
+	23,  // 95: api.vehicle.v1.VehicleService.UpdateRecordStatus:output_type -> api.vehicle.v1.UpdateRecordStatusResponse
+	26,  // 96: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
+	29,  // 97: api.vehicle.v1.VehicleService.CreateDevice:output_type -> api.vehicle.v1.CreateDeviceResponse
+	31,  // 98: api.vehicle.v1.VehicleService.GetDevice:output_type -> api.vehicle.v1.GetDeviceResponse
+	33,  // 99: api.vehicle.v1.VehicleService.UpdateDevice:output_type -> api.vehicle.v1.UpdateDeviceResponse
+	35,  // 100: api.vehicle.v1.VehicleService.DeleteDevice:output_type -> api.vehicle.v1.DeleteDeviceResponse
+	110, // 101: api.vehicle.v1.VehicleService.CreateManufacturer:output_type -> api.vehicle.v1.CreateManufacturerResponse
+	111, // 102: api.vehicle.v1.VehicleService.GetManufacturer:output_type -> api.vehicle.v1.GetManufacturerResponse
+	112, // 103: api.vehicle.v1.VehicleService.ListManufacturers:output_type -> api.vehicle.v1.ListManufacturersResponse
+	113, // 104: api.vehicle.v1.VehicleService.UpdateManufacturer:output_type -> api.vehicle.v1.UpdateManufacturerResponse
+	114, // 105: api.vehicle.v1.VehicleService.DeleteManufacturer:output_type -> api.vehicle.v1.DeleteManufacturerResponse
+	37,  // 106: api.vehicle.v1.VehicleService.CreateFirmware:output_type -> api.vehicle.v1.CreateFirmwareResponse
+	39,  // 107: api.vehicle.v1.VehicleService.GetFirmware:output_type -> api.vehicle.v1.GetFirmwareResponse
+	41,  // 108: api.vehicle.v1.VehicleService.GetFirmwareByID:output_type -> api.vehicle.v1.GetFirmwareByIDResponse
+	43,  // 109: api.vehicle.v1.VehicleService.ListFirmwares:output_type -> api.vehicle.v1.ListFirmwaresResponse
+	45,  // 110: api.vehicle.v1.VehicleService.UpdateFirmware:output_type -> api.vehicle.v1.UpdateFirmwareResponse
+	47,  // 111: api.vehicle.v1.VehicleService.DeleteFirmware:output_type -> api.vehicle.v1.DeleteFirmwareResponse
+	49,  // 112: api.vehicle.v1.VehicleService.GetLatestFirmware:output_type -> api.vehicle.v1.GetLatestFirmwareResponse
+	52,  // 113: api.vehicle.v1.VehicleService.CreateDevicePerformance:output_type -> api.vehicle.v1.CreateDevicePerformanceResponse
+	54,  // 114: api.vehicle.v1.VehicleService.GetDevicePerformance:output_type -> api.vehicle.v1.GetDevicePerformanceResponse
+	56,  // 115: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:output_type -> api.vehicle.v1.GetDevicePerformanceLatestResponse
+	59,  // 116: api.vehicle.v1.VehicleService.CreateDeviceFault:output_type -> api.vehicle.v1.CreateDeviceFaultResponse
+	61,  // 117: api.vehicle.v1.VehicleService.GetDeviceFault:output_type -> api.vehicle.v1.GetDeviceFaultResponse
+	63,  // 118: api.vehicle.v1.VehicleService.ListDeviceFaults:output_type -> api.vehicle.v1.ListDeviceFaultsResponse
+	65,  // 119: api.vehicle.v1.VehicleService.ResolveDeviceFault:output_type -> api.vehicle.v1.ResolveDeviceFaultResponse
+	68,  // 120: api.vehicle.v1.VehicleService.GetDeviceUsageStats:output_type -> api.vehicle.v1.GetDeviceUsageStatsResponse
+	70,  // 121: api.vehicle.v1.VehicleService.GetDeviceFaultStats:output_type -> api.vehicle.v1.GetDeviceFaultStatsResponse
+	72,  // 122: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:output_type -> api.vehicle.v1.GetDeviceStatsSummaryResponse
+	74,  // 123: api.vehicle.v1.VehicleService.UpgradeDevice:output_type -> api.vehicle.v1.UpgradeDeviceResponse
+	77,  // 124: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:output_type -> api.vehicle.v1.UpgradeStatusResponse
+	80,  // 125: api.vehicle.v1.VehicleService.GetDeviceLogs:output_type -> api.vehicle.v1.GetDeviceLogsResponse
+	82,  // 126: api.vehicle.v1.VehicleService.GetDeviceStats:output_type -> api.vehicle.v1.DeviceStatsResponse
+	85,  // 127: api.vehicle.v1.VehicleService.UpdateDeviceConfig:output_type -> api.vehicle.v1.UpdateDeviceConfigResponse
+	87,  // 128: api.vehicle.v1.VehicleService.AddBlacklistEntry:output_type -> api.vehicle.v1.AddBlacklistEntryResponse
+	89,  // 129: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:output_type -> api.vehicle.v1.RemoveBlacklistEntryResponse
+	91,  // 130: api.vehicle.v1.VehicleService.ListBlacklistEntries:output_type -> api.vehicle.v1.ListBlacklistEntriesResponse
+	93,  // 131: api.vehicle.v1.VehicleService.CheckBlacklist:output_type -> api.vehicle.v1.CheckBlacklistResponse
+	87,  // [87:132] is the sub-list for method output_type
+	42,  // [42:87] is the sub-list for method input_type
 	42,  // [42:42] is the sub-list for extension type_name
 	42,  // [42:42] is the sub-list for extension extendee
 	0,   // [0:42] is the sub-list for field type_name
@@ -7156,7 +7282,7 @@ func file_api_vehicle_v1_vehicle_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_vehicle_v1_vehicle_proto_rawDesc), len(file_api_vehicle_v1_vehicle_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   102,
+			NumMessages:   104,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -212,6 +212,22 @@ func (s *VehicleService) GetParkingRecord(ctx context.Context, req *v1.GetParkin
 	}, nil
 }
 
+// UpdateRecordStatus handles payment-driven record status updates.
+func (s *VehicleService) UpdateRecordStatus(ctx context.Context, req *v1.UpdateRecordStatusRequest) (*v1.UpdateRecordStatusResponse, error) {
+	if err := s.recordUseCase.UpdateRecordStatus(ctx, req.RecordId, req.Status); err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateRecordStatus failed: %v", err)
+		return &v1.UpdateRecordStatusResponse{
+			Code:    500,
+			Message: "更新停车记录支付状态失败",
+		}, nil
+	}
+
+	return &v1.UpdateRecordStatusResponse{
+		Code:    0,
+		Message: "success",
+	}, nil
+}
+
 // ListDevices handles list devices request.
 func (s *VehicleService) ListDevices(ctx context.Context, req *v1.ListDevicesRequest) (*v1.ListDevicesResponse, error) {
 	page := int(req.Page)

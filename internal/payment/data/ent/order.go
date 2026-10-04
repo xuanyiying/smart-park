@@ -24,8 +24,10 @@ type Order struct {
 	LotID uuid.UUID `json:"lot_id,omitempty"`
 	// 车辆ID
 	VehicleID *uuid.UUID `json:"vehicle_id,omitempty"`
-	// 车牌号
+	// 车牌号(充电订单无车牌)
 	PlateNumber string `json:"plate_number,omitempty"`
+	// 订单类型: 停车费/充电费
+	OrderType order.OrderType `json:"order_type,omitempty"`
 	// 原始金额(分)
 	Amount int64 `json:"amount,omitempty"`
 	// 优惠金额(分)
@@ -62,7 +64,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case order.FieldAmount, order.FieldDiscountAmount, order.FieldFinalAmount, order.FieldPaidAmount:
 			values[i] = new(sql.NullInt64)
-		case order.FieldPlateNumber, order.FieldStatus, order.FieldPayMethod, order.FieldTransactionID, order.FieldRefundTransactionID:
+		case order.FieldPlateNumber, order.FieldOrderType, order.FieldStatus, order.FieldPayMethod, order.FieldTransactionID, order.FieldRefundTransactionID:
 			values[i] = new(sql.NullString)
 		case order.FieldPayTime, order.FieldRefundedAt, order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -113,6 +115,12 @@ func (_m *Order) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field plate_number", values[i])
 			} else if value.Valid {
 				_m.PlateNumber = value.String
+			}
+		case order.FieldOrderType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field order_type", values[i])
+			} else if value.Valid {
+				_m.OrderType = order.OrderType(value.String)
 			}
 		case order.FieldAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -237,6 +245,9 @@ func (_m *Order) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("plate_number=")
 	builder.WriteString(_m.PlateNumber)
+	builder.WriteString(", ")
+	builder.WriteString("order_type=")
+	builder.WriteString(fmt.Sprintf("%v", _m.OrderType))
 	builder.WriteString(", ")
 	builder.WriteString("amount=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Amount))

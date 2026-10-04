@@ -399,6 +399,11 @@ func (uc *ChargingUseCase) ConfirmPayment(ctx context.Context, sessionID uuid.UU
 	}
 
 	if session.PaymentStatus != PaymentStatusPending {
+		// 支付服务回调可能重试（outbox 重投、渠道重发）：
+		// 同一交易号重复确认视为幂等成功，不同的确认才拒绝。
+		if session.PaymentStatus == PaymentStatusPaid && session.TransactionID == transactionID {
+			return nil
+		}
 		return fmt.Errorf("session payment already processed")
 	}
 

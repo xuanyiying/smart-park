@@ -126,7 +126,7 @@ func (Device) Fields() []ent.Field {
 func (Device) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("tenant_id"),
-		index.Fields("device_id").Unique().StorageKey("idx_device_id"),
+		index.Fields("device_id").Unique().StorageKey("idx_devices_device_id"),
 		index.Fields("lot_id").StorageKey("idx_device_lot"),
 		index.Fields("lane_id"),
 		index.Fields("status"),

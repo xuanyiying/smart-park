@@ -64,9 +64,9 @@ func (DeviceFault) Fields() []ent.Field {
 // Indexes of the DeviceFault.
 func (DeviceFault) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("device_id").StorageKey("idx_device_id"),
-		index.Fields("status").StorageKey("idx_status"),
-		index.Fields("severity").StorageKey("idx_severity"),
+		index.Fields("device_id").StorageKey("idx_device_faults_device_id"),
+		index.Fields("status").StorageKey("idx_device_faults_status"),
+		index.Fields("severity").StorageKey("idx_device_faults_severity"),
 		index.Fields("detected_at").StorageKey("idx_detected_at"),
 		index.Fields("device_id", "status").StorageKey("idx_device_status"),
 	}
