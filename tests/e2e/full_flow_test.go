@@ -71,6 +71,7 @@ func testLogger() log.Logger { return log.NewStdLogger(io.Discard) }
 type e2eEnv struct {
 	vehicleHTTP string // http://127.0.0.1:port
 	paymentHTTP string
+	vehicleRepo vehiclebiz.VehicleRepo
 	orderRepo   paymentbiz.OrderRepo
 	tenant      *multitenancy.TenantInfo
 }
@@ -106,30 +107,49 @@ func waitReady(t *testing.T, lis net.Listener) {
 	t.Fatalf("server on %s not ready", lis.Addr())
 }
 
-func setupE2E(t *testing.T) *e2eEnv {
+type e2eOpts struct {
+	billingDown bool // 模拟 billing 服务不可达（出场必须不放行）
+}
+
+func setupE2E(t *testing.T, apply ...func(*e2eOpts)) *e2eEnv {
 	t.Helper()
+	opts := &e2eOpts{}
+	for _, f := range apply {
+		f(opts)
+	}
 	ctx := context.Background()
 	logger := testLogger()
 	env := &e2eEnv{}
 
-	// ---------- billing：真实 gRPC server，供 vehicle 跨服务调用 ----------
-	bclient, err := billingent.Open("postgres", testDSN())
-	require.NoError(t, err)
-	t.Cleanup(func() { _ = bclient.Close() })
-	require.NoError(t, bclient.Schema.Create(ctx))
+	// billing gRPC 地址：正常时启动真实服务；注入故障时指向一个已关闭的端口，
+	// gRPC 懒连接在真正调用 CalculateFee 时才会报 connection refused。
+	var billingAddr string
+	if !opts.billingDown {
+		// ---------- billing：真实 gRPC server，供 vehicle 跨服务调用 ----------
+		bclient, err := billingent.Open("postgres", testDSN())
+		require.NoError(t, err)
+		t.Cleanup(func() { _ = bclient.Close() })
+		require.NoError(t, bclient.Schema.Create(ctx))
 
-	bdata, bcleanup, err := billingdata.NewData(bclient, logger)
-	require.NoError(t, err)
-	t.Cleanup(bcleanup)
+		bdata, bcleanup, err := billingdata.NewData(bclient, logger)
+		require.NoError(t, err)
+		t.Cleanup(bcleanup)
 
-	billingUC := billingbiz.NewBillingUseCase(billingdata.NewBillingRuleRepo(bdata), logger, nil)
-	billingSvc := billingservice.NewBillingService(billingUC, logger)
+		billingUC := billingbiz.NewBillingUseCase(billingdata.NewBillingRuleRepo(bdata), logger, nil)
+		billingSvc := billingservice.NewBillingService(billingUC, logger)
 
-	blis := mustListener(t)
-	bgs := kratosgrpc.NewServer(kratosgrpc.Listener(blis))
-	billingv1.RegisterBillingServiceServer(bgs, billingSvc)
-	startServer(t, "billing-grpc", bgs.Start)
-	waitReady(t, blis)
+		blis := mustListener(t)
+		bgs := kratosgrpc.NewServer(kratosgrpc.Listener(blis))
+		billingv1.RegisterBillingServiceServer(bgs, billingSvc)
+		startServer(t, "billing-grpc", bgs.Start)
+		waitReady(t, blis)
+		billingAddr = blis.Addr().String()
+	} else {
+		dead, err := net.Listen("tcp", "127.0.0.1:0")
+		require.NoError(t, err)
+		billingAddr = dead.Addr().String()
+		_ = dead.Close() // 立即关闭，制造 connection refused
+	}
 
 	// ---------- vehicle ----------
 	vclient, err := vehicleent.Open("postgres", testDSN())
@@ -147,6 +167,7 @@ func setupE2E(t *testing.T) *e2eEnv {
 	require.NoError(t, err)
 	t.Cleanup(vcleanup)
 	vrepo := vehicledata.NewVehicleRepo(vdata)
+	env.vehicleRepo = vrepo
 
 	// 种子数据：入口/出口车道 + 相机（带租户，模拟生产多租户写入）
 	tenantID := uuid.New()
@@ -174,7 +195,7 @@ func setupE2E(t *testing.T) *e2eEnv {
 	require.NoError(t, redisClient.Ping(ctx).Err())
 	t.Cleanup(func() { _ = redisClient.Close() })
 
-	billingConn, err := kratosgrpc.DialInsecure(ctx, kratosgrpc.WithEndpoint(blis.Addr().String()))
+	billingConn, err := kratosgrpc.DialInsecure(ctx, kratosgrpc.WithEndpoint(billingAddr))
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = billingConn.Close() })
 
@@ -328,4 +349,144 @@ func TestE2EEntryToPaidExit(t *testing.T) {
 	require.Equal(t, true, exit2["allowed"])
 	require.Equal(t, true, exit2["gateOpen"])
 	require.Equal(t, int64(0), num(exit2["finalAmount"]))
+}
+
+// TestE2EExceptionPaths 覆盖正常链路之外的异常分支：
+// 低置信度拒收、未知设备、无入场记录出场、黑名单拦截、
+// 非法状态回写、重复建单幂等。
+func TestE2EExceptionPaths(t *testing.T) {
+	env := setupE2E(t)
+
+	entry := func(plate, device string, confidence float64) map[string]interface{} {
+		return dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
+			`{"deviceId":%q,"plateNumber":%q,"plateImageUrl":"http://img/e.jpg","confidence":%v}`, device, plate, confidence)))
+	}
+	exit := func(plate, device string) map[string]interface{} {
+		return dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
+			`{"deviceId":%q,"plateNumber":%q,"plateImageUrl":"http://img/x.jpg","confidence":0.95}`, device, plate)))
+	}
+
+	t.Run("低置信度车牌拒收", func(t *testing.T) {
+		resp := entry("京X"+uuid.New().String()[:6], "CAM001", 0.3)
+		require.Equal(t, false, resp["allowed"])
+		require.Equal(t, false, resp["gateOpen"])
+	})
+
+	t.Run("未知设备拒收", func(t *testing.T) {
+		resp := entry("京X"+uuid.New().String()[:6], "CAM999", 0.95)
+		require.Equal(t, false, resp["allowed"])
+		require.Equal(t, false, resp["gateOpen"])
+	})
+
+	t.Run("黑名单车辆拦截", func(t *testing.T) {
+		plate := "京B" + uuid.New().String()[:6]
+		require.NoError(t, env.vehicleRepo.CreateBlacklistEntry(
+			multitenancy.ContextWithTenant(context.Background(), env.tenant),
+			&vehiclebiz.BlacklistEntry{
+				ID: uuid.New(), PlateNumber: plate, Reason: "e2e-test", Active: true,
+				CreatedAt: time.Now(), UpdatedAt: time.Now(),
+			}))
+		resp := entry(plate, "CAM001", 0.95)
+		require.Equal(t, false, resp["allowed"])
+		require.Equal(t, false, resp["gateOpen"])
+	})
+
+	t.Run("无入场记录出场不放行", func(t *testing.T) {
+		resp := exit("京C"+uuid.New().String()[:6], "CAM003")
+		require.Equal(t, false, resp["allowed"])
+		require.Equal(t, false, resp["gateOpen"])
+		require.NotEmpty(t, resp["displayMessage"])
+	})
+
+	t.Run("非法状态回写被拒绝", func(t *testing.T) {
+		plate := "京D" + uuid.New().String()[:6]
+		e := entry(plate, "CAM001", 0.95)
+		recordID := e["recordId"].(string)
+
+		resp := postJSON(t, env.vehicleHTTP+"/api/v1/vehicle/records/"+recordID+"/status", `{"status":"hacked"}`)
+		require.EqualValues(t, 500, resp["code"])
+
+		// 不存在的记录同样报错
+		resp = postJSON(t, env.vehicleHTTP+"/api/v1/vehicle/records/"+uuid.New().String()+"/status", `{"status":"paid"}`)
+		require.EqualValues(t, 500, resp["code"])
+	})
+
+	t.Run("未支付重复建单只保留一笔订单", func(t *testing.T) {
+		plate := "京F" + uuid.New().String()[:6]
+		e := entry(plate, "CAM001", 0.95)
+		recordID := e["recordId"].(string)
+		exit(plate, "CAM003") // 产生计费金额
+
+		rid, err := uuid.Parse(recordID)
+		require.NoError(t, err)
+
+		// 第一次建单（payURL 生成失败不影响订单落库）
+		_ = postJSON(t, env.paymentHTTP+"/api/v1/pay/create", fmt.Sprintf(
+			`{"recordId":%q,"amount":500,"payMethod":"wechat"}`, recordID))
+		// 用户没付钱，重新扫码再建单
+		_ = postJSON(t, env.paymentHTTP+"/api/v1/pay/create", fmt.Sprintf(
+			`{"recordId":%q,"amount":500,"payMethod":"wechat"}`, recordID))
+
+		order, err := env.orderRepo.GetOrderByRecordID(context.Background(), rid)
+		require.NoError(t, err, "重复建单不能让订单查询进入多行歧义状态")
+		require.NotNil(t, order)
+		require.Equal(t, "pending", order.Status)
+	})
+
+	t.Run("已支付订单重复建单幂等返回", func(t *testing.T) {
+		plate := "京G" + uuid.New().String()[:6]
+		e := entry(plate, "CAM001", 0.95)
+		recordID := e["recordId"].(string)
+		exit(plate, "CAM003")
+
+		// 首次建单（pending）
+		_ = postJSON(t, env.paymentHTTP+"/api/v1/pay/create", fmt.Sprintf(
+			`{"recordId":%q,"amount":500,"payMethod":"wechat"}`, recordID))
+		order := recordIDToOrderID(t, env, recordID)
+
+		// 模拟回调结算成功
+		oid, err := uuid.Parse(order)
+		require.NoError(t, err)
+		applied, err := env.orderRepo.MarkOrderPaid(context.Background(), oid, "wechat", "txn-e2e-"+order[:8], 500, time.Now())
+		require.NoError(t, err)
+		require.True(t, applied)
+
+		// 已付订单再建单：幂等返回已有订单信息
+		resp := postJSON(t, env.paymentHTTP+"/api/v1/pay/create", fmt.Sprintf(
+			`{"recordId":%q,"amount":500,"payMethod":"wechat"}`, recordID))
+		require.EqualValues(t, 0, resp["code"], "响应: %v", resp)
+		data, ok := resp["data"].(map[string]interface{})
+		require.True(t, ok)
+		require.Equal(t, order, data["orderId"])
+	})
+}
+
+// recordIDToOrderID 通过订单仓储把 recordId 换成订单 ID。
+func recordIDToOrderID(t *testing.T, env *e2eEnv, recordID string) string {
+	t.Helper()
+	rid, err := uuid.Parse(recordID)
+	require.NoError(t, err)
+	order, err := env.orderRepo.GetOrderByRecordID(context.Background(), rid)
+	require.NoError(t, err)
+	require.NotNil(t, order)
+	return order.ID.String()
+}
+
+// TestE2EExitWhenBillingDown 回归资损保护：billing 不可达时出场必须关闸
+// 不放行（拒绝白放车，引导人工收费），入场不受影响。
+func TestE2EExitWhenBillingDown(t *testing.T) {
+	env := setupE2E(t, func(o *e2eOpts) { o.billingDown = true })
+	plate := "京H" + uuid.New().String()[:6]
+
+	// 入场不依赖 billing，照常放行
+	entry := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
+		`{"deviceId":"CAM001","plateNumber":%q,"plateImageUrl":"http://img/e.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, true, entry["allowed"])
+
+	// 出场时计费不可达：不放行、不开闸、提示人工
+	exit1 := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
+		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"http://img/x.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, false, exit1["allowed"], "billing 不可达时禁止放行")
+	require.Equal(t, false, exit1["gateOpen"], "billing 不可达时禁止开闸")
+	require.NotEmpty(t, exit1["displayMessage"])
 }

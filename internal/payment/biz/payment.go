@@ -63,6 +63,8 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 
 	var recordID uuid.UUID
 	var err error
+	var order *Order
+	amount := int64(0)
 
 	if req.OrderType == "charging" && req.SessionId != "" {
 		sessionID, parseErr := uuid.Parse(req.SessionId)
@@ -77,32 +79,41 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 		}
 	}
 
+	// 同一记录已有订单时幂等处理：
+	// paid → 直接返回已有支付信息；pending → 复用订单重建支付链接。
+	// 若放任重复创建，record_id 会出现多笔订单，GetOrderByRecordID 的
+	// 单行语义随即报错，用户重新扫码反而失败。
 	if existingOrder, _ := uc.orderRepo.GetOrderByRecordID(ctx, recordID); existingOrder != nil {
-		if existingOrder.Status == string(StatusPaid) {
+		switch existingOrder.Status {
+		case string(StatusPaid):
 			return uc.buildExistingPaymentResponse(existingOrder), nil
+		case string(StatusPending):
+			order = existingOrder
+			amount = order.FinalAmount
 		}
 	}
 
-	amount := req.Amount
-	if req.OrderType != "charging" {
-		// 客户端自报金额不可信：以出场时计费并落库的服务端金额为权威，
-		// 防止篡改金额创建低价订单。取不到服务端金额（历史记录/异常路径）
-		// 时保持原行为，由对账兜底。
-		if serverAmount, ok := uc.serverAmountForRecord(ctx, recordID); ok && serverAmount > 0 {
-			if serverAmount != req.Amount {
-				uc.logSecurityEvent(ctx, SecurityEventAmountMismatch, recordID.String(),
-					float64(serverAmount)/100, float64(req.Amount)/100, "",
-					"client-provided amount differs from the server-side exit fee; using the server amount")
+	if order == nil {
+		amount = req.Amount
+		if req.OrderType != "charging" {
+			// 客户端自报金额不可信：以出场时计费并落库的服务端金额为权威，
+			// 防止篡改金额创建低价订单。取不到服务端金额（历史记录/异常路径）
+			// 时保持原行为，由对账兜底。
+			if serverAmount, ok := uc.serverAmountForRecord(ctx, recordID); ok && serverAmount > 0 {
+				if serverAmount != req.Amount {
+					uc.logSecurityEvent(ctx, SecurityEventAmountMismatch, recordID.String(),
+						float64(serverAmount)/100, float64(req.Amount)/100, "",
+						"client-provided amount differs from the server-side exit fee; using the server amount")
+				}
+				amount = serverAmount
 			}
-			amount = serverAmount
 		}
-	}
 
-	order, err := uc.createOrder(ctx, recordID, req.OrderType, amount)
-	// req.Amount is already in cents (分) from the API boundary; the SDKs below
-	// accept cents directly, so no 元→分 conversion can introduce rounding.
-	if err != nil {
-		return nil, err
+		var err error
+		order, err = uc.createOrder(ctx, recordID, req.OrderType, amount)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	payURL, qrCode, err := uc.generatePaymentURL(ctx, order, req)
