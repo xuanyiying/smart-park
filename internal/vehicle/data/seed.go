@@ -16,7 +16,7 @@ import (
 )
 
 // ErrSeedLotNotConfigured is returned when seeding is requested without a target parking
-// lot. Seeding against a hard-coded lot id used to attach demo lanes and devices to a
+// lot. Seeding used to attach placeholder lanes and devices to a
 // parking lot that does not exist in any real deployment.
 var ErrSeedLotNotConfigured = errors.New("seed: no target parking lot configured")
 

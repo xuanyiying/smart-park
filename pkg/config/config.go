@@ -155,7 +155,7 @@ type EntryExitConfig struct {
 	// Messages overrides driver-facing display messages by key (e.g. "welcome",
 	// "lot_full", "blacklisted"). Unset keys fall back to the built-in defaults.
 	Messages map[string]string `mapstructure:"messages"`
-	// SeedLotID opts into provisioning demo lanes/devices for a specific parking lot.
+	// SeedLotID opts into provisioning the default lanes/devices for a specific parking lot.
 	// Empty disables seeding entirely, which is the production default.
 	SeedLotID string `mapstructure:"seed_lot_id"`
 }

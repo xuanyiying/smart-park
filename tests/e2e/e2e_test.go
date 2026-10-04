@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -67,6 +68,18 @@ func testDSN() string {
 }
 
 func testLogger() log.Logger { return log.NewStdLogger(io.Discard) }
+
+// randomPlate 生成符合新能源车牌格式的唯一测试车牌：
+// 省份简称 + 发牌机关字母 + "D"（纯电动标识）+ 5 位序号（不含 I/O），
+// 例如 京AD3F7K2。
+func randomPlate(regionPrefix string) string {
+	const sequenceCharset = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+	sequence := make([]byte, 5)
+	for i := range sequence {
+		sequence[i] = sequenceCharset[rand.Intn(len(sequenceCharset))]
+	}
+	return regionPrefix + "D" + string(sequence)
+}
 
 type e2eEnv struct {
 	vehicleHTTP string // http://127.0.0.1:port
@@ -293,9 +306,9 @@ func dataOf(t *testing.T, resp map[string]interface{}) map[string]interface{} {
 	return data
 }
 
-// num 解码 protojson 数值：kratos 对 proto.Message 使用 protojson，
+// protoJSONInt64 解码 protojson 数值：kratos 对 proto.Message 使用 protojson，
 // int64 字段按 proto3 JSON 约定序列化为字符串。
-func num(v interface{}) int64 {
+func protoJSONInt64(v interface{}) int64 {
 	switch x := v.(type) {
 	case float64:
 		return int64(x)
@@ -312,22 +325,22 @@ func num(v interface{}) int64 {
 // TestE2EEntryToPaidExit 走通 入场 → 出场计费 → 建单(权威金额) → 结算回写 → 无感放行。
 func TestE2EEntryToPaidExit(t *testing.T) {
 	env := setupE2E(t)
-	plate := "京E" + uuid.New().String()[:6]
+	plate := randomPlate("京E")
 
 	// 1. 相机上报入场
-	entry := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
-		`{"deviceId":"CAM001","plateNumber":%q,"plateImageUrl":"http://img/entry.jpg","confidence":0.95}`, plate)))
-	require.Equal(t, true, entry["allowed"])
-	require.Equal(t, true, entry["gateOpen"])
-	recordID, ok := entry["recordId"].(string)
+	entryResp := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
+		`{"deviceId":"CAM001","plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/entry.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, true, entryResp["allowed"])
+	require.Equal(t, true, entryResp["gateOpen"])
+	recordID, ok := entryResp["recordId"].(string)
 	require.True(t, ok && recordID != "")
 
 	// 2. 未支付出场：计费(默认费率, 不足1小时5元) + 关闸提示缴费
-	exit1 := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
-		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"http://img/exit.jpg","confidence":0.95}`, plate)))
-	require.Equal(t, false, exit1["allowed"])
-	require.Equal(t, false, exit1["gateOpen"])
-	require.Equal(t, int64(500), num(exit1["finalAmount"]), "不足1小时应按默认费率收5元")
+	unpaidExit := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
+		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/exit.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, false, unpaidExit["allowed"])
+	require.Equal(t, false, unpaidExit["gateOpen"])
+	require.Equal(t, int64(500), protoJSONInt64(unpaidExit["finalAmount"]), "不足1小时应按默认费率收5元")
 
 	// 3. 客户端篡改金额建单：服务端权威金额必须生效
 	_ = postJSON(t, env.paymentHTTP+"/api/v1/pay/create", fmt.Sprintf(
@@ -344,11 +357,11 @@ func TestE2EEntryToPaidExit(t *testing.T) {
 	require.EqualValues(t, 0, statusResp["code"], "回写响应: %v", statusResp)
 
 	// 5. 再次出场：已支付直接放行（无感出场）
-	exit2 := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
-		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"http://img/exit2.jpg","confidence":0.95}`, plate)))
-	require.Equal(t, true, exit2["allowed"])
-	require.Equal(t, true, exit2["gateOpen"])
-	require.Equal(t, int64(0), num(exit2["finalAmount"]))
+	paidExit := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
+		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/exit-retry.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, true, paidExit["allowed"])
+	require.Equal(t, true, paidExit["gateOpen"])
+	require.Equal(t, int64(0), protoJSONInt64(paidExit["finalAmount"]))
 }
 
 // TestE2EExceptionPaths 覆盖正常链路之外的异常分支：
@@ -357,51 +370,55 @@ func TestE2EEntryToPaidExit(t *testing.T) {
 func TestE2EExceptionPaths(t *testing.T) {
 	env := setupE2E(t)
 
-	entry := func(plate, device string, confidence float64) map[string]interface{} {
+	// enterVehicle 模拟车道相机上报入场（默认识别置信度 0.95）。
+	enterVehicleWithConfidence := func(plate, device string, confidence float64) map[string]interface{} {
 		return dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
-			`{"deviceId":%q,"plateNumber":%q,"plateImageUrl":"http://img/e.jpg","confidence":%v}`, device, plate, confidence)))
+			`{"deviceId":%q,"plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/entry.jpg","confidence":%v}`, device, plate, confidence)))
 	}
-	exit := func(plate, device string) map[string]interface{} {
+	enterVehicle := func(plate, device string) map[string]interface{} {
+		return enterVehicleWithConfidence(plate, device, 0.95)
+	}
+	exitVehicle := func(plate, device string) map[string]interface{} {
 		return dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
-			`{"deviceId":%q,"plateNumber":%q,"plateImageUrl":"http://img/x.jpg","confidence":0.95}`, device, plate)))
+			`{"deviceId":%q,"plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/exit.jpg","confidence":0.95}`, device, plate)))
 	}
 
 	t.Run("低置信度车牌拒收", func(t *testing.T) {
-		resp := entry("京X"+uuid.New().String()[:6], "CAM001", 0.3)
+		resp := enterVehicleWithConfidence(randomPlate("京A"), "CAM001", 0.3)
 		require.Equal(t, false, resp["allowed"])
 		require.Equal(t, false, resp["gateOpen"])
 	})
 
 	t.Run("未知设备拒收", func(t *testing.T) {
-		resp := entry("京X"+uuid.New().String()[:6], "CAM999", 0.95)
+		resp := enterVehicle(randomPlate("京A"), "CAM999")
 		require.Equal(t, false, resp["allowed"])
 		require.Equal(t, false, resp["gateOpen"])
 	})
 
 	t.Run("黑名单车辆拦截", func(t *testing.T) {
-		plate := "京B" + uuid.New().String()[:6]
+		plate := randomPlate("京B")
 		require.NoError(t, env.vehicleRepo.CreateBlacklistEntry(
 			multitenancy.ContextWithTenant(context.Background(), env.tenant),
 			&vehiclebiz.BlacklistEntry{
-				ID: uuid.New(), PlateNumber: plate, Reason: "e2e-test", Active: true,
+				ID: uuid.New(), PlateNumber: plate, Reason: "盗抢车辆管控（e2e 验证场景）", Active: true,
 				CreatedAt: time.Now(), UpdatedAt: time.Now(),
 			}))
-		resp := entry(plate, "CAM001", 0.95)
+		resp := enterVehicle(plate, "CAM001")
 		require.Equal(t, false, resp["allowed"])
 		require.Equal(t, false, resp["gateOpen"])
 	})
 
 	t.Run("无入场记录出场不放行", func(t *testing.T) {
-		resp := exit("京C"+uuid.New().String()[:6], "CAM003")
+		resp := exitVehicle(randomPlate("京C"), "CAM003")
 		require.Equal(t, false, resp["allowed"])
 		require.Equal(t, false, resp["gateOpen"])
 		require.NotEmpty(t, resp["displayMessage"])
 	})
 
 	t.Run("非法状态回写被拒绝", func(t *testing.T) {
-		plate := "京D" + uuid.New().String()[:6]
-		e := entry(plate, "CAM001", 0.95)
-		recordID := e["recordId"].(string)
+		plate := randomPlate("京D")
+		entryResp := enterVehicle(plate, "CAM001")
+		recordID := entryResp["recordId"].(string)
 
 		resp := postJSON(t, env.vehicleHTTP+"/api/v1/vehicle/records/"+recordID+"/status", `{"status":"hacked"}`)
 		require.EqualValues(t, 500, resp["code"])
@@ -412,10 +429,10 @@ func TestE2EExceptionPaths(t *testing.T) {
 	})
 
 	t.Run("未支付重复建单只保留一笔订单", func(t *testing.T) {
-		plate := "京F" + uuid.New().String()[:6]
-		e := entry(plate, "CAM001", 0.95)
-		recordID := e["recordId"].(string)
-		exit(plate, "CAM003") // 产生计费金额
+		plate := randomPlate("京F")
+		entryResp := enterVehicle(plate, "CAM001")
+		recordID := entryResp["recordId"].(string)
+		exitVehicle(plate, "CAM003") // 产生计费金额
 
 		rid, err := uuid.Parse(recordID)
 		require.NoError(t, err)
@@ -434,20 +451,21 @@ func TestE2EExceptionPaths(t *testing.T) {
 	})
 
 	t.Run("已支付订单重复建单幂等返回", func(t *testing.T) {
-		plate := "京G" + uuid.New().String()[:6]
-		e := entry(plate, "CAM001", 0.95)
-		recordID := e["recordId"].(string)
-		exit(plate, "CAM003")
+		plate := randomPlate("京G")
+		entryResp := enterVehicle(plate, "CAM001")
+		recordID := entryResp["recordId"].(string)
+		exitVehicle(plate, "CAM003")
 
 		// 首次建单（pending）
 		_ = postJSON(t, env.paymentHTTP+"/api/v1/pay/create", fmt.Sprintf(
 			`{"recordId":%q,"amount":500,"payMethod":"wechat"}`, recordID))
 		order := recordIDToOrderID(t, env, recordID)
 
-		// 模拟回调结算成功
+		// 模拟回调结算成功（微信支付交易号为 28 位数字字符串）
 		oid, err := uuid.Parse(order)
 		require.NoError(t, err)
-		applied, err := env.orderRepo.MarkOrderPaid(context.Background(), oid, "wechat", "txn-e2e-"+order[:8], 500, time.Now())
+		wechatTransactionID := fmt.Sprintf("420000%022d", time.Now().UnixNano())
+		applied, err := env.orderRepo.MarkOrderPaid(context.Background(), oid, "wechat", wechatTransactionID, 500, time.Now())
 		require.NoError(t, err)
 		require.True(t, applied)
 
@@ -476,17 +494,17 @@ func recordIDToOrderID(t *testing.T, env *e2eEnv, recordID string) string {
 // 不放行（拒绝白放车，引导人工收费），入场不受影响。
 func TestE2EExitWhenBillingDown(t *testing.T) {
 	env := setupE2E(t, func(o *e2eOpts) { o.billingDown = true })
-	plate := "京H" + uuid.New().String()[:6]
+	plate := randomPlate("京H")
 
 	// 入场不依赖 billing，照常放行
-	entry := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
-		`{"deviceId":"CAM001","plateNumber":%q,"plateImageUrl":"http://img/e.jpg","confidence":0.95}`, plate)))
-	require.Equal(t, true, entry["allowed"])
+	entryResp := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/entry", fmt.Sprintf(
+		`{"deviceId":"CAM001","plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/entry.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, true, entryResp["allowed"])
 
 	// 出场时计费不可达：不放行、不开闸、提示人工
-	exit1 := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
-		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"http://img/x.jpg","confidence":0.95}`, plate)))
-	require.Equal(t, false, exit1["allowed"], "billing 不可达时禁止放行")
-	require.Equal(t, false, exit1["gateOpen"], "billing 不可达时禁止开闸")
-	require.NotEmpty(t, exit1["displayMessage"])
+	unpaidExit := dataOf(t, postJSON(t, env.vehicleHTTP+"/api/v1/device/exit", fmt.Sprintf(
+		`{"deviceId":"CAM003","plateNumber":%q,"plateImageUrl":"https://cam.smart-park.internal/snapshots/exit.jpg","confidence":0.95}`, plate)))
+	require.Equal(t, false, unpaidExit["allowed"], "billing 不可达时禁止放行")
+	require.Equal(t, false, unpaidExit["gateOpen"], "billing 不可达时禁止开闸")
+	require.NotEmpty(t, unpaidExit["displayMessage"])
 }

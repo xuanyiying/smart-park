@@ -180,7 +180,7 @@ func main() {
 
 	// Seed device data for the configured parking lot, if any.
 	//
-	// Seeding used to attach demo devices to a hard-coded lot id on every boot. Now an
+	// Seeding used to attach fixed placeholder devices to a hard-coded lot id on every boot. Now an
 	// operator opts in by setting entry_exit.seed_lot_id to the target lot; production
 	// deployments register devices through the device management API instead.
 	seedLotID := uuid.Nil

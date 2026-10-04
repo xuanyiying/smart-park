@@ -1,0 +1,60 @@
+version: '3.8'
+
+# 基础设施 compose：仅包含 etcd/redis/postgres/jaeger 等基础设施，
+# 供 scripts/start-all.sh、start-dev.sh、stop-dev.sh 单独启停基础设施使用。
+# 应用服务见 docker-compose.yml（自包含模式）或 docker-compose.app.yml（复用全局基础设施模式）。
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: smart-park-infra-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-parking}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: smart-park-infra-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.9
+    container_name: smart-park-infra-etcd
+    environment:
+      ETCD_NAME: etcd
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+    ports:
+      - "2379:2379"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    container_name: smart-park-infra-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+
+volumes:
+  postgres_data:
+  redis_data:
