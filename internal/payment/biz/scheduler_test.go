@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -67,14 +68,19 @@ func (r *sweepRepo) MarkOrderPaid(ctx context.Context, orderID uuid.UUID, method
 func newOrderID() uuid.UUID { return uuid.New() }
 
 // stubGateway lets tests script what the channel says about each order.
+// The mutex exists because RunOrderSweeper drives it from a background
+// goroutine while the test observes the counters.
 type stubGateway struct {
+	mu      sync.Mutex
 	paid    map[string]bool
 	err     error
 	queries int
 }
 
 func (g *stubGateway) confirm(ctx context.Context, order *Order) (bool, string, error) {
+	g.mu.Lock()
 	g.queries++
+	g.mu.Unlock()
 	if g.err != nil {
 		return false, "", g.err
 	}
@@ -82,6 +88,13 @@ func (g *stubGateway) confirm(ctx context.Context, order *Order) (bool, string, 
 		return true, "tx-" + order.ID.String(), nil
 	}
 	return false, "", nil
+}
+
+// queryCount reports how many times the channel was asked.
+func (g *stubGateway) queryCount() int {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.queries
 }
 
 func newSweepUseCaseWithGateway(repo *sweepRepo, gateway *stubGateway) *PaymentUseCase {
@@ -113,7 +126,7 @@ func TestSweepClosesExpiredUnpaidOrder(t *testing.T) {
 	if repo.Orders[orderID].Status != string(StatusFailed) {
 		t.Errorf("order status = %s, want failed", repo.Orders[orderID].Status)
 	}
-	if gateway.queries != 1 {
+	if gateway.queryCount() != 1 {
 		t.Errorf("the gateway must be asked before closing, queries = %d", gateway.queries)
 	}
 }
@@ -195,7 +208,7 @@ func TestSweepLeavesFreshOrdersAlone(t *testing.T) {
 	if result.Closed != 0 || result.Settled != 0 {
 		t.Errorf("fresh orders must not be touched, got %+v", result)
 	}
-	if gateway.queries != 0 {
+	if gateway.queryCount() != 0 {
 		t.Errorf("no gateway queries expected for fresh orders, got %d", gateway.queries)
 	}
 }

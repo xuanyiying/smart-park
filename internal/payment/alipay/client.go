@@ -77,6 +77,19 @@ func NewTestClient(cfg *Config) (*Client, error) {
 	return &Client{config: cfg}, nil
 }
 
+// NewClientWithGateway builds a Client around an already constructed SDK client.
+//
+// It mirrors wechat.NewClientWithCert: tests (and future sandbox harnesses) inject a
+// client whose HTTP transport is redirected, so gateway behaviour can be exercised
+// without merchant credentials or live network access. Production code keeps using
+// NewClient.
+func NewClientWithGateway(sdkClient *alipay.Client, cfg *Config) *Client {
+	return &Client{
+		client: sdkClient,
+		config: cfg,
+	}
+}
+
 // gateway returns the underlying SDK client, or an error when the client was built
 // without merchant credentials.
 func (c *Client) gateway() (*alipay.Client, error) {
