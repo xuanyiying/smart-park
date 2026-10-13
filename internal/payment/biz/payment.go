@@ -132,7 +132,9 @@ func (uc *PaymentUseCase) CreatePayment(ctx context.Context, req *v1.CreatePayme
 
 // validateCreatePaymentRequest validates the create payment request.
 func (uc *PaymentUseCase) validateCreatePaymentRequest(req *v1.CreatePaymentRequest) error {
-	if req.RecordId == "" {
+	// Charging orders identify their subject by session id; the record id is
+	// redundant for them (and the charging service never has a parking record).
+	if !(req.OrderType == "charging" && req.SessionId != "") && req.RecordId == "" {
 		return fmt.Errorf("record ID is required")
 	}
 	if req.Amount <= 0 {
@@ -284,6 +286,11 @@ func (uc *PaymentUseCase) GetPaymentStatus(ctx context.Context, orderID string) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get order: %w", err)
 	}
+	// The repository returns (nil, nil) for an unknown order; dereferencing it
+	// would panic the status endpoint on every typo'd or purged order id.
+	if order == nil {
+		return nil, fmt.Errorf("order not found: %s", orderID)
+	}
 
 	return &v1.PaymentStatusData{
 		OrderId:   order.ID.String(),
@@ -311,6 +318,14 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 	order, err := uc.orderRepo.GetOrder(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get order: %w", err)
+	}
+	// (nil, nil) is the repository's "not found"; treating it as a zero-value
+	// order would panic on the status check below.
+	if order == nil {
+		return &v1.RefundData{
+			RefundId: "",
+			Status:   "failed",
+		}, nil
 	}
 
 	if order.Status != string(StatusPaid) {

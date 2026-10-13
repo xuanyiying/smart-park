@@ -108,10 +108,22 @@ func (c *Client) QueryOrder(ctx context.Context, orderID string) (map[string]int
 	if err != nil {
 		return nil, fmt.Errorf("failed to query order: %w", err)
 	}
+	// The SDK decodes a successful HTTP response into a struct whose fields are all
+	// optional pointers. A short or malformed body (field dropped, wrong type)
+	// therefore yields nils here, and dereferencing them would panic the payment
+	// service on a channel hiccup. Absent fields simply stay absent from the map,
+	// and the reconciliation layer already treats a missing trade_state as a
+	// reportable mismatch rather than a crash.
+	if order == nil {
+		return nil, fmt.Errorf("wechat: query order returned no transaction data")
+	}
 
-	result := map[string]interface{}{
-		"out_trade_no": *order.OutTradeNo,
-		"trade_state":  *order.TradeState,
+	result := map[string]interface{}{}
+	if order.OutTradeNo != nil {
+		result["out_trade_no"] = *order.OutTradeNo
+	}
+	if order.TradeState != nil {
+		result["trade_state"] = *order.TradeState
 	}
 	// The channel's transaction id is what reconciliation and settlement records need;
 	// without it a swept order could only be settled with an empty reference.
