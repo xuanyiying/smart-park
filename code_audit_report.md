@@ -40,6 +40,29 @@
 
 **Seata 决策**：审计建议 H7 引入官方 Go SDK，经评估不引入。理由：计费—支付—出场链路已由"条件更新状态机（幂等）+ 巡检补单 + 每日对账"实现最终一致性，没有需要 2PC/TCC 强一致的资金场景；seata-go 仍在 Apache 孵化期，其 AT 数据源代理不支持 PostgreSQL；部署 TC server 的高可用与运维成本远超收益。剩余缺口（本地事务与外部副作用之间的原子交接）由 outbox 覆盖。
 
+**第五轮修复（上线前缺口补齐）**：审计结论中"上线前三项硬性验收"已推进两项——测试覆盖率与部署密钥治理；压测仍待执行。本轮在编写测试的过程中**新发现并修复 3 个生产缺陷**（均为真实代码路径上的空指针/校验缺陷，由新增测试直接暴露）。
+
+| 编号 | 修复内容 |
+|---|---|
+| C10 | `wechat.Client.QueryOrder` 对渠道响应无条件解引用 `*order.OutTradeNo` / `*order.TradeState`：网关返回短响应（字段缺失）时 payment 服务直接 panic。改为逐字段判空后写入 map，`order == nil` 显式报错；`reconcileWechatOrder` 原有的"trade_state 缺失即 mismatch"防御从此真正可达（`internal/payment/wechat/client.go`） |
+| C11 | `GetPaymentStatus` 与 `Refund` 在订单不存在时空指针 panic：仓库对未找到订单返回 `(nil, nil)`（与 `settleOrder` 的既有防御一致），两处却直接解引用。`GetPaymentStatus` 改为返回 `order not found` 错误，`Refund` 改为返回 `status=failed`（`internal/payment/biz/payment.go`） |
+| C12 | `CreatePayment` 校验要求 `RecordId` 非空，但充电订单以 `SessionId` 标识主体、根本没有停车记录，导致小程序充电支付无法建单。校验改为"充电且有 session_id 时豁免 RecordId"（`internal/payment/biz/payment.go`） |
+
+**测试覆盖率补齐**（发布清单要求核心 ≥80%、计费/支付 ≥90%；此前 payment/biz 37.4%、wechat 33.1%、alipay 31.5%、billing/biz 40.4%）：
+
+| 包 | 补齐前 | 补齐后 | 主要新增覆盖 |
+|---|---|---|---|
+| `internal/payment/biz` | 37.4% | **87.4%** | 微信 APIv3 / 支付宝回调全链路（签名→解密→金额校验→条件结算→幂等）、对账渠道核验与漏单发现、巡检调度器生命周期、outbox 事件原子性、gRPC 适配器、退款状态机、服务端权威金额 |
+| `internal/payment/wechat` | 33.1% | **87.6%** | 网关调用（查单/关单/退款/退款查询/下单）经重定向传输打到本地服务器、密钥加载器（PKCS8/PKCS1/证书/裸公钥）、回调验签全管道 happy path 与防重放窗口 |
+| `internal/payment/alipay` | 31.5% | **90.1%** | 同上思路的网关方法覆盖（含响应验签）、`NewClient` 密钥装载、未配置网关时的失败路径、`centsToYuanString` 金额格式化、通知解码与防篡改 |
+| `internal/billing/biz` | 40.4% | **97.4%** | `CalculateFee` 全部分支（base/discount/override/monthly/兜底/畸形规则跳过）、规则缓存与失效、CRUD 用例层、条件引擎与动作引擎全部分支、节假日日历 |
+
+测试方法说明：微信/支付宝 SDK 均支持注入 HTTP 客户端（`option.WithHTTPClient` / 导出的 `Client` 字段），测试用 `httptest` + 自定义 `RoundTripper` 把网关请求重定向到本地服务器并构造**真实签名**的响应，覆盖的是本仓库客户端代码而非 SDK 本身。为此参照 wechat 包既有的 `NewClientWithCert` 先例，为 alipay 包增加了对应的 `NewClientWithGateway` 注入构造器。
+
+**部署密钥治理**：`deploy/k8s/secrets.yaml` 原为 `${DB_PASSWORD}` 字面占位（直接 `kubectl apply` 会把占位符当成真实密钥）。新增 `scripts/k8s/create-secrets.sh`：随机生成强口令、base64 嵌入密钥文件、产出结构正确的 Secret，并拒绝包含占位内容的密钥文件；compose 侧的必需变量强校验此前已完成。
+
+**仍未完成（维持原结论）**：渠道沙箱端到端冒烟（对账/退款的真实一笔）、网关与出入场链路压测（README 性能指标仍为设计目标口径）、`web/` 管理后台逐页人工验收。
+
 **补记（此前已修复但未登记）**：以下三项在 C9/H1 的修复批次中一并完成，"修复状态"章节此前遗漏登记，经复核代码确认已生效。
 
 | 编号 | 修复内容 |
@@ -445,6 +468,8 @@ func (s *E2ETestSuite) TestVehicleEntryFlow() {
 **修复后结论——可达最小可用生产版本。** 9 个 Critical 项（C1–C9）与 High 项 H1、H3–H13 已全部修复，并通过 `go build ./...`、`go vet ./...`、`go test ./...` 全量验证。资金链路（对账、退款、验签、幂等）、设备控制链路（真实协议下发、心跳判在线、异常拦截留痕）、安全链路（网关 JWT 鉴权、租户拦截器）三条最高风险链路的阻断级缺陷均已闭合；Seata 经评估不引入，改由 outbox + 条件更新状态机 + 巡检补单 + 每日对账实现最终一致性。
 
 **第四轮修复后结论——遗留项清零。** 此前遗留的 13 项（H2 部分修复 + 12 项 Medium）已全部完成（见上文"第四轮修复"），其中原优先级最高的五项逐一闭合：黑名单（M12）以 schema + 用例 + 管理接口 + 入场拦截完整落地；车位余量校验（M13）随 `total_capacity` 字段与满位拦截生效；网关高可用（M9/M10）获得连接池上限、任一健康即就绪探针与健康感知轮询 + 熔断；车辆查询错误降级（M2）不再把 DB 故障当成"无车辆信息"；业务配置（M3）全面可注入。审计报告的全部 C/H/M 问题至此均有对应修复，`go build ./...`、`go vet ./...`、`go test ./...` 保持全绿。上线前仍建议：对资金链路做一次渠道沙箱端到端冒烟，对网关与出入场链路做一次压测以印证性能目标，并逐页验收 `web/` 管理后台。
+
+**第五轮修复后结论——上线前三项硬性验收已完成两项。** 测试覆盖率（发布清单要求的核心 ≥80%）四项全部达标：payment/biz 87.4%、wechat 87.6%、alipay 90.1%、billing/biz 97.4%；部署密钥治理（k8s secrets 生成脚本 + 占位拒绝）完成。本轮编写测试时新发现并修复 3 个生产缺陷（C10 微信查单响应短字段 panic、C11 订单不存在时状态/退款接口 panic、C12 充电订单被 RecordId 校验阻断建单），三者均位于真实请求路径上、由新增测试直接暴露。剩余唯一硬性验收为**渠道沙箱端到端冒烟与压测**——对账与退款的真实一笔、网关与出入场链路的实测性能数据，需在有渠道凭据与目标硬件的环境中执行，无法在单元测试层闭环。
 
 ## 六、审计局限
 
