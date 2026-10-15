@@ -63,6 +63,17 @@
 
 **仍未完成（维持原结论）**：渠道沙箱端到端冒烟（对账/退款的真实一笔）、网关与出入场链路压测（README 性能指标仍为设计目标口径）、`web/` 管理后台逐页人工验收。
 
+**第六轮修复（依赖与工具链漏洞清零）**：推送后 GitHub Dependabot 报告 10 项依赖漏洞，经 `govulncheck` 符号级分析确认其中**被本代码实际调用**的共 32 项，逐项修复至 **0**：
+
+| 升级项 | 变更 | 消除漏洞 |
+|---|---|---|
+| `golang.org/x/net` | v0.58.0 → v0.60.0 | 31（HTTP/2、html 解析等系列） |
+| `google.golang.org/grpc` | v1.83.1 → v1.83.2 | 1 |
+| Go 工具链 | go1.26.1 → **go1.26.9**（`toolchain` 指令） | 标准库漏洞（含 net/http、crypto 系列） |
+| Docker 构建镜像 | 7 个 Dockerfile `golang:1.25-alpine` → `golang:1.26.9-alpine` | 运行镜像与工具链对齐 |
+
+`govulncheck ./...` 最终结论：**Your code is affected by 0 vulnerabilities**。剩余 4 项告警（2 项在已导入包、2 项在依赖的必需模块中）均**未被本代码调用**（govulncheck 符号级验证），无实际风险面；Dependabot 因按 go.mod 清单口径（非符号级）统计仍会显示部分条目。`go build ./...`、`go vet ./...`、`go test ./...`（21 包）、`go mod verify` 全绿。
+
 **补记（此前已修复但未登记）**：以下三项在 C9/H1 的修复批次中一并完成，"修复状态"章节此前遗漏登记，经复核代码确认已生效。
 
 | 编号 | 修复内容 |
