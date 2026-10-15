@@ -22,12 +22,10 @@ Create Order → Pending Payment → Payment Success → Paid → Refund Request
 type OrderStatus string
 
 const (
-    StatusPending   OrderStatus = "pending"    // Pending payment
-    StatusPaid      OrderStatus = "paid"       // Paid
-    StatusFailed    OrderStatus = "failed"     // Payment failed
-    StatusRefunding OrderStatus = "refunding"  // Refunding
-    StatusRefunded  OrderStatus = "refunded"   // Refunded
-    StatusClosed    OrderStatus = "closed"     // Closed
+    StatusPending  OrderStatus = "pending"   // Pending payment
+    StatusPaid     OrderStatus = "paid"      // Paid
+    StatusRefunded OrderStatus = "refunded"  // Refunded
+    StatusFailed   OrderStatus = "failed"    // Payment failed
 )
 
 type Order struct {
@@ -464,11 +462,11 @@ Users may not pay or pay after timeout after scanning QR code, requiring proper 
    // Set expiration time when creating order
    order.ExpireTime = time.Now().Add(30 * time.Minute)
    
-   // Scheduled task to clean up expired orders
+   // Scheduled task to clean up expired orders (actual state machine: pending → failed conditional update)
    func (uc *PaymentUseCase) CleanupExpiredOrders(ctx context.Context) {
        expiredOrders, _ := uc.orderRepo.GetExpiredOrders(ctx)
        for _, order := range expiredOrders {
-           order.Status = string(StatusClosed)
+           order.Status = string(StatusFailed)
            uc.orderRepo.UpdateOrder(ctx, order)
        }
    }
@@ -495,10 +493,10 @@ Users may not pay or pay after timeout after scanning QR code, requiring proper 
            uc.alipayClient.CloseTrade(ctx, order.ID.String())
        }
        
-       order.Status = string(StatusClosed)
+       order.Status = string(StatusFailed)
        return uc.orderRepo.UpdateOrder(ctx, order)
-   }
-   ```
+       }
+       ```
 
 ### Challenge 3: Payment Channel Failure
 
@@ -719,4 +717,4 @@ alipay:
 
 - [Vehicle Service Documentation](vehicle_EN.md)
 - [Billing Service Documentation](billing_EN.md)
-- [Deployment Documentation](deployment_EN.md)
+- [Deployment Documentation](deployment.md)

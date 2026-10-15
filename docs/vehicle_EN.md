@@ -91,25 +91,19 @@ if vehicle.VehicleType == VehicleTypeMonthly {
 
 #### Device Authentication Mechanism
 
-HMAC-SHA256 signature authentication:
+The current implementation does not use signature headers (no HMAC/signature verification logic in code):
 
-```
-signature = HMAC-SHA256(deviceId + timestamp + bodyJson, deviceSecret)
-Header: X-Device-Id, X-Timestamp, X-Signature
-```
-
-**Technical Decision Explanation**:
-- Signature validity: 5 minutes to prevent replay attacks
-- Device keys distributed offline, encrypted storage in cloud
-- Supports temporary device disabling (maintenance scenarios)
+- Device identity is identified by the `device_secret` stored in the database; seed data generates a 32-byte random key per device (see `internal/vehicle/data/seed.go`)
+- External access goes through gateway JWT authentication (`/api/v1/device/*` requires `Authorization: Bearer <jwt>`); no separate device signature is used between services
 
 ### 4. Distributed Lock Implementation
 
 Redis-based distributed locks ensure data consistency in concurrent scenarios:
 
 ```go
-// Lock key design
-lockKey := fmt.Sprintf("parking:v1:lock:%s:%s", lockType, identifier)
+// Lock key design (prefix smart-park:vehicle, see cmd/vehicle/main.go and pkg/lock/redis_lock.go)
+// Full key example: smart-park:vehicle:lock:entry:京A12345
+lockKey := fmt.Sprintf("smart-park:vehicle:lock:%s", identifier)
 
 // Acquire lock
 acquired, err := uc.lockRepo.AcquireLock(ctx, lockKey, owner, ttl)
@@ -231,16 +225,15 @@ During morning and evening rush hours, a single lane may reach 300-500 vehicles/
 Redis-based distributed lock to ensure data consistency in concurrent scenarios:
 
 ```go
-// Lock key design
-lockKey := fmt.Sprintf("parking:v1:lock:%s:%s", lockType, identifier)
-
-// Acquire lock
+// Lock key prefix smart-park:vehicle; full key example: smart-park:vehicle:lock:entry:京A12345
 acquired, err := uc.lockRepo.AcquireLock(ctx, lockKey, owner, ttl)
 if !acquired {
-    return fmt.Errorf("operation in progress")
+    return fmt.Errorf("duplicate request in progress")
 }
 defer uc.lockRepo.ReleaseLock(ctx, lockKey, owner)
 ```
+
+The lock lease defaults to 10s (`entry_exit.lock_ttl`); a watchdog goroutine renews it every TTL/3 until the critical section completes (see `internal/vehicle/biz/entry_exit.go`).
 
 **Pros**: Simple implementation, strong consistency, supports distributed deployment
 **Cons**: Depends on Redis, has network overhead
@@ -463,7 +456,7 @@ The same vehicle may trigger billing at multiple exits simultaneously, requiring
 
 1. **Distributed Pessimistic Lock**
    ```go
-   lockKey := fmt.Sprintf("parking:v1:lock:exit:%s", recordID)
+   lockKey := fmt.Sprintf("smart-park:vehicle:lock:exit:%s", recordID)
    acquired, _ := lockRepo.AcquireLock(ctx, lockKey, owner, 30*time.Second)
    if !acquired {
        return fmt.Errorf("billing in progress")
@@ -489,9 +482,7 @@ The same vehicle may trigger billing at multiple exits simultaneously, requiring
 ```http
 POST /api/v1/device/entry
 Content-Type: application/json
-X-Device-Id: lane_001
-X-Timestamp: 1710916800000
-X-Signature: sha256=...
+Authorization: Bearer <jwt>
 
 {
   "deviceId": "lane_001",
@@ -521,7 +512,7 @@ X-Signature: sha256=...
 ```http
 POST /api/v1/device/exit
 Content-Type: application/json
-X-Device-Id: lane_002
+Authorization: Bearer <jwt>
 
 {
   "deviceId": "lane_002",
@@ -540,9 +531,9 @@ X-Device-Id: lane_002
     "recordId": "rec_xxx",
     "plateNumber": "京A12345",
     "parkingDuration": 7200,
-    "amount": 15.00,
+    "amount": 1500,
     "discountAmount": 0,
-    "finalAmount": 15.00,
+    "finalAmount": 1500,
     "allowed": true,
     "gateOpen": false,
     "displayMessage": "Please pay"
@@ -553,30 +544,41 @@ X-Device-Id: lane_002
 ## Configuration
 
 ```yaml
-# configs/vehicle.yaml
+# configs/vehicle.yaml (excerpt; gRPC :9001 hardcoded in cmd/vehicle/main.go)
 server:
-  http:
-    addr: 0.0.0.0:8001
-  grpc:
-    addr: 0.0.0.0:9001
+  port: 8001
+  timeout: 60
 
-data:
-  database:
-    driver: postgres
-    source: postgres://postgres:postgres@localhost:5432/parking?sslmode=disable
-  redis:
-    addr: localhost:6379
-    password: ""
-    db: 0
+database:
+  driver: postgres
+  primary:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  replica:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
 
 mqtt:
-  broker: tcp://localhost:1883
-  client_id: vehicle_service
+  # broker is required: gate commands are delivered over MQTT, service refuses to start without it
+  broker: ""
+  port: 1883
+  client_id: "vehicle-service"
   username: ""
   password: ""
+  tls: false
+  topics:
+    command: "parking/device/{device_id}/command"
+    status: "parking/device/{device_id}/status"
+    heartbeat: "parking/device/{device_id}/heartbeat"
 
-lock:
-  ttl: 30s  # Distributed lock timeout
+entry_exit:
+  # Distributed lock lease; watchdog renews every TTL/3
+  lock_ttl: "10s"
+  device_online_threshold: "5m"
+  min_confidence: 0.7
 ```
 
 ## Testing Strategy
@@ -626,4 +628,4 @@ wrk -t12 -c400 -d30s -s entry_test.lua http://localhost:8000/api/v1/device/entry
 
 - [Billing Service Documentation](billing_EN.md)
 - [Payment Service Documentation](payment_EN.md)
-- [Deployment Documentation](deployment_EN.md)
+- [Deployment Documentation](deployment.md)

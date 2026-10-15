@@ -3,8 +3,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -221,19 +219,42 @@ func (s *PaymentService) GetReconciliationReport(ctx context.Context, req *v1.Ge
 		}, nil
 	}
 
-	data := make(map[string]string, len(report))
-	for k, v := range report {
-		switch value := v.(type) {
-		case string:
-			data[k] = value
-		case int:
-			data[k] = fmt.Sprintf("%d", value)
-		case float64:
-			data[k] = fmt.Sprintf("%.2f", value)
-		default:
-			if encoded, err := json.Marshal(v); err == nil {
-				data[k] = string(encoded)
+	data := &v1.ReconciliationReportData{}
+	if v, ok := report["start_date"].(string); ok {
+		data.StartDate = v
+	}
+	if v, ok := report["end_date"].(string); ok {
+		data.EndDate = v
+	}
+	if v, ok := report["total_orders"].(int); ok {
+		data.TotalOrders = int32(v)
+	}
+	if v, ok := report["total_amount"].(int64); ok {
+		data.TotalAmount = v
+	}
+	if v, ok := report["total_paid"].(int64); ok {
+		data.TotalPaid = v
+	}
+	if v, ok := report["matched_orders"].(int); ok {
+		data.MatchedOrders = int32(v)
+	}
+	if v, ok := report["mismatched_orders"].(int); ok {
+		data.MismatchedOrders = int32(v)
+	}
+	if methods, ok := report["payment_methods"].(map[string]map[string]interface{}); ok {
+		data.PaymentMethods = make(map[string]*v1.PaymentMethodStat, len(methods))
+		for method, stat := range methods {
+			ps := &v1.PaymentMethodStat{}
+			if v, ok := stat["count"].(int); ok {
+				ps.Count = int32(v)
 			}
+			if v, ok := stat["amount"].(int64); ok {
+				ps.Amount = v
+			}
+			if v, ok := stat["paid"].(int64); ok {
+				ps.Paid = v
+			}
+			data.PaymentMethods[method] = ps
 		}
 	}
 

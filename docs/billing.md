@@ -12,12 +12,12 @@
 
 | 规则类型 | 说明 | 适用场景 |
 |----------|------|----------|
+| `base` | 基础计费 | 临时车标准收费（与 `time` 取最低者） |
 | `time` | 按时计费 | 临时车标准收费 |
-| `period` | 时段计费 | 夜间优惠、节假日收费 |
-| `monthly` | 月卡计费 | 月租车辆管理 |
-| `vip` | VIP计费 | 特权车辆优惠 |
 | `discount` | 折扣规则 | 优惠券、活动减免 |
 | `exemption` | 免费规则 | 免费时段、特殊车辆 |
+| `monthly` | 月卡计费 | 月租车辆（`vehicleType` 为 `monthly` 时免计费） |
+| `override` | 覆盖规则 | 直接采用该规则金额并清零折扣 |
 
 #### 规则结构
 
@@ -392,14 +392,9 @@ if vehicle.VehicleType == VehicleTypeMonthly {
 
 2. **缓存策略**
    ```go
-   // 费率规则缓存 24 小时
-   rules, err := uc.cache.GetOrSet(ctx, 
-       fmt.Sprintf("parking:v1:rules:%s", lotID),
-       func() ([]*BillingRule, error) {
-           return uc.repo.GetRulesByLotID(ctx, lotID)
-       },
-       24*time.Hour,
-   )
+   // 费率规则进程内缓存（ruleCache），TTL 30 秒
+   // 规则变更时立即失效；TTL 仅用于兜底绕过服务直改数据库的场景
+   const defaultRuleCacheTTL = 30 * time.Second
    ```
 
 3. **预编译条件**
@@ -524,25 +519,25 @@ Content-Type: application/json
 }
 ```
 
-**响应**：
+**响应**（金额单位为分，int64；`1500` 即 15.00 元）：
 ```json
 {
   "code": 0,
   "data": {
     "recordId": "rec_xxx",
-    "baseAmount": 15.00,
-    "discountAmount": 5.00,
-    "finalAmount": 10.00,
+    "baseAmount": 1500,
+    "discountAmount": 500,
+    "finalAmount": 1000,
     "appliedRules": [
       {
         "ruleId": "rule_001",
         "ruleName": "临时车标准收费",
-        "amount": 15.00
+        "amount": 1500
       },
       {
         "ruleId": "rule_003",
         "ruleName": "夜间优惠",
-        "amount": -5.00
+        "amount": -500
       }
     ]
   }
@@ -569,23 +564,43 @@ Content-Type: application/json
 ## 配置说明
 
 ```yaml
-# configs/billing.yaml
+# configs/billing.yaml（gRPC :9002 硬编码于 cmd/billing/main.go）
 server:
-  http:
-    addr: 0.0.0.0:8002
-  grpc:
-    addr: 0.0.0.0:9002
+  port: 8002
+  timeout: 60
 
-data:
-  database:
-    driver: postgres
-    source: postgres://postgres:postgres@localhost:5432/parking?sslmode=disable
+database:
+  driver: postgres
+  primary:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  replica:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 
-billing:
-  defaultCurrency: "CNY"
-  minChargeAmount: 0.01
-  maxChargeAmount: 10000.00
-  roundDecimals: 2
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+mq:
+  type: "redis"
+  redis:
+    addr: "localhost:6379"
+    password: ""
+    db: 0
+    stream: "parking"
+
+log:
+  level: info
+  format: json
+
+# 节假日日历（ISO 日期），命中时计费引擎的 holiday 条件生效
+holidays: []
+
+telemetry:
+  enabled: true
+  endpoint: "localhost:4317"
+  serviceName: "billing-svc"
+  sampleRate: 1.0
 ```
 
 ## 监控指标

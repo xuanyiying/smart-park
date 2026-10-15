@@ -209,12 +209,14 @@ docker images | grep smart-park
 # 复制环境变量模板
 cp .env.example .env
 
-# 编辑 .env 文件，配置以下参数：
-# - 数据库密码
-# - Redis 密码
-# - 微信支付密钥
-# - 支付宝密钥
-# - JWT 密钥
+# 编辑 .env 文件，以下变量为强校验必填（缺失时容器启动失败）：
+# - GRAFANA_PASSWORD     Grafana 管理员密码
+# - SP_MQTT_BROKER       MQTT broker 地址（车辆服务道闸指令依赖）
+# - SP_WECHAT_API_KEY    微信支付 API 密钥
+# - SP_JWT_SECRET        JWT 签名密钥
+#
+# 注意：根目录 .env.example 中的变量名与 compose 实际消费的变量名不完全一致，
+# 以 deploy/docker-compose.yml 中的 ${VAR:?} 强校验项为准。
 ```
 
 ### 3. 部署完整服务栈
@@ -266,155 +268,30 @@ sudo systemctl restart sshd
 
 ### 2. 生产配置
 
-#### 数据库配置
-
-```yaml
-# configs/production/database.yaml
-data:
-  database:
-    driver: postgres
-    source: postgres://parking:${DB_PASSWORD}@prod-db.internal:5432/parking?sslmode=require
-    max_open_conns: 100
-    max_idle_conns: 10
-    conn_max_lifetime: 1h
-```
-
-#### 安全配置
-
-```yaml
-# configs/production/security.yaml
-security:
-  jwt:
-    algorithm: RS256
-    public_key_path: /secrets/jwt-public.pem
-    private_key_path: /secrets/jwt-private.pem
-    expires_in: 24h
-  
-  device:
-    signature_ttl: 5m
-    max_failed_attempts: 5
-    lockout_duration: 30m
-```
+仓库中不存在 `configs/production/` 目录。生产配置直接修改各服务 `configs/*.yaml`，敏感字段（数据库连接串、密码、JWT 密钥等）通过 `SP_*` 环境变量覆盖（如 `SP_DATABASE_SOURCE`、`SP_JWT_SECRET`），详见各配置文件顶部的环境变量说明。
 
 ### 3. Docker Compose 生产配置
 
-```yaml
-# deploy/docker-compose.prod.yml
-version: '3.8'
+生产部署统一使用 `deploy/docker-compose.yml`（仓库中无 prod 变体文件），环境差异通过 `SP_*` 环境变量与 `.env` 覆盖：
 
-services:
-  gateway:
-    image: smart-park/gateway:latest
-    restart: always
-    ports:
-      - "8000:8000"
-    environment:
-      - KRATOS_CONF=/configs/gateway.yaml
-    volumes:
-      - ./configs/production:/configs:ro
-      - ./secrets:/secrets:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  vehicle:
-    image: smart-park/vehicle:latest
-    restart: always
-    environment:
-      - KRATOS_CONF=/configs/vehicle.yaml
-    volumes:
-      - ./configs/production:/configs:ro
-      - ./secrets:/secrets:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 512M
-
-  billing:
-    image: smart-park/billing:latest
-    restart: always
-    environment:
-      - KRATOS_CONF=/configs/billing.yaml
-    volumes:
-      - ./configs/production:/configs:ro
-      - ./secrets:/secrets:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-
-  payment:
-    image: smart-park/payment:latest
-    restart: always
-    environment:
-      - KRATOS_CONF=/configs/payment.yaml
-    volumes:
-      - ./configs/production:/configs:ro
-      - ./secrets:/secrets:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-
-  admin:
-    image: smart-park/admin:latest
-    restart: always
-    environment:
-      - KRATOS_CONF=/configs/admin.yaml
-    volumes:
-      - ./configs/production:/configs:ro
-      - ./secrets:/secrets:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-
-  # 使用外部数据库和缓存服务
-  # 生产环境建议使用云服务商的托管服务
+```bash
+# 生产环境部署
+./deploy/scripts/deploy.sh deploy production v1.0.0
 ```
 
 ### 4. 部署脚本
 
+`deploy/scripts/deploy.sh` 固定使用 `deploy/docker-compose.yml`，提供以下子命令：
+
 ```bash
-#!/bin/bash
-# deploy/scripts/deploy.sh
-
-set -e
-
-ENV=${1:-production}
-VERSION=${2:-latest}
-
-echo "Deploying Smart Park ${VERSION} to ${ENV}..."
-
-# 拉取最新镜像
-docker-compose -f deploy/docker-compose.${ENV}.yml pull
-
-# 滚动更新
-docker-compose -f deploy/docker-compose.${ENV}.yml up -d --no-deps --scale gateway=2 gateway
-docker-compose -f deploy/docker-compose.${ENV}.yml up -d --no-deps vehicle
-docker-compose -f deploy/docker-compose.${ENV}.yml up -d --no-deps billing
-docker-compose -f deploy/docker-compose.${ENV}.yml up -d --no-deps payment
-docker-compose -f deploy/docker-compose.${ENV}.yml up -d --no-deps admin
-
-# 清理旧镜像
-docker image prune -f
-
-echo "Deployment completed!"
+./deploy.sh deploy [env] [version]   # 部署服务（默认 development latest）
+./deploy.sh build                    # 构建 Docker 镜像
+./deploy.sh push                     # 推送镜像到仓库
+./deploy.sh update                   # 滚动更新服务
+./deploy.sh rollback                 # 回滚到上一个版本
+./deploy.sh status                   # 查看服务状态
+./deploy.sh logs [service]           # 查看日志
+./deploy.sh stop                     # 停止所有服务
 ```
 
 ### 5. 监控配置
@@ -422,7 +299,7 @@ echo "Deployment completed!"
 #### Prometheus 配置
 
 ```yaml
-# deploy/monitoring/prometheus.yml
+# deploy/prometheus/prometheus.yml
 global:
   scrape_interval: 15s
 
@@ -490,11 +367,26 @@ metadata:
   name: smart-park-config
   namespace: smart-park
 data:
+  # 扁平结构，与 configs/*.yaml 及 pkg/config.Load 保持一致；
+  # 敏感字段通过 SP_* 环境变量覆盖（完整内容见 deploy/k8s/configmap.yaml）
   gateway.yaml: |
     server:
-      http:
-        addr: 0.0.0.0:8000
-    # ... 其他配置
+      port: 8000
+      timeout: 60
+    routes:
+      - path: /api/v1/device
+        target: vehicle:8001
+      - path: /api/v1/billing
+        target: billing:8002
+      - path: /api/v1/pay
+        target: payment:8003
+      - path: /api/v1/admin
+        target: admin:8004
+    jwt:
+      public_key_path: "/keys/public.pem"
+    etcd:
+      endpoints:
+        - "etcd:2379"
 ```
 
 ### 3. Secret 配置
@@ -539,12 +431,11 @@ spec:
         image: smart-park/gateway:latest
         ports:
         - containerPort: 8000
-        env:
-        - name: KRATOS_CONF
-          value: "/configs/gateway.yaml"
+        # 配置通过 -conf flag 加载（镜像内 /app/configs/ 提供），非环境变量注入
+        command: ["./gateway-svc", "-conf", "/app/configs/gateway.yaml"]
         volumeMounts:
         - name: config
-          mountPath: /configs
+          mountPath: /app/configs
           readOnly: true
         - name: secrets
           mountPath: /secrets
@@ -661,9 +552,11 @@ kubectl get hpa -n smart-park
 
 ### 数据库备份
 
+> 说明：当前仓库未包含 backup.sh / restore.sh 脚本（deploy/scripts/ 下仅有 deploy.sh），以下为规划步骤，脚本需自行实现。
+
 ```bash
 #!/bin/bash
-# deploy/scripts/backup.sh
+# 规划：deploy/scripts/backup.sh
 
 BACKUP_DIR="/backup/parking"
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -682,7 +575,7 @@ find ${BACKUP_DIR} -name "parking_*.sql.gz" -mtime +7 -delete
 
 ```bash
 #!/bin/bash
-# deploy/scripts/restore.sh
+# 规划：deploy/scripts/restore.sh
 
 BACKUP_FILE=$1
 
@@ -748,21 +641,17 @@ export VERSION=v1.2.0
 docker-compose -f deploy/docker-compose.yml up -d --no-deps --scale gateway=2 gateway
 docker-compose -f deploy/docker-compose.yml up -d --no-deps vehicle billing payment admin
 
-# 3. 验证新版本
-curl http://localhost:8000/version
+# 3. 验证服务健康
+curl http://localhost:8000/health
 ```
 
 ### 数据库迁移
 
 ```bash
-# 执行迁移
-go run ./cmd/migrate up
+# 无独立迁移命令：表结构由各服务启动时通过 Ent Schema.Create 自动执行
 
-# 回滚迁移
-go run ./cmd/migrate down
-
-# 查看迁移状态
-go run ./cmd/migrate status
+# 一次性数据迁移脚本（金额元转分，已执行）
+# scripts/migrate_amount_to_cents.sql
 ```
 
 ## 安全建议

@@ -34,6 +34,7 @@ const OperationVehicleServiceExit = "/api.vehicle.v1.VehicleService/Exit"
 const OperationVehicleServiceGetDevice = "/api.vehicle.v1.VehicleService/GetDevice"
 const OperationVehicleServiceGetDeviceFault = "/api.vehicle.v1.VehicleService/GetDeviceFault"
 const OperationVehicleServiceGetDeviceFaultStats = "/api.vehicle.v1.VehicleService/GetDeviceFaultStats"
+const OperationVehicleServiceGetDeviceHeartbeat = "/api.vehicle.v1.VehicleService/GetDeviceHeartbeat"
 const OperationVehicleServiceGetDeviceLogs = "/api.vehicle.v1.VehicleService/GetDeviceLogs"
 const OperationVehicleServiceGetDevicePerformance = "/api.vehicle.v1.VehicleService/GetDevicePerformance"
 const OperationVehicleServiceGetDevicePerformanceLatest = "/api.vehicle.v1.VehicleService/GetDevicePerformanceLatest"
@@ -86,6 +87,7 @@ type VehicleServiceHTTPServer interface {
 	GetDevice(context.Context, *GetDeviceRequest) (*GetDeviceResponse, error)
 	GetDeviceFault(context.Context, *GetDeviceFaultRequest) (*GetDeviceFaultResponse, error)
 	GetDeviceFaultStats(context.Context, *GetDeviceFaultStatsRequest) (*GetDeviceFaultStatsResponse, error)
+	GetDeviceHeartbeat(context.Context, *GetDeviceStatusRequest) (*GetDeviceStatusResponse, error)
 	// GetDeviceLogs Device logs
 	GetDeviceLogs(context.Context, *GetDeviceLogsRequest) (*GetDeviceLogsResponse, error)
 	GetDevicePerformance(context.Context, *GetDevicePerformanceRequest) (*GetDevicePerformanceResponse, error)
@@ -129,6 +131,7 @@ func RegisterVehicleServiceHTTPServer(s *http.Server, srv VehicleServiceHTTPServ
 	r.POST("/api/v1/device/exit", _VehicleService_Exit0_HTTP_Handler(srv))
 	r.POST("/api/v1/device/heartbeat", _VehicleService_Heartbeat0_HTTP_Handler(srv))
 	r.GET("/api/v1/device/{deviceId}/status", _VehicleService_GetDeviceStatus0_HTTP_Handler(srv))
+	r.GET("/api/v1/device/{deviceId}/heartbeat", _VehicleService_GetDeviceHeartbeat0_HTTP_Handler(srv))
 	r.POST("/api/v1/device/{deviceId}/command", _VehicleService_SendCommand0_HTTP_Handler(srv))
 	r.GET("/api/v1/vehicle/{plateNumber}", _VehicleService_GetVehicleInfo0_HTTP_Handler(srv))
 	r.GET("/api/v1/vehicle/records", _VehicleService_ListParkingRecords0_HTTP_Handler(srv))
@@ -250,6 +253,28 @@ func _VehicleService_GetDeviceStatus0_HTTP_Handler(srv VehicleServiceHTTPServer)
 		http.SetOperation(ctx, OperationVehicleServiceGetDeviceStatus)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetDeviceStatus(ctx, req.(*GetDeviceStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDeviceStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VehicleService_GetDeviceHeartbeat0_HTTP_Handler(srv VehicleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDeviceStatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVehicleServiceGetDeviceHeartbeat)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDeviceHeartbeat(ctx, req.(*GetDeviceStatusRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -1175,6 +1200,7 @@ type VehicleServiceHTTPClient interface {
 	GetDevice(ctx context.Context, req *GetDeviceRequest, opts ...http.CallOption) (rsp *GetDeviceResponse, err error)
 	GetDeviceFault(ctx context.Context, req *GetDeviceFaultRequest, opts ...http.CallOption) (rsp *GetDeviceFaultResponse, err error)
 	GetDeviceFaultStats(ctx context.Context, req *GetDeviceFaultStatsRequest, opts ...http.CallOption) (rsp *GetDeviceFaultStatsResponse, err error)
+	GetDeviceHeartbeat(ctx context.Context, req *GetDeviceStatusRequest, opts ...http.CallOption) (rsp *GetDeviceStatusResponse, err error)
 	GetDeviceLogs(ctx context.Context, req *GetDeviceLogsRequest, opts ...http.CallOption) (rsp *GetDeviceLogsResponse, err error)
 	GetDevicePerformance(ctx context.Context, req *GetDevicePerformanceRequest, opts ...http.CallOption) (rsp *GetDevicePerformanceResponse, err error)
 	GetDevicePerformanceLatest(ctx context.Context, req *GetDevicePerformanceLatestRequest, opts ...http.CallOption) (rsp *GetDevicePerformanceLatestResponse, err error)
@@ -1402,6 +1428,19 @@ func (c *VehicleServiceHTTPClientImpl) GetDeviceFaultStats(ctx context.Context, 
 	pattern := "/api/v1/device/{deviceId}/fault-stats"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceFaultStats))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VehicleServiceHTTPClientImpl) GetDeviceHeartbeat(ctx context.Context, in *GetDeviceStatusRequest, opts ...http.CallOption) (*GetDeviceStatusResponse, error) {
+	var out GetDeviceStatusResponse
+	pattern := "/api/v1/device/{deviceId}/heartbeat"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationVehicleServiceGetDeviceHeartbeat))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

@@ -133,6 +133,25 @@ func (r *adminRepo) CreateVehicle(ctx context.Context, vehicle *biz.Vehicle) err
 	return nil
 }
 
+func (r *adminRepo) UpdateVehicle(ctx context.Context, vehicle *biz.Vehicle) error {
+	update := r.clientFromCtx(ctx).Vehicle.UpdateOneID(vehicle.ID).
+		SetPlateNumber(vehicle.PlateNumber).
+		SetVehicleType(vehicle.VehicleType).
+		SetOwnerName(vehicle.OwnerName).
+		SetOwnerPhone(vehicle.OwnerPhone)
+	if vehicle.MonthlyValidUntil != nil {
+		update.SetMonthlyValidUntil(*vehicle.MonthlyValidUntil)
+	}
+	_, err := update.Save(ctx)
+
+	if err != nil {
+		r.data.log.WithContext(ctx).Errorf("failed to update vehicle: %v", err)
+		return apperrors.Wrapf(err, apperrors.CodeInternal, "更新车辆信息失败")
+	}
+
+	return nil
+}
+
 func (r *adminRepo) ListVehicles(ctx context.Context, vehicleType string, page, pageSize int) ([]*biz.Vehicle, int64, error) {
 	offset := (page - 1) * pageSize
 	query := r.clientFromCtx(ctx).Vehicle.Query()

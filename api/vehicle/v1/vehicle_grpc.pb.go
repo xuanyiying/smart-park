@@ -23,6 +23,7 @@ const (
 	VehicleService_Exit_FullMethodName                       = "/api.vehicle.v1.VehicleService/Exit"
 	VehicleService_Heartbeat_FullMethodName                  = "/api.vehicle.v1.VehicleService/Heartbeat"
 	VehicleService_GetDeviceStatus_FullMethodName            = "/api.vehicle.v1.VehicleService/GetDeviceStatus"
+	VehicleService_GetDeviceHeartbeat_FullMethodName         = "/api.vehicle.v1.VehicleService/GetDeviceHeartbeat"
 	VehicleService_SendCommand_FullMethodName                = "/api.vehicle.v1.VehicleService/SendCommand"
 	VehicleService_GetVehicleInfo_FullMethodName             = "/api.vehicle.v1.VehicleService/GetVehicleInfo"
 	VehicleService_ListParkingRecords_FullMethodName         = "/api.vehicle.v1.VehicleService/ListParkingRecords"
@@ -74,6 +75,7 @@ type VehicleServiceClient interface {
 	Exit(ctx context.Context, in *ExitRequest, opts ...grpc.CallOption) (*ExitResponse, error)
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 	GetDeviceStatus(ctx context.Context, in *GetDeviceStatusRequest, opts ...grpc.CallOption) (*GetDeviceStatusResponse, error)
+	GetDeviceHeartbeat(ctx context.Context, in *GetDeviceStatusRequest, opts ...grpc.CallOption) (*GetDeviceStatusResponse, error)
 	SendCommand(ctx context.Context, in *SendCommandRequest, opts ...grpc.CallOption) (*SendCommandResponse, error)
 	GetVehicleInfo(ctx context.Context, in *GetVehicleInfoRequest, opts ...grpc.CallOption) (*GetVehicleInfoResponse, error)
 	ListParkingRecords(ctx context.Context, in *ListParkingRecordsRequest, opts ...grpc.CallOption) (*ListParkingRecordsResponse, error)
@@ -169,6 +171,16 @@ func (c *vehicleServiceClient) GetDeviceStatus(ctx context.Context, in *GetDevic
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDeviceStatusResponse)
 	err := c.cc.Invoke(ctx, VehicleService_GetDeviceStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vehicleServiceClient) GetDeviceHeartbeat(ctx context.Context, in *GetDeviceStatusRequest, opts ...grpc.CallOption) (*GetDeviceStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceStatusResponse)
+	err := c.cc.Invoke(ctx, VehicleService_GetDeviceHeartbeat_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -593,6 +605,7 @@ type VehicleServiceServer interface {
 	Exit(context.Context, *ExitRequest) (*ExitResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	GetDeviceStatus(context.Context, *GetDeviceStatusRequest) (*GetDeviceStatusResponse, error)
+	GetDeviceHeartbeat(context.Context, *GetDeviceStatusRequest) (*GetDeviceStatusResponse, error)
 	SendCommand(context.Context, *SendCommandRequest) (*SendCommandResponse, error)
 	GetVehicleInfo(context.Context, *GetVehicleInfoRequest) (*GetVehicleInfoResponse, error)
 	ListParkingRecords(context.Context, *ListParkingRecordsRequest) (*ListParkingRecordsResponse, error)
@@ -665,6 +678,9 @@ func (UnimplementedVehicleServiceServer) Heartbeat(context.Context, *HeartbeatRe
 }
 func (UnimplementedVehicleServiceServer) GetDeviceStatus(context.Context, *GetDeviceStatusRequest) (*GetDeviceStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDeviceStatus not implemented")
+}
+func (UnimplementedVehicleServiceServer) GetDeviceHeartbeat(context.Context, *GetDeviceStatusRequest) (*GetDeviceStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeviceHeartbeat not implemented")
 }
 func (UnimplementedVehicleServiceServer) SendCommand(context.Context, *SendCommandRequest) (*SendCommandResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendCommand not implemented")
@@ -878,6 +894,24 @@ func _VehicleService_GetDeviceStatus_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VehicleServiceServer).GetDeviceStatus(ctx, req.(*GetDeviceStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VehicleService_GetDeviceHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServiceServer).GetDeviceHeartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VehicleService_GetDeviceHeartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServiceServer).GetDeviceHeartbeat(ctx, req.(*GetDeviceStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1642,6 +1676,10 @@ var VehicleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDeviceStatus",
 			Handler:    _VehicleService_GetDeviceStatus_Handler,
+		},
+		{
+			MethodName: "GetDeviceHeartbeat",
+			Handler:    _VehicleService_GetDeviceHeartbeat_Handler,
 		},
 		{
 			MethodName: "SendCommand",

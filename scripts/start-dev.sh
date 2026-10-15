@@ -87,7 +87,7 @@ build_services() {
     
     mkdir -p bin
     
-    local services=("gateway" "vehicle" "billing" "payment" "admin")
+    local services=("gateway" "vehicle" "billing" "payment" "admin" "charging" "user" "multitenancy" "analytics")
     
     for service in "${services[@]}"; do
         log_info "Building $service service..."
@@ -161,7 +161,19 @@ start_microservices() {
     
     start_service "payment" "8003" "9003" "./configs/payment.yaml"
     sleep 2
-    
+
+    start_service "charging" "8005" "9005" "./configs/charging.yaml"
+    sleep 2
+
+    start_service "multitenancy" "8006" "9006" "./configs/multitenancy.yaml"
+    sleep 2
+
+    start_service "user" "8007" "9007" "./configs/user.yaml"
+    sleep 2
+
+    start_service "analytics" "8009" "9009" "./configs/analytics.yaml"
+    sleep 2
+
     start_service "gateway" "8000" "9000" "./configs/gateway.yaml"
     
     log_success "All microservices started"
@@ -198,7 +210,7 @@ show_status() {
     
     echo ""
     log_info "Microservices:"
-    local services=("gateway:8000" "vehicle:8001" "billing:8002" "payment:8003" "admin:8004")
+    local services=("gateway:8000" "vehicle:8001" "billing:8002" "payment:8003" "admin:8004" "charging:8005" "multitenancy:8006" "user:8007" "analytics:8009")
     for svc in "${services[@]}"; do
         IFS=':' read -r name port <<< "$svc"
         if lsof -ti:$port >/dev/null 2>&1; then

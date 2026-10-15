@@ -13,17 +13,14 @@
 ```go
 // ParkingLot 停车场实体
 type ParkingLot struct {
-    ID          uuid.UUID
-    Name        string          // 停车场名称
-    Address     string          // 地址
-    TotalSpaces int             // 总车位数
-    AvailableSpaces int         // 可用车位数
-    Status      string          // active/inactive/maintenance
-    ContactName string          // 联系人
-    ContactPhone string         // 联系电话
-    BusinessHours string        // 营业时间
-    CreatedAt   time.Time
-    UpdatedAt   time.Time
+    ID            uuid.UUID
+    Name          string          // 停车场名称
+    Address       string          // 地址
+    Lanes         int             // 车道数
+    TotalCapacity int             // 总车位数
+    Status        string          // 状态
+    CreatedAt     time.Time
+    UpdatedAt     time.Time
 }
 ```
 
@@ -51,6 +48,8 @@ const (
 )
 ```
 
+> 注：以上车辆类型常量（含黑名单）实际实现在 vehicle 服务（见 `internal/vehicle/biz/blacklist.go`，入场拦截拒放行），admin 服务中不存在这些常量。
+
 #### 月卡管理
 
 ```go
@@ -61,12 +60,8 @@ type Vehicle struct {
     VehicleType       string          // 车辆类型
     OwnerName         string          // 车主姓名
     OwnerPhone        string          // 车主电话
-    MonthlyValidFrom  *time.Time      // 月卡生效日期
     MonthlyValidUntil *time.Time      // 月卡过期日期
-    MonthlyFee        float64         // 月卡费用
-    LotID             uuid.UUID       // 所属停车场
-    Status            string          // active/inactive
-    Remarks           string          // 备注
+    CreatedAt         time.Time
 }
 ```
 
@@ -127,35 +122,30 @@ func (uc *AdminUseCase) QueryParkingRecords(ctx context.Context, query *RecordQu
 #### 订单查询与统计
 
 ```go
-// OrderQuery 订单查询参数
+// OrderQuery 订单查询参数（ListOrders 仅支持以下过滤条件）
 type OrderQuery struct {
-    OrderID       string
-    PlateNumber   string
-    LotID         uuid.UUID
-    Status        string  // pending/paid/refunded/failed
-    PayMethod     string  // wechat/alipay/cash
-    StartTime     time.Time
-    EndTime       time.Time
-    Page          int
-    PageSize      int
+    LotID    uuid.UUID
+    Status   string // pending/paid/refunded/failed
+    Page     int
+    PageSize int
 }
 ```
 
 #### 订单统计报表
 
 ```go
-// OrderStatistics 订单统计
+// OrderStatistics 订单统计（金额单位均为分，int64）
 type OrderStatistics struct {
     TotalOrders       int64
-    TotalAmount       float64
+    TotalAmount       int64
     PaidOrders        int64
-    PaidAmount        float64
+    PaidAmount        int64
     RefundedOrders    int64
-    RefundedAmount    float64
+    RefundedAmount    int64
     WechatOrders      int64
-    WechatAmount      float64
+    WechatAmount      int64
     AlipayOrders      int64
-    AlipayAmount      float64
+    AlipayAmount      int64
 }
 
 // 按日统计
@@ -182,11 +172,11 @@ type DailyReport struct {
     EntryCount        int64   // 入场车次
     ExitCount         int64   // 出场车次
     
-    // 收入统计
-    TotalRevenue      float64 // 总收入
-    CashRevenue       float64 // 现金收入
-    WechatRevenue     float64 // 微信收入
-    AlipayRevenue     float64 // 支付宝收入
+    // 收入统计（单位：分）
+    TotalRevenue      int64 // 总收入
+    CashRevenue       int64 // 现金收入
+    WechatRevenue     int64 // 微信收入
+    AlipayRevenue     int64 // 支付宝收入
     
     // 车辆类型分布
     TemporaryCount    int64   // 临时车数量
@@ -211,7 +201,7 @@ type MonthlyReport struct {
     
     // 汇总统计
     TotalEntryCount   int64
-    TotalRevenue      float64
+    TotalRevenue      int64 // 单位：分
     TotalOrders       int64
     
     // 趋势分析
@@ -220,7 +210,9 @@ type MonthlyReport struct {
 }
 ```
 
-### 6. 退款审批
+### 6. 退款审批（规划中，尚未实现）
+
+> 注：admin biz 层当前未实现退款审批，proto 也未暴露相关 API（仅 data 层有 ent 生成的 RefundApproval 表模型）。以下为规划中的设计。
 
 #### 退款审批流程
 
@@ -235,7 +227,7 @@ type RefundApproval struct {
     OrderID           uuid.UUID
     Applicant         string          // 申请人
     Approver          string          // 审批人
-    Amount            float64         // 退款金额
+    Amount            int64           // 退款金额（分）
     Reason            string          // 退款原因
     RefundMethod      string          // original/manual
     Status            string          // pending/approved/rejected
@@ -412,6 +404,8 @@ func (uc *AdminUseCase) ApproveRefund(ctx context.Context, approvalID uuid.UUID,
 
 **解决方案**：
 
+> 注：以下 RBAC 五角色常量、权限表与 AuthMiddleware 均为规划中的设计，当前代码尚未实现（角色仅为 User 上的自由字符串）。
+
 1. **RBAC 权限模型**
    ```go
    // 角色定义
@@ -541,9 +535,8 @@ Content-Type: application/json
 {
   "name": "测试停车场",
   "address": "北京市朝阳区xxx",
-  "totalSpaces": 500,
-  "contactName": "张三",
-  "contactPhone": "13800138000"
+  "lanes": 4,
+  "totalCapacity": 500
 }
 
 # 获取停车场列表
@@ -558,11 +551,8 @@ Content-Type: application/json
 
 {
   "name": "测试停车场（更新）",
-  "totalSpaces": 600
+  "totalCapacity": 600
 }
-
-# 删除停车场
-DELETE /api/v1/admin/lots/{id}
 ```
 
 ### 车辆管理
@@ -577,18 +567,11 @@ Content-Type: application/json
   "vehicleType": "monthly",
   "ownerName": "李四",
   "ownerPhone": "13900139000",
-  "monthlyValidUntil": "2026-12-31",
-  "lotId": "lot_xxx"
+  "monthlyValidUntil": "2026-12-31"
 }
 
 # 获取车辆列表
 GET /api/v1/admin/vehicles?lotId=lot_xxx&vehicleType=monthly&page=1
-
-# 更新车辆信息
-PUT /api/v1/admin/vehicles/{id}
-
-# 删除车辆
-DELETE /api/v1/admin/vehicles/{id}
 ```
 
 ### 记录查询
@@ -609,60 +592,52 @@ GET /api/v1/admin/reports/daily?lotId=lot_xxx&date=2026-03-20
 
 # 月报表
 GET /api/v1/admin/reports/monthly?lotId=lot_xxx&year=2026&month=3
-
-# 收入统计
-GET /api/v1/admin/reports/revenue?lotId=lot_xxx&startDate=2026-03-01&endDate=2026-03-31
 ```
 
-### 退款审批
+### 退款审批（规划中，尚未实现）
+
+> 注：以下端点在 proto 中均不存在，admin 服务当前未实现退款审批 API。
 
 ```http
-# 创建退款申请
+# 创建退款申请（规划中）
 POST /api/v1/admin/orders/{orderId}/refund
-Content-Type: application/json
 
-{
-  "amount": 15.00,
-  "reason": "收费错误"
-}
-
-# 审批退款
+# 审批退款（规划中）
 POST /api/v1/admin/refund-approvals/{approvalId}/approve
-Content-Type: application/json
 
-{
-  "approver": "admin_xxx"
-}
-
-# 拒绝退款
+# 拒绝退款（规划中）
 POST /api/v1/admin/refund-approvals/{approvalId}/reject
-Content-Type: application/json
-
-{
-  "rejectReason": "不符合退款条件"
-}
 ```
 
 ## 配置说明
 
 ```yaml
-# configs/admin.yaml
+# configs/admin.yaml（gRPC :9004 硬编码于 cmd/admin/main.go）
 server:
-  http:
-    addr: 0.0.0.0:8004
-  grpc:
-    addr: 0.0.0.0:9004
+  port: 8004
+  timeout: 60
 
-data:
-  database:
-    driver: postgres
-    source: postgres://postgres:postgres@localhost:5432/parking?sslmode=disable
+database:
+  driver: postgres
+  primary:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  replica:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 
-admin:
-  defaultPageSize: 20
-  maxPageSize: 100
-  reportCacheTTL: 5m
-  auditLogRetention: 90d  # 审计日志保留时间
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+log:
+  level: info
+  format: json
+
+telemetry:
+  enabled: true
+  endpoint: "localhost:4317"
+  serviceName: "admin-svc"
+  sampleRate: 1.0
 ```
 
 ## 监控指标

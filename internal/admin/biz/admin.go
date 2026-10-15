@@ -49,10 +49,10 @@ type ParkingRecord struct {
 
 // Order represents an order entity.
 type Order struct {
-	ID             uuid.UUID
-	RecordID       uuid.UUID
-	LotID          uuid.UUID
-	PlateNumber    string
+	ID          uuid.UUID
+	RecordID    uuid.UUID
+	LotID       uuid.UUID
+	PlateNumber string
 	// Amounts in cents (分).
 	Amount         int64
 	DiscountAmount int64
@@ -107,6 +107,7 @@ type AdminRepo interface {
 	UpdateParkingLot(ctx context.Context, lot *ParkingLot) error
 	ListParkingLots(ctx context.Context, page, pageSize int) ([]*ParkingLot, int64, error)
 	CreateVehicle(ctx context.Context, vehicle *Vehicle) error
+	UpdateVehicle(ctx context.Context, vehicle *Vehicle) error
 	ListVehicles(ctx context.Context, vehicleType string, page, pageSize int) ([]*Vehicle, int64, error)
 	ListParkingRecords(ctx context.Context, lotID uuid.UUID, plateNumber, startTime, endTime string, page, pageSize int) ([]*ParkingRecord, int64, error)
 	ListOrders(ctx context.Context, lotID uuid.UUID, status string, page, pageSize int) ([]*Order, int64, error)
@@ -275,6 +276,38 @@ func (uc *AdminUseCase) CreateVehicle(ctx context.Context, req *v1.CreateVehicle
 		MonthlyValidUntil: validUntil,
 		CreatedAt:         vehicle.CreatedAt.Format(time.RFC3339),
 	}, nil
+}
+
+// UpdateVehicle updates an existing vehicle.
+func (uc *AdminUseCase) UpdateVehicle(ctx context.Context, req *v1.UpdateVehicleRequest) error {
+	vehicleID, err := uuid.Parse(req.Id)
+	if err != nil {
+		return err
+	}
+
+	var monthlyValidUntil *time.Time
+	if req.MonthlyValidUntil != "" {
+		t, err := time.Parse(time.RFC3339, req.MonthlyValidUntil)
+		if err == nil {
+			monthlyValidUntil = &t
+		}
+	}
+
+	vehicle := &Vehicle{
+		ID:                vehicleID,
+		PlateNumber:       req.PlateNumber,
+		VehicleType:       req.VehicleType,
+		OwnerName:         req.OwnerName,
+		OwnerPhone:        req.OwnerPhone,
+		MonthlyValidUntil: monthlyValidUntil,
+	}
+
+	if err := uc.repo.UpdateVehicle(ctx, vehicle); err != nil {
+		uc.log.WithContext(ctx).Errorf("failed to update vehicle: %v", err)
+		return err
+	}
+
+	return nil
 }
 
 // ListVehicles lists vehicles.

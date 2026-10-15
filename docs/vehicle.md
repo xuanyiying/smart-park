@@ -91,25 +91,19 @@ if vehicle.VehicleType == VehicleTypeMonthly {
 
 #### 设备认证机制
 
-采用 HMAC-SHA256 签名认证：
+当前实现未使用签名头（代码中不存在 HMAC/签名校验逻辑）：
 
-```
-signature = HMAC-SHA256(deviceId + timestamp + bodyJson, deviceSecret)
-Header: X-Device-Id, X-Timestamp, X-Signature
-```
-
-**技术决策说明**：
-- 签名有效期 5 分钟，防止重放攻击
-- 设备密钥线下分配，云端加密存储
-- 支持设备临时禁用（维修场景）
+- 设备身份通过入库的 `device_secret` 标识，种子数据为每台设备生成 32 字节随机密钥（见 `internal/vehicle/data/seed.go`）
+- 外部访问统一经网关 JWT 鉴权（`/api/v1/device/*` 需携带 `Authorization: Bearer <jwt>`），服务间不单独做设备签名认证
 
 ### 4. 分布式锁实现
 
 基于 Redis 的分布式锁，确保并发场景数据一致性：
 
 ```go
-// 锁 Key 设计
-lockKey := fmt.Sprintf("parking:v1:lock:%s:%s", lockType, identifier)
+// 锁 Key 设计（前缀 smart-park:vehicle，见 cmd/vehicle/main.go 与 pkg/lock/redis_lock.go）
+// 完整 Key 如：smart-park:vehicle:lock:entry:京A12345
+lockKey := fmt.Sprintf("smart-park:vehicle:lock:%s", identifier)
 
 // 获取锁
 acquired, err := uc.lockRepo.AcquireLock(ctx, lockKey, owner, ttl)
@@ -230,16 +224,15 @@ type Lane struct {
 基于 Redis 的分布式锁，确保并发场景下数据一致性：
 
 ```go
-// 锁 Key 设计
-lockKey := fmt.Sprintf("parking:v1:lock:%s:%s", lockType, identifier)
-
-// 获取锁
+// 锁 Key 前缀 smart-park:vehicle，完整 Key 如 smart-park:vehicle:lock:entry:京A12345
 acquired, err := uc.lockRepo.AcquireLock(ctx, lockKey, owner, ttl)
 if !acquired {
-    return fmt.Errorf("operation in progress")
+    return fmt.Errorf("duplicate request in progress")
 }
 defer uc.lockRepo.ReleaseLock(ctx, lockKey, owner)
 ```
+
+锁租约默认 10s（`entry_exit.lock_ttl`），获取失败返回 "duplicate request in progress" 业务错误；续期协程按 TTL/3 自动续租，直至临界区执行完毕（见 `internal/vehicle/biz/entry_exit.go`）。
 
 **优点**：实现简单，强一致性，支持分布式部署
 **缺点**：依赖 Redis，存在网络开销
@@ -462,7 +455,7 @@ func (uc *UseCase) ProcessEntry(ctx context.Context, req *EntryRequest) (*EntryR
 
 1. **分布式悲观锁**
    ```go
-   lockKey := fmt.Sprintf("parking:v1:lock:exit:%s", recordID)
+   lockKey := fmt.Sprintf("smart-park:vehicle:lock:exit:%s", recordID)
    acquired, _ := lockRepo.AcquireLock(ctx, lockKey, owner, 30*time.Second)
    if !acquired {
        return fmt.Errorf("billing in progress")
@@ -488,9 +481,7 @@ func (uc *UseCase) ProcessEntry(ctx context.Context, req *EntryRequest) (*EntryR
 ```http
 POST /api/v1/device/entry
 Content-Type: application/json
-X-Device-Id: lane_001
-X-Timestamp: 1710916800000
-X-Signature: sha256=...
+Authorization: Bearer <jwt>
 
 {
   "deviceId": "lane_001",
@@ -520,7 +511,7 @@ X-Signature: sha256=...
 ```http
 POST /api/v1/device/exit
 Content-Type: application/json
-X-Device-Id: lane_002
+Authorization: Bearer <jwt>
 
 {
   "deviceId": "lane_002",
@@ -539,9 +530,9 @@ X-Device-Id: lane_002
     "recordId": "rec_xxx",
     "plateNumber": "京A12345",
     "parkingDuration": 7200,
-    "amount": 15.00,
+    "amount": 1500,
     "discountAmount": 0,
-    "finalAmount": 15.00,
+    "finalAmount": 1500,
     "allowed": true,
     "gateOpen": false,
     "displayMessage": "请缴费"
@@ -551,31 +542,47 @@ X-Device-Id: lane_002
 
 ## 配置说明
 
-```yaml
-# configs/vehicle.yaml
-server:
-  http:
-    addr: 0.0.0.0:8001
-  grpc:
-    addr: 0.0.0.0:9001
+> 除上述入场/出场接口外，`VehicleService` 还包含 40+ 端点（设备 CRUD、厂商适配、固件管理、故障上报、设备升级、黑名单等），完整清单见 `api/vehicle/v1/vehicle.proto` 与 `openapi.yaml`，此处不再逐个展开。
 
-data:
-  database:
-    driver: postgres
-    source: postgres://postgres:postgres@localhost:5432/parking?sslmode=disable
-  redis:
-    addr: localhost:6379
-    password: ""
-    db: 0
+## 配置说明
+
+```yaml
+# configs/vehicle.yaml（节选；gRPC :9001 硬编码于 cmd/vehicle/main.go）
+server:
+  port: 8001
+  timeout: 60
+
+database:
+  driver: postgres
+  primary:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  replica:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
 
 mqtt:
-  broker: tcp://localhost:1883
-  client_id: vehicle_service
+  # broker 必填：道闸指令依赖 MQTT 下发，未配置时服务拒绝启动
+  broker: ""
+  port: 1883
+  client_id: "vehicle-service"
   username: ""
   password: ""
+  tls: false
+  tls_skip_verify: false
+  topics:
+    command: "parking/device/{device_id}/command"
+    status: "parking/device/{device_id}/status"
+    heartbeat: "parking/device/{device_id}/heartbeat"
 
-lock:
-  ttl: 30s  # 分布式锁超时时间
+entry_exit:
+  # 分布式锁租约；临界区内包含跨服务计费调用，续期协程按 TTL/3 自动续租
+  lock_ttl: "10s"
+  device_online_threshold: "5m"
+  min_confidence: 0.7
 ```
 
 ## 测试策略
@@ -596,8 +603,8 @@ go test ./internal/vehicle/biz -run TestExit -v
 ### 集成测试
 
 ```bash
-# 启动测试环境
-docker-compose -f deploy/docker-compose.test.yml up -d
+# 启动测试环境（基础设施）
+docker-compose -f deploy/docker-compose.yml up -d postgres redis etcd jaeger
 
 # 运行集成测试
 go test ./tests/e2e -tags=integration -v

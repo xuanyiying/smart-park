@@ -63,7 +63,19 @@ build_services() {
     
     log_info "Building admin service..."
     go build -o bin/admin ./cmd/admin
-    
+
+    log_info "Building charging service..."
+    go build -o bin/charging ./cmd/charging
+
+    log_info "Building multitenancy service..."
+    go build -o bin/multitenancy ./cmd/multitenancy
+
+    log_info "Building user service..."
+    go build -o bin/user ./cmd/user
+
+    log_info "Building analytics service..."
+    go build -o bin/analytics ./cmd/analytics
+
     log_success "All services built successfully"
 }
 

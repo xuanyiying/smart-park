@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Stray compiled binaries (`charging`, `gateway`) accidentally committed to the repository root
+
+### Changed
+
+- Moved one-off working documents (`code_audit_report.md`, `GITHUB_ABOUT.md`) into `docs/`
+- Updated `.gitignore` to ignore root-level service build artifacts
+- Documentation overhaul: aligned `docs/` service docs, README, README_EN and CLAUDE.md with the actual code —
+  money amounts documented as int64 cents, flat `server.port` config format, real gateway route table (7 routes),
+  correct service inventory (9 services, ports 8000-8008 / gRPC 9001-9008), removed or marked as planned the
+  undocumented APIs (HMAC device signatures, refund approvals, `reports/revenue`, `refundWindow`,
+  `docker-compose.prod.yml`, `cmd/migrate`), fixed broken doc links and outdated frontend stack info
+  (web/ is a Next.js 16 admin dashboard, no longer "not implemented")
+
 ### Added
 
 - Charging service for electric vehicle charging stations

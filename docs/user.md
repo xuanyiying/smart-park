@@ -13,18 +13,18 @@
 
 | 功能 | 说明 |
 |------|------|
-| 用户注册/登录 | 账号密码注册登录，签发 JWT |
+| 用户注册/登录 | 微信小程序 code 换 openID 登录，首次登录自动创建用户，签发 JWT；无独立注册接口 |
 | 用户信息管理 | 查询与更新用户资料 |
 | 车牌绑定 | 一个用户可绑定多个车牌 |
 | 扫码支付 | 扫码识别入场记录，调用支付服务完成缴费 |
-| 支付记录 | 查询用户历史支付订单 |
+| 支付记录 | 查询用户历史停车记录（简化实现：金额硬编码为 0，未真实查询订单，待完善） |
 
 ## 网关免认证路径
 
 以下路径不经过 JWT 校验（见 `configs/gateway.yaml`）：
 
 - `/api/v1/user/login`
-- `/api/v1/user/register`
+- `/api/v1/user/register`（网关配置中保留了该免认证路径，但 user 服务当前无对应实现）
 
 ## 架构分层
 
@@ -58,18 +58,27 @@ database:
   source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 redis:
   addr: "localhost:6379"
+  password: ""
+  db: 0
 # 下游依赖 gRPC 端点（必填，缺失则服务启动退出）
 vehicle:
   endpoint: "localhost:9001"
 payment:
   endpoint: "localhost:9003"
 jwt:
+  # RSA 公私钥路径；留空时 JWTManager 不加载密钥（开发态可用）
   public_key_path: ""
   private_key_path: ""
   token_duration: 24h
 wechat:
   app_id: ""
-  api_key: ""   # 微信小程序 AppSecret
+  api_key: ""   # 微信小程序 AppSecret（可通过 SP_WECHAT_API_KEY 环境变量覆盖）
+log:
+  level: info
+  format: json
+otel:
+  endpoint: "localhost:4317"
+  serviceName: "user-svc"
 ```
 
 ## 运行

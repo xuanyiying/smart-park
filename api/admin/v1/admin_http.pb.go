@@ -36,6 +36,7 @@ const OperationAdminServiceListVehicles = "/api.admin.v1.AdminService/ListVehicl
 const OperationAdminServiceLogin = "/api.admin.v1.AdminService/Login"
 const OperationAdminServiceUpdateParkingLot = "/api.admin.v1.AdminService/UpdateParkingLot"
 const OperationAdminServiceUpdateUser = "/api.admin.v1.AdminService/UpdateUser"
+const OperationAdminServiceUpdateVehicle = "/api.admin.v1.AdminService/UpdateVehicle"
 
 type AdminServiceHTTPServer interface {
 	CreateParkingLot(context.Context, *CreateParkingLotRequest) (*CreateParkingLotResponse, error)
@@ -56,6 +57,7 @@ type AdminServiceHTTPServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	UpdateParkingLot(context.Context, *UpdateParkingLotRequest) (*UpdateParkingLotResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	UpdateVehicle(context.Context, *UpdateVehicleRequest) (*UpdateVehicleResponse, error)
 }
 
 func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) {
@@ -70,10 +72,11 @@ func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) 
 	r.GET("/api/v1/admin/lots/{id}", _AdminService_GetParkingLot0_HTTP_Handler(srv))
 	r.PUT("/api/v1/admin/lots/{id}", _AdminService_UpdateParkingLot0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/lots", _AdminService_ListParkingLots0_HTTP_Handler(srv))
-	r.GET("/api/v1/admin/records", _AdminService_ListParkingRecords1_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/records", _AdminService_ListParkingRecords0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/orders", _AdminService_ListOrders0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/orders/{id}", _AdminService_GetOrder0_HTTP_Handler(srv))
 	r.POST("/api/v1/admin/vehicles", _AdminService_CreateVehicle0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/vehicles/{id}", _AdminService_UpdateVehicle0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/vehicles", _AdminService_ListVehicles0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/reports/daily", _AdminService_GetDailyReport0_HTTP_Handler(srv))
 	r.GET("/api/v1/admin/reports/monthly", _AdminService_GetMonthlyReport0_HTTP_Handler(srv))
@@ -296,7 +299,7 @@ func _AdminService_ListParkingLots0_HTTP_Handler(srv AdminServiceHTTPServer) fun
 	}
 }
 
-func _AdminService_ListParkingRecords1_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+func _AdminService_ListParkingRecords0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListParkingRecordsRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -378,6 +381,31 @@ func _AdminService_CreateVehicle0_HTTP_Handler(srv AdminServiceHTTPServer) func(
 	}
 }
 
+func _AdminService_UpdateVehicle0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateVehicleRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceUpdateVehicle)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateVehicle(ctx, req.(*UpdateVehicleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateVehicleResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _AdminService_ListVehicles0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListVehiclesRequest
@@ -453,6 +481,7 @@ type AdminServiceHTTPClient interface {
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
 	UpdateParkingLot(ctx context.Context, req *UpdateParkingLotRequest, opts ...http.CallOption) (rsp *UpdateParkingLotResponse, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *UpdateUserResponse, err error)
+	UpdateVehicle(ctx context.Context, req *UpdateVehicleRequest, opts ...http.CallOption) (rsp *UpdateVehicleResponse, err error)
 }
 
 type AdminServiceHTTPClientImpl struct {
@@ -676,6 +705,19 @@ func (c *AdminServiceHTTPClientImpl) UpdateUser(ctx context.Context, in *UpdateU
 	pattern := "/api/v1/admin/users/{id}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAdminServiceUpdateUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) UpdateVehicle(ctx context.Context, in *UpdateVehicleRequest, opts ...http.CallOption) (*UpdateVehicleResponse, error) {
+	var out UpdateVehicleResponse
+	pattern := "/api/v1/admin/vehicles/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceUpdateVehicle))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {

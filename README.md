@@ -30,10 +30,6 @@
 
 ## 🎬 项目演示
 
-<p align="center">
-  <img src="docs/assets/demo.gif" alt="Smart Park Demo" width="800">
-</p>
-
 > 💡 **在线演示**: [https://demo.smart-park.example.com](https://demo.smart-park.example.com)
 > 📱 **测试账号**: admin / admin123
 >
@@ -163,8 +159,8 @@
 |------|------|------|------|
 | [Go](https://golang.org) | 1.26+ | 编程语言 | 高性能、并发友好 |
 | [Kratos](https://github.com/go-kratos/kratos) | v2.9 | 微服务框架 | 标准项目结构、内置中间件 |
-| [gRPC](https://grpc.io/) | v1.60+ | RPC 通信 | 高性能、类型安全 |
-| [Ent](https://entgo.io/) | v0.12+ | ORM 框架 | 类型安全、代码生成 |
+| [gRPC](https://grpc.io/) | v1.83+ | RPC 通信 | 高性能、类型安全 |
+| [Ent](https://entgo.io/) | v0.14+ | ORM 框架 | 类型安全、代码生成 |
 | [PostgreSQL](https://www.postgresql.org/) | 15+ | 关系型数据库 | 稳定可靠 |
 | [Redis](https://redis.io/) | 7+ | 缓存/消息队列 | 高性能缓存 
 | [Etcd](https://etcd.io/) | v3.5 | 服务注册发现 | 云原生标配 |
@@ -173,10 +169,12 @@
 ### 前端技术
 | 技术 | 版本 | 说明 |
 |------|------|------|
-| [React](https://react.dev/) | 18+ | 前端框架 |
+| [Next.js](https://nextjs.org/) | 16+ | 前端框架（App Router） |
+| [React](https://react.dev/) | 19+ | UI 库 |
 | [TypeScript](https://www.typescriptlang.org/) | 5+ | 类型安全 |
-| [Tailwind CSS](https://tailwindcss.com/) | 3+ | 样式框架 |
+| [Tailwind CSS](https://tailwindcss.com/) | 4+ | 样式框架 |
 | [shadcn/ui](https://ui.shadcn.com/) | - | UI 组件库 |
+| [Zustand](https://zustand.docs.pmnd.rs/) / [TanStack Query](https://tanstack.com/query) | - | 状态管理与数据请求 |
 
 ---
 
@@ -208,8 +206,8 @@ docker-compose ps
 # 5. 访问系统
 # API 网关:  http://localhost:8000
 # Grafana 监控: http://localhost:3000 （口令通过 GRAFANA_PASSWORD 注入）
-# 营销官网: site/ 目录（Next.js），注意它是产品介绍页，不是管理后台；
-#           管理后台前端尚未实现，运营操作目前通过 API 完成。
+# 管理后台前端: web/ 目录（Next.js 16 + React 19），npm run dev 后访问
+# 营销官网: site/ 目录（Next.js），产品介绍页
 ```
 
 #### 本地开发：复用全局基础设施（可选）
@@ -247,6 +245,8 @@ go run ./cmd/vehicle -conf ./configs
 go run ./cmd/billing -conf ./configs
 go run ./cmd/payment -conf ./configs
 go run ./cmd/admin -conf ./configs
+go run ./cmd/charging -conf ./configs
+go run ./cmd/user -conf ./configs
 
 # 5. 启动前端
 cd web
@@ -256,11 +256,14 @@ npm run dev
 
 ### 🧪 测试 API
 
+> 除 `/api/v1/user/login`、`/api/v1/user/register` 外，网关对全部 `/api/v1/*` 路径
+> 强制 JWT 校验，请求需携带 `Authorization: Bearer <jwt>` 头。
+
 ```bash
 # 车辆入场
 curl -X POST http://localhost:8000/api/v1/device/entry \
   -H "Content-Type: application/json" \
-  -H "X-Device-Id: lane_001" \
+  -H "Authorization: Bearer <jwt>" \
   -d '{
     "deviceId": "lane_001",
     "plateNumber": "京A12345",
@@ -283,15 +286,17 @@ curl -X POST http://localhost:8000/api/v1/pay/create \
 
 ## 📦 服务说明
 
-| 服务 | 端口 | 职责 | 状态 | 文档 |
-|------|------|------|------|------|
-| **Gateway** | 8000 | API 网关，路由转发 | ✅ 已完成 | [文档](docs/gateway.md) |
-| **Vehicle** | 8001 | 车辆入场/出场，设备管理 | ✅ 已完成 | [文档](docs/vehicle.md) |
-| **Billing** | 8002 | 费用计算，计费规则 | ✅ 已完成 | [文档](docs/billing.md) |
-| **Payment** | 8003 | 支付处理，订单管理 | ✅ 已完成 | [文档](docs/payment.md) |
-| **Admin** | 8004 | 停车场管理，报表统计 | ✅ 已完成 | [文档](docs/admin.md) |
-| **Charging** | 8005 | 充电桩管理 | ✅ 已完成 | [文档](docs/charging.md) |
-| **User** | 8007 | 用户认证，扫码支付，车牌绑定 | ✅ 已完成 | [文档](docs/user.md) |
+| 服务 | HTTP 端口 | gRPC 端口 | 职责 | 状态 | 文档 |
+|------|------|------|------|------|------|
+| **Gateway** | 8000 | - | API 网关，路由转发，JWT 鉴权 | ✅ 已完成 | [gateway.yaml](configs/gateway.yaml) |
+| **Vehicle** | 8001 | 9001 | 车辆入场/出场，设备管理 | ✅ 已完成 | [文档](docs/vehicle.md) |
+| **Billing** | 8002 | 9002 | 费用计算，计费规则 | ✅ 已完成 | [文档](docs/billing.md) |
+| **Payment** | 8003 | 9003 | 支付处理，订单管理，对账 | ✅ 已完成 | [文档](docs/payment.md) |
+| **Admin** | 8004 | 9004 | 停车场管理，报表统计 | ✅ 已完成 | [文档](docs/admin.md) |
+| **Charging** | 8005 | 9005 | 充电桩管理 | ✅ 已完成 | [文档](docs/charging.md) |
+| **Multitenancy** | 8006 | 9006 | 多租户管理（仅 gRPC） | ✅ 已完成 | - |
+| **User** | 8007 | 9007 | 用户认证，扫码支付，车牌绑定 | ✅ 已完成 | [文档](docs/user.md) |
+| **Notification** | 8008 | 9008 | 通知服务（占位，未接入网关） | 🚧 占位 | - |
 
 ---
 
@@ -351,7 +356,7 @@ curl -X POST http://localhost:8000/api/v1/pay/create \
 - [💳 支付服务](docs/payment.md) - 支付处理流程
 - [🎛️ 管理服务](docs/admin.md) - 运营管理功能
 - [🚀 部署指南](docs/deployment.md) - 各种环境部署说明
-- [🔌 API 文档](docs/api.md) - 完整 API 接口文档
+- [🔌 API 定义](openapi.yaml) - OpenAPI 规范（由 proto 生成，当前覆盖 VehicleService）
 - [📋 项目简历](docs/project-resume.md) - 技术亮点和成果
 
 ---
@@ -382,9 +387,9 @@ kubectl apply -f deploy/k8s/
 
 ### 如何贡献
 
-1. **🐛 提交 Bug** - 使用 [Issue 模板](.github/ISSUE_TEMPLATE/bug_report.md)
-2. **💡 功能建议** - 使用 [Feature 模板](.github/ISSUE_TEMPLATE/feature_request.md)
-3. **🔧 提交代码** - 阅读 [贡献指南](CONTRIBUTING.md)
+1. **🐛 提交 Bug** - 提交 [Issue](https://github.com/xuanyiying/smart-park/issues)
+2. **💡 功能建议** - 发起 [Discussion](https://github.com/xuanyiying/smart-park/discussions)
+3. **🔧 提交代码** - Fork 仓库并提交 Pull Request
 4. **📝 改进文档** - 文档也是代码
 5. **⭐ 点个 Star** - 让更多人看到这个项目
 
@@ -416,13 +421,6 @@ kubectl apply -f deploy/k8s/
 - **🐛 Issue 反馈**: [https://github.com/xuanyiying/smart-park/issues](https://github.com/xuanyiying/smart-park/issues)
 - **💬 Discussions**: [https://github.com/xuanyiying/smart-park/discussions](https://github.com/xuanyiying/smart-park/discussions)
 - **📧 邮箱**: support@smart-park.example.com
-- **💬 微信交流群**: 扫码加入（见下方二维码）
-
-<p align="center">
-  <img src="docs/assets/wechat-qr.png" alt="WeChat Group" width="200">
-  <br>
-  <small>微信交流群</small>
-</p>
 
 ---
 

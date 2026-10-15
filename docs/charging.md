@@ -113,7 +113,7 @@ energy = duration(hours) × power(kW)
 |------|------|------|
 | 确认支付 | POST | `/api/v1/charging/sessions/{sessionId}/payment/confirm` |
 
-`ConfirmPayment` 校验支付金额 ≥ 应付金额后，将支付状态更新为 `paid`，并记录交易号与支付方式。`RefundPayment` 可对已支付会话发起退款（状态置为 `refunded`）。
+`ConfirmPayment` 校验支付金额 ≥ 应付金额后，将支付状态更新为 `paid`，并记录交易号与支付方式。`RefundPayment` 可将已支付会话状态置为 `refunded`，但它只是内部 biz 方法，proto 中未暴露 HTTP/gRPC 端点，外部无法调用。
 
 ## 架构分层
 
@@ -146,6 +146,18 @@ database:
   source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 redis:
   addr: "localhost:6379"
+  password: ""
+  db: 0
+mq:
+  type: "redis"
+  redis:
+    addr: "localhost:6379"
+    password: ""
+    db: 0
+    stream: "parking"
+log:
+  level: info
+  format: json
 ```
 
 **默认业务参数**（`biz.DefaultConfig`）：

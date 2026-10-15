@@ -36,6 +36,12 @@ service VehicleService {
     };
   }
 
+  rpc GetDeviceHeartbeat(GetDeviceStatusRequest) returns (GetDeviceStatusResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/device/{deviceId}/heartbeat",
+    };
+  }
+
   rpc SendCommand(SendCommandRequest) returns (SendCommandResponse) {
     option (google.api.http) = {
       post: "/api/v1/device/{deviceId}/command",
@@ -947,10 +953,14 @@ message ListBlacklistEntriesRequest {
 }
 
 message ListBlacklistEntriesResponse {
-  int32                      code    = 1;
-  string                     message = 2;
-  repeated BlacklistEntryInfo entries = 3;
-  int32                      total   = 4;
+  int32                    code    = 1;
+  string                   message = 2;
+  BlacklistEntryListData   data    = 3;
+}
+
+message BlacklistEntryListData {
+  repeated BlacklistEntryInfo list  = 1;
+  int32                       total = 2;
 }
 
 message CheckBlacklistRequest {

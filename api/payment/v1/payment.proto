@@ -180,9 +180,28 @@ message GetReconciliationReportRequest {
 }
 
 message GetReconciliationReportResponse {
-  int32  code    = 1;
-  string message = 2;
-  map<string, string> data    = 3;
+  int32                    code    = 1;
+  string                   message = 2;
+  ReconciliationReportData data    = 3;
+}
+
+message ReconciliationReportData {
+  string startDate         = 1;
+  string endDate           = 2;
+  int32  totalOrders       = 3;
+  // Amounts in cents (分).
+  int64  totalAmount       = 4;
+  int64  totalPaid         = 5;
+  int32  matchedOrders     = 6;
+  int32  mismatchedOrders  = 7;
+  map<string, PaymentMethodStat> paymentMethods = 8;
+}
+
+message PaymentMethodStat {
+  int32 count  = 1;
+  // Amounts in cents (分).
+  int64 amount = 2;
+  int64 paid   = 3;
 }
 
 message FixMismatchedOrdersRequest {

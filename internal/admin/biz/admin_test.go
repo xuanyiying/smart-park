@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -58,6 +59,14 @@ func (m *MockAdminRepo) ListParkingLots(ctx context.Context, page, pageSize int)
 }
 
 func (m *MockAdminRepo) CreateVehicle(ctx context.Context, vehicle *Vehicle) error {
+	m.Vehicles[vehicle.ID] = vehicle
+	return nil
+}
+
+func (m *MockAdminRepo) UpdateVehicle(ctx context.Context, vehicle *Vehicle) error {
+	if _, ok := m.Vehicles[vehicle.ID]; !ok {
+		return errors.New("vehicle not found")
+	}
 	m.Vehicles[vehicle.ID] = vehicle
 	return nil
 }

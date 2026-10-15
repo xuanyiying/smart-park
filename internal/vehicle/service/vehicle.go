@@ -131,6 +131,24 @@ func (s *VehicleService) GetDeviceStatus(ctx context.Context, req *v1.GetDeviceS
 	}, nil
 }
 
+// GetDeviceHeartbeat handles get device heartbeat status request.
+func (s *VehicleService) GetDeviceHeartbeat(ctx context.Context, req *v1.GetDeviceStatusRequest) (*v1.GetDeviceStatusResponse, error) {
+	status, err := s.deviceUseCase.GetDeviceStatus(ctx, req.DeviceId)
+	if err != nil {
+		s.log.WithContext(ctx).Errorf("GetDeviceHeartbeat failed: %v", err)
+		return &v1.GetDeviceStatusResponse{
+			Code:    500,
+			Message: "获取设备心跳失败",
+		}, nil
+	}
+
+	return &v1.GetDeviceStatusResponse{
+		Code:    0,
+		Message: "success",
+		Data:    status,
+	}, nil
+}
+
 // SendCommand handles send command request.
 func (s *VehicleService) SendCommand(ctx context.Context, req *v1.SendCommandRequest) (*v1.SendCommandResponse, error) {
 	data, err := s.commandUseCase.SendCommand(ctx, req.DeviceId, req.Command, req.Params)
@@ -729,8 +747,10 @@ func (s *VehicleService) ListBlacklistEntries(ctx context.Context, req *v1.ListB
 	return &v1.ListBlacklistEntriesResponse{
 		Code:    0,
 		Message: "success",
-		Entries: items,
-		Total:   int32(total),
+		Data: &v1.BlacklistEntryListData{
+			List:  items,
+			Total: int32(total),
+		},
 	}, nil
 }
 

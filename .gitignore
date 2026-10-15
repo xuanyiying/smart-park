@@ -1,5 +1,14 @@
 # Binaries
 bin/
+# Root-level service build artifacts (go build -o <name> ./cmd/<name>)
+/admin
+/billing
+/charging
+/gateway
+/payment
+/user
+/vehicle
+/analytics
 *.exe
 *.exe~
 *.dll

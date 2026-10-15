@@ -33,6 +33,7 @@ const (
 	AdminService_ListOrders_FullMethodName         = "/api.admin.v1.AdminService/ListOrders"
 	AdminService_GetOrder_FullMethodName           = "/api.admin.v1.AdminService/GetOrder"
 	AdminService_CreateVehicle_FullMethodName      = "/api.admin.v1.AdminService/CreateVehicle"
+	AdminService_UpdateVehicle_FullMethodName      = "/api.admin.v1.AdminService/UpdateVehicle"
 	AdminService_ListVehicles_FullMethodName       = "/api.admin.v1.AdminService/ListVehicles"
 	AdminService_GetDailyReport_FullMethodName     = "/api.admin.v1.AdminService/GetDailyReport"
 	AdminService_GetMonthlyReport_FullMethodName   = "/api.admin.v1.AdminService/GetMonthlyReport"
@@ -57,6 +58,7 @@ type AdminServiceClient interface {
 	ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...grpc.CallOption) (*ListOrdersResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 	CreateVehicle(ctx context.Context, in *CreateVehicleRequest, opts ...grpc.CallOption) (*CreateVehicleResponse, error)
+	UpdateVehicle(ctx context.Context, in *UpdateVehicleRequest, opts ...grpc.CallOption) (*UpdateVehicleResponse, error)
 	ListVehicles(ctx context.Context, in *ListVehiclesRequest, opts ...grpc.CallOption) (*ListVehiclesResponse, error)
 	GetDailyReport(ctx context.Context, in *GetDailyReportRequest, opts ...grpc.CallOption) (*GetDailyReportResponse, error)
 	GetMonthlyReport(ctx context.Context, in *GetMonthlyReportRequest, opts ...grpc.CallOption) (*GetMonthlyReportResponse, error)
@@ -210,6 +212,16 @@ func (c *adminServiceClient) CreateVehicle(ctx context.Context, in *CreateVehicl
 	return out, nil
 }
 
+func (c *adminServiceClient) UpdateVehicle(ctx context.Context, in *UpdateVehicleRequest, opts ...grpc.CallOption) (*UpdateVehicleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateVehicleResponse)
+	err := c.cc.Invoke(ctx, AdminService_UpdateVehicle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminServiceClient) ListVehicles(ctx context.Context, in *ListVehiclesRequest, opts ...grpc.CallOption) (*ListVehiclesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListVehiclesResponse)
@@ -259,6 +271,7 @@ type AdminServiceServer interface {
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
 	CreateVehicle(context.Context, *CreateVehicleRequest) (*CreateVehicleResponse, error)
+	UpdateVehicle(context.Context, *UpdateVehicleRequest) (*UpdateVehicleResponse, error)
 	ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error)
 	GetDailyReport(context.Context, *GetDailyReportRequest) (*GetDailyReportResponse, error)
 	GetMonthlyReport(context.Context, *GetMonthlyReportRequest) (*GetMonthlyReportResponse, error)
@@ -313,6 +326,9 @@ func (UnimplementedAdminServiceServer) GetOrder(context.Context, *GetOrderReques
 }
 func (UnimplementedAdminServiceServer) CreateVehicle(context.Context, *CreateVehicleRequest) (*CreateVehicleResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateVehicle not implemented")
+}
+func (UnimplementedAdminServiceServer) UpdateVehicle(context.Context, *UpdateVehicleRequest) (*UpdateVehicleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateVehicle not implemented")
 }
 func (UnimplementedAdminServiceServer) ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListVehicles not implemented")
@@ -596,6 +612,24 @@ func _AdminService_CreateVehicle_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_UpdateVehicle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVehicleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).UpdateVehicle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_UpdateVehicle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).UpdateVehicle(ctx, req.(*UpdateVehicleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AdminService_ListVehicles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListVehiclesRequest)
 	if err := dec(in); err != nil {
@@ -712,6 +746,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateVehicle",
 			Handler:    _AdminService_CreateVehicle_Handler,
+		},
+		{
+			MethodName: "UpdateVehicle",
+			Handler:    _AdminService_UpdateVehicle_Handler,
 		},
 		{
 			MethodName: "ListVehicles",

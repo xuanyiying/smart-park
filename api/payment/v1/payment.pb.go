@@ -1142,10 +1142,10 @@ func (x *GetReconciliationReportRequest) GetEndDate() string {
 }
 
 type GetReconciliationReportResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Data          map[string]string      `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Code          int32                     `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                    `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *ReconciliationReportData `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1194,11 +1194,173 @@ func (x *GetReconciliationReportResponse) GetMessage() string {
 	return ""
 }
 
-func (x *GetReconciliationReportResponse) GetData() map[string]string {
+func (x *GetReconciliationReportResponse) GetData() *ReconciliationReportData {
 	if x != nil {
 		return x.Data
 	}
 	return nil
+}
+
+type ReconciliationReportData struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	StartDate   string                 `protobuf:"bytes,1,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate     string                 `protobuf:"bytes,2,opt,name=endDate,proto3" json:"endDate,omitempty"`
+	TotalOrders int32                  `protobuf:"varint,3,opt,name=totalOrders,proto3" json:"totalOrders,omitempty"`
+	// Amounts in cents (分).
+	TotalAmount      int64                         `protobuf:"varint,4,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
+	TotalPaid        int64                         `protobuf:"varint,5,opt,name=totalPaid,proto3" json:"totalPaid,omitempty"`
+	MatchedOrders    int32                         `protobuf:"varint,6,opt,name=matchedOrders,proto3" json:"matchedOrders,omitempty"`
+	MismatchedOrders int32                         `protobuf:"varint,7,opt,name=mismatchedOrders,proto3" json:"mismatchedOrders,omitempty"`
+	PaymentMethods   map[string]*PaymentMethodStat `protobuf:"bytes,8,rep,name=paymentMethods,proto3" json:"paymentMethods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ReconciliationReportData) Reset() {
+	*x = ReconciliationReportData{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReconciliationReportData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReconciliationReportData) ProtoMessage() {}
+
+func (x *ReconciliationReportData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReconciliationReportData.ProtoReflect.Descriptor instead.
+func (*ReconciliationReportData) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ReconciliationReportData) GetStartDate() string {
+	if x != nil {
+		return x.StartDate
+	}
+	return ""
+}
+
+func (x *ReconciliationReportData) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
+	}
+	return ""
+}
+
+func (x *ReconciliationReportData) GetTotalOrders() int32 {
+	if x != nil {
+		return x.TotalOrders
+	}
+	return 0
+}
+
+func (x *ReconciliationReportData) GetTotalAmount() int64 {
+	if x != nil {
+		return x.TotalAmount
+	}
+	return 0
+}
+
+func (x *ReconciliationReportData) GetTotalPaid() int64 {
+	if x != nil {
+		return x.TotalPaid
+	}
+	return 0
+}
+
+func (x *ReconciliationReportData) GetMatchedOrders() int32 {
+	if x != nil {
+		return x.MatchedOrders
+	}
+	return 0
+}
+
+func (x *ReconciliationReportData) GetMismatchedOrders() int32 {
+	if x != nil {
+		return x.MismatchedOrders
+	}
+	return 0
+}
+
+func (x *ReconciliationReportData) GetPaymentMethods() map[string]*PaymentMethodStat {
+	if x != nil {
+		return x.PaymentMethods
+	}
+	return nil
+}
+
+type PaymentMethodStat struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Count int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	// Amounts in cents (分).
+	Amount        int64 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	Paid          int64 `protobuf:"varint,3,opt,name=paid,proto3" json:"paid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PaymentMethodStat) Reset() {
+	*x = PaymentMethodStat{}
+	mi := &file_api_payment_v1_payment_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PaymentMethodStat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PaymentMethodStat) ProtoMessage() {}
+
+func (x *PaymentMethodStat) ProtoReflect() protoreflect.Message {
+	mi := &file_api_payment_v1_payment_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PaymentMethodStat.ProtoReflect.Descriptor instead.
+func (*PaymentMethodStat) Descriptor() ([]byte, []int) {
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *PaymentMethodStat) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *PaymentMethodStat) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *PaymentMethodStat) GetPaid() int64 {
+	if x != nil {
+		return x.Paid
+	}
+	return 0
 }
 
 type FixMismatchedOrdersRequest struct {
@@ -1210,7 +1372,7 @@ type FixMismatchedOrdersRequest struct {
 
 func (x *FixMismatchedOrdersRequest) Reset() {
 	*x = FixMismatchedOrdersRequest{}
-	mi := &file_api_payment_v1_payment_proto_msgTypes[18]
+	mi := &file_api_payment_v1_payment_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1222,7 +1384,7 @@ func (x *FixMismatchedOrdersRequest) String() string {
 func (*FixMismatchedOrdersRequest) ProtoMessage() {}
 
 func (x *FixMismatchedOrdersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_payment_v1_payment_proto_msgTypes[18]
+	mi := &file_api_payment_v1_payment_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1235,7 +1397,7 @@ func (x *FixMismatchedOrdersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FixMismatchedOrdersRequest.ProtoReflect.Descriptor instead.
 func (*FixMismatchedOrdersRequest) Descriptor() ([]byte, []int) {
-	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{18}
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *FixMismatchedOrdersRequest) GetOrderIds() []string {
@@ -1255,7 +1417,7 @@ type FixMismatchedOrdersResponse struct {
 
 func (x *FixMismatchedOrdersResponse) Reset() {
 	*x = FixMismatchedOrdersResponse{}
-	mi := &file_api_payment_v1_payment_proto_msgTypes[19]
+	mi := &file_api_payment_v1_payment_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1267,7 +1429,7 @@ func (x *FixMismatchedOrdersResponse) String() string {
 func (*FixMismatchedOrdersResponse) ProtoMessage() {}
 
 func (x *FixMismatchedOrdersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_payment_v1_payment_proto_msgTypes[19]
+	mi := &file_api_payment_v1_payment_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1280,7 +1442,7 @@ func (x *FixMismatchedOrdersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FixMismatchedOrdersResponse.ProtoReflect.Descriptor instead.
 func (*FixMismatchedOrdersResponse) Descriptor() ([]byte, []int) {
-	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{19}
+	return file_api_payment_v1_payment_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *FixMismatchedOrdersResponse) GetCode() int32 {
@@ -1398,14 +1560,27 @@ const file_api_payment_v1_payment_proto_rawDesc = "" +
 	"\x05notes\x18\t \x01(\tR\x05notes\"X\n" +
 	"\x1eGetReconciliationReportRequest\x12\x1c\n" +
 	"\tstartDate\x18\x01 \x01(\tR\tstartDate\x12\x18\n" +
-	"\aendDate\x18\x02 \x01(\tR\aendDate\"\xd7\x01\n" +
+	"\aendDate\x18\x02 \x01(\tR\aendDate\"\x8d\x01\n" +
 	"\x1fGetReconciliationReportResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12M\n" +
-	"\x04data\x18\x03 \x03(\v29.api.payment.v1.GetReconciliationReportResponse.DataEntryR\x04data\x1a7\n" +
-	"\tDataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"8\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12<\n" +
+	"\x04data\x18\x03 \x01(\v2(.api.payment.v1.ReconciliationReportDataR\x04data\"\xd2\x03\n" +
+	"\x18ReconciliationReportData\x12\x1c\n" +
+	"\tstartDate\x18\x01 \x01(\tR\tstartDate\x12\x18\n" +
+	"\aendDate\x18\x02 \x01(\tR\aendDate\x12 \n" +
+	"\vtotalOrders\x18\x03 \x01(\x05R\vtotalOrders\x12 \n" +
+	"\vtotalAmount\x18\x04 \x01(\x03R\vtotalAmount\x12\x1c\n" +
+	"\ttotalPaid\x18\x05 \x01(\x03R\ttotalPaid\x12$\n" +
+	"\rmatchedOrders\x18\x06 \x01(\x05R\rmatchedOrders\x12*\n" +
+	"\x10mismatchedOrders\x18\a \x01(\x05R\x10mismatchedOrders\x12d\n" +
+	"\x0epaymentMethods\x18\b \x03(\v2<.api.payment.v1.ReconciliationReportData.PaymentMethodsEntryR\x0epaymentMethods\x1ad\n" +
+	"\x13PaymentMethodsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x127\n" +
+	"\x05value\x18\x02 \x01(\v2!.api.payment.v1.PaymentMethodStatR\x05value:\x028\x01\"U\n" +
+	"\x11PaymentMethodStat\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12\x12\n" +
+	"\x04paid\x18\x03 \x01(\x03R\x04paid\"8\n" +
 	"\x1aFixMismatchedOrdersRequest\x12\x1a\n" +
 	"\borderIds\x18\x01 \x03(\tR\borderIds\"K\n" +
 	"\x1bFixMismatchedOrdersResponse\x12\x12\n" +
@@ -1433,7 +1608,7 @@ func file_api_payment_v1_payment_proto_rawDescGZIP() []byte {
 	return file_api_payment_v1_payment_proto_rawDescData
 }
 
-var file_api_payment_v1_payment_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_api_payment_v1_payment_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_api_payment_v1_payment_proto_goTypes = []any{
 	(*CreatePaymentRequest)(nil),            // 0: api.payment.v1.CreatePaymentRequest
 	(*CreatePaymentResponse)(nil),           // 1: api.payment.v1.CreatePaymentResponse
@@ -1453,37 +1628,41 @@ var file_api_payment_v1_payment_proto_goTypes = []any{
 	(*ReconciliationRecord)(nil),            // 15: api.payment.v1.ReconciliationRecord
 	(*GetReconciliationReportRequest)(nil),  // 16: api.payment.v1.GetReconciliationReportRequest
 	(*GetReconciliationReportResponse)(nil), // 17: api.payment.v1.GetReconciliationReportResponse
-	(*FixMismatchedOrdersRequest)(nil),      // 18: api.payment.v1.FixMismatchedOrdersRequest
-	(*FixMismatchedOrdersResponse)(nil),     // 19: api.payment.v1.FixMismatchedOrdersResponse
-	nil,                                     // 20: api.payment.v1.GetReconciliationReportResponse.DataEntry
+	(*ReconciliationReportData)(nil),        // 18: api.payment.v1.ReconciliationReportData
+	(*PaymentMethodStat)(nil),               // 19: api.payment.v1.PaymentMethodStat
+	(*FixMismatchedOrdersRequest)(nil),      // 20: api.payment.v1.FixMismatchedOrdersRequest
+	(*FixMismatchedOrdersResponse)(nil),     // 21: api.payment.v1.FixMismatchedOrdersResponse
+	nil,                                     // 22: api.payment.v1.ReconciliationReportData.PaymentMethodsEntry
 }
 var file_api_payment_v1_payment_proto_depIdxs = []int32{
 	2,  // 0: api.payment.v1.CreatePaymentResponse.data:type_name -> api.payment.v1.PaymentData
 	5,  // 1: api.payment.v1.GetPaymentStatusResponse.data:type_name -> api.payment.v1.PaymentStatusData
 	12, // 2: api.payment.v1.RefundResponse.data:type_name -> api.payment.v1.RefundData
 	15, // 3: api.payment.v1.ReconcileDailyResponse.data:type_name -> api.payment.v1.ReconciliationRecord
-	20, // 4: api.payment.v1.GetReconciliationReportResponse.data:type_name -> api.payment.v1.GetReconciliationReportResponse.DataEntry
-	0,  // 5: api.payment.v1.PaymentService.CreatePayment:input_type -> api.payment.v1.CreatePaymentRequest
-	3,  // 6: api.payment.v1.PaymentService.GetPaymentStatus:input_type -> api.payment.v1.GetPaymentStatusRequest
-	6,  // 7: api.payment.v1.PaymentService.WechatCallback:input_type -> api.payment.v1.WechatCallbackRequest
-	8,  // 8: api.payment.v1.PaymentService.AlipayCallback:input_type -> api.payment.v1.AlipayCallbackRequest
-	10, // 9: api.payment.v1.PaymentService.Refund:input_type -> api.payment.v1.RefundRequest
-	13, // 10: api.payment.v1.PaymentService.ReconcileDaily:input_type -> api.payment.v1.ReconcileDailyRequest
-	16, // 11: api.payment.v1.PaymentService.GetReconciliationReport:input_type -> api.payment.v1.GetReconciliationReportRequest
-	18, // 12: api.payment.v1.PaymentService.FixMismatchedOrders:input_type -> api.payment.v1.FixMismatchedOrdersRequest
-	1,  // 13: api.payment.v1.PaymentService.CreatePayment:output_type -> api.payment.v1.CreatePaymentResponse
-	4,  // 14: api.payment.v1.PaymentService.GetPaymentStatus:output_type -> api.payment.v1.GetPaymentStatusResponse
-	7,  // 15: api.payment.v1.PaymentService.WechatCallback:output_type -> api.payment.v1.WechatCallbackResponse
-	9,  // 16: api.payment.v1.PaymentService.AlipayCallback:output_type -> api.payment.v1.AlipayCallbackResponse
-	11, // 17: api.payment.v1.PaymentService.Refund:output_type -> api.payment.v1.RefundResponse
-	14, // 18: api.payment.v1.PaymentService.ReconcileDaily:output_type -> api.payment.v1.ReconcileDailyResponse
-	17, // 19: api.payment.v1.PaymentService.GetReconciliationReport:output_type -> api.payment.v1.GetReconciliationReportResponse
-	19, // 20: api.payment.v1.PaymentService.FixMismatchedOrders:output_type -> api.payment.v1.FixMismatchedOrdersResponse
-	13, // [13:21] is the sub-list for method output_type
-	5,  // [5:13] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	18, // 4: api.payment.v1.GetReconciliationReportResponse.data:type_name -> api.payment.v1.ReconciliationReportData
+	22, // 5: api.payment.v1.ReconciliationReportData.paymentMethods:type_name -> api.payment.v1.ReconciliationReportData.PaymentMethodsEntry
+	19, // 6: api.payment.v1.ReconciliationReportData.PaymentMethodsEntry.value:type_name -> api.payment.v1.PaymentMethodStat
+	0,  // 7: api.payment.v1.PaymentService.CreatePayment:input_type -> api.payment.v1.CreatePaymentRequest
+	3,  // 8: api.payment.v1.PaymentService.GetPaymentStatus:input_type -> api.payment.v1.GetPaymentStatusRequest
+	6,  // 9: api.payment.v1.PaymentService.WechatCallback:input_type -> api.payment.v1.WechatCallbackRequest
+	8,  // 10: api.payment.v1.PaymentService.AlipayCallback:input_type -> api.payment.v1.AlipayCallbackRequest
+	10, // 11: api.payment.v1.PaymentService.Refund:input_type -> api.payment.v1.RefundRequest
+	13, // 12: api.payment.v1.PaymentService.ReconcileDaily:input_type -> api.payment.v1.ReconcileDailyRequest
+	16, // 13: api.payment.v1.PaymentService.GetReconciliationReport:input_type -> api.payment.v1.GetReconciliationReportRequest
+	20, // 14: api.payment.v1.PaymentService.FixMismatchedOrders:input_type -> api.payment.v1.FixMismatchedOrdersRequest
+	1,  // 15: api.payment.v1.PaymentService.CreatePayment:output_type -> api.payment.v1.CreatePaymentResponse
+	4,  // 16: api.payment.v1.PaymentService.GetPaymentStatus:output_type -> api.payment.v1.GetPaymentStatusResponse
+	7,  // 17: api.payment.v1.PaymentService.WechatCallback:output_type -> api.payment.v1.WechatCallbackResponse
+	9,  // 18: api.payment.v1.PaymentService.AlipayCallback:output_type -> api.payment.v1.AlipayCallbackResponse
+	11, // 19: api.payment.v1.PaymentService.Refund:output_type -> api.payment.v1.RefundResponse
+	14, // 20: api.payment.v1.PaymentService.ReconcileDaily:output_type -> api.payment.v1.ReconcileDailyResponse
+	17, // 21: api.payment.v1.PaymentService.GetReconciliationReport:output_type -> api.payment.v1.GetReconciliationReportResponse
+	21, // 22: api.payment.v1.PaymentService.FixMismatchedOrders:output_type -> api.payment.v1.FixMismatchedOrdersResponse
+	15, // [15:23] is the sub-list for method output_type
+	7,  // [7:15] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_api_payment_v1_payment_proto_init() }
@@ -1497,7 +1676,7 @@ func file_api_payment_v1_payment_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_payment_v1_payment_proto_rawDesc), len(file_api_payment_v1_payment_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

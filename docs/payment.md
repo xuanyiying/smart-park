@@ -22,12 +22,10 @@
 type OrderStatus string
 
 const (
-    StatusPending   OrderStatus = "pending"    // 待支付
-    StatusPaid      OrderStatus = "paid"       // 已支付
-    StatusFailed    OrderStatus = "failed"     // 支付失败
-    StatusRefunding OrderStatus = "refunding"  // 退款中
-    StatusRefunded  OrderStatus = "refunded"   // 已退款
-    StatusClosed    OrderStatus = "closed"     // 已关闭
+    StatusPending  OrderStatus = "pending"   // 待支付
+    StatusPaid     OrderStatus = "paid"      // 已支付
+    StatusRefunded OrderStatus = "refunded"  // 已退款
+    StatusFailed   OrderStatus = "failed"    // 支付失败
 )
 
 type Order struct {
@@ -35,14 +33,14 @@ type Order struct {
     RecordID            uuid.UUID      // 关联停车记录
     LotID               uuid.UUID      // 停车场ID
     PlateNumber         string         // 车牌号
-    Amount              float64        // 应付金额
-    DiscountAmount      float64        // 优惠金额
-    FinalAmount         float64        // 实付金额
+    Amount              int64          // 应付金额（分）
+    DiscountAmount      int64          // 优惠金额（分）
+    FinalAmount         int64          // 实付金额（分）
     Status              string         // 订单状态
     PayMethod           string         // 支付方式
     PayTime             *time.Time     // 支付时间
     TransactionID       string         // 第三方支付流水号
-    PaidAmount          float64        // 实际支付金额（回调写入）
+    PaidAmount          int64          // 实际支付金额（分，回调写入）
     RefundedAt          *time.Time     // 退款时间
     RefundTransactionID string         // 退款流水号
     ExpireTime          time.Time      // 订单过期时间
@@ -227,11 +225,6 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
         return nil, fmt.Errorf("order status is not paid")
     }
     
-    // 检查退款时效（如 30 分钟内可自动退款）
-    if time.Since(*order.PayTime) > uc.config.RefundWindow {
-        return nil, fmt.Errorf("refund window expired")
-    }
-    
     // 生成退款ID
     refundID := uuid.New().String()
     
@@ -264,7 +257,9 @@ func (uc *PaymentUseCase) Refund(ctx context.Context, orderID, reason string) (*
 }
 ```
 
-#### 退款审批流程（管理端）
+#### 退款审批流程（管理端）（规划中，尚未实现）
+
+> 注：以下为规划中的设计；当前 biz 层未实现退款审批，proto 也未暴露相关 API（仅有 ent 层的 RefundApproval 表模型）。
 
 ```go
 // 创建退款审批申请
@@ -498,11 +493,11 @@ func (uc *PaymentUseCase) ProcessAutoPayment(ctx context.Context, recordID, plat
    // 创建订单时设置过期时间
    order.ExpireTime = time.Now().Add(30 * time.Minute)
    
-   // 定时任务清理过期订单
+   // 定时任务清理过期订单（实际状态机：pending → failed 条件更新）
    func (uc *PaymentUseCase) CleanupExpiredOrders(ctx context.Context) {
        expiredOrders, _ := uc.orderRepo.GetExpiredOrders(ctx)
        for _, order := range expiredOrders {
-           order.Status = string(StatusClosed)
+           order.Status = string(StatusFailed)
            uc.orderRepo.UpdateOrder(ctx, order)
        }
    }
@@ -529,10 +524,10 @@ func (uc *PaymentUseCase) ProcessAutoPayment(ctx context.Context, recordID, plat
            uc.alipayClient.CloseTrade(ctx, order.ID.String())
        }
        
-       order.Status = string(StatusClosed)
+       order.Status = string(StatusFailed)
        return uc.orderRepo.UpdateOrder(ctx, order)
-   }
-   ```
+       }
+       ```
 
 ### 挑战三：支付渠道故障
 
@@ -642,7 +637,7 @@ Content-Type: application/json
 
 {
   "recordId": "rec_xxx",
-  "amount": 15.00,
+  "amount": 1500,  // 单位：分（15.00 元）
   "payMethod": "wechat",
   "openId": "oxxxxx"  // JSAPI支付时必填
 }
@@ -654,7 +649,7 @@ Content-Type: application/json
   "code": 0,
   "data": {
     "orderId": "ord_xxx",
-    "amount": 15.00,
+    "amount": 1500,
     "payUrl": "weixin://wxpay/bizpayurl?pr=xxx",
     "qrCode": "https://api.example.com/qr/xxx",
     "expireTime": "2026-03-20T12:30:00Z"
@@ -703,39 +698,82 @@ Content-Type: application/json
 }
 ```
 
+### 微信支付回调
+
+```http
+POST /api/v1/pay/callback/wechat
+```
+
+### 支付宝支付回调
+
+```http
+POST /api/v1/pay/callback/alipay
+```
+
+### 发起每日对账
+
+```http
+POST /api/v1/pay/reconcile/daily
+```
+
+### 查询对账报告
+
+```http
+GET /api/v1/pay/reconcile/report
+```
+
+### 修复对账差异订单
+
+```http
+POST /api/v1/pay/reconcile/fix
+```
+
 ## 配置说明
 
 ```yaml
-# configs/payment.yaml
+# configs/payment.yaml（gRPC :9003 硬编码于 cmd/payment/main.go）
 server:
-  http:
-    addr: 0.0.0.0:8003
-  grpc:
-    addr: 0.0.0.0:9003
+  port: 8003
+  timeout: 60
 
-data:
-  database:
-    driver: postgres
-    source: postgres://postgres:postgres@localhost:5432/parking?sslmode=disable
+database:
+  driver: postgres
+  primary:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+  replica:
+    source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
 
-payment:
-  orderExpiration: 30m  # 订单过期时间
-  refundWindow: 30m     # 退款时效窗口
-  
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
 wechat:
-  appId: "wx_app_id"
-  mchId: "mch_id"
-  apiV3Key: "api_v3_key"
-  privateKeyPath: "/secrets/wechat_private_key.pem"
-  serialNo: "certificate_serial_no"
-  notifyUrl: "https://api.example.com/api/v1/pay/callback/wechat"
-  
+  app_id: ""
+  mch_id: ""
+  api_key: ""
+  cert_serial_no: ""
+  private_key_path: ""
+  public_key_path: ""
+  notify_url: ""
+
 alipay:
-  appId: "alipay_app_id"
-  privateKeyPath: "/secrets/alipay_private_key.pem"
-  publicKeyPath: "/secrets/alipay_public_key.pem"
-  notifyUrl: "https://api.example.com/api/v1/pay/callback/alipay"
+  app_id: ""
+  private_key: ""   # 内联私钥内容，非文件路径
+  public_key: ""    # 内联公钥内容，非文件路径
+  notify_url: ""
+  is_production: false
+
+log:
+  level: info
+  format: json
+
+otel:
+  endpoint: "localhost:4317"
+  serviceName: "payment-svc"
 ```
+
+> 订单过期时间（`OrderExpiration`，默认 30m）为 biz 层代码内置默认值，不读取 yaml 配置；代码中亦无退款时效窗口（RefundWindow）限制。
 
 ## 监控指标
 

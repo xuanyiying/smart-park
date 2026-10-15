@@ -1,0 +1,20 @@
+# 数据分析服务配置
+# 配置格式与 pkg/config.Load 保持一致（扁平结构）。
+# 敏感字段可通过 SP_* 环境变量覆盖，例如：
+#   SP_DATABASE_SOURCE  - 数据库连接串
+
+server:
+  port: 8009
+  timeout: 60
+
+database:
+  driver: postgres
+  source: "host=localhost user=postgres password=postgres dbname=parking port=5432 sslmode=disable"
+
+log:
+  level: info
+  format: json
+
+otel:
+  endpoint: "localhost:4317"
+  serviceName: "analytics-svc"

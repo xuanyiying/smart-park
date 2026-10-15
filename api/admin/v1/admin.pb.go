@@ -1527,6 +1527,142 @@ func (x *CreateVehicleResponse) GetData() *Vehicle {
 	return nil
 }
 
+type UpdateVehicleRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	PlateNumber       string                 `protobuf:"bytes,2,opt,name=plateNumber,proto3" json:"plateNumber,omitempty"`
+	VehicleType       string                 `protobuf:"bytes,3,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
+	OwnerName         string                 `protobuf:"bytes,4,opt,name=ownerName,proto3" json:"ownerName,omitempty"`
+	OwnerPhone        string                 `protobuf:"bytes,5,opt,name=ownerPhone,proto3" json:"ownerPhone,omitempty"`
+	MonthlyValidUntil string                 `protobuf:"bytes,6,opt,name=monthlyValidUntil,proto3" json:"monthlyValidUntil,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *UpdateVehicleRequest) Reset() {
+	*x = UpdateVehicleRequest{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateVehicleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVehicleRequest) ProtoMessage() {}
+
+func (x *UpdateVehicleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVehicleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateVehicleRequest) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *UpdateVehicleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetPlateNumber() string {
+	if x != nil {
+		return x.PlateNumber
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetVehicleType() string {
+	if x != nil {
+		return x.VehicleType
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetOwnerName() string {
+	if x != nil {
+		return x.OwnerName
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetOwnerPhone() string {
+	if x != nil {
+		return x.OwnerPhone
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetMonthlyValidUntil() string {
+	if x != nil {
+		return x.MonthlyValidUntil
+	}
+	return ""
+}
+
+type UpdateVehicleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateVehicleResponse) Reset() {
+	*x = UpdateVehicleResponse{}
+	mi := &file_api_admin_v1_admin_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateVehicleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVehicleResponse) ProtoMessage() {}
+
+func (x *UpdateVehicleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_admin_v1_admin_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVehicleResponse.ProtoReflect.Descriptor instead.
+func (*UpdateVehicleResponse) Descriptor() ([]byte, []int) {
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *UpdateVehicleResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateVehicleResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type ListVehiclesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	VehicleType   string                 `protobuf:"bytes,1,opt,name=vehicleType,proto3" json:"vehicleType,omitempty"`
@@ -1538,7 +1674,7 @@ type ListVehiclesRequest struct {
 
 func (x *ListVehiclesRequest) Reset() {
 	*x = ListVehiclesRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[22]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1550,7 +1686,7 @@ func (x *ListVehiclesRequest) String() string {
 func (*ListVehiclesRequest) ProtoMessage() {}
 
 func (x *ListVehiclesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[22]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1563,7 +1699,7 @@ func (x *ListVehiclesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVehiclesRequest.ProtoReflect.Descriptor instead.
 func (*ListVehiclesRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{22}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ListVehiclesRequest) GetVehicleType() string {
@@ -1598,7 +1734,7 @@ type ListVehiclesResponse struct {
 
 func (x *ListVehiclesResponse) Reset() {
 	*x = ListVehiclesResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[23]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1610,7 +1746,7 @@ func (x *ListVehiclesResponse) String() string {
 func (*ListVehiclesResponse) ProtoMessage() {}
 
 func (x *ListVehiclesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[23]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1623,7 +1759,7 @@ func (x *ListVehiclesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVehiclesResponse.ProtoReflect.Descriptor instead.
 func (*ListVehiclesResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{23}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ListVehiclesResponse) GetCode() int32 {
@@ -1659,7 +1795,7 @@ type VehicleListData struct {
 
 func (x *VehicleListData) Reset() {
 	*x = VehicleListData{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[24]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1671,7 +1807,7 @@ func (x *VehicleListData) String() string {
 func (*VehicleListData) ProtoMessage() {}
 
 func (x *VehicleListData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[24]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1684,7 +1820,7 @@ func (x *VehicleListData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VehicleListData.ProtoReflect.Descriptor instead.
 func (*VehicleListData) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{24}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *VehicleListData) GetList() []*Vehicle {
@@ -1730,7 +1866,7 @@ type Vehicle struct {
 
 func (x *Vehicle) Reset() {
 	*x = Vehicle{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[25]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1742,7 +1878,7 @@ func (x *Vehicle) String() string {
 func (*Vehicle) ProtoMessage() {}
 
 func (x *Vehicle) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[25]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1755,7 +1891,7 @@ func (x *Vehicle) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Vehicle.ProtoReflect.Descriptor instead.
 func (*Vehicle) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{25}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *Vehicle) GetId() string {
@@ -1817,7 +1953,7 @@ type GetDailyReportRequest struct {
 
 func (x *GetDailyReportRequest) Reset() {
 	*x = GetDailyReportRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[26]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1829,7 +1965,7 @@ func (x *GetDailyReportRequest) String() string {
 func (*GetDailyReportRequest) ProtoMessage() {}
 
 func (x *GetDailyReportRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[26]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1842,7 +1978,7 @@ func (x *GetDailyReportRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyReportRequest.ProtoReflect.Descriptor instead.
 func (*GetDailyReportRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{26}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetDailyReportRequest) GetLotId() string {
@@ -1870,7 +2006,7 @@ type GetDailyReportResponse struct {
 
 func (x *GetDailyReportResponse) Reset() {
 	*x = GetDailyReportResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[27]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1882,7 +2018,7 @@ func (x *GetDailyReportResponse) String() string {
 func (*GetDailyReportResponse) ProtoMessage() {}
 
 func (x *GetDailyReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[27]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1895,7 +2031,7 @@ func (x *GetDailyReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyReportResponse.ProtoReflect.Descriptor instead.
 func (*GetDailyReportResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{27}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GetDailyReportResponse) GetCode() int32 {
@@ -1936,7 +2072,7 @@ type DailyReport struct {
 
 func (x *DailyReport) Reset() {
 	*x = DailyReport{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[28]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1948,7 +2084,7 @@ func (x *DailyReport) String() string {
 func (*DailyReport) ProtoMessage() {}
 
 func (x *DailyReport) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[28]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1961,7 +2097,7 @@ func (x *DailyReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyReport.ProtoReflect.Descriptor instead.
 func (*DailyReport) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{28}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *DailyReport) GetLotId() string {
@@ -2031,7 +2167,7 @@ type GetMonthlyReportRequest struct {
 
 func (x *GetMonthlyReportRequest) Reset() {
 	*x = GetMonthlyReportRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[29]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2043,7 +2179,7 @@ func (x *GetMonthlyReportRequest) String() string {
 func (*GetMonthlyReportRequest) ProtoMessage() {}
 
 func (x *GetMonthlyReportRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[29]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2056,7 +2192,7 @@ func (x *GetMonthlyReportRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMonthlyReportRequest.ProtoReflect.Descriptor instead.
 func (*GetMonthlyReportRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{29}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetMonthlyReportRequest) GetLotId() string {
@@ -2091,7 +2227,7 @@ type GetMonthlyReportResponse struct {
 
 func (x *GetMonthlyReportResponse) Reset() {
 	*x = GetMonthlyReportResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[30]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2103,7 +2239,7 @@ func (x *GetMonthlyReportResponse) String() string {
 func (*GetMonthlyReportResponse) ProtoMessage() {}
 
 func (x *GetMonthlyReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[30]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2116,7 +2252,7 @@ func (x *GetMonthlyReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMonthlyReportResponse.ProtoReflect.Descriptor instead.
 func (*GetMonthlyReportResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{30}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *GetMonthlyReportResponse) GetCode() int32 {
@@ -2159,7 +2295,7 @@ type MonthlyReport struct {
 
 func (x *MonthlyReport) Reset() {
 	*x = MonthlyReport{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[31]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2171,7 +2307,7 @@ func (x *MonthlyReport) String() string {
 func (*MonthlyReport) ProtoMessage() {}
 
 func (x *MonthlyReport) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[31]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2184,7 +2320,7 @@ func (x *MonthlyReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MonthlyReport.ProtoReflect.Descriptor instead.
 func (*MonthlyReport) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{31}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *MonthlyReport) GetLotId() string {
@@ -2268,7 +2404,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[32]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2280,7 +2416,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[32]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2293,7 +2429,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{32}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *LoginRequest) GetUsername() string {
@@ -2321,7 +2457,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[33]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2333,7 +2469,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[33]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2346,7 +2482,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{33}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *LoginResponse) GetCode() int32 {
@@ -2381,7 +2517,7 @@ type LoginData struct {
 
 func (x *LoginData) Reset() {
 	*x = LoginData{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[34]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2393,7 +2529,7 @@ func (x *LoginData) String() string {
 func (*LoginData) ProtoMessage() {}
 
 func (x *LoginData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[34]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2406,7 +2542,7 @@ func (x *LoginData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginData.ProtoReflect.Descriptor instead.
 func (*LoginData) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{34}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *LoginData) GetToken() string {
@@ -2443,7 +2579,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[35]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2455,7 +2591,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[35]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2468,7 +2604,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{35}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *User) GetId() string {
@@ -2514,7 +2650,7 @@ type GetCurrentUserRequest struct {
 
 func (x *GetCurrentUserRequest) Reset() {
 	*x = GetCurrentUserRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[36]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2526,7 +2662,7 @@ func (x *GetCurrentUserRequest) String() string {
 func (*GetCurrentUserRequest) ProtoMessage() {}
 
 func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[36]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2539,7 +2675,7 @@ func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserRequest.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{36}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{38}
 }
 
 type GetCurrentUserResponse struct {
@@ -2553,7 +2689,7 @@ type GetCurrentUserResponse struct {
 
 func (x *GetCurrentUserResponse) Reset() {
 	*x = GetCurrentUserResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[37]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2565,7 +2701,7 @@ func (x *GetCurrentUserResponse) String() string {
 func (*GetCurrentUserResponse) ProtoMessage() {}
 
 func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[37]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2578,7 +2714,7 @@ func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserResponse.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{37}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetCurrentUserResponse) GetCode() int32 {
@@ -2613,7 +2749,7 @@ type ListUsersRequest struct {
 
 func (x *ListUsersRequest) Reset() {
 	*x = ListUsersRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[38]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2625,7 +2761,7 @@ func (x *ListUsersRequest) String() string {
 func (*ListUsersRequest) ProtoMessage() {}
 
 func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[38]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2638,7 +2774,7 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{38}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *ListUsersRequest) GetPage() int32 {
@@ -2666,7 +2802,7 @@ type ListUsersResponse struct {
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[39]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2678,7 +2814,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[39]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2691,7 +2827,7 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{39}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ListUsersResponse) GetCode() int32 {
@@ -2727,7 +2863,7 @@ type UserListData struct {
 
 func (x *UserListData) Reset() {
 	*x = UserListData{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[40]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2739,7 +2875,7 @@ func (x *UserListData) String() string {
 func (*UserListData) ProtoMessage() {}
 
 func (x *UserListData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[40]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2752,7 +2888,7 @@ func (x *UserListData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserListData.ProtoReflect.Descriptor instead.
 func (*UserListData) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{40}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *UserListData) GetList() []*User {
@@ -2797,7 +2933,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[41]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2809,7 +2945,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[41]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2822,7 +2958,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{41}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *CreateUserRequest) GetUsername() string {
@@ -2878,7 +3014,7 @@ type CreateUserResponse struct {
 
 func (x *CreateUserResponse) Reset() {
 	*x = CreateUserResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[42]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2890,7 +3026,7 @@ func (x *CreateUserResponse) String() string {
 func (*CreateUserResponse) ProtoMessage() {}
 
 func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[42]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2903,7 +3039,7 @@ func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
 func (*CreateUserResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{42}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *CreateUserResponse) GetCode() int32 {
@@ -2941,7 +3077,7 @@ type UpdateUserRequest struct {
 
 func (x *UpdateUserRequest) Reset() {
 	*x = UpdateUserRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[43]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2953,7 +3089,7 @@ func (x *UpdateUserRequest) String() string {
 func (*UpdateUserRequest) ProtoMessage() {}
 
 func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[43]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2966,7 +3102,7 @@ func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{43}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *UpdateUserRequest) GetId() string {
@@ -3022,7 +3158,7 @@ type UpdateUserResponse struct {
 
 func (x *UpdateUserResponse) Reset() {
 	*x = UpdateUserResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[44]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3034,7 +3170,7 @@ func (x *UpdateUserResponse) String() string {
 func (*UpdateUserResponse) ProtoMessage() {}
 
 func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[44]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3047,7 +3183,7 @@ func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
 func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{44}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *UpdateUserResponse) GetCode() int32 {
@@ -3080,7 +3216,7 @@ type DeleteUserRequest struct {
 
 func (x *DeleteUserRequest) Reset() {
 	*x = DeleteUserRequest{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[45]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3092,7 +3228,7 @@ func (x *DeleteUserRequest) String() string {
 func (*DeleteUserRequest) ProtoMessage() {}
 
 func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[45]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3105,7 +3241,7 @@ func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{45}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *DeleteUserRequest) GetId() string {
@@ -3125,7 +3261,7 @@ type DeleteUserResponse struct {
 
 func (x *DeleteUserResponse) Reset() {
 	*x = DeleteUserResponse{}
-	mi := &file_api_admin_v1_admin_proto_msgTypes[46]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3137,7 +3273,7 @@ func (x *DeleteUserResponse) String() string {
 func (*DeleteUserResponse) ProtoMessage() {}
 
 func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_admin_v1_admin_proto_msgTypes[46]
+	mi := &file_api_admin_v1_admin_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3150,7 +3286,7 @@ func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
 func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
-	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{46}
+	return file_api_admin_v1_admin_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *DeleteUserResponse) GetCode() int32 {
@@ -3286,7 +3422,19 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x15CreateVehicleResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12)\n" +
-	"\x04data\x18\x03 \x01(\v2\x15.api.admin.v1.VehicleR\x04data\"g\n" +
+	"\x04data\x18\x03 \x01(\v2\x15.api.admin.v1.VehicleR\x04data\"\xd6\x01\n" +
+	"\x14UpdateVehicleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
+	"\vplateNumber\x18\x02 \x01(\tR\vplateNumber\x12 \n" +
+	"\vvehicleType\x18\x03 \x01(\tR\vvehicleType\x12\x1c\n" +
+	"\townerName\x18\x04 \x01(\tR\townerName\x12\x1e\n" +
+	"\n" +
+	"ownerPhone\x18\x05 \x01(\tR\n" +
+	"ownerPhone\x12,\n" +
+	"\x11monthlyValidUntil\x18\x06 \x01(\tR\x11monthlyValidUntil\"E\n" +
+	"\x15UpdateVehicleResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"g\n" +
 	"\x13ListVehiclesRequest\x12 \n" +
 	"\vvehicleType\x18\x01 \x01(\tR\vvehicleType\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1a\n" +
@@ -3410,7 +3558,7 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"B\n" +
 	"\x12DeleteUserResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x98\x10\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x9b\x11\n" +
 	"\fAdminService\x12`\n" +
 	"\x05Login\x12\x1a.api.admin.v1.LoginRequest\x1a\x1b.api.admin.v1.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12w\n" +
 	"\x0eGetCurrentUser\x12#.api.admin.v1.GetCurrentUserRequest\x1a$.api.admin.v1.GetCurrentUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/admin/user\x12i\n" +
@@ -3429,7 +3577,8 @@ const file_api_admin_v1_admin_proto_rawDesc = "" +
 	"\n" +
 	"ListOrders\x12\x1f.api.admin.v1.ListOrdersRequest\x1a .api.admin.v1.ListOrdersResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/admin/orders\x12l\n" +
 	"\bGetOrder\x12\x1d.api.admin.v1.GetOrderRequest\x1a\x1e.api.admin.v1.GetOrderResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/admin/orders/{id}\x12{\n" +
-	"\rCreateVehicle\x12\".api.admin.v1.CreateVehicleRequest\x1a#.api.admin.v1.CreateVehicleResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/admin/vehicles\x12u\n" +
+	"\rCreateVehicle\x12\".api.admin.v1.CreateVehicleRequest\x1a#.api.admin.v1.CreateVehicleResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/admin/vehicles\x12\x80\x01\n" +
+	"\rUpdateVehicle\x12\".api.admin.v1.UpdateVehicleRequest\x1a#.api.admin.v1.UpdateVehicleResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\x1a\x1b/api/v1/admin/vehicles/{id}\x12u\n" +
 	"\fListVehicles\x12!.api.admin.v1.ListVehiclesRequest\x1a\".api.admin.v1.ListVehiclesResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/vehicles\x12\x80\x01\n" +
 	"\x0eGetDailyReport\x12#.api.admin.v1.GetDailyReportRequest\x1a$.api.admin.v1.GetDailyReportResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/admin/reports/daily\x12\x88\x01\n" +
 	"\x10GetMonthlyReport\x12%.api.admin.v1.GetMonthlyReportRequest\x1a&.api.admin.v1.GetMonthlyReportResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/admin/reports/monthlyB2Z0github.com/xuanyiying/smart-park/api/admin/v1;v1b\x06proto3"
@@ -3446,7 +3595,7 @@ func file_api_admin_v1_admin_proto_rawDescGZIP() []byte {
 	return file_api_admin_v1_admin_proto_rawDescData
 }
 
-var file_api_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_api_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_api_admin_v1_admin_proto_goTypes = []any{
 	(*CreateParkingLotRequest)(nil),    // 0: api.admin.v1.CreateParkingLotRequest
 	(*CreateParkingLotResponse)(nil),   // 1: api.admin.v1.CreateParkingLotResponse
@@ -3470,31 +3619,33 @@ var file_api_admin_v1_admin_proto_goTypes = []any{
 	(*Order)(nil),                      // 19: api.admin.v1.Order
 	(*CreateVehicleRequest)(nil),       // 20: api.admin.v1.CreateVehicleRequest
 	(*CreateVehicleResponse)(nil),      // 21: api.admin.v1.CreateVehicleResponse
-	(*ListVehiclesRequest)(nil),        // 22: api.admin.v1.ListVehiclesRequest
-	(*ListVehiclesResponse)(nil),       // 23: api.admin.v1.ListVehiclesResponse
-	(*VehicleListData)(nil),            // 24: api.admin.v1.VehicleListData
-	(*Vehicle)(nil),                    // 25: api.admin.v1.Vehicle
-	(*GetDailyReportRequest)(nil),      // 26: api.admin.v1.GetDailyReportRequest
-	(*GetDailyReportResponse)(nil),     // 27: api.admin.v1.GetDailyReportResponse
-	(*DailyReport)(nil),                // 28: api.admin.v1.DailyReport
-	(*GetMonthlyReportRequest)(nil),    // 29: api.admin.v1.GetMonthlyReportRequest
-	(*GetMonthlyReportResponse)(nil),   // 30: api.admin.v1.GetMonthlyReportResponse
-	(*MonthlyReport)(nil),              // 31: api.admin.v1.MonthlyReport
-	(*LoginRequest)(nil),               // 32: api.admin.v1.LoginRequest
-	(*LoginResponse)(nil),              // 33: api.admin.v1.LoginResponse
-	(*LoginData)(nil),                  // 34: api.admin.v1.LoginData
-	(*User)(nil),                       // 35: api.admin.v1.User
-	(*GetCurrentUserRequest)(nil),      // 36: api.admin.v1.GetCurrentUserRequest
-	(*GetCurrentUserResponse)(nil),     // 37: api.admin.v1.GetCurrentUserResponse
-	(*ListUsersRequest)(nil),           // 38: api.admin.v1.ListUsersRequest
-	(*ListUsersResponse)(nil),          // 39: api.admin.v1.ListUsersResponse
-	(*UserListData)(nil),               // 40: api.admin.v1.UserListData
-	(*CreateUserRequest)(nil),          // 41: api.admin.v1.CreateUserRequest
-	(*CreateUserResponse)(nil),         // 42: api.admin.v1.CreateUserResponse
-	(*UpdateUserRequest)(nil),          // 43: api.admin.v1.UpdateUserRequest
-	(*UpdateUserResponse)(nil),         // 44: api.admin.v1.UpdateUserResponse
-	(*DeleteUserRequest)(nil),          // 45: api.admin.v1.DeleteUserRequest
-	(*DeleteUserResponse)(nil),         // 46: api.admin.v1.DeleteUserResponse
+	(*UpdateVehicleRequest)(nil),       // 22: api.admin.v1.UpdateVehicleRequest
+	(*UpdateVehicleResponse)(nil),      // 23: api.admin.v1.UpdateVehicleResponse
+	(*ListVehiclesRequest)(nil),        // 24: api.admin.v1.ListVehiclesRequest
+	(*ListVehiclesResponse)(nil),       // 25: api.admin.v1.ListVehiclesResponse
+	(*VehicleListData)(nil),            // 26: api.admin.v1.VehicleListData
+	(*Vehicle)(nil),                    // 27: api.admin.v1.Vehicle
+	(*GetDailyReportRequest)(nil),      // 28: api.admin.v1.GetDailyReportRequest
+	(*GetDailyReportResponse)(nil),     // 29: api.admin.v1.GetDailyReportResponse
+	(*DailyReport)(nil),                // 30: api.admin.v1.DailyReport
+	(*GetMonthlyReportRequest)(nil),    // 31: api.admin.v1.GetMonthlyReportRequest
+	(*GetMonthlyReportResponse)(nil),   // 32: api.admin.v1.GetMonthlyReportResponse
+	(*MonthlyReport)(nil),              // 33: api.admin.v1.MonthlyReport
+	(*LoginRequest)(nil),               // 34: api.admin.v1.LoginRequest
+	(*LoginResponse)(nil),              // 35: api.admin.v1.LoginResponse
+	(*LoginData)(nil),                  // 36: api.admin.v1.LoginData
+	(*User)(nil),                       // 37: api.admin.v1.User
+	(*GetCurrentUserRequest)(nil),      // 38: api.admin.v1.GetCurrentUserRequest
+	(*GetCurrentUserResponse)(nil),     // 39: api.admin.v1.GetCurrentUserResponse
+	(*ListUsersRequest)(nil),           // 40: api.admin.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),          // 41: api.admin.v1.ListUsersResponse
+	(*UserListData)(nil),               // 42: api.admin.v1.UserListData
+	(*CreateUserRequest)(nil),          // 43: api.admin.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),         // 44: api.admin.v1.CreateUserResponse
+	(*UpdateUserRequest)(nil),          // 45: api.admin.v1.UpdateUserRequest
+	(*UpdateUserResponse)(nil),         // 46: api.admin.v1.UpdateUserResponse
+	(*DeleteUserRequest)(nil),          // 47: api.admin.v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),         // 48: api.admin.v1.DeleteUserResponse
 }
 var file_api_admin_v1_admin_proto_depIdxs = []int32{
 	9,  // 0: api.admin.v1.CreateParkingLotResponse.data:type_name -> api.admin.v1.ParkingLot
@@ -3506,25 +3657,25 @@ var file_api_admin_v1_admin_proto_depIdxs = []int32{
 	16, // 6: api.admin.v1.ListOrdersResponse.data:type_name -> api.admin.v1.OrderListData
 	19, // 7: api.admin.v1.OrderListData.list:type_name -> api.admin.v1.Order
 	19, // 8: api.admin.v1.GetOrderResponse.data:type_name -> api.admin.v1.Order
-	25, // 9: api.admin.v1.CreateVehicleResponse.data:type_name -> api.admin.v1.Vehicle
-	24, // 10: api.admin.v1.ListVehiclesResponse.data:type_name -> api.admin.v1.VehicleListData
-	25, // 11: api.admin.v1.VehicleListData.list:type_name -> api.admin.v1.Vehicle
-	28, // 12: api.admin.v1.GetDailyReportResponse.data:type_name -> api.admin.v1.DailyReport
-	31, // 13: api.admin.v1.GetMonthlyReportResponse.data:type_name -> api.admin.v1.MonthlyReport
-	28, // 14: api.admin.v1.MonthlyReport.dailyReports:type_name -> api.admin.v1.DailyReport
-	34, // 15: api.admin.v1.LoginResponse.data:type_name -> api.admin.v1.LoginData
-	35, // 16: api.admin.v1.LoginData.user:type_name -> api.admin.v1.User
-	35, // 17: api.admin.v1.GetCurrentUserResponse.data:type_name -> api.admin.v1.User
-	40, // 18: api.admin.v1.ListUsersResponse.data:type_name -> api.admin.v1.UserListData
-	35, // 19: api.admin.v1.UserListData.list:type_name -> api.admin.v1.User
-	35, // 20: api.admin.v1.CreateUserResponse.data:type_name -> api.admin.v1.User
-	35, // 21: api.admin.v1.UpdateUserResponse.data:type_name -> api.admin.v1.User
-	32, // 22: api.admin.v1.AdminService.Login:input_type -> api.admin.v1.LoginRequest
-	36, // 23: api.admin.v1.AdminService.GetCurrentUser:input_type -> api.admin.v1.GetCurrentUserRequest
-	38, // 24: api.admin.v1.AdminService.ListUsers:input_type -> api.admin.v1.ListUsersRequest
-	41, // 25: api.admin.v1.AdminService.CreateUser:input_type -> api.admin.v1.CreateUserRequest
-	43, // 26: api.admin.v1.AdminService.UpdateUser:input_type -> api.admin.v1.UpdateUserRequest
-	45, // 27: api.admin.v1.AdminService.DeleteUser:input_type -> api.admin.v1.DeleteUserRequest
+	27, // 9: api.admin.v1.CreateVehicleResponse.data:type_name -> api.admin.v1.Vehicle
+	26, // 10: api.admin.v1.ListVehiclesResponse.data:type_name -> api.admin.v1.VehicleListData
+	27, // 11: api.admin.v1.VehicleListData.list:type_name -> api.admin.v1.Vehicle
+	30, // 12: api.admin.v1.GetDailyReportResponse.data:type_name -> api.admin.v1.DailyReport
+	33, // 13: api.admin.v1.GetMonthlyReportResponse.data:type_name -> api.admin.v1.MonthlyReport
+	30, // 14: api.admin.v1.MonthlyReport.dailyReports:type_name -> api.admin.v1.DailyReport
+	36, // 15: api.admin.v1.LoginResponse.data:type_name -> api.admin.v1.LoginData
+	37, // 16: api.admin.v1.LoginData.user:type_name -> api.admin.v1.User
+	37, // 17: api.admin.v1.GetCurrentUserResponse.data:type_name -> api.admin.v1.User
+	42, // 18: api.admin.v1.ListUsersResponse.data:type_name -> api.admin.v1.UserListData
+	37, // 19: api.admin.v1.UserListData.list:type_name -> api.admin.v1.User
+	37, // 20: api.admin.v1.CreateUserResponse.data:type_name -> api.admin.v1.User
+	37, // 21: api.admin.v1.UpdateUserResponse.data:type_name -> api.admin.v1.User
+	34, // 22: api.admin.v1.AdminService.Login:input_type -> api.admin.v1.LoginRequest
+	38, // 23: api.admin.v1.AdminService.GetCurrentUser:input_type -> api.admin.v1.GetCurrentUserRequest
+	40, // 24: api.admin.v1.AdminService.ListUsers:input_type -> api.admin.v1.ListUsersRequest
+	43, // 25: api.admin.v1.AdminService.CreateUser:input_type -> api.admin.v1.CreateUserRequest
+	45, // 26: api.admin.v1.AdminService.UpdateUser:input_type -> api.admin.v1.UpdateUserRequest
+	47, // 27: api.admin.v1.AdminService.DeleteUser:input_type -> api.admin.v1.DeleteUserRequest
 	0,  // 28: api.admin.v1.AdminService.CreateParkingLot:input_type -> api.admin.v1.CreateParkingLotRequest
 	2,  // 29: api.admin.v1.AdminService.GetParkingLot:input_type -> api.admin.v1.GetParkingLotRequest
 	4,  // 30: api.admin.v1.AdminService.UpdateParkingLot:input_type -> api.admin.v1.UpdateParkingLotRequest
@@ -3533,28 +3684,30 @@ var file_api_admin_v1_admin_proto_depIdxs = []int32{
 	14, // 33: api.admin.v1.AdminService.ListOrders:input_type -> api.admin.v1.ListOrdersRequest
 	17, // 34: api.admin.v1.AdminService.GetOrder:input_type -> api.admin.v1.GetOrderRequest
 	20, // 35: api.admin.v1.AdminService.CreateVehicle:input_type -> api.admin.v1.CreateVehicleRequest
-	22, // 36: api.admin.v1.AdminService.ListVehicles:input_type -> api.admin.v1.ListVehiclesRequest
-	26, // 37: api.admin.v1.AdminService.GetDailyReport:input_type -> api.admin.v1.GetDailyReportRequest
-	29, // 38: api.admin.v1.AdminService.GetMonthlyReport:input_type -> api.admin.v1.GetMonthlyReportRequest
-	33, // 39: api.admin.v1.AdminService.Login:output_type -> api.admin.v1.LoginResponse
-	37, // 40: api.admin.v1.AdminService.GetCurrentUser:output_type -> api.admin.v1.GetCurrentUserResponse
-	39, // 41: api.admin.v1.AdminService.ListUsers:output_type -> api.admin.v1.ListUsersResponse
-	42, // 42: api.admin.v1.AdminService.CreateUser:output_type -> api.admin.v1.CreateUserResponse
-	44, // 43: api.admin.v1.AdminService.UpdateUser:output_type -> api.admin.v1.UpdateUserResponse
-	46, // 44: api.admin.v1.AdminService.DeleteUser:output_type -> api.admin.v1.DeleteUserResponse
-	1,  // 45: api.admin.v1.AdminService.CreateParkingLot:output_type -> api.admin.v1.CreateParkingLotResponse
-	3,  // 46: api.admin.v1.AdminService.GetParkingLot:output_type -> api.admin.v1.GetParkingLotResponse
-	5,  // 47: api.admin.v1.AdminService.UpdateParkingLot:output_type -> api.admin.v1.UpdateParkingLotResponse
-	7,  // 48: api.admin.v1.AdminService.ListParkingLots:output_type -> api.admin.v1.ListParkingLotsResponse
-	11, // 49: api.admin.v1.AdminService.ListParkingRecords:output_type -> api.admin.v1.ListParkingRecordsResponse
-	15, // 50: api.admin.v1.AdminService.ListOrders:output_type -> api.admin.v1.ListOrdersResponse
-	18, // 51: api.admin.v1.AdminService.GetOrder:output_type -> api.admin.v1.GetOrderResponse
-	21, // 52: api.admin.v1.AdminService.CreateVehicle:output_type -> api.admin.v1.CreateVehicleResponse
-	23, // 53: api.admin.v1.AdminService.ListVehicles:output_type -> api.admin.v1.ListVehiclesResponse
-	27, // 54: api.admin.v1.AdminService.GetDailyReport:output_type -> api.admin.v1.GetDailyReportResponse
-	30, // 55: api.admin.v1.AdminService.GetMonthlyReport:output_type -> api.admin.v1.GetMonthlyReportResponse
-	39, // [39:56] is the sub-list for method output_type
-	22, // [22:39] is the sub-list for method input_type
+	22, // 36: api.admin.v1.AdminService.UpdateVehicle:input_type -> api.admin.v1.UpdateVehicleRequest
+	24, // 37: api.admin.v1.AdminService.ListVehicles:input_type -> api.admin.v1.ListVehiclesRequest
+	28, // 38: api.admin.v1.AdminService.GetDailyReport:input_type -> api.admin.v1.GetDailyReportRequest
+	31, // 39: api.admin.v1.AdminService.GetMonthlyReport:input_type -> api.admin.v1.GetMonthlyReportRequest
+	35, // 40: api.admin.v1.AdminService.Login:output_type -> api.admin.v1.LoginResponse
+	39, // 41: api.admin.v1.AdminService.GetCurrentUser:output_type -> api.admin.v1.GetCurrentUserResponse
+	41, // 42: api.admin.v1.AdminService.ListUsers:output_type -> api.admin.v1.ListUsersResponse
+	44, // 43: api.admin.v1.AdminService.CreateUser:output_type -> api.admin.v1.CreateUserResponse
+	46, // 44: api.admin.v1.AdminService.UpdateUser:output_type -> api.admin.v1.UpdateUserResponse
+	48, // 45: api.admin.v1.AdminService.DeleteUser:output_type -> api.admin.v1.DeleteUserResponse
+	1,  // 46: api.admin.v1.AdminService.CreateParkingLot:output_type -> api.admin.v1.CreateParkingLotResponse
+	3,  // 47: api.admin.v1.AdminService.GetParkingLot:output_type -> api.admin.v1.GetParkingLotResponse
+	5,  // 48: api.admin.v1.AdminService.UpdateParkingLot:output_type -> api.admin.v1.UpdateParkingLotResponse
+	7,  // 49: api.admin.v1.AdminService.ListParkingLots:output_type -> api.admin.v1.ListParkingLotsResponse
+	11, // 50: api.admin.v1.AdminService.ListParkingRecords:output_type -> api.admin.v1.ListParkingRecordsResponse
+	15, // 51: api.admin.v1.AdminService.ListOrders:output_type -> api.admin.v1.ListOrdersResponse
+	18, // 52: api.admin.v1.AdminService.GetOrder:output_type -> api.admin.v1.GetOrderResponse
+	21, // 53: api.admin.v1.AdminService.CreateVehicle:output_type -> api.admin.v1.CreateVehicleResponse
+	23, // 54: api.admin.v1.AdminService.UpdateVehicle:output_type -> api.admin.v1.UpdateVehicleResponse
+	25, // 55: api.admin.v1.AdminService.ListVehicles:output_type -> api.admin.v1.ListVehiclesResponse
+	29, // 56: api.admin.v1.AdminService.GetDailyReport:output_type -> api.admin.v1.GetDailyReportResponse
+	32, // 57: api.admin.v1.AdminService.GetMonthlyReport:output_type -> api.admin.v1.GetMonthlyReportResponse
+	40, // [40:58] is the sub-list for method output_type
+	22, // [22:40] is the sub-list for method input_type
 	22, // [22:22] is the sub-list for extension type_name
 	22, // [22:22] is the sub-list for extension extendee
 	0,  // [0:22] is the sub-list for field type_name
@@ -3571,7 +3724,7 @@ func file_api_admin_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_admin_v1_admin_proto_rawDesc), len(file_api_admin_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   47,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

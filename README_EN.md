@@ -106,6 +106,12 @@ go run ./cmd/payment -conf ./configs
 
 # Run Admin Service
 go run ./cmd/admin -conf ./configs
+
+# Run Charging Service
+go run ./cmd/charging -conf ./configs
+
+# Run User Service
+go run ./cmd/user -conf ./configs
 ```
 
 ### Build Docker Images
@@ -120,14 +126,17 @@ docker-compose -f deploy/docker-compose.yml up -d
 
 ## Service Documentation
 
-| Service | Port | Description | Documentation |
-|---------|------|-------------|---------------|
-| Gateway | 8000 | API Gateway for request routing | [docs/gateway.md](docs/gateway.md) |
-| Vehicle | 8001 | Vehicle entry/exit, device management | [docs/vehicle_EN.md](docs/vehicle_EN.md) |
-| Billing | 8002 | Fee calculation and billing rules | [docs/billing_EN.md](docs/billing_EN.md) |
-| Payment | 8003 | Payment processing and order management | [docs/payment_EN.md](docs/payment_EN.md) |
-| Admin | 8004 | Parking lot management and reports | [docs/admin_EN.md](docs/admin_EN.md) |
-| Charging | 8005 | Charging pile management | [docs/charging.md](docs/charging.md) |
+| Service | HTTP Port | gRPC Port | Description | Documentation |
+|---------|------|------|-------------|---------------|
+| Gateway | 8000 | - | API Gateway with JWT authentication | [configs/gateway.yaml](configs/gateway.yaml) |
+| Vehicle | 8001 | 9001 | Vehicle entry/exit, device management | [docs/vehicle_EN.md](docs/vehicle_EN.md) |
+| Billing | 8002 | 9002 | Fee calculation and billing rules | [docs/billing_EN.md](docs/billing_EN.md) |
+| Payment | 8003 | 9003 | Payment processing, orders, reconciliation | [docs/payment_EN.md](docs/payment_EN.md) |
+| Admin | 8004 | 9004 | Parking lot management and reports | [docs/admin.md](docs/admin.md) |
+| Charging | 8005 | 9005 | Charging pile management | [docs/charging.md](docs/charging.md) |
+| Multitenancy | 8006 | 9006 | Multi-tenant management (gRPC only) | - |
+| User | 8007 | 9007 | User auth, scan-to-pay, plate binding | [docs/user.md](docs/user.md) |
+| Notification | 8008 | 9008 | Notification service (placeholder) | - |
 
 ## API Endpoints
 
@@ -136,8 +145,8 @@ docker-compose -f deploy/docker-compose.yml up -d
 - `POST /api/v1/device/entry` - Vehicle entry
 - `POST /api/v1/device/exit` - Vehicle exit
 - `POST /api/v1/device/heartbeat` - Device heartbeat
-- `GET /api/v1/device/{id}/status` - Device status query
-- `POST /api/v1/device/{id}/command` - Device control command
+- `GET /api/v1/device/{deviceId}/status` - Device status query
+- `POST /api/v1/device/{deviceId}/command` - Device control command
 
 ### Billing APIs
 
@@ -164,6 +173,13 @@ docker-compose -f deploy/docker-compose.yml up -d
 - `GET /api/v1/admin/reports/daily` - Daily report
 - `GET /api/v1/admin/reports/monthly` - Monthly report
 
+### User APIs
+
+- `POST /api/v1/user/login` - WeChat mini-program code login
+- `GET /api/v1/user/info` - User profile
+- `GET /api/v1/user/plates` - Bound plates / `POST /api/v1/user/plates` - Bind plate
+- `POST /api/v1/user/scan-pay` - Scan-to-pay
+
 ## Project Structure
 
 ```
@@ -179,26 +195,33 @@ smart-park/
 │   ├── vehicle/
 │   ├── billing/
 │   ├── payment/
-│   └── admin/
+│   ├── admin/
+│   ├── charging/
+│   ├── multitenancy/
+│   ├── notification/
+│   └── user/
 ├── configs/                # Configuration files per service
 ├── deploy/                 # Deployment configurations
 │   ├── docker/
 │   ├── docker-compose.yml
 │   └── k8s/                # Kubernetes manifests
 ├── docs/                   # Documentation
-├── internal/               # Internal implementations
+├── internal/               # Internal implementations (one dir per service)
 │   ├── admin/
 │   ├── billing/
+│   ├── charging/
 │   ├── payment/
-│   ├── vehicle/
-│   └── pkg/               # Common packages
+│   ├── user/
+│   └── vehicle/
 ├── pkg/                    # Reusable public libraries
 │   ├── auth/              # JWT authentication
 │   ├── cache/             # Cache wrapper
 │   ├── lock/              # Distributed lock
-│   ├── middleware/        # Middleware
+│   ├── outbox/            # Transactional outbox
+│   ├── tenant/            # Multi-tenancy interceptors
 │   └── ...
 ├── web/                    # Admin web frontend (Next.js)
+├── site/                   # Marketing site (Next.js)
 └── scripts/                # Utility scripts
 ```
 
@@ -233,7 +256,7 @@ golangci-lint run
 
 ## Production Deployment
 
-For detailed deployment documentation, please refer to [docs/deployment_EN.md](docs/deployment_EN.md)
+For detailed deployment documentation, please refer to [docs/deployment.md](docs/deployment.md)
 
 ### Deployment Architectures
 

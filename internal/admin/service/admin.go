@@ -168,6 +168,22 @@ func (s *AdminService) CreateVehicle(ctx context.Context, req *v1.CreateVehicleR
 	}, nil
 }
 
+// UpdateVehicle handles update vehicle request.
+func (s *AdminService) UpdateVehicle(ctx context.Context, req *v1.UpdateVehicleRequest) (*v1.UpdateVehicleResponse, error) {
+	if err := s.uc.UpdateVehicle(ctx, req); err != nil {
+		s.log.WithContext(ctx).Errorf("UpdateVehicle failed: %v", err)
+		return &v1.UpdateVehicleResponse{
+			Code:    500,
+			Message: "更新车辆失败",
+		}, nil
+	}
+
+	return &v1.UpdateVehicleResponse{
+		Code:    0,
+		Message: "success",
+	}, nil
+}
+
 // ListVehicles handles list vehicles request.
 func (s *AdminService) ListVehicles(ctx context.Context, req *v1.ListVehiclesRequest) (*v1.ListVehiclesResponse, error) {
 	data, err := s.uc.ListVehicles(ctx, req)

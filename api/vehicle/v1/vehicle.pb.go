@@ -6152,11 +6152,10 @@ func (x *ListBlacklistEntriesRequest) GetPageSize() int32 {
 }
 
 type ListBlacklistEntriesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Entries       []*BlacklistEntryInfo  `protobuf:"bytes,3,rep,name=entries,proto3" json:"entries,omitempty"`
-	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Code          int32                   `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                  `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *BlacklistEntryListData `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -6205,14 +6204,59 @@ func (x *ListBlacklistEntriesResponse) GetMessage() string {
 	return ""
 }
 
-func (x *ListBlacklistEntriesResponse) GetEntries() []*BlacklistEntryInfo {
+func (x *ListBlacklistEntriesResponse) GetData() *BlacklistEntryListData {
 	if x != nil {
-		return x.Entries
+		return x.Data
 	}
 	return nil
 }
 
-func (x *ListBlacklistEntriesResponse) GetTotal() int32 {
+type BlacklistEntryListData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*BlacklistEntryInfo  `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BlacklistEntryListData) Reset() {
+	*x = BlacklistEntryListData{}
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlacklistEntryListData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlacklistEntryListData) ProtoMessage() {}
+
+func (x *BlacklistEntryListData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlacklistEntryListData.ProtoReflect.Descriptor instead.
+func (*BlacklistEntryListData) Descriptor() ([]byte, []int) {
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{92}
+}
+
+func (x *BlacklistEntryListData) GetList() []*BlacklistEntryInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *BlacklistEntryListData) GetTotal() int32 {
 	if x != nil {
 		return x.Total
 	}
@@ -6228,7 +6272,7 @@ type CheckBlacklistRequest struct {
 
 func (x *CheckBlacklistRequest) Reset() {
 	*x = CheckBlacklistRequest{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6240,7 +6284,7 @@ func (x *CheckBlacklistRequest) String() string {
 func (*CheckBlacklistRequest) ProtoMessage() {}
 
 func (x *CheckBlacklistRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[92]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6253,7 +6297,7 @@ func (x *CheckBlacklistRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckBlacklistRequest.ProtoReflect.Descriptor instead.
 func (*CheckBlacklistRequest) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{92}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *CheckBlacklistRequest) GetPlateNumber() string {
@@ -6275,7 +6319,7 @@ type CheckBlacklistResponse struct {
 
 func (x *CheckBlacklistResponse) Reset() {
 	*x = CheckBlacklistResponse{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[93]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6287,7 +6331,7 @@ func (x *CheckBlacklistResponse) String() string {
 func (*CheckBlacklistResponse) ProtoMessage() {}
 
 func (x *CheckBlacklistResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[93]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6300,7 +6344,7 @@ func (x *CheckBlacklistResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckBlacklistResponse.ProtoReflect.Descriptor instead.
 func (*CheckBlacklistResponse) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{93}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *CheckBlacklistResponse) GetCode() int32 {
@@ -6344,7 +6388,7 @@ type BlacklistEntryInfo struct {
 
 func (x *BlacklistEntryInfo) Reset() {
 	*x = BlacklistEntryInfo{}
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[94]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6356,7 +6400,7 @@ func (x *BlacklistEntryInfo) String() string {
 func (*BlacklistEntryInfo) ProtoMessage() {}
 
 func (x *BlacklistEntryInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[94]
+	mi := &file_api_vehicle_v1_vehicle_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6369,7 +6413,7 @@ func (x *BlacklistEntryInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlacklistEntryInfo.ProtoReflect.Descriptor instead.
 func (*BlacklistEntryInfo) Descriptor() ([]byte, []int) {
-	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{94}
+	return file_api_vehicle_v1_vehicle_proto_rawDescGZIP(), []int{95}
 }
 
 func (x *BlacklistEntryInfo) GetPlateNumber() string {
@@ -6934,12 +6978,14 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"M\n" +
 	"\x1bListBlacklistEntriesRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1a\n" +
-	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"\xa0\x01\n" +
+	"\bpageSize\x18\x02 \x01(\x05R\bpageSize\"\x88\x01\n" +
 	"\x1cListBlacklistEntriesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12<\n" +
-	"\aentries\x18\x03 \x03(\v2\".api.vehicle.v1.BlacklistEntryInfoR\aentries\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x05R\x05total\"9\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12:\n" +
+	"\x04data\x18\x03 \x01(\v2&.api.vehicle.v1.BlacklistEntryListDataR\x04data\"f\n" +
+	"\x16BlacklistEntryListData\x126\n" +
+	"\x04list\x18\x01 \x03(\v2\".api.vehicle.v1.BlacklistEntryInfoR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"9\n" +
 	"\x15CheckBlacklistRequest\x12 \n" +
 	"\vplateNumber\x18\x01 \x01(\tR\vplateNumber\"\xa2\x01\n" +
 	"\x16CheckBlacklistResponse\x12\x12\n" +
@@ -6952,12 +6998,13 @@ const file_api_vehicle_v1_vehicle_proto_rawDesc = "" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x1c\n" +
 	"\tcreatedBy\x18\x03 \x01(\tR\tcreatedBy\x12\x16\n" +
 	"\x06active\x18\x04 \x01(\bR\x06active\x12\x1c\n" +
-	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt2\x9b1\n" +
+	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt2\xb02\n" +
 	"\x0eVehicleService\x12e\n" +
 	"\x05Entry\x12\x1c.api.vehicle.v1.EntryRequest\x1a\x1d.api.vehicle.v1.EntryResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/device/entry\x12a\n" +
 	"\x04Exit\x12\x1b.api.vehicle.v1.ExitRequest\x1a\x1c.api.vehicle.v1.ExitResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/device/exit\x12u\n" +
 	"\tHeartbeat\x12 .api.vehicle.v1.HeartbeatRequest\x1a!.api.vehicle.v1.HeartbeatResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/device/heartbeat\x12\x8c\x01\n" +
-	"\x0fGetDeviceStatus\x12&.api.vehicle.v1.GetDeviceStatusRequest\x1a'.api.vehicle.v1.GetDeviceStatusResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/device/{deviceId}/status\x12\x84\x01\n" +
+	"\x0fGetDeviceStatus\x12&.api.vehicle.v1.GetDeviceStatusRequest\x1a'.api.vehicle.v1.GetDeviceStatusResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/device/{deviceId}/status\x12\x92\x01\n" +
+	"\x12GetDeviceHeartbeat\x12&.api.vehicle.v1.GetDeviceStatusRequest\x1a'.api.vehicle.v1.GetDeviceStatusResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/device/{deviceId}/heartbeat\x12\x84\x01\n" +
 	"\vSendCommand\x12\".api.vehicle.v1.SendCommandRequest\x1a#.api.vehicle.v1.SendCommandResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/device/{deviceId}/command\x12\x86\x01\n" +
 	"\x0eGetVehicleInfo\x12%.api.vehicle.v1.GetVehicleInfoRequest\x1a&.api.vehicle.v1.GetVehicleInfoResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/vehicle/{plateNumber}\x12\x8c\x01\n" +
 	"\x12ListParkingRecords\x12).api.vehicle.v1.ListParkingRecordsRequest\x1a*.api.vehicle.v1.ListParkingRecordsResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/vehicle/records\x12\x91\x01\n" +
@@ -7012,7 +7059,7 @@ func file_api_vehicle_v1_vehicle_proto_rawDescGZIP() []byte {
 	return file_api_vehicle_v1_vehicle_proto_rawDescData
 }
 
-var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 104)
+var file_api_vehicle_v1_vehicle_proto_msgTypes = make([]protoimpl.MessageInfo, 105)
 var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
 	(*EntryRequest)(nil),                       // 0: api.vehicle.v1.EntryRequest
 	(*EntryResponse)(nil),                      // 1: api.vehicle.v1.EntryResponse
@@ -7106,47 +7153,48 @@ var file_api_vehicle_v1_vehicle_proto_goTypes = []any{
 	(*RemoveBlacklistEntryResponse)(nil),       // 89: api.vehicle.v1.RemoveBlacklistEntryResponse
 	(*ListBlacklistEntriesRequest)(nil),        // 90: api.vehicle.v1.ListBlacklistEntriesRequest
 	(*ListBlacklistEntriesResponse)(nil),       // 91: api.vehicle.v1.ListBlacklistEntriesResponse
-	(*CheckBlacklistRequest)(nil),              // 92: api.vehicle.v1.CheckBlacklistRequest
-	(*CheckBlacklistResponse)(nil),             // 93: api.vehicle.v1.CheckBlacklistResponse
-	(*BlacklistEntryInfo)(nil),                 // 94: api.vehicle.v1.BlacklistEntryInfo
-	nil,                                        // 95: api.vehicle.v1.HeartbeatRequest.StatsEntry
-	nil,                                        // 96: api.vehicle.v1.SendCommandRequest.ParamsEntry
-	nil,                                        // 97: api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
-	nil,                                        // 98: api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
-	nil,                                        // 99: api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
-	nil,                                        // 100: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
-	nil,                                        // 101: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
-	nil,                                        // 102: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
-	nil,                                        // 103: api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
-	(*structpb.Value)(nil),                     // 104: google.protobuf.Value
-	(*CreateManufacturerRequest)(nil),          // 105: api.vehicle.v1.CreateManufacturerRequest
-	(*GetManufacturerRequest)(nil),             // 106: api.vehicle.v1.GetManufacturerRequest
-	(*ListManufacturersRequest)(nil),           // 107: api.vehicle.v1.ListManufacturersRequest
-	(*UpdateManufacturerRequest)(nil),          // 108: api.vehicle.v1.UpdateManufacturerRequest
-	(*DeleteManufacturerRequest)(nil),          // 109: api.vehicle.v1.DeleteManufacturerRequest
-	(*CreateManufacturerResponse)(nil),         // 110: api.vehicle.v1.CreateManufacturerResponse
-	(*GetManufacturerResponse)(nil),            // 111: api.vehicle.v1.GetManufacturerResponse
-	(*ListManufacturersResponse)(nil),          // 112: api.vehicle.v1.ListManufacturersResponse
-	(*UpdateManufacturerResponse)(nil),         // 113: api.vehicle.v1.UpdateManufacturerResponse
-	(*DeleteManufacturerResponse)(nil),         // 114: api.vehicle.v1.DeleteManufacturerResponse
+	(*BlacklistEntryListData)(nil),             // 92: api.vehicle.v1.BlacklistEntryListData
+	(*CheckBlacklistRequest)(nil),              // 93: api.vehicle.v1.CheckBlacklistRequest
+	(*CheckBlacklistResponse)(nil),             // 94: api.vehicle.v1.CheckBlacklistResponse
+	(*BlacklistEntryInfo)(nil),                 // 95: api.vehicle.v1.BlacklistEntryInfo
+	nil,                                        // 96: api.vehicle.v1.HeartbeatRequest.StatsEntry
+	nil,                                        // 97: api.vehicle.v1.SendCommandRequest.ParamsEntry
+	nil,                                        // 98: api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
+	nil,                                        // 99: api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
+	nil,                                        // 100: api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
+	nil,                                        // 101: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
+	nil,                                        // 102: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
+	nil,                                        // 103: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
+	nil,                                        // 104: api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
+	(*structpb.Value)(nil),                     // 105: google.protobuf.Value
+	(*CreateManufacturerRequest)(nil),          // 106: api.vehicle.v1.CreateManufacturerRequest
+	(*GetManufacturerRequest)(nil),             // 107: api.vehicle.v1.GetManufacturerRequest
+	(*ListManufacturersRequest)(nil),           // 108: api.vehicle.v1.ListManufacturersRequest
+	(*UpdateManufacturerRequest)(nil),          // 109: api.vehicle.v1.UpdateManufacturerRequest
+	(*DeleteManufacturerRequest)(nil),          // 110: api.vehicle.v1.DeleteManufacturerRequest
+	(*CreateManufacturerResponse)(nil),         // 111: api.vehicle.v1.CreateManufacturerResponse
+	(*GetManufacturerResponse)(nil),            // 112: api.vehicle.v1.GetManufacturerResponse
+	(*ListManufacturersResponse)(nil),          // 113: api.vehicle.v1.ListManufacturersResponse
+	(*UpdateManufacturerResponse)(nil),         // 114: api.vehicle.v1.UpdateManufacturerResponse
+	(*DeleteManufacturerResponse)(nil),         // 115: api.vehicle.v1.DeleteManufacturerResponse
 }
 var file_api_vehicle_v1_vehicle_proto_depIdxs = []int32{
 	2,   // 0: api.vehicle.v1.EntryResponse.data:type_name -> api.vehicle.v1.EntryData
 	5,   // 1: api.vehicle.v1.ExitResponse.data:type_name -> api.vehicle.v1.ExitData
-	95,  // 2: api.vehicle.v1.HeartbeatRequest.stats:type_name -> api.vehicle.v1.HeartbeatRequest.StatsEntry
+	96,  // 2: api.vehicle.v1.HeartbeatRequest.stats:type_name -> api.vehicle.v1.HeartbeatRequest.StatsEntry
 	10,  // 3: api.vehicle.v1.GetDeviceStatusResponse.data:type_name -> api.vehicle.v1.DeviceStatus
-	96,  // 4: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
+	97,  // 4: api.vehicle.v1.SendCommandRequest.params:type_name -> api.vehicle.v1.SendCommandRequest.ParamsEntry
 	13,  // 5: api.vehicle.v1.SendCommandResponse.data:type_name -> api.vehicle.v1.CommandData
 	16,  // 6: api.vehicle.v1.GetVehicleInfoResponse.data:type_name -> api.vehicle.v1.VehicleInfo
 	19,  // 7: api.vehicle.v1.ListParkingRecordsResponse.data:type_name -> api.vehicle.v1.ListParkingRecordsData
 	24,  // 8: api.vehicle.v1.ListParkingRecordsData.records:type_name -> api.vehicle.v1.ParkingRecordInfo
 	24,  // 9: api.vehicle.v1.GetParkingRecordResponse.data:type_name -> api.vehicle.v1.ParkingRecordInfo
 	27,  // 10: api.vehicle.v1.ListDevicesResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	97,  // 11: api.vehicle.v1.DeviceInfo.vendorSpecificConfig:type_name -> api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
-	98,  // 12: api.vehicle.v1.CreateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
+	98,  // 11: api.vehicle.v1.DeviceInfo.vendorSpecificConfig:type_name -> api.vehicle.v1.DeviceInfo.VendorSpecificConfigEntry
+	99,  // 12: api.vehicle.v1.CreateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.CreateDeviceRequest.VendorSpecificConfigEntry
 	27,  // 13: api.vehicle.v1.CreateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
 	27,  // 14: api.vehicle.v1.GetDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	99,  // 15: api.vehicle.v1.UpdateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
+	100, // 15: api.vehicle.v1.UpdateDeviceRequest.vendorSpecificConfig:type_name -> api.vehicle.v1.UpdateDeviceRequest.VendorSpecificConfigEntry
 	27,  // 16: api.vehicle.v1.UpdateDeviceResponse.data:type_name -> api.vehicle.v1.DeviceInfo
 	50,  // 17: api.vehicle.v1.CreateFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
 	50,  // 18: api.vehicle.v1.GetFirmwareResponse.data:type_name -> api.vehicle.v1.Firmware
@@ -7159,115 +7207,118 @@ var file_api_vehicle_v1_vehicle_proto_depIdxs = []int32{
 	66,  // 25: api.vehicle.v1.CreateDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
 	66,  // 26: api.vehicle.v1.GetDeviceFaultResponse.data:type_name -> api.vehicle.v1.DeviceFault
 	66,  // 27: api.vehicle.v1.ListDeviceFaultsResponse.data:type_name -> api.vehicle.v1.DeviceFault
-	100, // 28: api.vehicle.v1.GetDeviceUsageStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
-	101, // 29: api.vehicle.v1.GetDeviceFaultStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
-	102, // 30: api.vehicle.v1.GetDeviceStatsSummaryResponse.data:type_name -> api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
+	101, // 28: api.vehicle.v1.GetDeviceUsageStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry
+	102, // 29: api.vehicle.v1.GetDeviceFaultStatsResponse.data:type_name -> api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry
+	103, // 30: api.vehicle.v1.GetDeviceStatsSummaryResponse.data:type_name -> api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry
 	75,  // 31: api.vehicle.v1.UpgradeDeviceResponse.data:type_name -> api.vehicle.v1.UpgradeStatusData
 	78,  // 32: api.vehicle.v1.GetDeviceLogsResponse.data:type_name -> api.vehicle.v1.DeviceLog
 	83,  // 33: api.vehicle.v1.DeviceStatsResponse.data:type_name -> api.vehicle.v1.DeviceStatsData
-	103, // 34: api.vehicle.v1.UpdateDeviceConfigRequest.config:type_name -> api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
+	104, // 34: api.vehicle.v1.UpdateDeviceConfigRequest.config:type_name -> api.vehicle.v1.UpdateDeviceConfigRequest.ConfigEntry
 	27,  // 35: api.vehicle.v1.UpdateDeviceConfigResponse.data:type_name -> api.vehicle.v1.DeviceInfo
-	94,  // 36: api.vehicle.v1.AddBlacklistEntryResponse.data:type_name -> api.vehicle.v1.BlacklistEntryInfo
-	94,  // 37: api.vehicle.v1.ListBlacklistEntriesResponse.entries:type_name -> api.vehicle.v1.BlacklistEntryInfo
-	94,  // 38: api.vehicle.v1.CheckBlacklistResponse.entry:type_name -> api.vehicle.v1.BlacklistEntryInfo
-	104, // 39: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
-	104, // 40: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
-	104, // 41: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry.value:type_name -> google.protobuf.Value
-	0,   // 42: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
-	3,   // 43: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
-	6,   // 44: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
-	8,   // 45: api.vehicle.v1.VehicleService.GetDeviceStatus:input_type -> api.vehicle.v1.GetDeviceStatusRequest
-	11,  // 46: api.vehicle.v1.VehicleService.SendCommand:input_type -> api.vehicle.v1.SendCommandRequest
-	14,  // 47: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
-	17,  // 48: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
-	20,  // 49: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
-	22,  // 50: api.vehicle.v1.VehicleService.UpdateRecordStatus:input_type -> api.vehicle.v1.UpdateRecordStatusRequest
-	25,  // 51: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
-	28,  // 52: api.vehicle.v1.VehicleService.CreateDevice:input_type -> api.vehicle.v1.CreateDeviceRequest
-	30,  // 53: api.vehicle.v1.VehicleService.GetDevice:input_type -> api.vehicle.v1.GetDeviceRequest
-	32,  // 54: api.vehicle.v1.VehicleService.UpdateDevice:input_type -> api.vehicle.v1.UpdateDeviceRequest
-	34,  // 55: api.vehicle.v1.VehicleService.DeleteDevice:input_type -> api.vehicle.v1.DeleteDeviceRequest
-	105, // 56: api.vehicle.v1.VehicleService.CreateManufacturer:input_type -> api.vehicle.v1.CreateManufacturerRequest
-	106, // 57: api.vehicle.v1.VehicleService.GetManufacturer:input_type -> api.vehicle.v1.GetManufacturerRequest
-	107, // 58: api.vehicle.v1.VehicleService.ListManufacturers:input_type -> api.vehicle.v1.ListManufacturersRequest
-	108, // 59: api.vehicle.v1.VehicleService.UpdateManufacturer:input_type -> api.vehicle.v1.UpdateManufacturerRequest
-	109, // 60: api.vehicle.v1.VehicleService.DeleteManufacturer:input_type -> api.vehicle.v1.DeleteManufacturerRequest
-	36,  // 61: api.vehicle.v1.VehicleService.CreateFirmware:input_type -> api.vehicle.v1.CreateFirmwareRequest
-	38,  // 62: api.vehicle.v1.VehicleService.GetFirmware:input_type -> api.vehicle.v1.GetFirmwareRequest
-	40,  // 63: api.vehicle.v1.VehicleService.GetFirmwareByID:input_type -> api.vehicle.v1.GetFirmwareByIDRequest
-	42,  // 64: api.vehicle.v1.VehicleService.ListFirmwares:input_type -> api.vehicle.v1.ListFirmwaresRequest
-	44,  // 65: api.vehicle.v1.VehicleService.UpdateFirmware:input_type -> api.vehicle.v1.UpdateFirmwareRequest
-	46,  // 66: api.vehicle.v1.VehicleService.DeleteFirmware:input_type -> api.vehicle.v1.DeleteFirmwareRequest
-	48,  // 67: api.vehicle.v1.VehicleService.GetLatestFirmware:input_type -> api.vehicle.v1.GetLatestFirmwareRequest
-	51,  // 68: api.vehicle.v1.VehicleService.CreateDevicePerformance:input_type -> api.vehicle.v1.CreateDevicePerformanceRequest
-	53,  // 69: api.vehicle.v1.VehicleService.GetDevicePerformance:input_type -> api.vehicle.v1.GetDevicePerformanceRequest
-	55,  // 70: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:input_type -> api.vehicle.v1.GetDevicePerformanceLatestRequest
-	58,  // 71: api.vehicle.v1.VehicleService.CreateDeviceFault:input_type -> api.vehicle.v1.CreateDeviceFaultRequest
-	60,  // 72: api.vehicle.v1.VehicleService.GetDeviceFault:input_type -> api.vehicle.v1.GetDeviceFaultRequest
-	62,  // 73: api.vehicle.v1.VehicleService.ListDeviceFaults:input_type -> api.vehicle.v1.ListDeviceFaultsRequest
-	64,  // 74: api.vehicle.v1.VehicleService.ResolveDeviceFault:input_type -> api.vehicle.v1.ResolveDeviceFaultRequest
-	67,  // 75: api.vehicle.v1.VehicleService.GetDeviceUsageStats:input_type -> api.vehicle.v1.GetDeviceUsageStatsRequest
-	69,  // 76: api.vehicle.v1.VehicleService.GetDeviceFaultStats:input_type -> api.vehicle.v1.GetDeviceFaultStatsRequest
-	71,  // 77: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:input_type -> api.vehicle.v1.GetDeviceStatsSummaryRequest
-	73,  // 78: api.vehicle.v1.VehicleService.UpgradeDevice:input_type -> api.vehicle.v1.UpgradeDeviceRequest
-	76,  // 79: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:input_type -> api.vehicle.v1.GetDeviceUpgradeStatusRequest
-	79,  // 80: api.vehicle.v1.VehicleService.GetDeviceLogs:input_type -> api.vehicle.v1.GetDeviceLogsRequest
-	81,  // 81: api.vehicle.v1.VehicleService.GetDeviceStats:input_type -> api.vehicle.v1.GetDeviceStatsRequest
-	84,  // 82: api.vehicle.v1.VehicleService.UpdateDeviceConfig:input_type -> api.vehicle.v1.UpdateDeviceConfigRequest
-	86,  // 83: api.vehicle.v1.VehicleService.AddBlacklistEntry:input_type -> api.vehicle.v1.AddBlacklistEntryRequest
-	88,  // 84: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:input_type -> api.vehicle.v1.RemoveBlacklistEntryRequest
-	90,  // 85: api.vehicle.v1.VehicleService.ListBlacklistEntries:input_type -> api.vehicle.v1.ListBlacklistEntriesRequest
-	92,  // 86: api.vehicle.v1.VehicleService.CheckBlacklist:input_type -> api.vehicle.v1.CheckBlacklistRequest
-	1,   // 87: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
-	4,   // 88: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
-	7,   // 89: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
-	9,   // 90: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
-	12,  // 91: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
-	15,  // 92: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
-	18,  // 93: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
-	21,  // 94: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
-	23,  // 95: api.vehicle.v1.VehicleService.UpdateRecordStatus:output_type -> api.vehicle.v1.UpdateRecordStatusResponse
-	26,  // 96: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
-	29,  // 97: api.vehicle.v1.VehicleService.CreateDevice:output_type -> api.vehicle.v1.CreateDeviceResponse
-	31,  // 98: api.vehicle.v1.VehicleService.GetDevice:output_type -> api.vehicle.v1.GetDeviceResponse
-	33,  // 99: api.vehicle.v1.VehicleService.UpdateDevice:output_type -> api.vehicle.v1.UpdateDeviceResponse
-	35,  // 100: api.vehicle.v1.VehicleService.DeleteDevice:output_type -> api.vehicle.v1.DeleteDeviceResponse
-	110, // 101: api.vehicle.v1.VehicleService.CreateManufacturer:output_type -> api.vehicle.v1.CreateManufacturerResponse
-	111, // 102: api.vehicle.v1.VehicleService.GetManufacturer:output_type -> api.vehicle.v1.GetManufacturerResponse
-	112, // 103: api.vehicle.v1.VehicleService.ListManufacturers:output_type -> api.vehicle.v1.ListManufacturersResponse
-	113, // 104: api.vehicle.v1.VehicleService.UpdateManufacturer:output_type -> api.vehicle.v1.UpdateManufacturerResponse
-	114, // 105: api.vehicle.v1.VehicleService.DeleteManufacturer:output_type -> api.vehicle.v1.DeleteManufacturerResponse
-	37,  // 106: api.vehicle.v1.VehicleService.CreateFirmware:output_type -> api.vehicle.v1.CreateFirmwareResponse
-	39,  // 107: api.vehicle.v1.VehicleService.GetFirmware:output_type -> api.vehicle.v1.GetFirmwareResponse
-	41,  // 108: api.vehicle.v1.VehicleService.GetFirmwareByID:output_type -> api.vehicle.v1.GetFirmwareByIDResponse
-	43,  // 109: api.vehicle.v1.VehicleService.ListFirmwares:output_type -> api.vehicle.v1.ListFirmwaresResponse
-	45,  // 110: api.vehicle.v1.VehicleService.UpdateFirmware:output_type -> api.vehicle.v1.UpdateFirmwareResponse
-	47,  // 111: api.vehicle.v1.VehicleService.DeleteFirmware:output_type -> api.vehicle.v1.DeleteFirmwareResponse
-	49,  // 112: api.vehicle.v1.VehicleService.GetLatestFirmware:output_type -> api.vehicle.v1.GetLatestFirmwareResponse
-	52,  // 113: api.vehicle.v1.VehicleService.CreateDevicePerformance:output_type -> api.vehicle.v1.CreateDevicePerformanceResponse
-	54,  // 114: api.vehicle.v1.VehicleService.GetDevicePerformance:output_type -> api.vehicle.v1.GetDevicePerformanceResponse
-	56,  // 115: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:output_type -> api.vehicle.v1.GetDevicePerformanceLatestResponse
-	59,  // 116: api.vehicle.v1.VehicleService.CreateDeviceFault:output_type -> api.vehicle.v1.CreateDeviceFaultResponse
-	61,  // 117: api.vehicle.v1.VehicleService.GetDeviceFault:output_type -> api.vehicle.v1.GetDeviceFaultResponse
-	63,  // 118: api.vehicle.v1.VehicleService.ListDeviceFaults:output_type -> api.vehicle.v1.ListDeviceFaultsResponse
-	65,  // 119: api.vehicle.v1.VehicleService.ResolveDeviceFault:output_type -> api.vehicle.v1.ResolveDeviceFaultResponse
-	68,  // 120: api.vehicle.v1.VehicleService.GetDeviceUsageStats:output_type -> api.vehicle.v1.GetDeviceUsageStatsResponse
-	70,  // 121: api.vehicle.v1.VehicleService.GetDeviceFaultStats:output_type -> api.vehicle.v1.GetDeviceFaultStatsResponse
-	72,  // 122: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:output_type -> api.vehicle.v1.GetDeviceStatsSummaryResponse
-	74,  // 123: api.vehicle.v1.VehicleService.UpgradeDevice:output_type -> api.vehicle.v1.UpgradeDeviceResponse
-	77,  // 124: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:output_type -> api.vehicle.v1.UpgradeStatusResponse
-	80,  // 125: api.vehicle.v1.VehicleService.GetDeviceLogs:output_type -> api.vehicle.v1.GetDeviceLogsResponse
-	82,  // 126: api.vehicle.v1.VehicleService.GetDeviceStats:output_type -> api.vehicle.v1.DeviceStatsResponse
-	85,  // 127: api.vehicle.v1.VehicleService.UpdateDeviceConfig:output_type -> api.vehicle.v1.UpdateDeviceConfigResponse
-	87,  // 128: api.vehicle.v1.VehicleService.AddBlacklistEntry:output_type -> api.vehicle.v1.AddBlacklistEntryResponse
-	89,  // 129: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:output_type -> api.vehicle.v1.RemoveBlacklistEntryResponse
-	91,  // 130: api.vehicle.v1.VehicleService.ListBlacklistEntries:output_type -> api.vehicle.v1.ListBlacklistEntriesResponse
-	93,  // 131: api.vehicle.v1.VehicleService.CheckBlacklist:output_type -> api.vehicle.v1.CheckBlacklistResponse
-	87,  // [87:132] is the sub-list for method output_type
-	42,  // [42:87] is the sub-list for method input_type
-	42,  // [42:42] is the sub-list for extension type_name
-	42,  // [42:42] is the sub-list for extension extendee
-	0,   // [0:42] is the sub-list for field type_name
+	95,  // 36: api.vehicle.v1.AddBlacklistEntryResponse.data:type_name -> api.vehicle.v1.BlacklistEntryInfo
+	92,  // 37: api.vehicle.v1.ListBlacklistEntriesResponse.data:type_name -> api.vehicle.v1.BlacklistEntryListData
+	95,  // 38: api.vehicle.v1.BlacklistEntryListData.list:type_name -> api.vehicle.v1.BlacklistEntryInfo
+	95,  // 39: api.vehicle.v1.CheckBlacklistResponse.entry:type_name -> api.vehicle.v1.BlacklistEntryInfo
+	105, // 40: api.vehicle.v1.GetDeviceUsageStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
+	105, // 41: api.vehicle.v1.GetDeviceFaultStatsResponse.DataEntry.value:type_name -> google.protobuf.Value
+	105, // 42: api.vehicle.v1.GetDeviceStatsSummaryResponse.DataEntry.value:type_name -> google.protobuf.Value
+	0,   // 43: api.vehicle.v1.VehicleService.Entry:input_type -> api.vehicle.v1.EntryRequest
+	3,   // 44: api.vehicle.v1.VehicleService.Exit:input_type -> api.vehicle.v1.ExitRequest
+	6,   // 45: api.vehicle.v1.VehicleService.Heartbeat:input_type -> api.vehicle.v1.HeartbeatRequest
+	8,   // 46: api.vehicle.v1.VehicleService.GetDeviceStatus:input_type -> api.vehicle.v1.GetDeviceStatusRequest
+	8,   // 47: api.vehicle.v1.VehicleService.GetDeviceHeartbeat:input_type -> api.vehicle.v1.GetDeviceStatusRequest
+	11,  // 48: api.vehicle.v1.VehicleService.SendCommand:input_type -> api.vehicle.v1.SendCommandRequest
+	14,  // 49: api.vehicle.v1.VehicleService.GetVehicleInfo:input_type -> api.vehicle.v1.GetVehicleInfoRequest
+	17,  // 50: api.vehicle.v1.VehicleService.ListParkingRecords:input_type -> api.vehicle.v1.ListParkingRecordsRequest
+	20,  // 51: api.vehicle.v1.VehicleService.GetParkingRecord:input_type -> api.vehicle.v1.GetParkingRecordRequest
+	22,  // 52: api.vehicle.v1.VehicleService.UpdateRecordStatus:input_type -> api.vehicle.v1.UpdateRecordStatusRequest
+	25,  // 53: api.vehicle.v1.VehicleService.ListDevices:input_type -> api.vehicle.v1.ListDevicesRequest
+	28,  // 54: api.vehicle.v1.VehicleService.CreateDevice:input_type -> api.vehicle.v1.CreateDeviceRequest
+	30,  // 55: api.vehicle.v1.VehicleService.GetDevice:input_type -> api.vehicle.v1.GetDeviceRequest
+	32,  // 56: api.vehicle.v1.VehicleService.UpdateDevice:input_type -> api.vehicle.v1.UpdateDeviceRequest
+	34,  // 57: api.vehicle.v1.VehicleService.DeleteDevice:input_type -> api.vehicle.v1.DeleteDeviceRequest
+	106, // 58: api.vehicle.v1.VehicleService.CreateManufacturer:input_type -> api.vehicle.v1.CreateManufacturerRequest
+	107, // 59: api.vehicle.v1.VehicleService.GetManufacturer:input_type -> api.vehicle.v1.GetManufacturerRequest
+	108, // 60: api.vehicle.v1.VehicleService.ListManufacturers:input_type -> api.vehicle.v1.ListManufacturersRequest
+	109, // 61: api.vehicle.v1.VehicleService.UpdateManufacturer:input_type -> api.vehicle.v1.UpdateManufacturerRequest
+	110, // 62: api.vehicle.v1.VehicleService.DeleteManufacturer:input_type -> api.vehicle.v1.DeleteManufacturerRequest
+	36,  // 63: api.vehicle.v1.VehicleService.CreateFirmware:input_type -> api.vehicle.v1.CreateFirmwareRequest
+	38,  // 64: api.vehicle.v1.VehicleService.GetFirmware:input_type -> api.vehicle.v1.GetFirmwareRequest
+	40,  // 65: api.vehicle.v1.VehicleService.GetFirmwareByID:input_type -> api.vehicle.v1.GetFirmwareByIDRequest
+	42,  // 66: api.vehicle.v1.VehicleService.ListFirmwares:input_type -> api.vehicle.v1.ListFirmwaresRequest
+	44,  // 67: api.vehicle.v1.VehicleService.UpdateFirmware:input_type -> api.vehicle.v1.UpdateFirmwareRequest
+	46,  // 68: api.vehicle.v1.VehicleService.DeleteFirmware:input_type -> api.vehicle.v1.DeleteFirmwareRequest
+	48,  // 69: api.vehicle.v1.VehicleService.GetLatestFirmware:input_type -> api.vehicle.v1.GetLatestFirmwareRequest
+	51,  // 70: api.vehicle.v1.VehicleService.CreateDevicePerformance:input_type -> api.vehicle.v1.CreateDevicePerformanceRequest
+	53,  // 71: api.vehicle.v1.VehicleService.GetDevicePerformance:input_type -> api.vehicle.v1.GetDevicePerformanceRequest
+	55,  // 72: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:input_type -> api.vehicle.v1.GetDevicePerformanceLatestRequest
+	58,  // 73: api.vehicle.v1.VehicleService.CreateDeviceFault:input_type -> api.vehicle.v1.CreateDeviceFaultRequest
+	60,  // 74: api.vehicle.v1.VehicleService.GetDeviceFault:input_type -> api.vehicle.v1.GetDeviceFaultRequest
+	62,  // 75: api.vehicle.v1.VehicleService.ListDeviceFaults:input_type -> api.vehicle.v1.ListDeviceFaultsRequest
+	64,  // 76: api.vehicle.v1.VehicleService.ResolveDeviceFault:input_type -> api.vehicle.v1.ResolveDeviceFaultRequest
+	67,  // 77: api.vehicle.v1.VehicleService.GetDeviceUsageStats:input_type -> api.vehicle.v1.GetDeviceUsageStatsRequest
+	69,  // 78: api.vehicle.v1.VehicleService.GetDeviceFaultStats:input_type -> api.vehicle.v1.GetDeviceFaultStatsRequest
+	71,  // 79: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:input_type -> api.vehicle.v1.GetDeviceStatsSummaryRequest
+	73,  // 80: api.vehicle.v1.VehicleService.UpgradeDevice:input_type -> api.vehicle.v1.UpgradeDeviceRequest
+	76,  // 81: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:input_type -> api.vehicle.v1.GetDeviceUpgradeStatusRequest
+	79,  // 82: api.vehicle.v1.VehicleService.GetDeviceLogs:input_type -> api.vehicle.v1.GetDeviceLogsRequest
+	81,  // 83: api.vehicle.v1.VehicleService.GetDeviceStats:input_type -> api.vehicle.v1.GetDeviceStatsRequest
+	84,  // 84: api.vehicle.v1.VehicleService.UpdateDeviceConfig:input_type -> api.vehicle.v1.UpdateDeviceConfigRequest
+	86,  // 85: api.vehicle.v1.VehicleService.AddBlacklistEntry:input_type -> api.vehicle.v1.AddBlacklistEntryRequest
+	88,  // 86: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:input_type -> api.vehicle.v1.RemoveBlacklistEntryRequest
+	90,  // 87: api.vehicle.v1.VehicleService.ListBlacklistEntries:input_type -> api.vehicle.v1.ListBlacklistEntriesRequest
+	93,  // 88: api.vehicle.v1.VehicleService.CheckBlacklist:input_type -> api.vehicle.v1.CheckBlacklistRequest
+	1,   // 89: api.vehicle.v1.VehicleService.Entry:output_type -> api.vehicle.v1.EntryResponse
+	4,   // 90: api.vehicle.v1.VehicleService.Exit:output_type -> api.vehicle.v1.ExitResponse
+	7,   // 91: api.vehicle.v1.VehicleService.Heartbeat:output_type -> api.vehicle.v1.HeartbeatResponse
+	9,   // 92: api.vehicle.v1.VehicleService.GetDeviceStatus:output_type -> api.vehicle.v1.GetDeviceStatusResponse
+	9,   // 93: api.vehicle.v1.VehicleService.GetDeviceHeartbeat:output_type -> api.vehicle.v1.GetDeviceStatusResponse
+	12,  // 94: api.vehicle.v1.VehicleService.SendCommand:output_type -> api.vehicle.v1.SendCommandResponse
+	15,  // 95: api.vehicle.v1.VehicleService.GetVehicleInfo:output_type -> api.vehicle.v1.GetVehicleInfoResponse
+	18,  // 96: api.vehicle.v1.VehicleService.ListParkingRecords:output_type -> api.vehicle.v1.ListParkingRecordsResponse
+	21,  // 97: api.vehicle.v1.VehicleService.GetParkingRecord:output_type -> api.vehicle.v1.GetParkingRecordResponse
+	23,  // 98: api.vehicle.v1.VehicleService.UpdateRecordStatus:output_type -> api.vehicle.v1.UpdateRecordStatusResponse
+	26,  // 99: api.vehicle.v1.VehicleService.ListDevices:output_type -> api.vehicle.v1.ListDevicesResponse
+	29,  // 100: api.vehicle.v1.VehicleService.CreateDevice:output_type -> api.vehicle.v1.CreateDeviceResponse
+	31,  // 101: api.vehicle.v1.VehicleService.GetDevice:output_type -> api.vehicle.v1.GetDeviceResponse
+	33,  // 102: api.vehicle.v1.VehicleService.UpdateDevice:output_type -> api.vehicle.v1.UpdateDeviceResponse
+	35,  // 103: api.vehicle.v1.VehicleService.DeleteDevice:output_type -> api.vehicle.v1.DeleteDeviceResponse
+	111, // 104: api.vehicle.v1.VehicleService.CreateManufacturer:output_type -> api.vehicle.v1.CreateManufacturerResponse
+	112, // 105: api.vehicle.v1.VehicleService.GetManufacturer:output_type -> api.vehicle.v1.GetManufacturerResponse
+	113, // 106: api.vehicle.v1.VehicleService.ListManufacturers:output_type -> api.vehicle.v1.ListManufacturersResponse
+	114, // 107: api.vehicle.v1.VehicleService.UpdateManufacturer:output_type -> api.vehicle.v1.UpdateManufacturerResponse
+	115, // 108: api.vehicle.v1.VehicleService.DeleteManufacturer:output_type -> api.vehicle.v1.DeleteManufacturerResponse
+	37,  // 109: api.vehicle.v1.VehicleService.CreateFirmware:output_type -> api.vehicle.v1.CreateFirmwareResponse
+	39,  // 110: api.vehicle.v1.VehicleService.GetFirmware:output_type -> api.vehicle.v1.GetFirmwareResponse
+	41,  // 111: api.vehicle.v1.VehicleService.GetFirmwareByID:output_type -> api.vehicle.v1.GetFirmwareByIDResponse
+	43,  // 112: api.vehicle.v1.VehicleService.ListFirmwares:output_type -> api.vehicle.v1.ListFirmwaresResponse
+	45,  // 113: api.vehicle.v1.VehicleService.UpdateFirmware:output_type -> api.vehicle.v1.UpdateFirmwareResponse
+	47,  // 114: api.vehicle.v1.VehicleService.DeleteFirmware:output_type -> api.vehicle.v1.DeleteFirmwareResponse
+	49,  // 115: api.vehicle.v1.VehicleService.GetLatestFirmware:output_type -> api.vehicle.v1.GetLatestFirmwareResponse
+	52,  // 116: api.vehicle.v1.VehicleService.CreateDevicePerformance:output_type -> api.vehicle.v1.CreateDevicePerformanceResponse
+	54,  // 117: api.vehicle.v1.VehicleService.GetDevicePerformance:output_type -> api.vehicle.v1.GetDevicePerformanceResponse
+	56,  // 118: api.vehicle.v1.VehicleService.GetDevicePerformanceLatest:output_type -> api.vehicle.v1.GetDevicePerformanceLatestResponse
+	59,  // 119: api.vehicle.v1.VehicleService.CreateDeviceFault:output_type -> api.vehicle.v1.CreateDeviceFaultResponse
+	61,  // 120: api.vehicle.v1.VehicleService.GetDeviceFault:output_type -> api.vehicle.v1.GetDeviceFaultResponse
+	63,  // 121: api.vehicle.v1.VehicleService.ListDeviceFaults:output_type -> api.vehicle.v1.ListDeviceFaultsResponse
+	65,  // 122: api.vehicle.v1.VehicleService.ResolveDeviceFault:output_type -> api.vehicle.v1.ResolveDeviceFaultResponse
+	68,  // 123: api.vehicle.v1.VehicleService.GetDeviceUsageStats:output_type -> api.vehicle.v1.GetDeviceUsageStatsResponse
+	70,  // 124: api.vehicle.v1.VehicleService.GetDeviceFaultStats:output_type -> api.vehicle.v1.GetDeviceFaultStatsResponse
+	72,  // 125: api.vehicle.v1.VehicleService.GetDeviceStatsSummary:output_type -> api.vehicle.v1.GetDeviceStatsSummaryResponse
+	74,  // 126: api.vehicle.v1.VehicleService.UpgradeDevice:output_type -> api.vehicle.v1.UpgradeDeviceResponse
+	77,  // 127: api.vehicle.v1.VehicleService.GetDeviceUpgradeStatus:output_type -> api.vehicle.v1.UpgradeStatusResponse
+	80,  // 128: api.vehicle.v1.VehicleService.GetDeviceLogs:output_type -> api.vehicle.v1.GetDeviceLogsResponse
+	82,  // 129: api.vehicle.v1.VehicleService.GetDeviceStats:output_type -> api.vehicle.v1.DeviceStatsResponse
+	85,  // 130: api.vehicle.v1.VehicleService.UpdateDeviceConfig:output_type -> api.vehicle.v1.UpdateDeviceConfigResponse
+	87,  // 131: api.vehicle.v1.VehicleService.AddBlacklistEntry:output_type -> api.vehicle.v1.AddBlacklistEntryResponse
+	89,  // 132: api.vehicle.v1.VehicleService.RemoveBlacklistEntry:output_type -> api.vehicle.v1.RemoveBlacklistEntryResponse
+	91,  // 133: api.vehicle.v1.VehicleService.ListBlacklistEntries:output_type -> api.vehicle.v1.ListBlacklistEntriesResponse
+	94,  // 134: api.vehicle.v1.VehicleService.CheckBlacklist:output_type -> api.vehicle.v1.CheckBlacklistResponse
+	89,  // [89:135] is the sub-list for method output_type
+	43,  // [43:89] is the sub-list for method input_type
+	43,  // [43:43] is the sub-list for extension type_name
+	43,  // [43:43] is the sub-list for extension extendee
+	0,   // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_api_vehicle_v1_vehicle_proto_init() }
@@ -7282,7 +7333,7 @@ func file_api_vehicle_v1_vehicle_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_vehicle_v1_vehicle_proto_rawDesc), len(file_api_vehicle_v1_vehicle_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   104,
+			NumMessages:   105,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

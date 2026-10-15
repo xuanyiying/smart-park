@@ -3,9 +3,1072 @@
 
 openapi: 3.0.3
 info:
-    title: VehicleService API
+    title: "smart-park API"
     version: 0.0.1
 paths:
+    /api/v1/admin/billing/rules:
+        get:
+            tags:
+                - BillingService
+            operationId: BillingService_GetBillingRules
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetBillingRulesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - BillingService
+            operationId: BillingService_CreateBillingRule
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateBillingRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateBillingRuleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/billing/rules/test:
+        post:
+            tags:
+                - BillingService
+            operationId: BillingService_TestBillingRule
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TestBillingRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TestBillingRuleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/billing/rules/{id}:
+        put:
+            tags:
+                - BillingService
+            operationId: BillingService_UpdateBillingRule
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateBillingRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateBillingRuleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - BillingService
+            operationId: BillingService_DeleteBillingRule
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteBillingRuleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/login:
+        post:
+            tags:
+                - AdminService
+            operationId: AdminService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/lots:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListParkingLots
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListParkingLotsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - AdminService
+            operationId: AdminService_CreateParkingLot
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateParkingLotRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateParkingLotResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/lots/{id}:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetParkingLot
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetParkingLotResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - AdminService
+            operationId: AdminService_UpdateParkingLot
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateParkingLotRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateParkingLotResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/orders:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListOrders
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListOrdersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/orders/{id}:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetOrder
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetOrderResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/records:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListParkingRecords
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+                - name: plateNumber
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListParkingRecordsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/reports/daily:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetDailyReport
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: date
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDailyReportResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/reports/monthly:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetMonthlyReport
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: year
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: month
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetMonthlyReportResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_ListTenants
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListTenantsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - TenantService
+            operationId: TenantService_CreateTenant
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateTenantRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateTenantResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants/code/{code}:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_GetTenantByCode
+            parameters:
+                - name: code
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetTenantByCodeResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants/{tenantId}:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_GetTenant
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetTenantResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - TenantService
+            operationId: TenantService_UpdateTenant
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateTenantRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateTenantResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - TenantService
+            operationId: TenantService_DeleteTenant
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteTenantResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants/{tenantId}/disable:
+        post:
+            tags:
+                - TenantService
+            operationId: TenantService_DisableTenant
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DisableTenantResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants/{tenantId}/enable:
+        post:
+            tags:
+                - TenantService
+            operationId: TenantService_EnableTenant
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EnableTenantResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants/{tenantId}/features/{feature}:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_CheckFeature
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: feature
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckFeatureResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/tenants/{tenantId}/quota:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_CheckQuota
+            parameters:
+                - name: tenantId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: resourceType
+                  in: query
+                  schema:
+                    type: string
+                - name: currentCount
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckQuotaResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/user:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetCurrentUser
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCurrentUserResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/users:
+        get:
+            tags:
+                - AdminService
+            description: User Management
+            operationId: AdminService_ListUsers
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListUsersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - AdminService
+            operationId: AdminService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateUserResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/users/{id}:
+        put:
+            tags:
+                - AdminService
+            operationId: AdminService_UpdateUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateUserResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - AdminService
+            operationId: AdminService_DeleteUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteUserResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/vehicles:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListVehicles
+            parameters:
+                - name: vehicleType
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListVehiclesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - AdminService
+            operationId: AdminService_CreateVehicle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateVehicleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateVehicleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/admin/vehicles/{id}:
+        put:
+            tags:
+                - AdminService
+            operationId: AdminService_UpdateVehicle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateVehicleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateVehicleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/analytics/lots/{lotId}:
+        get:
+            tags:
+                - AnalyticsService
+            operationId: AnalyticsService_GetLotAnalytics
+            parameters:
+                - name: lotId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startDate
+                  in: query
+                  schema:
+                    type: string
+                - name: endDate
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetLotAnalyticsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/analytics/occupancy:
+        get:
+            tags:
+                - AnalyticsService
+            operationId: AnalyticsService_GetOccupancyRate
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: startDate
+                  in: query
+                  schema:
+                    type: string
+                - name: endDate
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetOccupancyRateResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/analytics/predict/peak-hours:
+        get:
+            tags:
+                - AnalyticsService
+            operationId: AnalyticsService_PredictPeakHours
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: date
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PredictPeakHoursResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/analytics/revenue/trend:
+        get:
+            tags:
+                - AnalyticsService
+            operationId: AnalyticsService_GetRevenueTrend
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: period
+                  in: query
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetRevenueTrendResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/analytics/vehicle-flow:
+        get:
+            tags:
+                - AnalyticsService
+            operationId: AnalyticsService_GetVehicleFlow
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: date
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetVehicleFlowResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/billing/calculate:
+        post:
+            tags:
+                - BillingService
+            operationId: BillingService_CalculateFee
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CalculateFeeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CalculateFeeResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/v1/blacklist:
         get:
             tags:
@@ -100,6 +1163,475 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RemoveBlacklistEntryResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/connectors:
+        post:
+            tags:
+                - ChargingService
+            description: Connector management
+            operationId: ChargingService_CreateConnector
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateConnectorRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateConnectorResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/connectors/{connectorId}:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetConnector
+            parameters:
+                - name: connectorId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetConnectorResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/prices:
+        post:
+            tags:
+                - ChargingService
+            description: Price management
+            operationId: ChargingService_CreatePrice
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreatePriceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreatePriceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListUserSessions
+            parameters:
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListUserSessionsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/start:
+        post:
+            tags:
+                - ChargingService
+            description: Charging session
+            operationId: ChargingService_StartCharging
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/StartChargingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/StartChargingResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetSessionResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}/payment/confirm:
+        post:
+            tags:
+                - ChargingService
+            description: Payment
+            operationId: ChargingService_ConfirmPayment
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ConfirmPaymentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConfirmPaymentResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}/stop:
+        post:
+            tags:
+                - ChargingService
+            operationId: ChargingService_StopCharging
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/StopChargingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/StopChargingResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/sessions/{sessionId}/summary:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetChargingSummary
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetChargingSummaryResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListStations
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListStationsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - ChargingService
+            description: Station management
+            operationId: ChargingService_CreateStation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateStationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/available:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetAvailableStations
+            parameters:
+                - name: lotId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetAvailableStationsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetStation
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - ChargingService
+            operationId: ChargingService_UpdateStation
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateStationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - ChargingService
+            operationId: ChargingService_DeleteStation
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteStationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}/connectors:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListConnectors
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListConnectorsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}/price:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_GetCurrentPrice
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCurrentPriceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/charging/stations/{stationId}/prices:
+        get:
+            tags:
+                - ChargingService
+            operationId: ChargingService_ListPrices
+            parameters:
+                - name: stationId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPricesResponse'
                 default:
                     description: Default error response
                     content:
@@ -449,6 +1981,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetDeviceFaultStatsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/device/{deviceId}/heartbeat:
+        get:
+            tags:
+                - VehicleService
+            operationId: VehicleService_GetDeviceHeartbeat
+            parameters:
+                - name: deviceId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetDeviceStatusResponse'
                 default:
                     description: Default error response
                     content:
@@ -1097,6 +2653,454 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/pay/callback/alipay:
+        post:
+            tags:
+                - PaymentService
+            operationId: PaymentService_AlipayCallback
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AlipayCallbackRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AlipayCallbackResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/callback/wechat:
+        post:
+            tags:
+                - PaymentService
+            operationId: PaymentService_WechatCallback
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WechatCallbackRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WechatCallbackResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/create:
+        post:
+            tags:
+                - PaymentService
+            operationId: PaymentService_CreatePayment
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreatePaymentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreatePaymentResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/reconcile/daily:
+        post:
+            tags:
+                - PaymentService
+            operationId: PaymentService_ReconcileDaily
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ReconcileDailyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ReconcileDailyResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/reconcile/fix:
+        post:
+            tags:
+                - PaymentService
+            operationId: PaymentService_FixMismatchedOrders
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/FixMismatchedOrdersRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FixMismatchedOrdersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/reconcile/report:
+        get:
+            tags:
+                - PaymentService
+            operationId: PaymentService_GetReconciliationReport
+            parameters:
+                - name: startDate
+                  in: query
+                  schema:
+                    type: string
+                - name: endDate
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetReconciliationReportResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/{orderId}/refund:
+        post:
+            tags:
+                - PaymentService
+            operationId: PaymentService_Refund
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RefundRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefundResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/pay/{orderId}/status:
+        get:
+            tags:
+                - PaymentService
+            operationId: PaymentService_GetPaymentStatus
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetPaymentStatusResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/info:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetUserInfo
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetUserInfoResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/login:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/monthly-card:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_PurchaseMonthlyCard
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PurchaseMonthlyCardRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PurchaseMonthlyCardResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/monthly-card/{plateNumber}:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetMonthlyCard
+            parameters:
+                - name: plateNumber
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetMonthlyCardResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/parking-records:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_ListParkingRecords
+            parameters:
+                - name: plateNumber
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListParkingRecordsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/parking-records/{recordId}:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetParkingRecord
+            parameters:
+                - name: recordId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetParkingRecordResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/plates:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_ListPlates
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPlatesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - UserService
+            operationId: UserService_BindPlate
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/BindPlateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BindPlateResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/plates/{plateNumber}:
+        delete:
+            tags:
+                - UserService
+            operationId: UserService_UnbindPlate
+            parameters:
+                - name: plateNumber
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnbindPlateResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/user/scan-pay:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_ScanPay
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ScanPayRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ScanPayResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/v1/vehicle/records:
         get:
             tags:
@@ -1232,6 +3236,93 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/BlacklistEntryInfo'
+        AlipayCallbackRequest:
+            type: object
+            properties:
+                tradeStatus:
+                    type: string
+                tradeNo:
+                    type: string
+                outTradeNo:
+                    type: string
+                totalAmount:
+                    type: string
+                gmtPayment:
+                    type: string
+                sign:
+                    type: string
+        AlipayCallbackResponse:
+            type: object
+            properties:
+                code:
+                    type: string
+                msg:
+                    type: string
+        AppliedRule:
+            type: object
+            properties:
+                ruleId:
+                    type: string
+                ruleName:
+                    type: string
+                amount:
+                    type: string
+                    description: Contribution of this rule, in cents (分).
+        BillData:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                baseAmount:
+                    type: string
+                    description: Amounts are in cents (分) to avoid float rounding on the money path.
+                discountAmount:
+                    type: string
+                finalAmount:
+                    type: string
+                appliedRules:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AppliedRule'
+        BillingRule:
+            type: object
+            properties:
+                id:
+                    type: string
+                lotId:
+                    type: string
+                ruleName:
+                    type: string
+                ruleType:
+                    type: string
+                conditionsJson:
+                    type: string
+                actionsJson:
+                    type: string
+                priority:
+                    type: integer
+                    format: int32
+                isActive:
+                    type: boolean
+                createdAt:
+                    type: string
+        BindPlateRequest:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+        BindPlateResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
         BlacklistEntryInfo:
             type: object
             properties:
@@ -1245,6 +3336,72 @@ components:
                     type: boolean
                 createdAt:
                     type: string
+        BlacklistEntryListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/BlacklistEntryInfo'
+                total:
+                    type: integer
+                    format: int32
+        CalculateFeeRequest:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                lotId:
+                    type: string
+                plateNumber:
+                    type: string
+                entryTime:
+                    type: string
+                exitTime:
+                    type: string
+                vehicleType:
+                    type: string
+        CalculateFeeResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/BillData'
+        ChargingSummary:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                stationName:
+                    type: string
+                connectorNum:
+                    type: integer
+                    format: int32
+                vehiclePlate:
+                    type: string
+                startTime:
+                    type: string
+                endTime:
+                    type: string
+                duration:
+                    type: number
+                    format: double
+                chargedEnergy:
+                    type: number
+                    format: double
+                cost:
+                    type: string
+                    description: Amounts in cents (分).
+                serviceFee:
+                    type: string
+                totalAmount:
+                    type: string
+                paymentStatus:
+                    type: string
         CheckBlacklistResponse:
             type: object
             properties:
@@ -1257,6 +3414,32 @@ components:
                     type: boolean
                 entry:
                     $ref: '#/components/schemas/BlacklistEntryInfo'
+        CheckFeatureResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                hasFeature:
+                    type: boolean
+        CheckQuotaResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                allowed:
+                    type: boolean
+                limit:
+                    type: integer
+                    format: int32
+                remaining:
+                    type: integer
+                    format: int32
         CommandData:
             type: object
             properties:
@@ -1264,6 +3447,113 @@ components:
                     type: string
                 status:
                     type: string
+        ConfirmPaymentRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                transactionId:
+                    type: string
+                paymentMethod:
+                    type: string
+                paidAmount:
+                    type: string
+                    description: Amount in cents (分).
+            description: Payment messages
+        ConfirmPaymentResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Session'
+        Connector:
+            type: object
+            properties:
+                id:
+                    type: string
+                stationId:
+                    type: string
+                number:
+                    type: integer
+                    format: int32
+                type:
+                    type: string
+                status:
+                    type: string
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+                current:
+                    type: number
+                    format: double
+                faultCode:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        CreateBillingRuleRequest:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                ruleName:
+                    type: string
+                ruleType:
+                    type: string
+                conditionsJson:
+                    type: string
+                actionsJson:
+                    type: string
+                priority:
+                    type: integer
+                    format: int32
+                isActive:
+                    type: boolean
+        CreateBillingRuleResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/BillingRule'
+        CreateConnectorRequest:
+            type: object
+            properties:
+                stationId:
+                    type: string
+                number:
+                    type: integer
+                    format: int32
+                type:
+                    type: string
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+            description: Connector messages
+        CreateConnectorResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Connector'
         CreateDeviceFaultRequest:
             type: object
             properties:
@@ -1412,6 +3702,246 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/Manufacturer'
+        CreateParkingLotRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                address:
+                    type: string
+                lanes:
+                    type: integer
+                    format: int32
+                totalCapacity:
+                    type: integer
+                    format: int32
+        CreateParkingLotResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ParkingLot'
+        CreatePaymentRequest:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                amount:
+                    type: string
+                    description: Amount in cents (分).
+                payMethod:
+                    type: string
+                openId:
+                    type: string
+                notifyUrl:
+                    type: string
+                orderType:
+                    type: string
+                sessionId:
+                    type: string
+        CreatePaymentResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/PaymentData'
+        CreatePriceRequest:
+            type: object
+            properties:
+                stationId:
+                    type: string
+                name:
+                    type: string
+                startHour:
+                    type: integer
+                    format: int32
+                endHour:
+                    type: integer
+                    format: int32
+                pricePerKwh:
+                    type: number
+                    format: double
+                serviceFee:
+                    type: number
+                    format: double
+                peakLoad:
+                    type: number
+                    format: double
+                offPeakLoad:
+                    type: number
+                    format: double
+                isPeakHours:
+                    type: boolean
+                effectiveAt:
+                    type: string
+                expiresAt:
+                    type: string
+            description: Price messages
+        CreatePriceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Price'
+        CreateStationRequest:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                name:
+                    type: string
+                stationType:
+                    type: string
+                connectorType:
+                    type: string
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+                totalConnectors:
+                    type: integer
+                    format: int32
+                location:
+                    type: string
+                floor:
+                    type: string
+            description: Station messages
+        CreateStationResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Station'
+        CreateTenantRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                code:
+                    type: string
+                config:
+                    $ref: '#/components/schemas/TenantConfig'
+        CreateTenantResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Tenant'
+        CreateUserRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+                name:
+                    type: string
+                role:
+                    type: string
+                email:
+                    type: string
+                status:
+                    type: string
+        CreateUserResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/User'
+        CreateVehicleRequest:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                vehicleType:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+                monthlyValidUntil:
+                    type: string
+        CreateVehicleResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Vehicle'
+        DailyReport:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                date:
+                    type: string
+                totalEntries:
+                    type: integer
+                    format: int32
+                totalExits:
+                    type: integer
+                    format: int32
+                totalVehicles:
+                    type: integer
+                    format: int32
+                totalAmount:
+                    type: string
+                    description: Amounts in cents (分).
+                totalDiscount:
+                    type: string
+                netAmount:
+                    type: string
+        DailyStats:
+            type: object
+            properties:
+                date:
+                    type: string
+                vehicleCount:
+                    type: integer
+                    format: int32
+                revenue:
+                    type: string
+                    description: Amount in cents (分).
+                occupancyRate:
+                    type: number
+                    format: double
+        DeleteBillingRuleResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
         DeleteDeviceResponse:
             type: object
             properties:
@@ -1429,6 +3959,30 @@ components:
                 message:
                     type: string
         DeleteManufacturerResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        DeleteStationResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        DeleteTenantResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        DeleteUserResponse:
             type: object
             properties:
                 code:
@@ -1587,6 +4141,22 @@ components:
                     type: string
                 lastHeartbeat:
                     type: string
+        DisableTenantResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        EnableTenantResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
         EntryData:
             type: object
             properties:
@@ -1702,6 +4272,109 @@ components:
                     type: string
                 updatedAt:
                     type: string
+        FixMismatchedOrdersRequest:
+            type: object
+            properties:
+                orderIds:
+                    type: array
+                    items:
+                        type: string
+        FixMismatchedOrdersResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        FlowPoint:
+            type: object
+            properties:
+                timestamp:
+                    type: string
+                entries:
+                    type: integer
+                    format: int32
+                exits:
+                    type: integer
+                    format: int32
+                netFlow:
+                    type: integer
+                    format: int32
+        GetAvailableStationsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Station'
+        GetBillingRulesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/BillingRule'
+        GetChargingSummaryResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ChargingSummary'
+        GetConnectorResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Connector'
+        GetCurrentPriceResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Price'
+        GetCurrentUserResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/User'
+        GetDailyReportResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DailyReport'
         GetDeviceFaultResponse:
             type: object
             properties:
@@ -1835,6 +4508,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/Firmware'
+        GetLotAnalyticsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/LotAnalyticsData'
         GetManufacturerResponse:
             type: object
             properties:
@@ -1845,6 +4528,56 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/Manufacturer'
+        GetMonthlyCardResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/MonthlyCardInfo'
+        GetMonthlyReportResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/MonthlyReport'
+        GetOccupancyRateResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/OccupancyRateData'
+        GetOrderResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Order'
+        GetParkingLotResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ParkingLot'
         GetParkingRecordResponse:
             type: object
             properties:
@@ -1855,6 +4588,96 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/ParkingRecordInfo'
+        GetPaymentStatusResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/PaymentStatusData'
+        GetReconciliationReportResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ReconciliationReportData'
+        GetRevenueTrendResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/RevenueTrendData'
+        GetSessionResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Session'
+        GetStationResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Station'
+        GetTenantByCodeResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Tenant'
+        GetTenantResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Tenant'
+        GetUserInfoResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/UserInfo'
+        GetVehicleFlowResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/VehicleFlowData'
         GetVehicleInfoResponse:
             type: object
             properties:
@@ -1904,6 +4727,18 @@ components:
                     format: int32
                 message:
                     type: string
+        HourlyStats:
+            type: object
+            properties:
+                hour:
+                    type: integer
+                    format: int32
+                vehicleCount:
+                    type: integer
+                    format: int32
+                revenue:
+                    type: string
+                    description: Amount in cents (分).
         ListBlacklistEntriesResponse:
             type: object
             properties:
@@ -1912,13 +4747,20 @@ components:
                     format: int32
                 message:
                     type: string
-                entries:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/BlacklistEntryInfo'
-                total:
+                data:
+                    $ref: '#/components/schemas/BlacklistEntryListData'
+        ListConnectorsResponse:
+            type: object
+            properties:
+                code:
                     type: integer
                     format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Connector'
         ListDeviceFaultsResponse:
             type: object
             properties:
@@ -1979,16 +4821,26 @@ components:
                 total:
                     type: integer
                     format: int32
-        ListParkingRecordsData:
+        ListOrdersResponse:
             type: object
             properties:
-                records:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ParkingRecordInfo'
-                total:
+                code:
                     type: integer
                     format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/OrderListData'
+        ListParkingLotsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ParkingLotListData'
         ListParkingRecordsResponse:
             type: object
             properties:
@@ -1998,7 +4850,158 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ListParkingRecordsData'
+                    $ref: '#/components/schemas/ParkingRecordListData'
+        ListPlatesData:
+            type: object
+            properties:
+                plates:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PlateInfo'
+                total:
+                    type: integer
+                    format: int32
+        ListPlatesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ListPlatesData'
+        ListPricesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Price'
+        ListStationsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Station'
+                total:
+                    type: string
+        ListTenantsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Tenant'
+                total:
+                    type: string
+        ListUserSessionsResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Session'
+                total:
+                    type: string
+        ListUsersResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/UserListData'
+        ListVehiclesResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/VehicleListData'
+        LoginData:
+            type: object
+            properties:
+                token:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/User'
+                expiresAt:
+                    type: string
+        LoginRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+            description: Login messages
+        LoginResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/LoginData'
+        LotAnalyticsData:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                lotName:
+                    type: string
+                totalVehicles:
+                    type: integer
+                    format: int32
+                totalRevenue:
+                    type: string
+                    description: Amount in cents (分).
+                avgDuration:
+                    type: number
+                    format: double
+                occupancyRate:
+                    type: number
+                    format: double
+                peakHour:
+                    type: integer
+                    format: int32
+                hourlyStats:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/HourlyStats'
+                dailyStats:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DailyStats'
         Manufacturer:
             type: object
             properties:
@@ -2015,6 +5018,179 @@ components:
                 createdAt:
                     type: string
                 updatedAt:
+                    type: string
+        MonthlyCardInfo:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                validUntil:
+                    type: string
+                daysRemaining:
+                    type: integer
+                    format: int32
+                isValid:
+                    type: boolean
+        MonthlyReport:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                year:
+                    type: integer
+                    format: int32
+                month:
+                    type: integer
+                    format: int32
+                totalEntries:
+                    type: integer
+                    format: int32
+                totalExits:
+                    type: integer
+                    format: int32
+                totalVehicles:
+                    type: integer
+                    format: int32
+                totalAmount:
+                    type: string
+                    description: Amounts in cents (分).
+                totalDiscount:
+                    type: string
+                netAmount:
+                    type: string
+                dailyReports:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DailyReport'
+        OccupancyPoint:
+            type: object
+            properties:
+                timestamp:
+                    type: string
+                rate:
+                    type: number
+                    format: double
+                occupiedSpaces:
+                    type: integer
+                    format: int32
+                totalSpaces:
+                    type: integer
+                    format: int32
+        OccupancyRateData:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                currentRate:
+                    type: number
+                    format: double
+                avgRate:
+                    type: number
+                    format: double
+                maxRate:
+                    type: number
+                    format: double
+                minRate:
+                    type: number
+                    format: double
+                points:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/OccupancyPoint'
+        Order:
+            type: object
+            properties:
+                id:
+                    type: string
+                recordId:
+                    type: string
+                lotId:
+                    type: string
+                plateNumber:
+                    type: string
+                amount:
+                    type: string
+                    description: Amounts in cents (分).
+                discountAmount:
+                    type: string
+                finalAmount:
+                    type: string
+                status:
+                    type: string
+                payTime:
+                    type: string
+                payMethod:
+                    type: string
+        OrderListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Order'
+                total:
+                    type: integer
+                    format: int32
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+        ParkingLot:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                address:
+                    type: string
+                lanes:
+                    type: integer
+                    format: int32
+                status:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                totalCapacity:
+                    type: integer
+                    format: int32
+        ParkingLotListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ParkingLot'
+                total:
+                    type: integer
+                    format: int32
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+        ParkingRecord:
+            type: object
+            properties:
+                id:
+                    type: string
+                lotId:
+                    type: string
+                plateNumber:
+                    type: string
+                entryTime:
+                    type: string
+                exitTime:
+                    type: string
+                parkingDuration:
+                    type: integer
+                    format: int32
+                status:
                     type: string
         ParkingRecordInfo:
             type: object
@@ -2054,6 +5230,269 @@ components:
                 finalAmount:
                     type: string
                     description: 服务端计费的应收金额(分)，由出场流程写入记录元数据；0 表示未计费
+        ParkingRecordListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ParkingRecord'
+                total:
+                    type: integer
+                    format: int32
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+        PaymentData:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                amount:
+                    type: string
+                    description: Amount in cents (分).
+                payUrl:
+                    type: string
+                qrCode:
+                    type: string
+                expireTime:
+                    type: string
+        PaymentMethodStat:
+            type: object
+            properties:
+                count:
+                    type: integer
+                    format: int32
+                amount:
+                    type: string
+                    description: Amounts in cents (分).
+                paid:
+                    type: string
+        PaymentStatusData:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                status:
+                    type: string
+                payTime:
+                    type: string
+                payMethod:
+                    type: string
+        PeakHour:
+            type: object
+            properties:
+                startHour:
+                    type: integer
+                    format: int32
+                endHour:
+                    type: integer
+                    format: int32
+                expectedVehicles:
+                    type: integer
+                    format: int32
+                probability:
+                    type: number
+                    format: double
+        PeakHoursPrediction:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                date:
+                    type: string
+                peakHours:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PeakHour'
+                confidence:
+                    type: number
+                    format: double
+        PlateInfo:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                vehicleType:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+                monthlyValidUntil:
+                    type: string
+        PredictPeakHoursResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/PeakHoursPrediction'
+        Price:
+            type: object
+            properties:
+                id:
+                    type: string
+                stationId:
+                    type: string
+                name:
+                    type: string
+                startHour:
+                    type: integer
+                    format: int32
+                endHour:
+                    type: integer
+                    format: int32
+                pricePerKwh:
+                    type: number
+                    format: double
+                serviceFee:
+                    type: number
+                    format: double
+                peakLoad:
+                    type: number
+                    format: double
+                offPeakLoad:
+                    type: number
+                    format: double
+                isPeakHours:
+                    type: boolean
+                effectiveAt:
+                    type: string
+                expiresAt:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        PurchaseMonthlyCardData:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                amount:
+                    type: string
+                    description: Amount in cents (分).
+                payUrl:
+                    type: string
+                qrCode:
+                    type: string
+        PurchaseMonthlyCardRequest:
+            type: object
+            properties:
+                plateNumber:
+                    type: string
+                months:
+                    type: integer
+                    format: int32
+                payMethod:
+                    type: string
+                openId:
+                    type: string
+        PurchaseMonthlyCardResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/PurchaseMonthlyCardData'
+        ReconcileDailyRequest:
+            type: object
+            properties:
+                date:
+                    type: string
+        ReconcileDailyResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ReconciliationRecord'
+        ReconciliationRecord:
+            type: object
+            properties:
+                id:
+                    type: string
+                orderId:
+                    type: string
+                paymentMethod:
+                    type: string
+                orderAmount:
+                    type: string
+                    description: Amounts in cents (分).
+                paidAmount:
+                    type: string
+                transactionId:
+                    type: string
+                reconciliationTime:
+                    type: string
+                status:
+                    type: string
+                notes:
+                    type: string
+        ReconciliationReportData:
+            type: object
+            properties:
+                startDate:
+                    type: string
+                endDate:
+                    type: string
+                totalOrders:
+                    type: integer
+                    format: int32
+                totalAmount:
+                    type: string
+                    description: Amounts in cents (分).
+                totalPaid:
+                    type: string
+                matchedOrders:
+                    type: integer
+                    format: int32
+                mismatchedOrders:
+                    type: integer
+                    format: int32
+                paymentMethods:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/PaymentMethodStat'
+        RefundData:
+            type: object
+            properties:
+                refundId:
+                    type: string
+                status:
+                    type: string
+        RefundRequest:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                reason:
+                    type: string
+        RefundResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/RefundData'
         RemoveBlacklistEntryResponse:
             type: object
             properties:
@@ -2070,6 +5509,65 @@ components:
                     format: int32
                 message:
                     type: string
+        RevenuePoint:
+            type: object
+            properties:
+                date:
+                    type: string
+                revenue:
+                    type: string
+                    description: Amount in cents (分).
+                vehicleCount:
+                    type: integer
+                    format: int32
+        RevenueTrendData:
+            type: object
+            properties:
+                points:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RevenuePoint'
+                totalRevenue:
+                    type: string
+                    description: Amounts in cents (分).
+                avgRevenue:
+                    type: string
+                growthRate:
+                    type: number
+                    format: double
+        ScanPayData:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                amount:
+                    type: string
+                    description: Amount in cents (分).
+                payUrl:
+                    type: string
+                qrCode:
+                    type: string
+                expireTime:
+                    type: string
+        ScanPayRequest:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                payMethod:
+                    type: string
+                openId:
+                    type: string
+        ScanPayResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/ScanPayData'
         SendCommandRequest:
             type: object
             properties:
@@ -2091,6 +5589,110 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/CommandData'
+        Session:
+            type: object
+            properties:
+                id:
+                    type: string
+                stationId:
+                    type: string
+                connectorId:
+                    type: string
+                userId:
+                    type: string
+                vehiclePlate:
+                    type: string
+                startTime:
+                    type: string
+                endTime:
+                    type: string
+                startEnergy:
+                    type: number
+                    format: double
+                endEnergy:
+                    type: number
+                    format: double
+                chargedEnergy:
+                    type: number
+                    format: double
+                cost:
+                    type: string
+                    description: Amounts in cents (分).
+                serviceFee:
+                    type: string
+                totalAmount:
+                    type: string
+                status:
+                    type: string
+                paymentStatus:
+                    type: string
+                payTime:
+                    type: string
+                paymentMethod:
+                    type: string
+                transactionId:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        StartChargingRequest:
+            type: object
+            properties:
+                stationId:
+                    type: string
+                connectorId:
+                    type: string
+                userId:
+                    type: string
+                vehiclePlate:
+                    type: string
+            description: Session messages
+        StartChargingResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Session'
+        Station:
+            type: object
+            properties:
+                id:
+                    type: string
+                lotId:
+                    type: string
+                name:
+                    type: string
+                stationType:
+                    type: string
+                status:
+                    type: string
+                connectorType:
+                    type: string
+                maxPower:
+                    type: number
+                    format: double
+                voltage:
+                    type: number
+                    format: double
+                totalConnectors:
+                    type: integer
+                    format: int32
+                availableConnectors:
+                    type: integer
+                    format: int32
+                location:
+                    type: string
+                floor:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
         Status:
             type: object
             properties:
@@ -2107,6 +5709,132 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        StopChargingRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                userId:
+                    type: string
+        StopChargingResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Session'
+        Tenant:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                code:
+                    type: string
+                status:
+                    type: string
+                config:
+                    $ref: '#/components/schemas/TenantConfig'
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                expiredAt:
+                    type: string
+        TenantConfig:
+            type: object
+            properties:
+                maxParkingLots:
+                    type: integer
+                    format: int32
+                maxDevices:
+                    type: integer
+                    format: int32
+                maxUsers:
+                    type: integer
+                    format: int32
+                storageQuota:
+                    type: string
+                features:
+                    type: array
+                    items:
+                        type: string
+                customDomain:
+                    type: string
+                timezone:
+                    type: string
+                currency:
+                    type: string
+                language:
+                    type: string
+        TestBillingRuleRequest:
+            type: object
+            properties:
+                vehicleType:
+                    type: string
+                entryTime:
+                    type: string
+                exitTime:
+                    type: string
+                isHoliday:
+                    type: boolean
+                conditionsJson:
+                    type: string
+                actionsJson:
+                    type: string
+        TestBillingRuleResponse:
+            type: object
+            properties:
+                conditionMet:
+                    type: boolean
+                calculatedFee:
+                    type: string
+                    description: Calculated fee in cents (分).
+                appliedActions:
+                    type: array
+                    items:
+                        type: string
+                duration:
+                    type: number
+                    format: double
+        UnbindPlateResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        UpdateBillingRuleRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                ruleName:
+                    type: string
+                ruleType:
+                    type: string
+                conditionsJson:
+                    type: string
+                actionsJson:
+                    type: string
+                priority:
+                    type: integer
+                    format: int32
+                isActive:
+                    type: boolean
+        UpdateBillingRuleResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
         UpdateDeviceConfigRequest:
             type: object
             properties:
@@ -2216,6 +5944,31 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/Manufacturer'
+        UpdateParkingLotRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                address:
+                    type: string
+                lanes:
+                    type: integer
+                    format: int32
+                status:
+                    type: string
+                totalCapacity:
+                    type: integer
+                    format: int32
+        UpdateParkingLotResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
         UpdateRecordStatusRequest:
             type: object
             properties:
@@ -2225,6 +5978,102 @@ components:
                     type: string
                     description: '出场支付状态: unpaid/paid/refunded/waived'
         UpdateRecordStatusResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+        UpdateStationRequest:
+            type: object
+            properties:
+                stationId:
+                    type: string
+                name:
+                    type: string
+                status:
+                    type: string
+                maxPower:
+                    type: number
+                    format: double
+                totalConnectors:
+                    type: integer
+                    format: int32
+                location:
+                    type: string
+                floor:
+                    type: string
+        UpdateStationResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Station'
+        UpdateTenantRequest:
+            type: object
+            properties:
+                tenantId:
+                    type: string
+                name:
+                    type: string
+                config:
+                    $ref: '#/components/schemas/TenantConfig'
+        UpdateTenantResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/Tenant'
+        UpdateUserRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                name:
+                    type: string
+                role:
+                    type: string
+                email:
+                    type: string
+                status:
+                    type: string
+        UpdateUserResponse:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/User'
+        UpdateVehicleRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                plateNumber:
+                    type: string
+                vehicleType:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+                monthlyValidUntil:
+                    type: string
+        UpdateVehicleResponse:
             type: object
             properties:
                 code:
@@ -2280,6 +6129,87 @@ components:
                     type: string
                 endTime:
                     type: string
+        User:
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                name:
+                    type: string
+                role:
+                    type: string
+                avatar:
+                    type: string
+        UserInfo:
+            type: object
+            properties:
+                userId:
+                    type: string
+                openId:
+                    type: string
+                nickname:
+                    type: string
+                avatar:
+                    type: string
+                phone:
+                    type: string
+                createdAt:
+                    type: string
+        UserListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/User'
+                total:
+                    type: integer
+                    format: int32
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+        Vehicle:
+            type: object
+            properties:
+                id:
+                    type: string
+                plateNumber:
+                    type: string
+                vehicleType:
+                    type: string
+                ownerName:
+                    type: string
+                ownerPhone:
+                    type: string
+                monthlyValidUntil:
+                    type: string
+                createdAt:
+                    type: string
+        VehicleFlowData:
+            type: object
+            properties:
+                lotId:
+                    type: string
+                date:
+                    type: string
+                totalEntries:
+                    type: integer
+                    format: int32
+                totalExits:
+                    type: integer
+                    format: int32
+                currentVehicles:
+                    type: integer
+                    format: int32
+                flowPoints:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FlowPoint'
         VehicleInfo:
             type: object
             properties:
@@ -2293,5 +6223,54 @@ components:
                     type: string
                 monthlyValidUntil:
                     type: string
+        VehicleListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Vehicle'
+                total:
+                    type: integer
+                    format: int32
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+        WechatCallbackRequest:
+            type: object
+            properties:
+                returnCode:
+                    type: string
+                returnMsg:
+                    type: string
+                resultCode:
+                    type: string
+                transactionId:
+                    type: string
+                outTradeNo:
+                    type: string
+                totalFee:
+                    type: string
+                timeEnd:
+                    type: string
+                sign:
+                    type: string
+        WechatCallbackResponse:
+            type: object
+            properties:
+                returnCode:
+                    type: string
+                returnMsg:
+                    type: string
 tags:
+    - name: AdminService
+    - name: AnalyticsService
+    - name: BillingService
+    - name: ChargingService
+    - name: PaymentService
+    - name: TenantService
+    - name: UserService
     - name: VehicleService

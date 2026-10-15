@@ -98,6 +98,13 @@ service AdminService {
     };
   }
 
+  rpc UpdateVehicle(UpdateVehicleRequest) returns (UpdateVehicleResponse) {
+    option (google.api.http) = {
+      put:  "/api/v1/admin/vehicles/{id}",
+      body: "*",
+    };
+  }
+
   rpc ListVehicles(ListVehiclesRequest) returns (ListVehiclesResponse) {
     option (google.api.http) = {
       get: "/api/v1/admin/vehicles",
@@ -271,6 +278,20 @@ message CreateVehicleResponse {
   int32   code    = 1;
   string  message = 2;
   Vehicle data    = 3;
+}
+
+message UpdateVehicleRequest {
+  string id                = 1;
+  string plateNumber       = 2;
+  string vehicleType       = 3;
+  string ownerName         = 4;
+  string ownerPhone        = 5;
+  string monthlyValidUntil = 6;
+}
+
+message UpdateVehicleResponse {
+  int32  code    = 1;
+  string message = 2;
 }
 
 message ListVehiclesRequest {

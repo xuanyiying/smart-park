@@ -90,7 +90,7 @@
   - [ ] `docs/vehicle.md` 和 `docs/vehicle_EN.md`
   - [ ] `docs/billing.md` 和 `docs/billing_EN.md`
   - [ ] `docs/payment.md` 和 `docs/payment_EN.md`
-  - [ ] `docs/admin.md` 和 `docs/admin_EN.md`
+  - [ ] `docs/admin.md`
 
 - [ ] **部署文档**
   - [ ] Docker 部署文档

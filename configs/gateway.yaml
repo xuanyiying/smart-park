@@ -2,19 +2,43 @@ server:
   port: 8000
   timeout: 60
 
+# 注意：路由为顺序前缀匹配（MatchRoute 按配置顺序命中第一个前缀），
+# 更具体的路径必须放在其父前缀之前。
 routes:
+  # vehicle-svc (8001): 设备接入 + 车辆 + 黑名单 + 厂商 + 固件
   - path: /api/v1/device
     target: localhost:8001
+  - path: /api/v1/devices
+    target: localhost:8001
+  - path: /api/v1/vehicle
+    target: localhost:8001
+  - path: /api/v1/manufacturers
+    target: localhost:8001
+  - path: /api/v1/firmwares
+    target: localhost:8001
+  - path: /api/v1/blacklist
+    target: localhost:8001
+  # billing-svc (8002)
   - path: /api/v1/billing
     target: localhost:8002
+  # payment-svc (8003)
   - path: /api/v1/pay
     target: localhost:8003
+  # admin-svc (8004)：更具体的 /api/v1/admin/* 前缀需先于 /api/v1/admin
   - path: /api/v1/admin/billing
     target: localhost:8002
+  - path: /api/v1/admin/tenants
+    target: localhost:8006
   - path: /api/v1/admin
     target: localhost:8004
+  # charging-svc (8005)
   - path: /api/v1/charging
     target: localhost:8005
+  # analytics-svc (8009)
+  - path: /api/v1/analytics
+    target: localhost:8009
+  # multitenancy-svc (8006)：已由上面的 /api/v1/admin/tenants 前缀覆盖
+  # user-svc (8007)
   - path: /api/v1/user
     target: localhost:8007
 
@@ -26,7 +50,6 @@ jwt:
     - "/health"
     - "/ready"
     - "/api/v1/user/login"
-    - "/api/v1/user/register"
 
 etcd:
   endpoints:
